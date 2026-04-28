@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usama Bin Nusrat</title>
+  <title>Usama Database</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -83,7 +83,6 @@
       margin: 8px 0 14px;
       color: #a8b3c7;
       font-size: 14px;
-      gap: 12px;
     }
 
     .loadingBadge {
@@ -94,12 +93,10 @@
       padding: 8px 12px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 500;
+      margin-left: 8px;
     }
 
-    .loadingBadge.show {
-      display: inline-block;
-    }
+    .loadingBadge.show { display: inline-block; }
 
     .tablebox {
       overflow: auto;
@@ -113,7 +110,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1300px;
+      min-width: 1350px;
     }
 
     th {
@@ -138,7 +135,18 @@
 
     tr:hover { background: rgba(37,99,235,.08); }
 
-    .empty, .loadingRow {
+    .waBtn {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .empty {
       text-align: center;
       color: #94a3b8;
       padding: 70px 20px;
@@ -184,23 +192,17 @@
       font-weight: 600;
       color: #e5e7eb;
     }
-
-    @media (max-width: 900px) {
-      body { padding: 14px; }
-      .filters { grid-template-columns: 1fr; }
-      .pager { flex-direction: column; align-items: flex-start; }
-    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h1>Owner Database</h1>
+    <h1>Usama Database</h1>
     <div class="sub">Fast search database with community, cluster, unit and source filters.</div>
 
     <div class="card">
       <div class="filters">
-        <input id="searchInput" placeholder="Search owner or unit..." />
+        <input id="searchInput" placeholder="Search owner, phone or unit..." />
 
         <select id="communityFilter">
           <option value="">All Communities</option>
@@ -235,14 +237,12 @@
               <th>Cluster / Tower</th>
               <th>Unit</th>
               <th>Owner Name</th>
-              <th>Phone</th>
-              <th>Email</th>
+              <th>Phone / WhatsApp</th>
               <th>Remarks</th>
-              <th>WhatsApp Status</th>
               <th>Source</th>
+              <th>Email</th>
             </tr>
           </thead>
-
           <tbody id="tableBody"></tbody>
         </table>
       </div>
@@ -278,12 +278,53 @@
       return String(value);
     }
 
+    function get(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
+      }
+      return "";
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatPhone(phone) {
+      let p = String(phone || "").replace(/[^\d]/g, "");
+      if (!p) return "";
+      if (p.startsWith("00")) p = p.substring(2);
+      if (p.length === 9 && p.startsWith("5")) p = "971" + p;
+      if (p.length === 10 && p.startsWith("05")) p = "971" + p.substring(1);
+      return p;
+    }
+
+    function whatsappButton(row) {
+      const phone = get(row, ["phone", "Phone", "mobile", "Mobile", "contact", "Contact", "number", "Number", "phone_number", "Phone Number"]);
+      const formatted = formatPhone(phone);
+
+      if (!formatted) return "-";
+
+      const owner = get(row, ["owner", "Owner"]);
+      const unit = get(row, ["unit", "Unit"]);
+      const cluster = get(row, ["cluster", "Cluster"]);
+      const community = get(row, ["community", "Community"]);
+
+      const msg = `Hi ${owner || "there"}, this is Usama from BFG Properties. I wanted to check if your unit ${unit} in ${cluster}, ${community} is available for sale or rent.`;
+
+      return `<a class="waBtn" target="_blank" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">${escapeHtml(phone)}</a>`;
+    }
+
     function showLoading() {
       el("loadingBadge").classList.add("show");
       el("status").textContent = "Loading database, please wait...";
+
       el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `
         <tr>
-          <td><div class="skeleton"></div></td>
           <td><div class="skeleton"></div></td>
           <td><div class="skeleton"></div></td>
           <td><div class="skeleton"></div></td>
@@ -318,16 +359,13 @@
       const source = el("sourceFilter").value;
 
       if (search) {
-        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%`);
+        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone.ilike.%${search}%`);
       }
 
       if (community) query = query.eq("community", community);
       if (cluster) query = query.eq("cluster", cluster);
       if (unit) query = query.ilike("unit", `%${unit}%`);
-
-      if (source) {
-        query = query.eq("data_source", source);
-      }
+      if (source) query = query.eq("data_source", source);
 
       query = query
         .order("community", { ascending: true })
@@ -340,11 +378,7 @@
 
       if (error) {
         el("status").textContent = "Error loading data";
-        el("tableBody").innerHTML = `
-          <tr>
-            <td colspan="9" class="empty">Error: ${error.message}</td>
-          </tr>
-        `;
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
         return;
       }
 
@@ -361,40 +395,52 @@
 
     function renderTable(rows) {
       if (!rows.length) {
-        el("tableBody").innerHTML = `
-          <tr>
-            <td colspan="9" class="empty">No records found</td>
-          </tr>
-        `;
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
         return;
       }
 
-      el("tableBody").innerHTML = rows.map(row => `
-        <tr>
-          <td>${clean(row.community)}</td>
-          <td>${clean(row.cluster)}</td>
-          <td>${clean(row.unit)}</td>
-          <td>${clean(row.owner)}</td>
-          <td>${clean(row.phone)}</td>
-          <td>${clean(row.email)}</td>
-          <td>${clean(row.remarks)}</td>
-          <td>${clean(row.whatsapp_status)}</td>
-          <td>${clean(row.data_source)}</td>
-        </tr>
-      `).join("");
+      el("tableBody").innerHTML = rows.map(row => {
+        const remarks = get(row, ["remarks", "Remarks", "remark", "Remark", "note", "Note"]);
+        const email = get(row, ["email", "Email"]);
+        const source = get(row, ["data_source", "Data Source", "source", "Source"]);
+
+        return `
+          <tr>
+            <td>${escapeHtml(clean(row.community))}</td>
+            <td>${escapeHtml(clean(row.cluster))}</td>
+            <td>${escapeHtml(clean(row.unit))}</td>
+            <td>${escapeHtml(clean(row.owner))}</td>
+            <td>${whatsappButton(row)}</td>
+            <td>${escapeHtml(clean(remarks))}</td>
+            <td>${escapeHtml(clean(source))}</td>
+            <td>${escapeHtml(clean(email))}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     async function loadDropdowns() {
-      const { data, error } = await db
-        .from(TABLE_NAME)
-        .select("*")
-        .limit(5000);
+      let allRows = [];
+      let from = 0;
+      const batchSize = 1000;
 
-      if (error || !data) return;
+      while (true) {
+        const { data, error } = await db
+          .from(TABLE_NAME)
+          .select("community, cluster, data_source")
+          .range(from, from + batchSize - 1);
 
-      fillSelect("communityFilter", [...new Set(data.map(x => x.community).filter(Boolean))]);
-      fillSelect("clusterFilter", [...new Set(data.map(x => x.cluster).filter(Boolean))]);
-      fillSelect("sourceFilter", [...new Set(data.map(x => x.data_source).filter(Boolean))]);
+        if (error || !data || data.length === 0) break;
+
+        allRows = allRows.concat(data);
+
+        if (data.length < batchSize) break;
+        from += batchSize;
+      }
+
+      fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
+      fillSelect("clusterFilter", [...new Set(allRows.map(x => x.cluster).filter(Boolean))]);
+      fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
     }
 
     function fillSelect(id, values) {
@@ -403,7 +449,7 @@
 
       select.innerHTML = firstOption + values
         .sort((a, b) => String(a).localeCompare(String(b)))
-        .map(v => `<option value="${v}">${v}</option>`)
+        .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
         .join("");
     }
 
