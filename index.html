@@ -304,7 +304,7 @@
     }
 
     function whatsappButton(row) {
-      const phone = get(row, ["phone", "Phone", "mobile", "Mobile", "contact", "Contact", "number", "Number", "phone_number", "Phone Number"]);
+      const phone = get(row, ["phone1", "phone2", "phone3", "phone", "Phone", "mobile", "Mobile", "contact", "Contact", "number", "Number", "phone_number", "Phone Number"]);
       const formatted = formatPhone(phone);
 
       if (!formatted) return "-";
