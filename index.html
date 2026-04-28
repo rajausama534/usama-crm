@@ -20,85 +20,124 @@
         #05070c;
       color: #e5e7eb;
       font-family: Poppins, sans-serif;
-      padding: 24px;
+      padding: 22px;
     }
 
-    .wrap { max-width: 1500px; margin: auto; }
+    .hidden { display: none !important; }
 
-    h1 { margin: 0; font-size: 30px; font-weight: 700; }
+    .wrap {
+      max-width: 1600px;
+      margin: auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
 
     .sub {
-      color: #9ca3af;
-      margin: 10px 0 28px;
+      color: #a8b3c7;
+      margin: 10px 0 22px;
       font-size: 15px;
+      max-width: 600px;
+      line-height: 1.5;
     }
 
-    .card, .loginBox {
-      background: rgba(3,7,18,.82);
-      border: 1px solid rgba(148,163,184,.18);
-      border-radius: 18px;
-      padding: 20px;
+    .mainHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .logoutBtn {
+      width: auto;
+      min-width: 110px;
+      padding: 11px 18px;
+      background: #111827;
+      border: 1px solid rgba(148,163,184,.25);
+      color: #fff;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     .loginBox {
-      max-width: 420px;
+      max-width: 430px;
       margin: 80px auto;
+      background: rgba(3,7,18,.86);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.35);
     }
 
-    .loginBox h1 { margin-bottom: 10px; }
+    .loginBox input {
+      margin-bottom: 12px;
+    }
+
+    .loginError {
+      color: #f87171;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .card {
+      background: rgba(3,7,18,.84);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.30);
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
 
     input, select, button {
       width: 100%;
-      border: 1px solid rgba(148,163,184,.22);
+      border: 1px solid rgba(148,163,184,.24);
       background: #020617;
       color: #e5e7eb;
-      border-radius: 12px;
-      padding: 13px 14px;
+      border-radius: 14px;
+      padding: 14px 15px;
       font-family: Poppins, sans-serif;
       outline: none;
       font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(37,99,235,.7);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
     }
 
     button {
       cursor: pointer;
       background: linear-gradient(135deg, #2563eb, #16a34a);
       border: none;
-      font-weight: 600;
-    }
-
-    .loginBox input { margin-bottom: 12px; }
-    .loginError { color: #f87171; margin-top: 12px; font-size: 13px; }
-
-    .hidden { display: none !important; }
-
-    .filters {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
+      font-weight: 700;
     }
 
     .reset {
       margin-bottom: 18px;
-      height: 52px;
+      height: 54px;
       font-size: 15px;
     }
 
-    .topbar {
+    .topInfo {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 8px 0 14px;
+      margin: 10px 0 14px;
       color: #a8b3c7;
       font-size: 14px;
       gap: 12px;
-    }
-
-    .logoutBtn {
-      width: auto;
-      padding: 9px 14px;
-      background: #111827;
-      border: 1px solid rgba(148,163,184,.22);
     }
 
     .loadingBadge {
@@ -106,9 +145,9 @@
       background: rgba(37,99,235,.15);
       border: 1px solid rgba(37,99,235,.35);
       color: #bfdbfe;
-      padding: 8px 12px;
+      padding: 7px 11px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       margin-left: 8px;
     }
 
@@ -116,17 +155,17 @@
 
     .tablebox {
       overflow: auto;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,.14);
-      min-height: 360px;
-      max-height: 68vh;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,.16);
+      min-height: 430px;
+      max-height: 70vh;
       background: #020617;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1350px;
+      min-width: 1550px;
     }
 
     th {
@@ -136,89 +175,111 @@
       color: #d1d5db;
       text-align: left;
       font-size: 13px;
-      padding: 14px;
+      padding: 15px 16px;
       z-index: 2;
       white-space: nowrap;
+      border-bottom: 1px solid rgba(148,163,184,.12);
     }
 
     td {
-      padding: 13px 14px;
-      border-top: 1px solid rgba(148,163,184,.10);
+      padding: 14px 16px;
+      border-top: 1px solid rgba(148,163,184,.08);
       font-size: 13px;
       color: #e5e7eb;
       white-space: nowrap;
+      vertical-align: middle;
     }
 
-    tr:hover { background: rgba(37,99,235,.08); }
+    tr:hover {
+      background: rgba(37,99,235,.08);
+    }
 
     .waBtn {
       display: inline-block;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 9px 13px;
+      border-radius: 12px;
       background: linear-gradient(135deg, #16a34a, #059669);
       color: white;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 12px;
+      font-weight: 700;
+      font-size: 13px;
     }
 
     .remarksInput {
-      background: transparent;
-      border: 1px solid rgba(148,163,184,.22);
+      background: #030712;
+      border: 1px solid rgba(148,163,184,.24);
       color: #fff;
-      width: 220px;
-      padding: 8px 10px;
-      border-radius: 8px;
+      width: 360px;
+      min-width: 360px;
+      padding: 10px 12px;
+      border-radius: 10px;
       font-size: 13px;
+    }
+
+    .remarksInput:focus {
+      border-color: rgba(37,99,235,.7);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
     }
 
     .mobileCards { display: none; }
 
     .ownerCard {
       background: #020617;
-      border: 1px solid rgba(148,163,184,.14);
-      border-radius: 16px;
-      padding: 15px;
+      border: 1px solid rgba(148,163,184,.16);
+      border-radius: 18px;
+      padding: 14px;
       margin-bottom: 12px;
     }
 
     .ownerTop {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .ownerName {
       font-weight: 700;
-      font-size: 15px;
+      font-size: 16px;
+      line-height: 1.3;
     }
 
     .unitBadge {
-      background: rgba(37,99,235,.16);
+      background: rgba(37,99,235,.18);
       color: #bfdbfe;
-      padding: 5px 9px;
+      padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
+      font-weight: 700;
       white-space: nowrap;
     }
 
     .infoLine {
-      font-size: 13px;
-      color: #cbd5e1;
-      margin: 7px 0;
+      font-size: 14px;
+      color: #e5e7eb;
+      margin: 9px 0;
+      line-height: 1.35;
     }
 
     .infoLine span {
       color: #94a3b8;
+      font-size: 12px;
       display: block;
-      font-size: 11px;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+    }
+
+    .ownerCard .waBtn {
+      font-size: 14px;
+      padding: 10px 14px;
+      margin-top: 2px;
     }
 
     .ownerCard .remarksInput {
       width: 100%;
-      margin-top: 6px;
+      min-width: 100%;
+      margin-top: 4px;
+      white-space: normal;
     }
 
     .empty {
@@ -247,7 +308,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 18px;
       color: #a8b3c7;
       font-size: 14px;
     }
@@ -259,36 +320,78 @@
 
     .pager button {
       width: auto;
-      min-width: 115px;
-      padding: 11px 16px;
+      min-width: 120px;
+      padding: 12px 17px;
     }
 
     .pageNumber {
-      font-weight: 600;
+      font-weight: 700;
       color: #e5e7eb;
     }
 
     @media (max-width: 800px) {
-      body { padding: 14px; }
+      body {
+        padding: 14px;
+        background:
+          radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%),
+          #07111f;
+      }
 
-      h1 { font-size: 24px; }
+      .mainHeader {
+        align-items: center;
+        margin-bottom: 16px;
+      }
 
-      .sub { font-size: 13px; margin-bottom: 18px; }
+      h1 {
+        font-size: 25px;
+      }
 
-      .card { padding: 14px; border-radius: 16px; }
+      .sub {
+        font-size: 13px;
+        margin: 8px 0 0;
+      }
+
+      .logoutBtn {
+        min-width: unset;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
 
       .filters {
         grid-template-columns: 1fr;
         gap: 10px;
       }
 
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
+      input, select {
+        padding: 12px;
+        font-size: 13px;
+        border-radius: 13px;
       }
 
-      .tablebox { display: none; }
-      .mobileCards { display: block; }
+      .reset {
+        height: 50px;
+        margin-bottom: 15px;
+      }
+
+      .topInfo {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 13px;
+      }
+
+      .tablebox {
+        display: none;
+      }
+
+      .mobileCards {
+        display: block;
+      }
 
       .pager {
         flex-direction: column;
@@ -326,7 +429,7 @@
   </div>
 
   <div id="appView" class="wrap hidden">
-    <div class="topbar">
+    <div class="mainHeader">
       <div>
         <h1>Usama Database</h1>
         <div class="sub">Fast search database with community, cluster, unit and source filters.</div>
@@ -355,7 +458,7 @@
 
       <button class="reset" onclick="resetFilters()">Reset Filters</button>
 
-      <div class="topbar">
+      <div class="topInfo">
         <div>
           <span id="status">Preparing database...</span>
           <span id="loadingBadge" class="loadingBadge">Loading data...</span>
@@ -406,6 +509,7 @@
     let currentPage = 0;
     let totalCount = 0;
     let debounceTimer = null;
+    let listenersReady = false;
 
     const el = id => document.getElementById(id);
 
@@ -435,10 +539,7 @@
         return;
       }
 
-      const { error } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
+      const { error } = await db.auth.signInWithPassword({ email, password });
 
       if (error) {
         el("loginError").textContent = "Wrong email or password.";
@@ -551,7 +652,9 @@ Usama Bin Nusrat.`;
         .update({ remarks: value })
         .eq("id", id);
 
-      if (error) alert("Failed to update remarks");
+      if (error) {
+        alert("Failed to update remarks");
+      }
     }
 
     async function loadData() {
@@ -580,10 +683,10 @@ Usama Bin Nusrat.`;
       if (unit) query = query.ilike("unit", `%${unit}%`);
       if (source) query = query.eq("data_source", source);
 
-    query = query
-  .order("community", { ascending: true })
-  .order("cluster", { ascending: true })
-  .order("id", { ascending: true });
+      query = query
+        .order("community", { ascending: true })
+        .order("cluster", { ascending: true })
+        .order("unit_sort", { ascending: true });
 
       const { data, error, count } = await query;
 
@@ -729,8 +832,6 @@ Usama Bin Nusrat.`;
       currentPage--;
       loadData();
     }
-
-    let listenersReady = false;
 
     function setupListeners() {
       if (listenersReady) return;
