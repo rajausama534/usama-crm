@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>Usama Bin Nusrat</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -31,7 +30,6 @@
       margin: 0;
       font-size: 30px;
       font-weight: 700;
-      letter-spacing: -0.5px;
     }
 
     .title-block p {
@@ -56,7 +54,6 @@
       border-radius: 18px;
       padding: 18px;
       box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(14px);
     }
 
     .filters {
@@ -75,23 +72,12 @@
       padding: 13px 14px;
       font-size: 14px;
       font-family: inherit;
-      transition: all 0.2s ease;
       outline: none;
     }
 
     textarea {
       resize: vertical;
       min-height: 120px;
-      line-height: 1.5;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #6b7280;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
     }
 
     .table-wrap {
@@ -113,7 +99,6 @@
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.7px;
       padding: 15px 16px;
       text-align: left;
       border-bottom: 1px solid #222938;
@@ -158,7 +143,6 @@
     .actions {
       display: flex;
       gap: 8px;
-      align-items: center;
     }
 
     button {
@@ -170,21 +154,14 @@
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
-      transition: all 0.2s ease;
     }
 
     .whatsapp {
       background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.18);
     }
 
     .edit {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
-    }
-
-    button:hover {
-      transform: translateY(-1px);
     }
 
     .empty {
@@ -193,47 +170,32 @@
       padding: 35px;
     }
 
-    /* Premium Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(10px);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 999;
-      opacity: 0;
-      transition: opacity 0.25s ease;
     }
 
     .modal-overlay.active {
       display: flex;
-      opacity: 1;
     }
 
     .modal {
       width: 460px;
       max-width: 92%;
-      background: rgba(17, 22, 32, 0.95);
+      background: rgba(17, 22, 32, 0.98);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 20px;
       padding: 22px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.55);
-      transform: translateY(18px) scale(0.96);
-      animation: modalIn 0.25s ease forwards;
-    }
-
-    @keyframes modalIn {
-      to {
-        transform: translateY(0) scale(1);
-      }
     }
 
     .modal h3 {
       margin: 0 0 6px;
       font-size: 20px;
-      font-weight: 600;
     }
 
     .modal p {
@@ -276,7 +238,6 @@
     <h2>Usama Bin Nusrat</h2>
     <p>Owner database · WhatsApp outreach · Remarks tracking</p>
   </div>
-
   <div class="status-pill">Live CRM Connected</div>
 </div>
 
@@ -304,11 +265,10 @@
   </div>
 </div>
 
-<!-- Premium Edit Modal -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h3>Edit Remarks</h3>
-    <p>Update owner remarks and save directly to Google Sheets.</p>
+    <p>Update owner remarks and save directly to Supabase.</p>
 
     <textarea id="modalRemarks" placeholder="Write remarks here..."></textarea>
 
@@ -321,7 +281,6 @@
 
 <script>
 const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
 
 const HEADERS = {
@@ -331,7 +290,7 @@ const HEADERS = {
 };
 
 let fullData = [];
-let activeUnitKey = "";
+let activeRowId = null;
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -348,20 +307,43 @@ function formatDate(dateString) {
   return `${months[date.getMonth()]}-${date.getFullYear()}`;
 }
 
+function getFirstName(name) {
+  return name ? String(name).trim().split(" ")[0] : "";
+}
+
+function safe(value) {
+  return value === null || value === undefined ? "" : String(value);
+}
+
 async function loadData() {
- // showLoading();
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/owners?select=*&order=id.asc&limit=5000`,
+      { headers: HEADERS }
+    );
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/owners?select=*&order=id.asc&limit=100`,
-    { headers: HEADERS }
-  );
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText);
+    }
 
-  fullData = await res.json();
-  filteredData = fullData;
+    fullData = await res.json();
 
-  populateFilters();
-  currentPage = 1;
-  renderTable();
+    console.log("Loaded rows:", fullData.length);
+    console.log(fullData);
+
+    populateFilters();
+    renderTable(fullData);
+
+  } catch (error) {
+    console.error("Supabase load error:", error);
+
+    document.getElementById("dataTable").innerHTML = `
+      <tr>
+        <td class="empty">Error loading data. Check Console.</td>
+      </tr>
+    `;
+  }
 }
 
 function populateFilters() {
@@ -389,17 +371,6 @@ function addOptions(id, values) {
   });
 }
 
-function getFirstName(name) {
-  return name ? String(name).trim().split(" ")[0] : "";
-}
-
-function escapeText(text) {
-  return String(text || "")
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, "&quot;");
-}
-
 function renderTable(data) {
   const table = document.getElementById("dataTable");
 
@@ -417,7 +388,7 @@ function renderTable(data) {
     </tr>
   `;
 
-  if (!data.length) {
+  if (!data || !data.length) {
     table.innerHTML += `
       <tr>
         <td colspan="9" class="empty">No matching records found</td>
@@ -427,9 +398,8 @@ function renderTable(data) {
   }
 
   data.forEach(row => {
-    const phone = String(row.phone1 || "").replace(/\D/g, "");
+    const phone = safe(row.phone1).replace(/\D/g, "");
     const firstName = getFirstName(row.owner);
-    const unitKey = `${row.community}|${row.cluster}|${row.unit}`.toLowerCase();
 
     const message = `Hello, Mr. ${firstName}
 
@@ -437,7 +407,7 @@ Hope You're Doing Well.
 
 This is Usama from BFG Properties.
 
-I'm reaching out regarding your property in ${row.cluster || ""} (Unit#${row.unit || ""}), ${row.community || ""}.
+I'm reaching out regarding your property in ${safe(row.cluster)} (Unit#${safe(row.unit)}), ${safe(row.community)}.
 
 Would you consider selling if you receive a strong offer?
 
@@ -452,18 +422,18 @@ Usama Bin Nusrat.`;
 
     table.innerHTML += `
       <tr>
-        <td>${row.community || ""}</td>
-        <td>${row.cluster || ""}</td>
-        <td>${row.unit || ""}</td>
-        <td class="owner-name">${row.owner || ""}</td>
+        <td>${safe(row.community)}</td>
+        <td>${safe(row.cluster)}</td>
+        <td>${safe(row.unit)}</td>
+        <td class="owner-name">${safe(row.owner)}</td>
         <td>${phone}</td>
-        <td>${row.email || ""}</td>
-        <td class="remarks">${row.remarks || ""}</td>
+        <td>${safe(row.email)}</td>
+        <td class="remarks">${safe(row.remarks)}</td>
         <td><span class="source-badge">${formatDate(row.dataSource)}</span></td>
         <td>
           <div class="actions">
-            <button class="whatsapp" onclick="sendWhatsApp('${unitKey}', '${whatsappLink}')">WhatsApp</button>
-            <button class="edit" onclick="openEditModal('${unitKey}', '${escapeText(row.remarks)}')">Edit</button>
+            <button class="whatsapp" onclick="sendWhatsApp('${whatsappLink}')">WhatsApp</button>
+            <button class="edit" onclick="openEditModal(${row.id}, \`${safe(row.remarks).replace(/`/g, "\\`")}\`)">Edit</button>
           </div>
         </td>
       </tr>
@@ -471,50 +441,58 @@ Usama Bin Nusrat.`;
   });
 }
 
-async function sendWhatsApp(unitKey, link) {
+function sendWhatsApp(link) {
   if (link === "#") {
     alert("Invalid WhatsApp number");
     return;
   }
 
   window.open(link, "_blank");
-
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "updateWhatsappStatus",
-      unitKey: unitKey
-    })
-  });
-
-  loadData();
 }
 
-function openEditModal(unitKey, remarks) {
-  activeUnitKey = unitKey;
+function openEditModal(id, remarks) {
+  activeRowId = id;
   document.getElementById("modalRemarks").value = remarks || "";
   document.getElementById("editModal").classList.add("active");
 }
 
 function closeModal() {
   document.getElementById("editModal").classList.remove("active");
-  activeUnitKey = "";
+  activeRowId = null;
 }
 
 async function saveModalRemarks() {
+  if (!activeRowId) return;
+
   const newRemarks = document.getElementById("modalRemarks").value;
 
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "updateRemarks",
-      unitKey: activeUnitKey,
-      remarks: newRemarks
-    })
-  });
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/owners?id=eq.${activeRowId}`,
+      {
+        method: "PATCH",
+        headers: {
+          ...HEADERS,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({
+          remarks: newRemarks
+        })
+      }
+    );
 
-  closeModal();
-  loadData();
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText);
+    }
+
+    closeModal();
+    loadData();
+
+  } catch (error) {
+    console.error("Remarks update error:", error);
+    alert("Could not save remarks. Check Supabase permissions.");
+  }
 }
 
 function applyFilters() {
@@ -525,13 +503,23 @@ function applyFilters() {
   const source = document.getElementById("sourceFilter").value;
 
   const filtered = fullData.filter(row => {
-    const combined = `${row.community} ${row.cluster} ${row.unit} ${row.owner} ${row.phone1} ${row.phone2} ${row.email} ${row.remarks} ${formatDate(row.dataSource)}`.toLowerCase();
+    const combined = `
+      ${safe(row.community)}
+      ${safe(row.cluster)}
+      ${safe(row.unit)}
+      ${safe(row.owner)}
+      ${safe(row.phone1)}
+      ${safe(row.phone2)}
+      ${safe(row.email)}
+      ${safe(row.remarks)}
+      ${formatDate(row.dataSource)}
+    `.toLowerCase();
 
     return (
       combined.includes(search) &&
       (!community || row.community === community) &&
       (!cluster || row.cluster === cluster) &&
-      (!unit || String(row.unit).toLowerCase().includes(unit)) &&
+      (!unit || safe(row.unit).toLowerCase().includes(unit)) &&
       (!source || formatDate(row.dataSource) === source)
     );
   });
