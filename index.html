@@ -580,10 +580,10 @@ Usama Bin Nusrat.`;
       if (unit) query = query.ilike("unit", `%${unit}%`);
       if (source) query = query.eq("data_source", source);
 
-      query = query
-        .order("community", { ascending: true })
-        .order("cluster", { ascending: true })
-        .order("unit", { ascending: true });
+    query = query
+  .order("community", { ascending: true })
+  .order("cluster", { ascending: true })
+  .order("id", { ascending: true });
 
       const { data, error, count } = await query;
 
