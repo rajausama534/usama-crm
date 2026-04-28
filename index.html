@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Usama Bin Nusrat</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -11,536 +15,368 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 35%),
-        radial-gradient(circle at top right, rgba(34, 197, 94, 0.10), transparent 30%),
+        radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
         #080b10;
       color: #e5e7eb;
-      font-family: 'Poppins', sans-serif;
-      padding: 28px;
+      font-family: Poppins, sans-serif;
+      padding: 24px;
     }
 
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 26px;
-    }
+    .wrap { max-width: 1400px; margin: auto; }
 
-    .title-block h2 {
-      margin: 0;
-      font-size: 30px;
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
       font-weight: 700;
     }
 
-    .title-block p {
-      margin: 6px 0 0;
-      color: #8b95a7;
-      font-size: 13px;
+    .sub {
+      color: #9ca3af;
+      margin-bottom: 22px;
+      font-size: 14px;
     }
 
-    .status-pill {
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      color: #86efac;
-      padding: 9px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .panel {
-      background: rgba(15, 18, 27, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .card {
+      background: rgba(15,23,42,.78);
+      border: 1px solid rgba(148,163,184,.18);
       border-radius: 18px;
       padding: 18px;
-      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,.28);
     }
 
     .filters {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 0.8fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
-    input, select, textarea {
+    input, select, button {
       width: 100%;
-      background: #10151f;
-      color: #f3f4f6;
-      border: 1px solid #242b38;
+      border: 1px solid rgba(148,163,184,.22);
+      background: #0b1220;
+      color: #e5e7eb;
       border-radius: 12px;
-      padding: 13px 14px;
-      font-size: 14px;
-      font-family: inherit;
+      padding: 12px 13px;
+      font-family: Poppins, sans-serif;
       outline: none;
+      font-size: 13px;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 120px;
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #16a34a);
+      border: none;
+      font-weight: 600;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.07);
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0;
+      color: #9ca3af;
+      font-size: 13px;
+      gap: 10px;
+    }
+
+    .tablebox {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.14);
+      max-height: 68vh;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #0d1119;
       min-width: 1100px;
+      background: rgba(2,6,23,.35);
     }
 
     th {
-      background: #111722;
-      color: #9ca3af;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      padding: 15px 16px;
+      position: sticky;
+      top: 0;
+      background: #111827;
+      color: #cbd5e1;
       text-align: left;
-      border-bottom: 1px solid #222938;
+      font-size: 12px;
+      padding: 13px;
+      z-index: 1;
       white-space: nowrap;
     }
 
     td {
+      padding: 12px 13px;
+      border-top: 1px solid rgba(148,163,184,.10);
+      font-size: 13px;
       color: #e5e7eb;
-      font-size: 14px;
-      padding: 16px;
-      border-bottom: 1px solid #1b2230;
+      vertical-align: top;
       white-space: nowrap;
     }
 
-    tr:hover td {
-      background: #121926;
-    }
+    tr:hover { background: rgba(37,99,235,.08); }
 
-    .owner-name {
-      font-weight: 600;
-      color: #fff;
-    }
+    .muted { color: #94a3b8; }
 
-    .remarks {
-      color: #cbd5e1;
-      max-width: 260px;
-      white-space: normal;
-      line-height: 1.4;
-    }
-
-    .source-badge {
-      display: inline-flex;
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.22);
-      color: #93c5fd;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .actions {
+    .pager {
       display: flex;
-      gap: 8px;
-    }
-
-    button {
-      border: none;
-      color: white;
-      padding: 9px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .whatsapp {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-    }
-
-    .edit {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    }
-
-    .empty {
-      text-align: center;
-      color: #9ca3af;
-      padding: 35px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      width: 460px;
-      max-width: 92%;
-      background: rgba(17, 22, 32, 0.98);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
-      padding: 22px;
-    }
-
-    .modal h3 {
-      margin: 0 0 6px;
-      font-size: 20px;
-    }
-
-    .modal p {
-      margin: 0 0 16px;
-      color: #8b95a7;
-      font-size: 13px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
       gap: 10px;
-      margin-top: 16px;
+      justify-content: flex-end;
+      margin-top: 14px;
     }
 
-    .cancel-btn {
-      background: #1f2937;
+    .pager button {
+      width: auto;
+      min-width: 110px;
+      padding: 10px 14px;
     }
 
-    .save-btn {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    .empty, .loading {
+      padding: 30px;
+      text-align: center;
+      color: #94a3b8;
     }
 
-    @media (max-width: 1100px) {
-      .filters { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 700px) {
-      body { padding: 18px; }
-      .page-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+    @media (max-width: 900px) {
+      body { padding: 14px; }
       .filters { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <h1>Owner Database</h1>
+    <div class="sub">Fast search database with community, cluster, unit and source filters.</div>
 
-<div class="page-header">
-  <div class="title-block">
-    <h2>Usama Bin Nusrat</h2>
-    <p>Owner database · WhatsApp outreach · Remarks tracking</p>
-  </div>
-  <div class="status-pill">Live CRM Connected</div>
-</div>
+    <div class="card">
+      <div class="filters">
+        <input id="searchInput" placeholder="Search owner, phone, unit, email..." />
+        <select id="communityFilter">
+          <option value="">All Communities</option>
+        </select>
+        <select id="clusterFilter">
+          <option value="">All Clusters / Towers</option>
+        </select>
+        <input id="unitFilter" placeholder="Unit No." />
+        <select id="sourceFilter">
+          <option value="">All Data Sources</option>
+        </select>
+      </div>
 
-<div class="panel">
-  <div class="filters">
-    <input id="searchInput" type="text" placeholder="Search owner, phone, unit...">
+      <button onclick="resetFilters()">Reset Filters</button>
 
-    <select id="communityFilter">
-      <option value="">Community</option>
-    </select>
+      <div class="topbar">
+        <div id="status">Loading...</div>
+        <div class="muted">Showing 50 records per page</div>
+      </div>
 
-    <select id="clusterFilter">
-      <option value="">Cluster / Tower</option>
-    </select>
+      <div class="tablebox">
+        <table>
+          <thead>
+            <tr>
+              <th>Community</th>
+              <th>Cluster / Tower</th>
+              <th>Unit</th>
+              <th>Owner Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Remarks</th>
+              <th>Data Source</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="8" class="loading">Loading data...</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-    <input id="unitFilter" type="text" placeholder="Unit">
-
-    <select id="sourceFilter">
-      <option value="">Data Source</option>
-    </select>
-  </div>
-
-  <div class="table-wrap">
-    <table id="dataTable"></table>
-  </div>
-</div>
-
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h3>Edit Remarks</h3>
-    <p>Update owner remarks and save directly to Supabase.</p>
-
-    <textarea id="modalRemarks" placeholder="Write remarks here..."></textarea>
-
-    <div class="modal-actions">
-      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-      <button class="save-btn" onclick="saveModalRemarks()">Save Remarks</button>
+      <div class="pager">
+        <button onclick="prevPage()">Previous</button>
+        <button onclick="nextPage()">Next</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
-const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
+  <script>
+    const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
 
-const HEADERS = {
-  "apikey": SUPABASE_KEY,
-  "Authorization": "Bearer " + SUPABASE_KEY,
-  "Content-Type": "application/json"
-};
+    const TABLE_NAME = "owners"; 
+    const PAGE_SIZE = 50;
 
-let fullData = [];
-let activeRowId = null;
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function formatDate(dateString) {
-  if (!dateString) return "";
+    let currentPage = 0;
+    let totalCount = 0;
+    let debounceTimer;
 
-  const date = new Date(dateString);
-  if (isNaN(date)) return dateString;
+    const el = id => document.getElementById(id);
 
-  const months = [
-    "January","February","March","April",
-    "May","June","July","August",
-    "September","October","November","December"
-  ];
-
-  return `${months[date.getMonth()]}-${date.getFullYear()}`;
-}
-
-function getFirstName(name) {
-  return name ? String(name).trim().split(" ")[0] : "";
-}
-
-function safe(value) {
-  return value === null || value === undefined ? "" : String(value);
-}
-
-async function loadData() {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/owners?select=*&order=id.asc&limit=5000`,
-      { headers: HEADERS }
-    );
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText);
+    function clean(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      return String(value);
     }
 
-    fullData = await res.json();
-
-    console.log("Loaded rows:", fullData.length);
-    console.log(fullData);
-
-    populateFilters();
-    renderTable(fullData);
-
-  } catch (error) {
-    console.error("Supabase load error:", error);
-
-    document.getElementById("dataTable").innerHTML = `
-      <tr>
-        <td class="empty">Error loading data. Check Console.</td>
-      </tr>
-    `;
-  }
-}
-
-function populateFilters() {
-  addOptions("communityFilter", [...new Set(fullData.map(row => row.community).filter(Boolean))]);
-  addOptions("clusterFilter", [...new Set(fullData.map(row => row.cluster).filter(Boolean))]);
-
-  const formattedSources = [...new Set(
-    fullData
-      .map(row => row.dataSource)
-      .filter(Boolean)
-      .map(source => formatDate(source))
-  )];
-
-  addOptions("sourceFilter", formattedSources);
-}
-
-function addOptions(id, values) {
-  const select = document.getElementById(id);
-  const firstOption = select.options[0].outerHTML;
-
-  select.innerHTML = firstOption;
-
-  values.sort().forEach(value => {
-    select.innerHTML += `<option value="${value}">${value}</option>`;
-  });
-}
-
-function renderTable(data) {
-  const table = document.getElementById("dataTable");
-
-  table.innerHTML = `
-    <tr>
-      <th>Community</th>
-      <th>Cluster/Tower</th>
-      <th>Unit</th>
-      <th>Owner</th>
-      <th>Phone</th>
-      <th>Email</th>
-      <th>Remarks</th>
-      <th>Source</th>
-      <th>Action</th>
-    </tr>
-  `;
-
-  if (!data || !data.length) {
-    table.innerHTML += `
-      <tr>
-        <td colspan="9" class="empty">No matching records found</td>
-      </tr>
-    `;
-    return;
-  }
-
-  data.forEach(row => {
-    const phone = safe(row.phone1).replace(/\D/g, "");
-    const firstName = getFirstName(row.owner);
-
-    const message = `Hello, Mr. ${firstName}
-
-Hope You're Doing Well.
-
-This is Usama from BFG Properties.
-
-I'm reaching out regarding your property in ${safe(row.cluster)} (Unit#${safe(row.unit)}), ${safe(row.community)}.
-
-Would you consider selling if you receive a strong offer?
-
-Waiting for your kind response.
-
-Regards,
-Usama Bin Nusrat.`;
-
-    const whatsappLink = phone.length >= 9
-      ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
-      : "#";
-
-    table.innerHTML += `
-      <tr>
-        <td>${safe(row.community)}</td>
-        <td>${safe(row.cluster)}</td>
-        <td>${safe(row.unit)}</td>
-        <td class="owner-name">${safe(row.owner)}</td>
-        <td>${phone}</td>
-        <td>${safe(row.email)}</td>
-        <td class="remarks">${safe(row.remarks)}</td>
-        <td><span class="source-badge">${formatDate(row.dataSource)}</span></td>
-        <td>
-          <div class="actions">
-            <button class="whatsapp" onclick="sendWhatsApp('${whatsappLink}')">WhatsApp</button>
-            <button class="edit" onclick="openEditModal(${row.id}, \`${safe(row.remarks).replace(/`/g, "\\`")}\`)">Edit</button>
-          </div>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-function sendWhatsApp(link) {
-  if (link === "#") {
-    alert("Invalid WhatsApp number");
-    return;
-  }
-
-  window.open(link, "_blank");
-}
-
-function openEditModal(id, remarks) {
-  activeRowId = id;
-  document.getElementById("modalRemarks").value = remarks || "";
-  document.getElementById("editModal").classList.add("active");
-}
-
-function closeModal() {
-  document.getElementById("editModal").classList.remove("active");
-  activeRowId = null;
-}
-
-async function saveModalRemarks() {
-  if (!activeRowId) return;
-
-  const newRemarks = document.getElementById("modalRemarks").value;
-
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/owners?id=eq.${activeRowId}`,
-      {
-        method: "PATCH",
-        headers: {
-          ...HEADERS,
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify({
-          remarks: newRemarks
-        })
+    function get(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
       }
-    );
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText);
+      return "";
     }
 
-    closeModal();
+    function mapRow(row) {
+      return {
+        community: get(row, ["community", "Community"]),
+        cluster: get(row, ["cluster", "cluster_tower", "tower", "Cluster", "Cluster/Tower"]),
+        unit: get(row, ["unit", "unit_number", "unit_no", "Unit", "Unit No"]),
+        owner: get(row, ["owner_name", "owner", "name", "Owner Name"]),
+        phone: get(row, ["phone", "mobile", "contact", "Phone", "Mobile"]),
+        email: get(row, ["email", "Email"]),
+        remarks: get(row, ["remarks", "note", "Remarks"]),
+        source: get(row, ["data_source", "source", "Data Source"])
+      };
+    }
+
+    async function loadData() {
+      el("tableBody").innerHTML = `<tr><td colspan="8" class="loading">Loading data...</td></tr>`;
+      el("status").textContent = "Loading...";
+
+      const from = currentPage * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      let query = db
+        .from(TABLE_NAME)
+        .select("*", { count: "exact" })
+        .range(from, to);
+
+      const search = el("searchInput").value.trim();
+      const community = el("communityFilter").value;
+      const cluster = el("clusterFilter").value;
+      const unit = el("unitFilter").value.trim();
+      const source = el("sourceFilter").value;
+
+      if (search) {
+        query = query.or(
+          `owner_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%,unit_number.ilike.%${search}%`
+        );
+      }
+
+      if (community) query = query.eq("community", community);
+      if (cluster) query = query.eq("cluster", cluster);
+      if (unit) query = query.ilike("unit_number", `%${unit}%`);
+      if (source) query = query.eq("data_source", source);
+
+      query = query.order("community", { ascending: true })
+                   .order("cluster", { ascending: true })
+                   .order("unit_number", { ascending: true });
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
+        el("status").textContent = "Error loading data";
+        return;
+      }
+
+      totalCount = count || 0;
+      renderTable(data || []);
+
+      const start = totalCount === 0 ? 0 : from + 1;
+      const end = Math.min(to + 1, totalCount);
+      el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`;
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
+        return;
+      }
+
+      el("tableBody").innerHTML = rows.map(row => {
+        const r = mapRow(row);
+        return `
+          <tr>
+            <td>${clean(r.community)}</td>
+            <td>${clean(r.cluster)}</td>
+            <td>${clean(r.unit)}</td>
+            <td>${clean(r.owner)}</td>
+            <td>${clean(r.phone)}</td>
+            <td>${clean(r.email)}</td>
+            <td>${clean(r.remarks)}</td>
+            <td>${clean(r.source)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function loadDropdowns() {
+      const { data, error } = await db.from(TABLE_NAME).select("community, cluster, data_source");
+
+      if (error || !data) return;
+
+      fillSelect("communityFilter", [...new Set(data.map(x => x.community).filter(Boolean))]);
+      fillSelect("clusterFilter", [...new Set(data.map(x => x.cluster).filter(Boolean))]);
+      fillSelect("sourceFilter", [...new Set(data.map(x => x.data_source).filter(Boolean))]);
+    }
+
+    function fillSelect(id, values) {
+      const select = el(id);
+      const first = select.children[0].outerHTML;
+
+      select.innerHTML = first + values
+        .sort((a, b) => String(a).localeCompare(String(b)))
+        .map(v => `<option value="${v}">${v}</option>`)
+        .join("");
+    }
+
+    function resetFilters() {
+      el("searchInput").value = "";
+      el("communityFilter").value = "";
+      el("clusterFilter").value = "";
+      el("unitFilter").value = "";
+      el("sourceFilter").value = "";
+      currentPage = 0;
+      loadData();
+    }
+
+    function nextPage() {
+      if ((currentPage + 1) * PAGE_SIZE >= totalCount) return;
+      currentPage++;
+      loadData();
+    }
+
+    function prevPage() {
+      if (currentPage === 0) return;
+      currentPage--;
+      loadData();
+    }
+
+    function setupListeners() {
+      ["searchInput", "unitFilter"].forEach(id => {
+        el(id).addEventListener("input", () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            currentPage = 0;
+            loadData();
+          }, 400);
+        });
+      });
+
+      ["communityFilter", "clusterFilter", "sourceFilter"].forEach(id => {
+        el(id).addEventListener("change", () => {
+          currentPage = 0;
+          loadData();
+        });
+      });
+    }
+
+    setupListeners();
+    loadDropdowns();
     loadData();
-
-  } catch (error) {
-    console.error("Remarks update error:", error);
-    alert("Could not save remarks. Check Supabase permissions.");
-  }
-}
-
-function applyFilters() {
-  const search = document.getElementById("searchInput").value.toLowerCase();
-  const community = document.getElementById("communityFilter").value;
-  const cluster = document.getElementById("clusterFilter").value;
-  const unit = document.getElementById("unitFilter").value.toLowerCase();
-  const source = document.getElementById("sourceFilter").value;
-
-  const filtered = fullData.filter(row => {
-    const combined = `
-      ${safe(row.community)}
-      ${safe(row.cluster)}
-      ${safe(row.unit)}
-      ${safe(row.owner)}
-      ${safe(row.phone1)}
-      ${safe(row.phone2)}
-      ${safe(row.email)}
-      ${safe(row.remarks)}
-      ${formatDate(row.dataSource)}
-    `.toLowerCase();
-
-    return (
-      combined.includes(search) &&
-      (!community || row.community === community) &&
-      (!cluster || row.cluster === cluster) &&
-      (!unit || safe(row.unit).toLowerCase().includes(unit)) &&
-      (!source || formatDate(row.dataSource) === source)
-    );
-  });
-
-  renderTable(filtered);
-}
-
-document.getElementById("searchInput").addEventListener("input", applyFilters);
-document.getElementById("communityFilter").addEventListener("change", applyFilters);
-document.getElementById("clusterFilter").addEventListener("change", applyFilters);
-document.getElementById("unitFilter").addEventListener("input", applyFilters);
-document.getElementById("sourceFilter").addEventListener("change", applyFilters);
-
-document.getElementById("editModal").addEventListener("click", function(e) {
-  if (e.target.id === "editModal") {
-    closeModal();
-  }
-});
-
-loadData();
-</script>
-
+  </script>
 </body>
 </html>
