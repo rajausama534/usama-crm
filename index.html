@@ -17,51 +17,50 @@
       background:
         radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 35%),
         radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
-        #080b10;
+        #05070c;
       color: #e5e7eb;
       font-family: Poppins, sans-serif;
       padding: 24px;
     }
 
-    .wrap { max-width: 1400px; margin: auto; }
+    .wrap { max-width: 1500px; margin: auto; }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 26px;
+      margin: 0;
+      font-size: 30px;
       font-weight: 700;
     }
 
     .sub {
       color: #9ca3af;
-      margin-bottom: 22px;
-      font-size: 14px;
+      margin: 10px 0 28px;
+      font-size: 15px;
     }
 
     .card {
-      background: rgba(15,23,42,.78);
+      background: rgba(3,7,18,.82);
       border: 1px solid rgba(148,163,184,.18);
       border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      padding: 20px;
     }
 
     .filters {
       display: grid;
       grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     input, select, button {
       width: 100%;
       border: 1px solid rgba(148,163,184,.22);
-      background: #0b1220;
+      background: #020617;
       color: #e5e7eb;
       border-radius: 12px;
-      padding: 12px 13px;
+      padding: 13px 14px;
       font-family: Poppins, sans-serif;
       outline: none;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     button {
@@ -71,78 +70,125 @@
       font-weight: 600;
     }
 
+    .reset {
+      margin-bottom: 18px;
+      height: 52px;
+      font-size: 15px;
+    }
+
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 14px 0;
-      color: #9ca3af;
+      margin: 8px 0 14px;
+      color: #a8b3c7;
+      font-size: 14px;
+      gap: 12px;
+    }
+
+    .loadingBadge {
+      display: none;
+      background: rgba(37,99,235,.15);
+      border: 1px solid rgba(37,99,235,.35);
+      color: #bfdbfe;
+      padding: 8px 12px;
+      border-radius: 999px;
       font-size: 13px;
-      gap: 10px;
+      font-weight: 500;
+    }
+
+    .loadingBadge.show {
+      display: inline-block;
     }
 
     .tablebox {
       overflow: auto;
       border-radius: 14px;
       border: 1px solid rgba(148,163,184,.14);
+      min-height: 360px;
       max-height: 68vh;
+      background: #020617;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1100px;
-      background: rgba(2,6,23,.35);
+      min-width: 1300px;
     }
 
     th {
       position: sticky;
       top: 0;
-      background: #111827;
-      color: #cbd5e1;
+      background: #0b1020;
+      color: #d1d5db;
       text-align: left;
-      font-size: 12px;
-      padding: 13px;
-      z-index: 1;
+      font-size: 13px;
+      padding: 14px;
+      z-index: 2;
       white-space: nowrap;
     }
 
     td {
-      padding: 12px 13px;
+      padding: 13px 14px;
       border-top: 1px solid rgba(148,163,184,.10);
       font-size: 13px;
       color: #e5e7eb;
-      vertical-align: top;
       white-space: nowrap;
     }
 
     tr:hover { background: rgba(37,99,235,.08); }
 
-    .muted { color: #94a3b8; }
+    .empty, .loadingRow {
+      text-align: center;
+      color: #94a3b8;
+      padding: 70px 20px;
+      font-size: 15px;
+    }
+
+    .skeleton {
+      height: 18px;
+      width: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #111827, #1f2937, #111827);
+      background-size: 200% 100%;
+      animation: shine 1.2s infinite;
+    }
+
+    @keyframes shine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
 
     .pager {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      color: #a8b3c7;
+      font-size: 14px;
+    }
+
+    .pagerBtns {
+      display: flex;
       gap: 10px;
-      justify-content: flex-end;
-      margin-top: 14px;
     }
 
     .pager button {
       width: auto;
-      min-width: 110px;
-      padding: 10px 14px;
+      min-width: 115px;
+      padding: 11px 16px;
     }
 
-    .empty, .loading {
-      padding: 30px;
-      text-align: center;
-      color: #94a3b8;
+    .pageNumber {
+      font-weight: 600;
+      color: #e5e7eb;
     }
 
     @media (max-width: 900px) {
       body { padding: 14px; }
       .filters { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: flex-start; }
+      .pager { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -154,24 +200,31 @@
 
     <div class="card">
       <div class="filters">
-        <input id="searchInput" placeholder="Search owner, phone, unit, email..." />
+        <input id="searchInput" placeholder="Search owner or unit..." />
+
         <select id="communityFilter">
           <option value="">All Communities</option>
         </select>
+
         <select id="clusterFilter">
           <option value="">All Clusters / Towers</option>
         </select>
+
         <input id="unitFilter" placeholder="Unit No." />
+
         <select id="sourceFilter">
           <option value="">All Data Sources</option>
         </select>
       </div>
 
-      <button onclick="resetFilters()">Reset Filters</button>
+      <button class="reset" onclick="resetFilters()">Reset Filters</button>
 
       <div class="topbar">
-        <div id="status">Loading...</div>
-        <div class="muted">Showing 50 records per page</div>
+        <div>
+          <span id="status">Preparing database...</span>
+          <span id="loadingBadge" class="loadingBadge">Loading data...</span>
+        </div>
+        <div>Showing 50 records per page</div>
       </div>
 
       <div class="tablebox">
@@ -185,18 +238,22 @@
               <th>Phone</th>
               <th>Email</th>
               <th>Remarks</th>
-              <th>Data Source</th>
+              <th>WhatsApp Status</th>
+              <th>Source</th>
             </tr>
           </thead>
-          <tbody id="tableBody">
-            <tr><td colspan="8" class="loading">Loading data...</td></tr>
-          </tbody>
+
+          <tbody id="tableBody"></tbody>
         </table>
       </div>
 
       <div class="pager">
-        <button onclick="prevPage()">Previous</button>
-        <button onclick="nextPage()">Next</button>
+        <div id="pageInfo" class="pageNumber">Page 1</div>
+
+        <div class="pagerBtns">
+          <button onclick="prevPage()">Previous</button>
+          <button onclick="nextPage()">Next</button>
+        </div>
       </div>
     </div>
   </div>
@@ -205,14 +262,14 @@
     const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
 
-    const TABLE_NAME = "owners"; 
+    const TABLE_NAME = "owners";
     const PAGE_SIZE = 50;
 
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentPage = 0;
     let totalCount = 0;
-    let debounceTimer;
+    let debounceTimer = null;
 
     const el = id => document.getElementById(id);
 
@@ -221,29 +278,30 @@
       return String(value);
     }
 
-    function get(row, keys) {
-      for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
-      }
-      return "";
+    function showLoading() {
+      el("loadingBadge").classList.add("show");
+      el("status").textContent = "Loading database, please wait...";
+      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `
+        <tr>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+        </tr>
+      `).join("");
     }
 
-    function mapRow(row) {
-      return {
-        community: get(row, ["community", "Community"]),
-        cluster: get(row, ["cluster", "cluster_tower", "tower", "Cluster", "Cluster/Tower"]),
-        unit: get(row, ["unit", "unit_number", "unit_no", "Unit", "Unit No"]),
-        owner: get(row, ["owner_name", "owner", "name", "Owner Name"]),
-        phone: get(row, ["phone", "mobile", "contact", "Phone", "Mobile"]),
-        email: get(row, ["email", "Email"]),
-        remarks: get(row, ["remarks", "note", "Remarks"]),
-        source: get(row, ["data_source", "source", "Data Source"])
-      };
+    function hideLoading() {
+      el("loadingBadge").classList.remove("show");
     }
 
     async function loadData() {
-      el("tableBody").innerHTML = `<tr><td colspan="8" class="loading">Loading data...</td></tr>`;
-      el("status").textContent = "Loading...";
+      showLoading();
 
       const from = currentPage * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
@@ -260,25 +318,33 @@
       const source = el("sourceFilter").value;
 
       if (search) {
-        query = query.or(
-          `owner_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%,unit_number.ilike.%${search}%`
-        );
+        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%`);
       }
 
       if (community) query = query.eq("community", community);
       if (cluster) query = query.eq("cluster", cluster);
-      if (unit) query = query.ilike("unit_number", `%${unit}%`);
-      if (source) query = query.eq("data_source", source);
+      if (unit) query = query.ilike("unit", `%${unit}%`);
 
-      query = query.order("community", { ascending: true })
-                   .order("cluster", { ascending: true })
-                   .order("unit_number", { ascending: true });
+      if (source) {
+        query = query.eq("data_source", source);
+      }
+
+      query = query
+        .order("community", { ascending: true })
+        .order("cluster", { ascending: true })
+        .order("unit", { ascending: true });
 
       const { data, error, count } = await query;
 
+      hideLoading();
+
       if (error) {
-        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
         el("status").textContent = "Error loading data";
+        el("tableBody").innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">Error: ${error.message}</td>
+          </tr>
+        `;
         return;
       }
 
@@ -287,34 +353,42 @@
 
       const start = totalCount === 0 ? 0 : from + 1;
       const end = Math.min(to + 1, totalCount);
+      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
       el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`;
+      el("pageInfo").textContent = `Page ${currentPage + 1} of ${totalPages}`;
     }
 
     function renderTable(rows) {
       if (!rows.length) {
-        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
+        el("tableBody").innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">No records found</td>
+          </tr>
+        `;
         return;
       }
 
-      el("tableBody").innerHTML = rows.map(row => {
-        const r = mapRow(row);
-        return `
-          <tr>
-            <td>${clean(r.community)}</td>
-            <td>${clean(r.cluster)}</td>
-            <td>${clean(r.unit)}</td>
-            <td>${clean(r.owner)}</td>
-            <td>${clean(r.phone)}</td>
-            <td>${clean(r.email)}</td>
-            <td>${clean(r.remarks)}</td>
-            <td>${clean(r.source)}</td>
-          </tr>
-        `;
-      }).join("");
+      el("tableBody").innerHTML = rows.map(row => `
+        <tr>
+          <td>${clean(row.community)}</td>
+          <td>${clean(row.cluster)}</td>
+          <td>${clean(row.unit)}</td>
+          <td>${clean(row.owner)}</td>
+          <td>${clean(row.phone)}</td>
+          <td>${clean(row.email)}</td>
+          <td>${clean(row.remarks)}</td>
+          <td>${clean(row.whatsapp_status)}</td>
+          <td>${clean(row.data_source)}</td>
+        </tr>
+      `).join("");
     }
 
     async function loadDropdowns() {
-      const { data, error } = await db.from(TABLE_NAME).select("community, cluster, data_source");
+      const { data, error } = await db
+        .from(TABLE_NAME)
+        .select("*")
+        .limit(5000);
 
       if (error || !data) return;
 
@@ -325,9 +399,9 @@
 
     function fillSelect(id, values) {
       const select = el(id);
-      const first = select.children[0].outerHTML;
+      const firstOption = select.children[0].outerHTML;
 
-      select.innerHTML = first + values
+      select.innerHTML = firstOption + values
         .sort((a, b) => String(a).localeCompare(String(b)))
         .map(v => `<option value="${v}">${v}</option>`)
         .join("");
@@ -339,6 +413,7 @@
       el("clusterFilter").value = "";
       el("unitFilter").value = "";
       el("sourceFilter").value = "";
+
       currentPage = 0;
       loadData();
     }
