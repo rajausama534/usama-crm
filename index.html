@@ -25,11 +25,7 @@
 
     .wrap { max-width: 1500px; margin: auto; }
 
-    h1 {
-      margin: 0;
-      font-size: 30px;
-      font-weight: 700;
-    }
+    h1 { margin: 0; font-size: 30px; font-weight: 700; }
 
     .sub {
       color: #9ca3af;
@@ -37,19 +33,19 @@
       font-size: 15px;
     }
 
-    .card {
+    .card, .loginBox {
       background: rgba(3,7,18,.82);
       border: 1px solid rgba(148,163,184,.18);
       border-radius: 18px;
       padding: 20px;
     }
 
-    .filters {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
+    .loginBox {
+      max-width: 420px;
+      margin: 80px auto;
     }
+
+    .loginBox h1 { margin-bottom: 10px; }
 
     input, select, button {
       width: 100%;
@@ -70,6 +66,18 @@
       font-weight: 600;
     }
 
+    .loginBox input { margin-bottom: 12px; }
+    .loginError { color: #f87171; margin-top: 12px; font-size: 13px; }
+
+    .hidden { display: none !important; }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
     .reset {
       margin-bottom: 18px;
       height: 52px;
@@ -83,6 +91,14 @@
       margin: 8px 0 14px;
       color: #a8b3c7;
       font-size: 14px;
+      gap: 12px;
+    }
+
+    .logoutBtn {
+      width: auto;
+      padding: 9px 14px;
+      background: #111827;
+      border: 1px solid rgba(148,163,184,.22);
     }
 
     .loadingBadge {
@@ -146,6 +162,65 @@
       font-size: 12px;
     }
 
+    .remarksInput {
+      background: transparent;
+      border: 1px solid rgba(148,163,184,.22);
+      color: #fff;
+      width: 220px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .mobileCards { display: none; }
+
+    .ownerCard {
+      background: #020617;
+      border: 1px solid rgba(148,163,184,.14);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    .ownerTop {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .ownerName {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .unitBadge {
+      background: rgba(37,99,235,.16);
+      color: #bfdbfe;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .infoLine {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin: 7px 0;
+    }
+
+    .infoLine span {
+      color: #94a3b8;
+      display: block;
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .ownerCard .remarksInput {
+      width: 100%;
+      margin-top: 6px;
+    }
+
     .empty {
       text-align: center;
       color: #94a3b8;
@@ -192,13 +267,72 @@
       font-weight: 600;
       color: #e5e7eb;
     }
+
+    @media (max-width: 800px) {
+      body { padding: 14px; }
+
+      h1 { font-size: 24px; }
+
+      .sub { font-size: 13px; margin-bottom: 18px; }
+
+      .card { padding: 14px; border-radius: 16px; }
+
+      .filters {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .tablebox { display: none; }
+      .mobileCards { display: block; }
+
+      .pager {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .pagerBtns {
+        width: 100%;
+      }
+
+      .pager button {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .loginBox {
+        margin: 50px auto;
+        padding: 18px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+
+  <div id="loginView" class="loginBox">
     <h1>Usama Database</h1>
-    <div class="sub">Fast search database with community, cluster, unit and source filters.</div>
+    <div class="sub">Login to access your database.</div>
+
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+
+    <div id="loginError" class="loginError"></div>
+  </div>
+
+  <div id="appView" class="wrap hidden">
+    <div class="topbar">
+      <div>
+        <h1>Usama Database</h1>
+        <div class="sub">Fast search database with community, cluster, unit and source filters.</div>
+      </div>
+      <button class="logoutBtn" onclick="logout()">Logout</button>
+    </div>
 
     <div class="card">
       <div class="filters">
@@ -247,6 +381,8 @@
         </table>
       </div>
 
+      <div id="mobileCards" class="mobileCards"></div>
+
       <div class="pager">
         <div id="pageInfo" class="pageNumber">Page 1</div>
 
@@ -273,14 +409,60 @@
 
     const el = id => document.getElementById(id);
 
+    async function checkSession() {
+      const { data } = await db.auth.getSession();
+
+      if (data.session) {
+        el("loginView").classList.add("hidden");
+        el("appView").classList.remove("hidden");
+        setupListeners();
+        loadDropdowns();
+        loadData();
+      } else {
+        el("loginView").classList.remove("hidden");
+        el("appView").classList.add("hidden");
+      }
+    }
+
+    async function login() {
+      el("loginError").textContent = "";
+
+      const email = el("loginEmail").value.trim();
+      const password = el("loginPassword").value.trim();
+
+      if (!email || !password) {
+        el("loginError").textContent = "Enter email and password.";
+        return;
+      }
+
+      const { error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        el("loginError").textContent = "Wrong email or password.";
+        return;
+      }
+
+      checkSession();
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      location.reload();
+    }
+
     function clean(value) {
-      if (value === null || value === undefined || value === "") return "-";
+      if (value === null || value === undefined || value === "" || value === "EMPTY") return "-";
       return String(value);
     }
 
     function get(row, keys) {
       for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "" && row[key] !== "EMPTY") {
+          return row[key];
+        }
       }
       return "";
     }
@@ -304,17 +486,17 @@
     }
 
     function whatsappButton(row) {
-      const phone = get(row, ["phone1", "phone2", "phone3", "phone", "Phone", "mobile", "Mobile", "contact", "Contact", "number", "Number", "phone_number", "Phone Number"]);
+      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
       const formatted = formatPhone(phone);
 
       if (!formatted) return "-";
 
-      const owner = get(row, ["owner", "Owner"]);
-      const unit = get(row, ["unit", "Unit"]);
-      const cluster = get(row, ["cluster", "Cluster"]);
-      const community = get(row, ["community", "Community"]);
+      const owner = get(row, ["owner"]);
+      const unit = get(row, ["unit"]);
+      const cluster = get(row, ["cluster"]);
+      const community = get(row, ["community"]);
 
-      const msg = `Hello Mr. ${owner || ""},
+      const msg = `Hello, Mr. ${owner || ""}
 
 Hope you're doing well.
 
@@ -324,10 +506,10 @@ I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${communi
 
 Would you consider selling if you receive a strong offer?
 
-Looking forward to your response.
+Looking forward to your kind response.
 
-Regards,  
-Usama Bin Nusrat`;
+Regards,
+Usama Bin Nusrat.`;
 
       return `<a class="waBtn" target="_blank" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">${escapeHtml(phone)}</a>`;
     }
@@ -348,10 +530,28 @@ Usama Bin Nusrat`;
           <td><div class="skeleton"></div></td>
         </tr>
       `).join("");
+
+      el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() => `
+        <div class="ownerCard">
+          <div class="skeleton" style="height:22px;margin-bottom:12px;"></div>
+          <div class="skeleton" style="margin-bottom:10px;"></div>
+          <div class="skeleton" style="margin-bottom:10px;"></div>
+          <div class="skeleton"></div>
+        </div>
+      `).join("");
     }
 
     function hideLoading() {
       el("loadingBadge").classList.remove("show");
+    }
+
+    async function updateRemarks(id, value) {
+      const { error } = await db
+        .from(TABLE_NAME)
+        .update({ remarks: value })
+        .eq("id", id);
+
+      if (error) alert("Failed to update remarks");
     }
 
     async function loadData() {
@@ -392,11 +592,12 @@ Usama Bin Nusrat`;
       if (error) {
         el("status").textContent = "Error loading data";
         el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
+        el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`;
         return;
       }
 
       totalCount = count || 0;
-      renderTable(data || []);
+      renderData(data || []);
 
       const start = totalCount === 0 ? 0 : from + 1;
       const end = Math.min(to + 1, totalCount);
@@ -406,16 +607,17 @@ Usama Bin Nusrat`;
       el("pageInfo").textContent = `Page ${currentPage + 1} of ${totalPages}`;
     }
 
-    function renderTable(rows) {
+    function renderData(rows) {
       if (!rows.length) {
         el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
+        el("mobileCards").innerHTML = `<div class="empty">No records found</div>`;
         return;
       }
 
       el("tableBody").innerHTML = rows.map(row => {
-        const remarks = get(row, ["remarks", "Remarks", "remark", "Remark", "note", "Note"]);
-        const email = get(row, ["email", "Email"]);
-        const source = get(row, ["data_source", "Data Source", "source", "Source"]);
+        const remarks = get(row, ["remarks"]);
+        const email = get(row, ["email"]);
+        const source = get(row, ["data_source"]);
 
         return `
           <tr>
@@ -424,10 +626,49 @@ Usama Bin Nusrat`;
             <td>${escapeHtml(clean(row.unit))}</td>
             <td>${escapeHtml(clean(row.owner))}</td>
             <td>${whatsappButton(row)}</td>
-            <td>${escapeHtml(clean(remarks))}</td>
+            <td>
+              <input 
+                class="remarksInput"
+                value="${escapeHtml(remarks)}"
+                placeholder="Add remarks..."
+                onblur="updateRemarks(${row.id}, this.value)"
+              />
+            </td>
             <td>${escapeHtml(clean(source))}</td>
             <td>${escapeHtml(clean(email))}</td>
           </tr>
+        `;
+      }).join("");
+
+      el("mobileCards").innerHTML = rows.map(row => {
+        const remarks = get(row, ["remarks"]);
+        const email = get(row, ["email"]);
+        const source = get(row, ["data_source"]);
+
+        return `
+          <div class="ownerCard">
+            <div class="ownerTop">
+              <div class="ownerName">${escapeHtml(clean(row.owner))}</div>
+              <div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div>
+            </div>
+
+            <div class="infoLine"><span>Community</span>${escapeHtml(clean(row.community))}</div>
+            <div class="infoLine"><span>Cluster / Tower</span>${escapeHtml(clean(row.cluster))}</div>
+            <div class="infoLine"><span>WhatsApp</span>${whatsappButton(row)}</div>
+
+            <div class="infoLine">
+              <span>Remarks</span>
+              <input 
+                class="remarksInput"
+                value="${escapeHtml(remarks)}"
+                placeholder="Add remarks..."
+                onblur="updateRemarks(${row.id}, this.value)"
+              />
+            </div>
+
+            <div class="infoLine"><span>Source</span>${escapeHtml(clean(source))}</div>
+            <div class="infoLine"><span>Email</span>${escapeHtml(clean(email))}</div>
+          </div>
         `;
       }).join("");
     }
@@ -489,7 +730,12 @@ Usama Bin Nusrat`;
       loadData();
     }
 
+    let listenersReady = false;
+
     function setupListeners() {
+      if (listenersReady) return;
+      listenersReady = true;
+
       ["searchInput", "unitFilter"].forEach(id => {
         el(id).addEventListener("input", () => {
           clearTimeout(debounceTimer);
@@ -508,9 +754,7 @@ Usama Bin Nusrat`;
       });
     }
 
-    setupListeners();
-    loadDropdowns();
-    loadData();
+    checkSession();
   </script>
 </body>
 </html>
