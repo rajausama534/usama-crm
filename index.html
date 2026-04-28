@@ -314,7 +314,20 @@
       const cluster = get(row, ["cluster", "Cluster"]);
       const community = get(row, ["community", "Community"]);
 
-      const msg = `Hi ${owner || "there"}, this is Usama from BFG Properties. I wanted to check if your unit ${unit} in ${cluster}, ${community} is available for sale or rent.`;
+      const msg = `Hello Mr. ${owner || ""},
+
+Hope you're doing well.
+
+This is Usama from BFG Properties.
+
+I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${community}.
+
+Would you consider selling if you receive a strong offer?
+
+Looking forward to your response.
+
+Regards,  
+Usama Bin Nusrat`;
 
       return `<a class="waBtn" target="_blank" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">${escapeHtml(phone)}</a>`;
     }
