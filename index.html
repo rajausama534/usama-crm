@@ -359,7 +359,7 @@
       const source = el("sourceFilter").value;
 
       if (search) {
-        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone.ilike.%${search}%`);
+        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone1.ilike.%${search}%,phone2.ilike.%${search}%`);
       }
 
       if (community) query = query.eq("community", community);
