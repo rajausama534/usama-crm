@@ -349,7 +349,7 @@ function formatDate(dateString) {
 }
 
 async function loadData() {
-  showLoading();
+ // showLoading();
 
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/owners?select=*&order=id.asc&limit=100`,
