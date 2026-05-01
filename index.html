@@ -1,1257 +1,953 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usama Database</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 35%),
-        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
-        #05070c;
-      color: #e5e7eb;
-      font-family: Poppins, sans-serif;
-      padding: 22px;
-    }
-
-    .hidden { display: none !important; }
-
-    .wrap { max-width: 1500px; margin: auto; }
-
-    h1 { margin: 0; font-size: 32px; font-weight: 700; }
-
-    .sub {
-      color: #a8b3c7;
-      margin: 10px 0 20px;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .mainHeader {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-
-    .headerBtns {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .loginBox, .card {
-      background: rgba(3,7,18,.84);
-      border: 1px solid rgba(148,163,184,.18);
-      border-radius: 22px;
-      box-shadow: 0 20px 70px rgba(0,0,0,.30);
-    }
-
-    .loginBox {
-      max-width: 430px;
-      margin: 80px auto;
-      padding: 24px;
-    }
-
-    input, select, button, textarea {
-      font-family: Poppins, sans-serif;
-      outline: none;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid rgba(148,163,184,.24);
-      background: #020617;
-      color: #e5e7eb;
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-size: 14px;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: rgba(37,99,235,.7);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-      color: #fff;
-      font-weight: 700;
-      border-radius: 12px;
-    }
-
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    .primaryBtn {
-      background: linear-gradient(135deg, #2563eb, #16a34a);
-      padding: 11px 16px;
-    }
-
-    .darkBtn {
-      background: #111827;
-      border: 1px solid rgba(148,163,184,.25);
-      padding: 10px 15px;
-    }
-
-    .loginBox input { margin-bottom: 12px; }
-
-    .loginError {
-      color: #f87171;
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .card { padding: 22px; }
-
-    .filters {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .actionsRow {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin: 6px 0 18px;
-      gap: 10px;
-    }
-
-    .reset {
-      width: auto;
-      min-width: 150px;
-      height: 42px;
-      padding: 0 18px;
-      font-size: 14px;
-      background: linear-gradient(135deg, #2563eb, #16a34a);
-    }
-
-    .quickFilters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .quickFilters button {
-      background: #0b1020;
-      border: 1px solid rgba(148,163,184,.20);
-      padding: 8px 12px;
-      font-size: 12px;
-      color: #cbd5e1;
-    }
-
-    .topInfo {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 10px 0 14px;
-      color: #a8b3c7;
-      font-size: 14px;
-      gap: 12px;
-    }
-
-    .loadingBadge, .saveToast {
-      display: none;
-      background: rgba(37,99,235,.15);
-      border: 1px solid rgba(37,99,235,.35);
-      color: #bfdbfe;
-      padding: 7px 11px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin-left: 8px;
-    }
-
-    .loadingBadge.show, .saveToast.show { display: inline-block; }
-
-    .tablebox {
-      overflow: auto;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.16);
-      min-height: 430px;
-      max-height: 70vh;
-      background: #020617;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1200px;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      background: #0b1020;
-      color: #d1d5db;
-      text-align: left;
-      font-size: 13px;
-      padding: 15px 16px;
-      z-index: 2;
-      white-space: nowrap;
-      border-bottom: 1px solid rgba(148,163,184,.12);
-    }
-
-    td {
-      padding: 14px 16px;
-      border-top: 1px solid rgba(148,163,184,.08);
-      font-size: 13px;
-      color: #e5e7eb;
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-
-    tr:hover { background: rgba(37,99,235,.08); }
-
-    .waBtn {
-      display: inline-block;
-      padding: 9px 13px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #16a34a, #059669);
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .statusSelect {
-      width: 150px;
-      padding: 9px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .status-New { color: #cbd5e1; }
-    .status-ForSale { color: #22c55e; }
-    .status-ForRent { color: #86efac; }
-    .status-Sold { color: #ef4444; }
-    .status-CallBack { color: #f59e0b; }
-    .status-NoResponse { color: #eab308; }
-    .status-NotInterested { color: #f87171; }
-    .status-InvalidNumber { color: #94a3b8; }
-
-    .remarkBox {
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-    }
-
-    .remarksInput {
-      background: #030712;
-      border: 1px solid rgba(148,163,184,.24);
-      color: #fff;
-      width: 360px;
-      height: 42px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      line-height: 1.4;
-      resize: none;
-      overflow: hidden;
-      white-space: nowrap;
-      transition: .15s ease;
-    }
-
-    .remarksInput:focus {
-      width: 480px;
-      height: 120px;
-      white-space: normal;
-      overflow-y: auto;
-      position: relative;
-      z-index: 5;
-    }
-
-    .saveRemarkBtn {
-      display: none;
-      background: #16a34a;
-      padding: 10px 12px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .saveRemarkBtn.show { display: inline-block; }
-
-    .moreUnitBtn {
-      background: rgba(37,99,235,.15);
-      border: 1px solid rgba(37,99,235,.30);
-      color: #bfdbfe;
-      padding: 6px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-
-    .mobileCards { display: none; }
-
-    .ownerCard {
-      background: #020617;
-      border: 1px solid rgba(148,163,184,.16);
-      border-radius: 18px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .ownerTop {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .ownerName {
-      font-weight: 700;
-      font-size: 16px;
-      line-height: 1.3;
-    }
-
-    .unitBadge {
-      background: rgba(37,99,235,.18);
-      color: #bfdbfe;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .mobileLocation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      background: rgba(15,23,42,.72);
-      border: 1px solid rgba(148,163,184,.14);
-      border-radius: 14px;
-      padding: 11px;
-      margin-bottom: 12px;
-    }
-
-    .locationText {
-      font-size: 13px;
-      line-height: 1.35;
-      color: #e5e7eb;
-    }
-
-    .locationText span {
-      display: block;
-      color: #94a3b8;
-      font-size: 11px;
-      margin-bottom: 3px;
-    }
-
-    .infoLine {
-      font-size: 14px;
-      color: #e5e7eb;
-      margin: 10px 0;
-      line-height: 1.35;
-    }
-
-    .infoLine span {
-      color: #94a3b8;
-      font-size: 12px;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .ownerCard .waBtn {
-      font-size: 12px;
-      padding: 9px 11px;
-    }
-
-    .ownerCard .remarksInput {
-      width: 100%;
-      height: 44px;
-      min-width: 100%;
-      white-space: nowrap;
-    }
-
-    .ownerCard .remarksInput:focus {
-      width: 100%;
-      height: 130px;
-      white-space: normal;
-    }
-
-    .ownerCard .remarkBox {
-      flex-direction: column;
-    }
-
-    .ownerCard .saveRemarkBtn {
-      width: 100%;
-    }
-
-    .empty {
-      text-align: center;
-      color: #94a3b8;
-      padding: 70px 20px;
-      font-size: 15px;
-    }
-
-    .skeleton {
-      height: 18px;
-      width: 100%;
-      border-radius: 8px;
-      background: linear-gradient(90deg, #111827, #1f2937, #111827);
-      background-size: 200% 100%;
-      animation: shine 1.2s infinite;
-    }
-
-    @keyframes shine {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    .pager {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-      margin-top: 16px;
-      color: #e5e7eb;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .pager button {
-      width: auto;
-      min-width: 86px;
-      padding: 9px 13px;
-      background: #111827;
-      border: 1px solid rgba(148,163,184,.25);
-    }
-
-    .modalOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.65);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 18px;
-    }
-
-    .modalOverlay.show { display: flex; }
-
-    .modal {
-      background: #020617;
-      border: 1px solid rgba(148,163,184,.22);
-      border-radius: 18px;
-      padding: 18px;
-      width: min(520px, 100%);
-      max-height: 80vh;
-      overflow: auto;
-    }
-
-    .modal h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
-    }
-
-    .modalRow {
-      border-top: 1px solid rgba(148,163,184,.12);
-      padding: 12px 0;
-      font-size: 14px;
-      color: #e5e7eb;
-    }
-
-    .modalActions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 800px) {
-      body {
-        padding: 14px;
-        background:
-          radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%),
-          #07111f;
-      }
-
-      .mainHeader {
-        align-items: center;
-        margin-bottom: 16px;
-      }
-
-      h1 { font-size: 25px; }
-
-      .sub {
-        font-size: 13px;
-        margin: 8px 0 0;
-      }
-
-      .headerBtns {
-        flex-direction: column;
-        align-items: flex-end;
-      }
-
-      .darkBtn, .primaryBtn {
-        padding: 9px 12px;
-        font-size: 12px;
-      }
-
-      .card {
-        padding: 14px;
-        border-radius: 18px;
-      }
-
-      .filters {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      #searchInput {
-        grid-column: span 2;
-      }
-
-      input, select {
-        padding: 12px;
-        font-size: 13px;
-        border-radius: 13px;
-      }
-
-      .quickFilters {
-        gap: 7px;
-      }
-
-      .quickFilters button {
-        font-size: 11px;
-        padding: 8px 10px;
-      }
-
-      .actionsRow {
-        justify-content: stretch;
-      }
-
-      .reset {
-        width: 100%;
-        min-width: unset;
-      }
-
-      .topInfo {
-        flex-direction: column;
-        align-items: flex-start;
-        font-size: 13px;
-      }
-
-      .tablebox { display: none; }
-      .mobileCards { display: block; }
-
-      .pager { gap: 10px; }
-
-      .pager button { min-width: 75px; }
-
-      .loginBox {
-        margin: 50px auto;
-        padding: 18px;
-      }
-
-      .statusSelect {
-        width: 100%;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Property Breakdown Generator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#0b0f17;
+  --panel:#111827;
+  --panel2:#0f172a;
+  --border:#263244;
+  --gold:#d6b24a;
+  --green:#16a34a;
+  --blue:#2563eb;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --paper:#ffffff;
+  --ink:#101827;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.app{
+  display:grid;
+  grid-template-columns:430px 1fr;
+  min-height:100vh;
+}
+
+.editor{
+  background:linear-gradient(180deg,#111827,#0b0f17);
+  border-right:1px solid var(--border);
+  padding:22px;
+  height:100vh;
+  overflow:auto;
+  position:sticky;
+  top:0;
+}
+
+.editor h1{
+  font-size:21px;
+  margin:0 0 18px;
+  letter-spacing:-.3px;
+}
+
+.editor h2{
+  font-size:15px;
+  margin:24px 0 12px;
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:.3px;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+input,textarea{
+  width:100%;
+  background:#070b12;
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:11px 12px;
+  font-size:14px;
+  margin-bottom:12px;
+  outline:none;
+}
+
+input:focus,textarea:focus{
+  border-color:var(--gold);
+}
+
+textarea{
+  min-height:78px;
+  resize:vertical;
+  line-height:1.45;
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+button{
+  border:0;
+  border-radius:11px;
+  padding:12px 15px;
+  font-weight:900;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.primary{background:var(--gold);color:#111}
+.dark{background:#1e293b;color:#fff}
+.greenBtn{background:var(--green);color:#fff}
+.blueBtn{background:var(--blue);color:#fff}
+
+.status{
+  margin-top:12px;
+  color:var(--muted);
+  font-size:12px;
+  word-break:break-all;
+  line-height:1.5;
+}
+
+.preview-wrap{
+  background:#d8d8d8;
+  padding:26px;
+  overflow:auto;
+}
+
+.preview-page{
+  width:794px;
+  min-height:1123px;
+  background:var(--paper);
+  color:var(--ink);
+  margin:0 auto;
+  padding:28px 32px;
+  box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+
+.header-info{
+  text-align:left;
+  font-size:12px;
+  margin-bottom:10px;
+  color:#111;
+  line-height:1.5;
+}
+
+.header-info strong{
+  font-weight:900;
+}
+
+.preview-page h1{
+  font-size:27px;
+  line-height:1.12;
+  margin:0 0 14px;
+  font-weight:900;
+  letter-spacing:-.6px;
+}
+
+.preview-page h2{
+  font-size:20px;
+  margin:20px 0 8px;
+  padding-bottom:6px;
+  border-bottom:2px solid #d7d7d7;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.info-card{
+  border:1px solid #e5e7eb;
+  border-radius:9px;
+  padding:8px 10px;
+  min-height:48px;
+  background:#fff;
+}
+
+.info-card b{
+  display:block;
+  color:#6b7280;
+  text-transform:uppercase;
+  font-size:8.5px;
+  margin-bottom:3px;
+  font-weight:900;
+}
+
+.info-card span{
+  font-size:13px;
+  font-weight:900;
+}
+
+.desc{
+  margin:12px 0 2px;
+  padding:9px 12px;
+  border-left:4px solid #111827;
+  border-radius:8px;
+  font-size:13px;
+  line-height:1.42;
+}
+
+.breakdown{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:8px;
+  font-size:12.5px;
+}
+
+.breakdown td{
+  padding:7px 8px;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.breakdown td:last-child{
+  text-align:right;
+  font-weight:900;
+}
+
+.soft{background:#f3f4f6;font-weight:900}
+.green{background:#e9fbf3;font-weight:900}
+.pink{background:#fff1f2;font-weight:900}
+
+.section{
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
+
+.image-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.image-card{
+  width:100%;
+  aspect-ratio:4/3;
+  background:#f8fafc;
+  border-radius:11px;
+  overflow:hidden;
+  border:1px solid #e5e7eb;
+  position:relative;
+}
+
+.image-card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.plan-card img{
+  object-fit:contain!important;
+  background:#fff;
+}
+
+.remove-img{
+  position:absolute;
+  top:7px;
+  right:7px;
+  background:#111827;
+  color:#fff;
+  font-size:10px;
+  padding:5px 7px;
+  border-radius:7px;
+}
+
+.hidden{display:none}
+
+.whatsapp-client{
+  display:inline-block;
+  margin-top:11px;
+  background:var(--green);
+  color:#fff;
+  text-decoration:none;
+  padding:9px 15px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:12px;
+}
+
+.installment-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 38px;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.installment-row input{margin-bottom:0}
+
+.installment-row button{
+  padding:8px;
+  background:#991b1b;
+  color:white;
+}
+
+.small-help{
+  color:#64748b;
+  font-size:11px;
+  margin:-6px 0 10px;
+  line-height:1.4;
+}
+
+@media(max-width:1100px){
+  .app{grid-template-columns:1fr}
+  .editor{height:auto;position:relative}
+  .preview-page{width:100%}
+}
+</style>
 </head>
 
 <body>
+<div class="app">
 
-  <div id="loginView" class="loginBox">
-    <h1>Usama Database</h1>
-    <div class="sub">Login to access your database.</div>
+<div class="editor">
+<h1>Property Breakdown Generator</h1>
 
-    <input id="loginEmail" type="email" placeholder="Email" />
-    <input id="loginPassword" type="password" placeholder="Password" />
-    <button class="primaryBtn" onclick="login()">Login</button>
+<h2>Contact Info</h2>
+<label>Name</label>
+<input id="agentName" placeholder="Usama Bin Nusrat">
 
-    <div id="loginError" class="loginError"></div>
+<label>Agency</label>
+<input id="agencyName" placeholder="BFG Properties">
+
+<label>WhatsApp / Contact Number</label>
+<input id="contactNumber" placeholder="971528176879">
+
+<h2>Property Details</h2>
+<label>Title</label>
+<input id="projectTitle" placeholder="5-Bedroom - Farm Gardens, The Valley">
+
+<div class="two">
+  <div>
+    <label>Project</label>
+    <input id="project" placeholder="Farm Gardens">
   </div>
-
-  <div id="appView" class="wrap hidden">
-    <div class="mainHeader">
-      <div>
-        <h1>Usama Database</h1>
-        <div class="sub">Fast CRM database with filters, status, remarks and WhatsApp outreach.</div>
-      </div>
-
-      <div class="headerBtns">
-        <button id="exportBtn" class="primaryBtn hidden" onclick="exportCSV()">Export CSV</button>
-        <button class="darkBtn" onclick="logout()">Logout</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="filters">
-        <input id="searchInput" placeholder="Search owner, phone or unit..." />
-
-        <select id="communityFilter">
-          <option value="">All Communities</option>
-        </select>
-
-        <select id="clusterFilter">
-          <option value="">All Clusters</option>
-        </select>
-
-        <input id="unitFilter" placeholder="Unit No." />
-
-        <select id="sourceFilter">
-          <option value="">All Sources</option>
-        </select>
-
-        <select id="statusFilter">
-          <option value="">All Statuses</option>
-          <option>New</option>
-          <option>For Sale</option>
-          <option>For Rent</option>
-          <option>Sold</option>
-          <option>Call Back</option>
-          <option>No Response</option>
-          <option>Not Interested</option>
-          <option>Invalid Number</option>
-        </select>
-      </div>
-
-      <div class="quickFilters">
-        <button onclick="quickStatus('New')">New</button>
-        <button onclick="quickStatus('For Sale')">For Sale</button>
-        <button onclick="quickStatus('For Rent')">For Rent</button>
-        <button onclick="quickStatus('Sold')">Sold</button>
-        <button onclick="quickStatus('No Response')">No Response</button>
-        <button onclick="quickStatus('Invalid Number')">Invalid</button>
-      </div>
-
-      <div class="actionsRow">
-        <button class="reset" onclick="resetFilters()">Reset Filters</button>
-      </div>
-
-      <div class="topInfo">
-        <div>
-          <span id="status">Preparing database...</span>
-          <span id="loadingBadge" class="loadingBadge">Loading data...</span>
-          <span id="saveToast" class="saveToast">Saved ✓</span>
-        </div>
-        <div>Showing 50 records per page</div>
-      </div>
-
-      <div class="tablebox">
-        <table>
-          <thead>
-            <tr>
-              <th>Community</th>
-              <th>Cluster</th>
-              <th>Unit</th>
-              <th>Owner Name</th>
-              <th>WhatsApp</th>
-              <th>Status</th>
-              <th>Remarks</th>
-              <th>Last Contacted</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-
-      <div id="mobileCards" class="mobileCards"></div>
-
-      <div class="pager">
-        <button id="prevBtn" onclick="prevPage()">Previous</button>
-        <div id="pageInfo">1 / 1</div>
-        <button id="nextBtn" onclick="nextPage()">Next</button>
-      </div>
-    </div>
+  <div>
+    <label>Developer</label>
+    <input id="developer" placeholder="EMAAR">
   </div>
+</div>
 
-  <div id="propertiesModal" class="modalOverlay">
-    <div class="modal">
-      <h2 id="modalTitle">More Units</h2>
-      <div id="modalContent"></div>
-      <div class="modalActions">
-        <button class="darkBtn" onclick="closeModal()">Close</button>
-      </div>
-    </div>
+<label>Area</label>
+<input id="area" placeholder="The Valley">
+
+<div class="two">
+  <div>
+    <label>Type</label>
+    <input id="propertyType" placeholder="Villa">
   </div>
+  <div>
+    <label>Bedrooms</label>
+    <input id="bedrooms" placeholder="5-BR">
+  </div>
+</div>
 
-  <script>
-    const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
+<div class="two">
+  <div>
+    <label>Bathrooms</label>
+    <input id="bathrooms" placeholder="6">
+  </div>
+  <div>
+    <label>Floor</label>
+    <input id="floor" placeholder="G+1">
+  </div>
+</div>
 
-    const TABLE_NAME = "owners";
-    const PAGE_SIZE = 50;
+<label>Size</label>
+<input id="size" placeholder="Plot: 10,008 sq ft • BUA: 5,657 sq ft">
 
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<div class="two">
+  <div>
+    <label>View</label>
+    <input id="view" placeholder="Community">
+  </div>
+  <div>
+    <label>Completion</label>
+    <input id="completion" placeholder="Aug-2025">
+  </div>
+</div>
 
-    let currentPage = 0;
-    let totalCount = 0;
-    let debounceTimer = null;
-    let listenersReady = false;
-    let currentAccess = null;
-    let allMiniRows = [];
+<label>Description</label>
+<textarea id="projectDescription" placeholder="Premium villa in a well-established Emaar community with strong end-user demand and long-term investment potential."></textarea>
 
-    const el = id => document.getElementById(id);
+<h2>Payment Breakdown</h2>
+<label>Unit Price</label>
+<input id="unitPrice" type="number" placeholder="8600000">
 
-    async function checkSession() {
-      const { data } = await db.auth.getSession();
+<label>Payment to Seller</label>
+<input id="paymentToSeller" type="number" placeholder="7340023">
 
-      if (!data.session) {
-        el("loginView").classList.remove("hidden");
-        el("appView").classList.add("hidden");
-        return;
-      }
+<div class="two">
+  <div>
+    <label>DLD %</label>
+    <input id="dldPercent" type="number" value="4">
+  </div>
+  <div>
+    <label>DLD Amount AED</label>
+    <input id="dldAmount" type="number" placeholder="Optional">
+  </div>
+</div>
 
-      const email = data.session.user.email;
+<div class="two">
+  <div>
+    <label>Brokerage %</label>
+    <input id="brokeragePercent" type="number" value="2">
+  </div>
+  <div>
+    <label>Brokerage Amount AED</label>
+    <input id="brokerageAmount" type="number" placeholder="Optional">
+  </div>
+</div>
 
-      const { data: access } = await db
-        .from("user_access")
-        .select("*")
-        .eq("email", email)
-        .single();
+<div class="two">
+  <div>
+    <label>VAT on Brokerage %</label>
+    <input id="vatPercent" type="number" value="5">
+  </div>
+  <div>
+    <label>VAT Amount AED</label>
+    <input id="vatAmount" type="number" placeholder="Optional">
+  </div>
+</div>
 
-      currentAccess = access;
+<div class="two">
+  <div>
+    <label>Trustee Fee AED</label>
+    <input id="trusteeFee" type="number" value="4200">
+  </div>
+  <div>
+    <label>Title Deed Fee AED</label>
+    <input id="titleDeedFee" type="number" value="580">
+  </div>
+</div>
 
-      if (currentAccess?.can_export) {
-        el("exportBtn").classList.remove("hidden");
-      }
+<div class="small-help">
+Manual AED amount overrides percentage. Brokerage total shown = Brokerage + VAT.
+</div>
 
-      el("loginView").classList.add("hidden");
-      el("appView").classList.remove("hidden");
+<h2>Pending / Installments Optional</h2>
+<div id="installmentsEditor"></div>
+<button class="dark" onclick="addInstallment()">+ Add Installment</button>
 
-      setupListeners();
-      await loadDropdowns();
-      loadData();
+<h2>Images</h2>
+<label>Floor Plans</label>
+<input id="floorPlansInput" type="file" accept="image/*" multiple>
+
+<label>Cluster / Master Plan Optional</label>
+<input id="clusterPlansInput" type="file" accept="image/*" multiple>
+
+<label>Property Images</label>
+<input id="projectImagesInput" type="file" accept="image/*" multiple>
+
+<div class="actions">
+  <button class="primary" onclick="saveProject()">Save / Update Link</button>
+  <button class="blueBtn" onclick="downloadPDF()">Generate PDF</button>
+  <button class="greenBtn" onclick="openWhatsApp()">WhatsApp Client</button>
+  <button class="dark" onclick="newCopy()">New Copy</button>
+  <button class="dark" onclick="clearAll()">Clear</button>
+</div>
+
+<div class="status" id="statusBox"></div>
+</div>
+
+<div class="preview-wrap">
+<div class="preview-page" id="pdfArea">
+
+<div class="header-info" id="headerInfo"></div>
+
+<h1 id="pTitle">Property Breakdown</h1>
+
+<div class="info-grid">
+  <div class="info-card"><b>Project</b><span id="pProject">-</span></div>
+  <div class="info-card"><b>Developer</b><span id="pDeveloper">-</span></div>
+  <div class="info-card"><b>Area</b><span id="pArea">-</span></div>
+  <div class="info-card"><b>Type</b><span id="pType">-</span></div>
+  <div class="info-card"><b>Bedrooms</b><span id="pBedrooms">-</span></div>
+  <div class="info-card"><b>Bathrooms</b><span id="pBathrooms">-</span></div>
+  <div class="info-card"><b>Size</b><span id="pSize">-</span></div>
+  <div class="info-card"><b>Floor</b><span id="pFloor">-</span></div>
+  <div class="info-card"><b>View</b><span id="pView">-</span></div>
+  <div class="info-card"><b>Completion</b><span id="pCompletion">-</span></div>
+</div>
+
+<div class="desc" id="pDescription"></div>
+
+<h2>Payment Breakdown</h2>
+<table class="breakdown" id="breakdownTable"></table>
+
+<div id="clientWhatsappBox"></div>
+
+<div class="section">
+  <h2>Floor Plans</h2>
+  <div class="image-grid" id="floorPlansPreview"></div>
+</div>
+
+<div class="section hidden" id="clusterSection">
+  <h2>Cluster / Master Plan</h2>
+  <div class="image-grid" id="clusterPlansPreview"></div>
+</div>
+
+<div class="section">
+  <h2>Property Images</h2>
+  <div class="image-grid" id="projectImagesPreview"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://cowyowpcktpvnevrmfej.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_KEY_HERE";
+const STORAGE_BUCKET = "presentation-images";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentId = new URLSearchParams(window.location.search).get("id");
+
+const data = {
+  floorPlans: [],
+  clusterPlans: [],
+  projectImages: [],
+  installments: []
+};
+
+const fields = [
+  "agentName","agencyName","contactNumber",
+  "projectTitle","project","developer","area",
+  "propertyType","bedrooms","bathrooms","size",
+  "floor","view","completion","projectDescription",
+  "unitPrice","paymentToSeller",
+  "dldPercent","dldAmount",
+  "brokeragePercent","brokerageAmount",
+  "vatPercent","vatAmount",
+  "trusteeFee","titleDeedFee"
+];
+
+function val(id){return document.getElementById(id).value.trim()}
+function num(id){return Number(val(id)||0)}
+
+function money(value){
+  return "AED " + Number(value||0).toLocaleString("en-AE",{maximumFractionDigits:0});
+}
+
+function set(id,value){
+  document.getElementById(id).innerText = value;
+}
+
+function status(msg){
+  document.getElementById("statusBox").innerHTML = msg || "";
+}
+
+function addInstallment(label="",amount=""){
+  data.installments.push({label,amount});
+  renderInstallmentsEditor();
+  updatePreview();
+}
+
+function removeInstallment(index){
+  data.installments.splice(index,1);
+  renderInstallmentsEditor();
+  updatePreview();
+}
+
+function renderInstallmentsEditor(){
+  document.getElementById("installmentsEditor").innerHTML =
+    data.installments.map((item,index)=>`
+      <div class="installment-row">
+        <input placeholder="Installment name" value="${escapeHtml(item.label||"")}" oninput="data.installments[${index}].label=this.value;updatePreview()">
+        <input type="number" placeholder="Amount" value="${escapeHtml(item.amount||"")}" oninput="data.installments[${index}].amount=this.value;updatePreview()">
+        <button onclick="removeInstallment(${index})">X</button>
+      </div>
+    `).join("");
+}
+
+function calculate(){
+  const unit = num("unitPrice");
+  const seller = num("paymentToSeller");
+
+  const dld = num("dldAmount") > 0
+    ? num("dldAmount")
+    : unit * num("dldPercent") / 100;
+
+  const brokerage = num("brokerageAmount") > 0
+    ? num("brokerageAmount")
+    : unit * num("brokeragePercent") / 100;
+
+  const vat = num("vatAmount") > 0
+    ? num("vatAmount")
+    : brokerage * num("vatPercent") / 100;
+
+  const brokerageVat = brokerage + vat;
+
+  const trustee = num("trusteeFee");
+  const title = num("titleDeedFee");
+
+  const transferFees = dld + trustee + title + brokerageVat;
+
+  const remaining = data.installments.reduce((sum,item)=>{
+    return sum + Number(item.amount || 0);
+  },0);
+
+  const total = seller + transferFees + remaining;
+
+  return {
+    unit,
+    seller,
+    dld,
+    brokerage,
+    vat,
+    brokerageVat,
+    trustee,
+    title,
+    transferFees,
+    remaining,
+    total
+  };
+}
+
+function updatePreview(){
+  const header = [];
+
+  if(val("agentName")) header.push(`<strong>Name:</strong> ${escapeHtml(val("agentName"))}`);
+  if(val("agencyName")) header.push(`<strong>Agency:</strong> ${escapeHtml(val("agencyName"))}`);
+  if(val("contactNumber")) header.push(`<strong>Contact:</strong> +${val("contactNumber").replace(/\D/g,"")}`);
+
+  document.getElementById("headerInfo").innerHTML = header.join("<br>");
+
+  set("pTitle", val("projectTitle") || "Property Breakdown");
+  set("pProject", val("project") || "-");
+  set("pDeveloper", val("developer") || "-");
+  set("pArea", val("area") || "-");
+  set("pType", val("propertyType") || "-");
+  set("pBedrooms", val("bedrooms") || "-");
+  set("pBathrooms", val("bathrooms") || "-");
+  set("pSize", val("size") || "-");
+  set("pFloor", val("floor") || "-");
+  set("pView", val("view") || "-");
+  set("pCompletion", val("completion") || "-");
+  set("pDescription", val("projectDescription") || "");
+
+  const c = calculate();
+
+  let rows = `
+    <tr class="soft"><td>Unit Price</td><td>${money(c.unit)}</td></tr>
+    <tr><td>Payment to Seller</td><td>${money(c.seller)}</td></tr>
+    <tr><td>DLD Fee</td><td>${money(c.dld)}</td></tr>
+    <tr><td>Trustee Office Fee</td><td>${money(c.trustee)}</td></tr>
+    <tr><td>Title Deed Fee</td><td>${money(c.title)}</td></tr>
+    <tr><td>Brokerage 2% + VAT</td><td>${money(c.brokerageVat)}</td></tr>
+  `;
+
+  data.installments.forEach(item=>{
+    rows += `
+      <tr class="green">
+        <td>${escapeHtml(item.label || "Pending Payment")}</td>
+        <td>${money(item.amount)}</td>
+      </tr>
+    `;
+  });
+
+  rows += `
+    <tr class="pink"><td>Total Transfer Fees</td><td>${money(c.transferFees)}</td></tr>
+    ${c.remaining > 0 ? `<tr class="green"><td>Total Remaining Payment Plan</td><td>${money(c.remaining)}</td></tr>` : ""}
+    <tr class="soft"><td>Total Cost for Buyer</td><td>${money(c.total)}</td></tr>
+  `;
+
+  document.getElementById("breakdownTable").innerHTML = rows;
+
+  const phone = val("contactNumber").replace(/\D/g,"");
+
+  document.getElementById("clientWhatsappBox").innerHTML = phone
+    ? `<a class="whatsapp-client" target="_blank" href="https://wa.me/${phone}?text=${encodeURIComponent("Hi, I am interested in " + (val("projectTitle") || "this property"))}">WhatsApp Now</a>`
+    : "";
+
+  renderImages();
+}
+
+function imageHtml(item,type,index){
+  const src = typeof item === "string" ? item : item.url;
+  const planClass = type === "floorPlans" || type === "clusterPlans" ? "plan-card" : "";
+
+  return `
+    <div class="image-card ${planClass}">
+      <img src="${src}">
+      <button class="remove-img" onclick="removeImage('${type}',${index})">Remove</button>
+    </div>
+  `;
+}
+
+function renderImages(){
+  document.getElementById("floorPlansPreview").innerHTML =
+    data.floorPlans.map((src,index)=>imageHtml(src,"floorPlans",index)).join("");
+
+  document.getElementById("clusterPlansPreview").innerHTML =
+    data.clusterPlans.map((src,index)=>imageHtml(src,"clusterPlans",index)).join("");
+
+  document.getElementById("projectImagesPreview").innerHTML =
+    data.projectImages.map((src,index)=>imageHtml(src,"projectImages",index)).join("");
+
+  document.getElementById("clusterSection").classList.toggle(
+    "hidden",
+    data.clusterPlans.length === 0
+  );
+}
+
+function removeImage(type,index){
+  data[type].splice(index,1);
+  updatePreview();
+}
+
+async function uploadImages(input,type){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+
+  status("Uploading images...");
+
+  for(const file of files){
+    const uploaded = await uploadOriginalToSupabase(file,type);
+    data[type].push(uploaded);
+  }
+
+  input.value = "";
+  updatePreview();
+  status("Images uploaded. Click Save / Update Link.");
+}
+
+async function uploadOriginalToSupabase(file,type){
+  const safeName = file.name.replace(/[^\w.\-]+/g,"-");
+  const path = `${currentId || "draft"}/${type}/${Date.now()}-${safeName}`;
+
+  const { error } = await sb.storage
+    .from(STORAGE_BUCKET)
+    .upload(path,file,{cacheControl:"3600",upsert:false});
+
+  if(error){
+    console.warn("Storage upload failed, using base64 fallback:", error.message);
+    return await readImageOriginal(file);
+  }
+
+  const { data:pub } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  return {url:pub.publicUrl,path};
+}
+
+function readImageOriginal(file){
+  return new Promise(resolve=>{
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById("floorPlansInput").addEventListener("change",function(){
+  uploadImages(this,"floorPlans");
+});
+
+document.getElementById("clusterPlansInput").addEventListener("change",function(){
+  uploadImages(this,"clusterPlans");
+});
+
+document.getElementById("projectImagesInput").addEventListener("change",function(){
+  uploadImages(this,"projectImages");
+});
+
+fields.forEach(id=>{
+  document.getElementById(id).addEventListener("input",updatePreview);
+});
+
+function collectPayload(){
+  const form = {};
+  fields.forEach(id=>form[id]=val(id));
+
+  form.floorPlans = data.floorPlans;
+  form.clusterPlans = data.clusterPlans;
+  form.projectImages = data.projectImages;
+  form.installments = data.installments;
+
+  return form;
+}
+
+async function saveProject(){
+  status("Saving...");
+
+  const form = collectPayload();
+  const title = val("projectTitle") || "Property Breakdown";
+
+  if(currentId){
+    const { error } = await sb
+      .from("presentations")
+      .update({title,form})
+      .eq("id",currentId);
+
+    if(error){
+      status("Save failed: " + error.message);
+      return;
+    }
+  }else{
+    const { data:res,error } = await sb
+      .from("presentations")
+      .insert([{title,form}])
+      .select("id")
+      .single();
+
+    if(error){
+      status("Save failed: " + error.message);
+      return;
     }
 
-    async function login() {
-      el("loginError").textContent = "";
+    currentId = res.id;
+    const newUrl = `${window.location.origin}${window.location.pathname}?id=${currentId}`;
+    window.history.replaceState({}, "", newUrl);
+  }
 
-      const email = el("loginEmail").value.trim();
-      const password = el("loginPassword").value.trim();
+  const link = `${window.location.origin}${window.location.pathname}?id=${currentId}`;
 
-      if (!email || !password) {
-        el("loginError").textContent = "Enter email and password.";
-        return;
-      }
+  status(`Saved ✅<br>Share/Edit Link:<br><a style="color:#d4af37" href="${link}" target="_blank">${link}</a>`);
+}
 
-      const { error } = await db.auth.signInWithPassword({ email, password });
+async function loadProject(){
+  if(!currentId) return;
 
-      if (error) {
-        el("loginError").textContent = "Wrong email or password.";
-        return;
-      }
+  status("Loading saved presentation...");
 
-      checkSession();
+  const {data:res,error} = await sb
+    .from("presentations")
+    .select("id,title,form")
+    .eq("id",currentId)
+    .single();
+
+  if(error || !res){
+    status("Could not load saved project.");
+    return;
+  }
+
+  const f = res.form || {};
+
+  fields.forEach(id=>{
+    if(f[id] !== undefined && document.getElementById(id)){
+      document.getElementById(id).value = f[id];
     }
+  });
 
-    async function logout() {
-      await db.auth.signOut();
-      location.reload();
+  data.floorPlans = f.floorPlans || [];
+  data.clusterPlans = f.clusterPlans || [];
+  data.projectImages = f.projectImages || [];
+  data.installments = f.installments || [];
+
+  renderInstallmentsEditor();
+  updatePreview();
+  status("Loaded ✅");
+}
+
+function downloadPDF(){
+  const element = document.getElementById("pdfArea");
+
+  document.querySelectorAll(".remove-img").forEach(btn=>{
+    btn.style.display = "none";
+  });
+
+  html2pdf().set({
+    margin:0,
+    filename:(val("projectTitle") || "property-breakdown") + ".pdf",
+    image:{type:"jpeg",quality:1},
+    html2canvas:{
+      scale:3,
+      useCORS:true,
+      backgroundColor:"#ffffff",
+      scrollY:0
+    },
+    jsPDF:{
+      unit:"px",
+      format:[794,1123],
+      orientation:"portrait"
+    },
+    pagebreak:{
+      mode:["css","legacy"]
     }
-
-    function today() {
-      return new Date().toISOString().slice(0, 10);
-    }
-
-    function clean(value) {
-      if (value === null || value === undefined || value === "" || value === "EMPTY") return "-";
-      return String(value);
-    }
-
-    function get(row, keys) {
-      for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== "" && row[key] !== "EMPTY") {
-          return row[key];
-        }
-      }
-      return "";
-    }
-
-    function escapeHtml(text) {
-      return String(text || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function formatPhone(phone) {
-      let p = String(phone || "").replace(/[^\d]/g, "");
-      if (!p) return "";
-      if (p.startsWith("00")) p = p.substring(2);
-      if (p.length === 9 && p.startsWith("5")) p = "971" + p;
-      if (p.length === 10 && p.startsWith("05")) p = "971" + p.substring(1);
-      return p;
-    }
-
-    function statusClass(status) {
-      return "status-" + String(status || "New").replaceAll(" ", "");
-    }
-
-    function showSaved() {
-      el("saveToast").classList.add("show");
-      setTimeout(() => el("saveToast").classList.remove("show"), 1200);
-    }
-
-    async function markContacted(id) {
-      await db.from(TABLE_NAME).update({ last_contacted: today() }).eq("id", id);
-    }
-
-    function whatsappButton(row) {
-      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
-      const formatted = formatPhone(phone);
-
-      if (!formatted) return "-";
-
-      const owner = get(row, ["owner"]);
-      const unit = get(row, ["unit"]);
-      const cluster = get(row, ["cluster"]);
-      const community = get(row, ["community"]);
-
-      const msg = `Hello, Mr. ${owner || ""}
-
-Hope you're doing well.
-
-This is Usama from BFG Properties.
-
-I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${community}.
-
-Would you consider selling if you receive a strong offer?
-
-Looking forward to your kind response.
-
-Regards,
-Usama Bin Nusrat.`;
-
-      return `<a class="waBtn" target="_blank" onclick="markContacted(${row.id})" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">${escapeHtml(phone)}</a>`;
-    }
-
-    function showLoading() {
-      el("loadingBadge").classList.add("show");
-      el("status").textContent = "Loading database...";
-
-      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `
-        <tr>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-          <td><div class="skeleton"></div></td>
-        </tr>
-      `).join("");
-
-      el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() => `
-        <div class="ownerCard">
-          <div class="skeleton" style="height:22px;margin-bottom:12px;"></div>
-          <div class="skeleton" style="margin-bottom:10px;"></div>
-          <div class="skeleton" style="margin-bottom:10px;"></div>
-          <div class="skeleton"></div>
-        </div>
-      `).join("");
-    }
-
-    function hideLoading() {
-      el("loadingBadge").classList.remove("show");
-    }
-
-    function markRemarkDirty(btnId) {
-      el(btnId).classList.add("show");
-    }
-
-    async function saveRemarks(id, textareaId, btnId) {
-      const value = el(textareaId).value;
-
-      const { error } = await db
-        .from(TABLE_NAME)
-        .update({
-          remarks: value,
-          last_contacted: today()
-        })
-        .eq("id", id);
-
-      if (error) {
-        alert("Failed to update remarks");
-        return;
-      }
-
-      el(btnId).classList.remove("show");
-      showSaved();
-
-      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    async function updateStatus(id, value) {
-      const { error } = await db
-        .from(TABLE_NAME)
-        .update({
-          status: value,
-          last_contacted: today()
-        })
-        .eq("id", id);
-
-      if (error) {
-        alert("Failed to update status");
-        return;
-      }
-
-      showSaved();
-
-      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    function applyFilters(query) {
-      const search = el("searchInput").value.trim();
-      const community = el("communityFilter").value;
-      const cluster = el("clusterFilter").value;
-      const unit = el("unitFilter").value.trim();
-      const source = el("sourceFilter").value;
-      const status = el("statusFilter").value;
-
-      if (search) {
-        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone1.ilike.%${search}%,phone2.ilike.%${search}%`);
-      }
-
-      if (community) query = query.eq("community", community);
-      if (cluster) query = query.eq("cluster", cluster);
-      if (unit) query = query.ilike("unit", `%${unit}%`);
-      if (source) query = query.eq("data_source", source);
-      if (status) query = query.eq("status", status);
-
-      return query;
-    }
-
-    async function loadData() {
-      showLoading();
-
-      const from = currentPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-
-      let query = db
-        .from(TABLE_NAME)
-        .select("*", { count: "exact" })
-        .range(from, to);
-
-      query = applyFilters(query);
-
-      query = query
-        .order("community", { ascending: true })
-        .order("cluster", { ascending: true })
-        .order("unit_sort", { ascending: true });
-
-      const { data, error, count } = await query;
-
-      hideLoading();
-
-      if (error) {
-        el("status").textContent = "Error loading data";
-        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
-        el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`;
-        return;
-      }
-
-      totalCount = count || 0;
-      renderData(data || []);
-
-      const start = totalCount === 0 ? 0 : from + 1;
-      const end = Math.min(to + 1, totalCount);
-      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-
-      el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`;
-      el("pageInfo").textContent = `${currentPage + 1} / ${totalPages}`;
-
-      el("prevBtn").disabled = currentPage === 0;
-      el("nextBtn").disabled = currentPage + 1 >= totalPages;
-    }
-
-    function statusDropdown(row) {
-      const current = clean(row.status) === "-" ? "New" : row.status;
-      const statuses = ["New", "For Sale", "For Rent", "Sold", "Call Back", "No Response", "Not Interested", "Invalid Number"];
-
-      return `
-        <select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">
-          ${statuses.map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
-      `;
-    }
-
-    function remarksEditor(row, remarks, prefix) {
-      const textareaId = `${prefix}_remark_${row.id}`;
-      const btnId = `${prefix}_save_${row.id}`;
-
-      return `
-        <div class="remarkBox">
-          <textarea 
-            id="${textareaId}"
-            class="remarksInput"
-            placeholder="Add remarks..."
-            oninput="markRemarkDirty('${btnId}')"
-          >${escapeHtml(remarks)}</textarea>
-          <button id="${btnId}" class="saveRemarkBtn" onclick="saveRemarks(${row.id}, '${textareaId}', '${btnId}')">Save</button>
-        </div>
-      `;
-    }
-
-    function rowKey(row) {
-      const owner = String(get(row, ["owner"])).trim().toLowerCase();
-      const p1 = formatPhone(get(row, ["phone1"]));
-      const p2 = formatPhone(get(row, ["phone2"]));
-      return { owner, p1, p2 };
-    }
-
-    function getRelatedRows(row) {
-      const key = rowKey(row);
-
-      return allMiniRows.filter(x => {
-        const k = rowKey(x);
-
-        const sameOwner = key.owner && k.owner && key.owner === k.owner;
-        const samePhone1 = key.p1 && (key.p1 === k.p1 || key.p1 === k.p2);
-        const samePhone2 = key.p2 && (key.p2 === k.p1 || key.p2 === k.p2);
-
-        return sameOwner || samePhone1 || samePhone2;
-      });
-    }
-
-    function moreUnitButton(row) {
-      const related = getRelatedRows(row);
-      if (related.length <= 1) return "";
-      return `<button class="moreUnitBtn" onclick='openProperties(${JSON.stringify(row).replaceAll("'", "&#039;")})'>More Unit</button>`;
-    }
-
-    function renderData(rows) {
-      if (!rows.length) {
-        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
-        el("mobileCards").innerHTML = `<div class="empty">No records found</div>`;
-        return;
-      }
-
-      el("tableBody").innerHTML = rows.map(row => {
-        const remarks = get(row, ["remarks"]);
-
-        return `
-          <tr>
-            <td>${escapeHtml(clean(row.community))}</td>
-            <td>${escapeHtml(clean(row.cluster))}</td>
-            <td>${escapeHtml(clean(row.unit))}</td>
-            <td>
-              ${escapeHtml(clean(row.owner))}
-              ${moreUnitButton(row)}
-            </td>
-            <td>${whatsappButton(row)}</td>
-            <td>${statusDropdown(row)}</td>
-            <td>${remarksEditor(row, remarks, "desk")}</td>
-            <td data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</td>
-          </tr>
-        `;
-      }).join("");
-
-      el("mobileCards").innerHTML = rows.map(row => {
-        const remarks = get(row, ["remarks"]);
-
-        return `
-          <div class="ownerCard">
-            <div class="ownerTop">
-              <div class="ownerName">
-                ${escapeHtml(clean(row.owner))}
-                ${moreUnitButton(row)}
-              </div>
-              <div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div>
-            </div>
-
-            <div class="mobileLocation">
-              <div class="locationText">
-                <span>Property</span>
-                ${escapeHtml(clean(row.community))} - ${escapeHtml(clean(row.cluster))}
-              </div>
-              ${whatsappButton(row)}
-            </div>
-
-            <div class="infoLine"><span>Status</span>${statusDropdown(row)}</div>
-            <div class="infoLine"><span>Remarks</span>${remarksEditor(row, remarks, "mob")}</div>
-            <div class="infoLine"><span>Last Contacted</span><span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span></div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function openProperties(row) {
-      const related = getRelatedRows(row);
-
-      el("modalTitle").textContent = `${clean(row.owner)} - More Units`;
-
-      if (!related.length) {
-        el("modalContent").innerHTML = `<div class="empty">No more units found</div>`;
-      } else {
-        el("modalContent").innerHTML = related
-          .sort((a, b) => String(a.unit_sort || a.unit).localeCompare(String(b.unit_sort || b.unit), undefined, { numeric: true }))
-          .map(x => `
-            <div class="modalRow">
-              ${escapeHtml(clean(x.community))} - ${escapeHtml(clean(x.cluster))} - Unit#${escapeHtml(clean(x.unit))}
-            </div>
-          `).join("");
-      }
-
-      el("propertiesModal").classList.add("show");
-    }
-
-    function closeModal() {
-      el("propertiesModal").classList.remove("show");
-    }
-
-    async function loadDropdowns() {
-      let allRows = [];
-      let from = 0;
-      const batchSize = 1000;
-
-      while (true) {
-        const { data, error } = await db
-          .from(TABLE_NAME)
-          .select("id, community, cluster, unit, unit_sort, owner, phone1, phone2, data_source")
-          .range(from, from + batchSize - 1);
-
-        if (error || !data || data.length === 0) break;
-
-        allRows = allRows.concat(data);
-
-        if (data.length < batchSize) break;
-        from += batchSize;
-      }
-
-      allMiniRows = allRows;
-
-      fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
-      fillSelect("clusterFilter", [...new Set(allRows.map(x => x.cluster).filter(Boolean))]);
-      fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
-    }
-
-    function fillSelect(id, values) {
-      const select = el(id);
-      const firstOption = select.children[0].outerHTML;
-
-      select.innerHTML = firstOption + values
-        .sort((a, b) => String(a).localeCompare(String(b)))
-        .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
-        .join("");
-    }
-
-    function quickStatus(status) {
-      el("statusFilter").value = status;
-      currentPage = 0;
-      loadData();
-    }
-
-    function resetFilters() {
-      el("searchInput").value = "";
-      el("communityFilter").value = "";
-      el("clusterFilter").value = "";
-      el("unitFilter").value = "";
-      el("sourceFilter").value = "";
-      el("statusFilter").value = "";
-      currentPage = 0;
-      loadData();
-    }
-
-    function nextPage() {
-      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-      if (currentPage + 1 >= totalPages) return;
-      currentPage++;
-      loadData();
-    }
-
-    function prevPage() {
-      if (currentPage === 0) return;
-      currentPage--;
-      loadData();
-    }
-
-    async function exportCSV() {
-      if (!currentAccess?.can_export) return;
-
-      let allRows = [];
-      let from = 0;
-      const batchSize = 1000;
-
-      while (true) {
-        const { data, error } = await db
-          .from(TABLE_NAME)
-          .select("community,cluster,unit,owner,phone1,phone2,remarks,data_source,status,last_contacted")
-          .range(from, from + batchSize - 1);
-
-        if (error) {
-          alert("Export failed");
-          return;
-        }
-
-        if (!data || data.length === 0) break;
-
-        allRows = allRows.concat(data);
-        if (data.length < batchSize) break;
-        from += batchSize;
-      }
-
-      const headers = ["community","cluster","unit","owner","phone1","phone2","remarks","data_source","status","last_contacted"];
-
-      const csv = [
-        headers.join(","),
-        ...allRows.map(row => headers.map(h => {
-          const value = row[h] ?? "";
-          return `"${String(value).replaceAll('"', '""')}"`;
-        }).join(","))
-      ].join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `usama_database_export_${today()}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function setupListeners() {
-      if (listenersReady) return;
-      listenersReady = true;
-
-      ["searchInput", "unitFilter"].forEach(id => {
-        el(id).addEventListener("input", () => {
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(() => {
-            currentPage = 0;
-            loadData();
-          }, 400);
-        });
-      });
-
-      ["communityFilter", "clusterFilter", "sourceFilter", "statusFilter"].forEach(id => {
-        el(id).addEventListener("change", () => {
-          currentPage = 0;
-          loadData();
-        });
-      });
-    }
-
-    checkSession();
-  </script>
+  }).from(element).save().then(()=>{
+    document.querySelectorAll(".remove-img").forEach(btn=>{
+      btn.style.display = "block";
+    });
+  });
+}
+
+function openWhatsApp(){
+  const phone = val("contactNumber").replace(/\D/g,"");
+
+  if(!phone){
+    alert("Add your WhatsApp/contact number first.");
+    return;
+  }
+
+  const message = `Hi, I am interested in ${val("projectTitle") || "this property"}.`;
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+}
+
+function newCopy(){
+  currentId = null;
+  window.history.replaceState({}, "", window.location.pathname);
+  status("New copy mode. Click Save / Update Link to create a new saved link.");
+}
+
+function clearAll(){
+  if(!confirm("Clear all fields and images?")) return;
+
+  fields.forEach(id=>{
+    if(id === "dldPercent") document.getElementById(id).value = 4;
+    else if(id === "brokeragePercent") document.getElementById(id).value = 2;
+    else if(id === "vatPercent") document.getElementById(id).value = 5;
+    else if(id === "trusteeFee") document.getElementById(id).value = 4200;
+    else if(id === "titleDeedFee") document.getElementById(id).value = 580;
+    else document.getElementById(id).value = "";
+  });
+
+  data.floorPlans = [];
+  data.clusterPlans = [];
+  data.projectImages = [];
+  data.installments = [];
+
+  renderInstallmentsEditor();
+  updatePreview();
+  status("");
+}
+
+function escapeHtml(str){
+  return String(str||"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+renderInstallmentsEditor();
+updatePreview();
+loadProject();
+</script>
 </body>
 </html>
