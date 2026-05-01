@@ -12,24 +12,25 @@
 *{box-sizing:border-box}
 
 :root{
-  --bg:#0b0f17;
-  --panel:#111827;
-  --panel2:#0f172a;
+  --bg:#070b12;
+  --panel:#0f172a;
+  --panel-soft:#111827;
   --border:#263244;
   --gold:#d6b24a;
-  --green:#16a34a;
   --blue:#2563eb;
-  --text:#f8fafc;
+  --green:#16a34a;
+  --red:#991b1b;
   --muted:#94a3b8;
   --paper:#ffffff;
-  --ink:#101827;
+  --ink:#111827;
+  --soft:#f8fafc;
 }
 
 body{
   margin:0;
   font-family:Arial,sans-serif;
   background:var(--bg);
-  color:var(--text);
+  color:#fff;
 }
 
 .app{
@@ -38,8 +39,9 @@ body{
   min-height:100vh;
 }
 
+/* LEFT EDITOR */
 .editor{
-  background:linear-gradient(180deg,#111827,#0b0f17);
+  background:linear-gradient(180deg,#111827,#070b12);
   border-right:1px solid var(--border);
   padding:22px;
   height:100vh;
@@ -51,15 +53,15 @@ body{
 .editor h1{
   font-size:21px;
   margin:0 0 18px;
-  letter-spacing:-.3px;
+  letter-spacing:-.4px;
 }
 
 .editor h2{
-  font-size:15px;
+  font-size:14px;
   margin:24px 0 12px;
   color:var(--gold);
   text-transform:uppercase;
-  letter-spacing:.3px;
+  letter-spacing:.5px;
 }
 
 label{
@@ -72,7 +74,7 @@ label{
 
 input,textarea{
   width:100%;
-  background:#070b12;
+  background:#05070d;
   color:#fff;
   border:1px solid var(--border);
   border-radius:11px;
@@ -115,9 +117,9 @@ button{
 }
 
 .primary{background:var(--gold);color:#111}
-.dark{background:#1e293b;color:#fff}
-.greenBtn{background:var(--green);color:#fff}
 .blueBtn{background:var(--blue);color:#fff}
+.greenBtn{background:var(--green);color:#fff}
+.dark{background:#1e293b;color:#fff}
 
 .status{
   margin-top:12px;
@@ -127,9 +129,14 @@ button{
   line-height:1.5;
 }
 
+.status a{
+  color:var(--gold);
+}
+
+/* PREVIEW */
 .preview-wrap{
-  background:#d8d8d8;
-  padding:26px;
+  background:#d9d9d9;
+  padding:24px;
   overflow:auto;
 }
 
@@ -139,16 +146,16 @@ button{
   background:var(--paper);
   color:var(--ink);
   margin:0 auto;
-  padding:28px 32px;
+  padding:24px 28px;
   box-shadow:0 8px 30px rgba(0,0,0,.18);
 }
 
 .header-info{
   text-align:left;
-  font-size:12px;
+  font-size:11.5px;
   margin-bottom:10px;
   color:#111;
-  line-height:1.5;
+  line-height:1.45;
 }
 
 .header-info strong{
@@ -156,18 +163,18 @@ button{
 }
 
 .preview-page h1{
-  font-size:27px;
+  font-size:24px;
   line-height:1.12;
-  margin:0 0 14px;
+  margin:0 0 16px;
   font-weight:900;
-  letter-spacing:-.6px;
+  letter-spacing:-.4px;
 }
 
 .preview-page h2{
-  font-size:20px;
-  margin:20px 0 8px;
+  font-size:18px;
+  margin:18px 0 8px;
   padding-bottom:6px;
-  border-bottom:2px solid #d7d7d7;
+  border-bottom:1px solid #e5e7eb;
   font-weight:900;
   letter-spacing:-.3px;
 }
@@ -175,23 +182,24 @@ button{
 .info-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:7px;
+  gap:8px;
 }
 
 .info-card{
   border:1px solid #e5e7eb;
-  border-radius:9px;
-  padding:8px 10px;
-  min-height:48px;
-  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  min-height:54px;
+  background:#f9fafb;
 }
 
 .info-card b{
   display:block;
   color:#6b7280;
   text-transform:uppercase;
-  font-size:8.5px;
-  margin-bottom:3px;
+  font-size:9px;
+  letter-spacing:.5px;
+  margin-bottom:4px;
   font-weight:900;
 }
 
@@ -202,7 +210,7 @@ button{
 
 .desc{
   margin:12px 0 2px;
-  padding:9px 12px;
+  padding:10px 12px;
   border-left:4px solid #111827;
   border-radius:8px;
   font-size:13px;
@@ -213,7 +221,7 @@ button{
   width:100%;
   border-collapse:collapse;
   margin-top:8px;
-  font-size:12.5px;
+  font-size:12px;
 }
 
 .breakdown td{
@@ -227,8 +235,8 @@ button{
 }
 
 .soft{background:#f3f4f6;font-weight:900}
-.green{background:#e9fbf3;font-weight:900}
-.pink{background:#fff1f2;font-weight:900}
+.green{background:#ecfdf5;font-weight:900}
+.pink{background:#fef2f2;font-weight:900}
 
 .section{
   break-inside:avoid;
@@ -279,7 +287,7 @@ button{
 
 .whatsapp-client{
   display:inline-block;
-  margin-top:11px;
+  margin-top:10px;
   background:var(--green);
   color:#fff;
   text-decoration:none;
@@ -300,7 +308,7 @@ button{
 
 .installment-row button{
   padding:8px;
-  background:#991b1b;
+  background:var(--red);
   color:white;
 }
 
@@ -393,6 +401,7 @@ button{
 <textarea id="projectDescription" placeholder="Premium villa in a well-established Emaar community with strong end-user demand and long-term investment potential."></textarea>
 
 <h2>Payment Breakdown</h2>
+
 <label>Unit Price</label>
 <input id="unitPrice" type="number" placeholder="8600000">
 
@@ -520,7 +529,7 @@ Manual AED amount overrides percentage. Brokerage total shown = Brokerage + VAT.
 
 <script>
 const SUPABASE_URL = "https://cowyowpcktpvnevrmfej.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_KEY_HERE";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
 const STORAGE_BUCKET = "presentation-images";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -600,7 +609,6 @@ function calculate(){
     : brokerage * num("vatPercent") / 100;
 
   const brokerageVat = brokerage + vat;
-
   const trustee = num("trusteeFee");
   const title = num("titleDeedFee");
 
@@ -657,7 +665,7 @@ function updatePreview(){
     <tr><td>DLD Fee</td><td>${money(c.dld)}</td></tr>
     <tr><td>Trustee Office Fee</td><td>${money(c.trustee)}</td></tr>
     <tr><td>Title Deed Fee</td><td>${money(c.title)}</td></tr>
-    <tr><td>Brokerage 2% + VAT</td><td>${money(c.brokerageVat)}</td></tr>
+    <tr><td>Brokerage + VAT</td><td>${money(c.brokerageVat)}</td></tr>
   `;
 
   data.installments.forEach(item=>{
@@ -823,7 +831,7 @@ async function saveProject(){
 
   const link = `${window.location.origin}${window.location.pathname}?id=${currentId}`;
 
-  status(`Saved ✅<br>Share/Edit Link:<br><a style="color:#d4af37" href="${link}" target="_blank">${link}</a>`);
+  status(`Saved ✅<br>Share/Edit Link:<br><a href="${link}" target="_blank">${link}</a>`);
 }
 
 async function loadProject(){
