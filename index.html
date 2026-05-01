@@ -1,490 +1,681 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Client Payment Calculator</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Property Breakdown Generator</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* {
+  box-sizing: border-box;
+}
 
-  <style>
-    * { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #d8d8d8;
+  color: #111;
+}
 
-    body {
-      margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background: #f4f6f8;
-      color: #111827;
-      padding: 24px;
-    }
+.app {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: 100vh;
+}
 
-    .app {
-      max-width: 1100px;
-      margin: auto;
-      background: #ffffff;
-      border-radius: 22px;
-      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-      overflow: hidden;
-      border: 1px solid #e5e7eb;
-    }
+.sidebar {
+  background: #030303;
+  color: #fff;
+  padding: 28px 22px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
 
-    .header {
-      padding: 22px 26px;
-      background: linear-gradient(135deg, #111827, #1f2937);
-      color: white;
-    }
+.sidebar h1 {
+  font-size: 24px;
+  margin: 0 0 28px;
+}
 
-    .header h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-    }
+.section-title {
+  color: #d4af37;
+  font-size: 17px;
+  font-weight: 800;
+  margin: 28px 0 14px;
+}
 
-    .header p {
-      margin: 6px 0 0;
-      color: #d1d5db;
-      font-size: 13px;
-    }
+label {
+  display: block;
+  color: #c7c7c7;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
 
-    .content {
-      padding: 24px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
+input, select, textarea {
+  width: 100%;
+  background: #050505;
+  border: 1px solid #1d2940;
+  color: #fff;
+  padding: 12px 13px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
 
-    .card {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 18px;
-      padding: 18px;
-    }
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
 
-    .card h2 {
-      margin: 0 0 16px;
-      font-size: 16px;
-      color: #111827;
-    }
+input:focus, select:focus, textarea:focus {
+  border-color: #d4af37;
+}
 
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 6px;
-    }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
 
-    input, select {
-      width: 100%;
-      padding: 12px 13px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      font-size: 14px;
-      background: white;
-      outline: none;
-    }
+.form-full {
+  margin-bottom: 14px;
+}
 
-    input:focus, select:focus {
-      border-color: #111827;
-    }
+.actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
 
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+button {
+  border: none;
+  padding: 13px 15px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 14px;
+}
 
-    .full {
-      margin-bottom: 14px;
-    }
+.primary {
+  background: #d4af37;
+  color: #111;
+}
 
-    .result {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
-    }
+.secondary {
+  background: #161616;
+  color: #fff;
+  border: 1px solid #333;
+}
 
-    .result:last-child { border-bottom: none; }
+.preview-wrap {
+  padding: 35px;
+  overflow: auto;
+}
 
-    .result span:first-child {
-      color: #4b5563;
-    }
+.document {
+  width: 794px;
+  min-height: 1123px;
+  margin: auto;
+  background: #fff;
+  padding: 46px 50px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+}
 
-    .result span:last-child {
-      font-weight: 700;
-      color: #111827;
-      text-align: right;
-    }
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #111;
+  padding-bottom: 22px;
+  margin-bottom: 26px;
+}
 
-    .total {
-      margin-top: 14px;
-      padding: 16px;
-      border-radius: 16px;
-      background: #111827;
-      color: white;
-    }
+.brand h2 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: #d4af37;
+}
 
-    .total div {
-      display: flex;
-      justify-content: space-between;
-      font-size: 18px;
-      font-weight: 800;
-    }
+.brand p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #555;
+}
 
-    .actions {
-      padding: 0 24px 24px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+.contact {
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #333;
+}
 
-    button {
-      border: none;
-      padding: 12px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-    }
+.document h1 {
+  font-size: 34px;
+  margin: 0 0 24px;
+  letter-spacing: -1px;
+}
 
-    .primary {
-      background: #111827;
-      color: white;
-    }
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-    .secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
+.info-box {
+  border: 1px solid #dfe3e8;
+  border-radius: 12px;
+  padding: 13px 14px;
+  min-height: 58px;
+}
 
-    .share-box {
-      display: none;
-      margin: 0 24px 24px;
-      background: #f9fafb;
-      border: 1px dashed #9ca3af;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 13px;
-      word-break: break-all;
-    }
+.info-box small {
+  display: block;
+  font-size: 9px;
+  color: #5f6b7a;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
 
-    @media print {
-      body { background: white; padding: 0; }
-      .actions, .share-box { display: none !important; }
-      .app { box-shadow: none; border: none; }
-    }
+.info-box strong {
+  font-size: 14px;
+}
 
-    @media (max-width: 850px) {
-      .content { grid-template-columns: 1fr; }
-      .row { grid-template-columns: 1fr; }
-    }
-  </style>
+.block-title {
+  font-size: 22px;
+  font-weight: 900;
+  margin: 34px 0 12px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 9px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table tr {
+  border-bottom: 1px solid #e1e5ea;
+}
+
+.table td {
+  padding: 11px 10px;
+}
+
+.table td:last-child {
+  text-align: right;
+  font-weight: 800;
+}
+
+.table .shade {
+  background: #f3f4f6;
+  font-weight: 800;
+}
+
+.table .pink {
+  background: #fdeaea;
+  font-weight: 900;
+}
+
+.table .dark {
+  background: #111;
+  color: #fff;
+  font-weight: 900;
+}
+
+.notes {
+  margin-top: 28px;
+  background: #fafafa;
+  border-left: 4px solid #d4af37;
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-top: 14px;
+  border-top: 1px solid #ddd;
+  font-size: 10px;
+  color: #777;
+  display: flex;
+  justify-content: space-between;
+}
+
+.share-box {
+  display: none;
+  margin-top: 14px;
+  padding: 12px;
+  background: #111;
+  border: 1px dashed #d4af37;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .app {
+    display: block;
+  }
+
+  .preview-wrap {
+    padding: 0;
+  }
+
+  .document {
+    box-shadow: none;
+    width: 100%;
+    min-height: auto;
+    padding: 35px 42px;
+  }
+}
+
+@media (max-width: 950px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    max-height: none;
+  }
+
+  .document {
+    width: 100%;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
-  <div class="header">
-    <h1>Client Payment Calculator</h1>
-    <p>Dubai Property Purchase Cost Breakdown</p>
-  </div>
 
-  <div class="content">
-    <div class="card">
-      <h2>Property Details</h2>
+  <aside class="sidebar">
+    <h1>Property Breakdown Generator</h1>
 
-      <div class="full">
-        <label>Project / Property Name</label>
-        <input id="propertyName" placeholder="Example: Emaar The Valley" />
+    <div class="section-title">Contact Info</div>
+
+    <div class="form-full">
+      <label>Name</label>
+      <input id="agentName" value="Usama Bin Nusrat">
+    </div>
+
+    <div class="form-full">
+      <label>Agency</label>
+      <input id="agency" value="BFG Properties">
+    </div>
+
+    <div class="form-full">
+      <label>WhatsApp / Contact Number</label>
+      <input id="phone" value="+971528176879">
+    </div>
+
+    <div class="section-title">Property Details</div>
+
+    <div class="form-full">
+      <label>Title</label>
+      <input id="title" value="4-Bedroom - Raya, Ranches 3">
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Project</label>
+        <input id="project" value="RAYA">
       </div>
-
-      <div class="row">
-        <div>
-          <label>Unit Price AED</label>
-          <input id="unitPrice" type="number" value="2000000" />
-        </div>
-        <div>
-          <label>Paid to Developer AED</label>
-          <input id="paidAmount" type="number" value="1600000" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Selling Price AED</label>
-          <input id="sellingPrice" type="number" value="2500000" />
-        </div>
-        <div>
-          <label>Pending to Developer AED</label>
-          <input id="pendingAmount" type="number" value="400000" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>DLD Fee</label>
-          <input id="dldFee" type="number" value="4" />
-        </div>
-        <div>
-          <label>DLD Type</label>
-          <select id="dldType">
-            <option value="percent">Percentage %</option>
-            <option value="amount">Fixed Amount</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Brokerage</label>
-          <input id="brokerageFee" type="number" value="2" />
-        </div>
-        <div>
-          <label>Brokerage Type</label>
-          <select id="brokerageType">
-            <option value="percent">Percentage %</option>
-            <option value="amount">Fixed Amount</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>VAT on Brokerage %</label>
-          <input id="vatPercent" type="number" value="5" />
-        </div>
-        <div>
-          <label>Trustee Fee AED</label>
-          <input id="trusteeFee" type="number" value="4200" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Title Deed AED</label>
-          <input id="titleDeed" type="number" value="580" />
-        </div>
-        <div>
-          <label>Other Charges AED</label>
-          <input id="otherCharges" type="number" value="0" />
-        </div>
+      <div>
+        <label>Developer</label>
+        <input id="developer" value="EMAAR">
       </div>
     </div>
 
-    <div class="card">
-      <h2>Calculation Summary</h2>
+    <div class="form-full">
+      <label>Area</label>
+      <input id="area" value="Arabian Ranches 3">
+    </div>
 
-      <div class="result">
-        <span>Original Unit Price</span>
-        <span id="rUnitPrice">AED 0</span>
+    <div class="form-row">
+      <div>
+        <label>Type</label>
+        <input id="type" value="Townhouse">
       </div>
-
-      <div class="result">
-        <span>Selling Price</span>
-        <span id="rSellingPrice">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Seller Premium / Profit</span>
-        <span id="rPremium">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Paid to Developer</span>
-        <span id="rPaid">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Pending to Developer</span>
-        <span id="rPending">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>DLD Fee</span>
-        <span id="rDld">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Brokerage Fee</span>
-        <span id="rBrokerage">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>VAT on Brokerage</span>
-        <span id="rVat">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Trustee Fee</span>
-        <span id="rTrustee">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Title Deed</span>
-        <span id="rTitle">AED 0</span>
-      </div>
-
-      <div class="result">
-        <span>Other Charges</span>
-        <span id="rOther">AED 0</span>
-      </div>
-
-      <div class="total">
-        <div>
-          <span>Total Buyer Payable</span>
-          <span id="rTotal">AED 0</span>
-        </div>
+      <div>
+        <label>Bedrooms</label>
+        <input id="bedrooms" value="4 + Maid's Room">
       </div>
     </div>
-  </div>
 
-  <div class="actions">
-    <button class="primary" onclick="calculate()">Calculate</button>
-    <button class="secondary" onclick="generateShareLink()">Generate Client Link</button>
-    <button class="secondary" onclick="window.print()">Download PDF</button>
-    <button class="secondary" onclick="resetForm()">Reset</button>
-  </div>
+    <div class="form-row">
+      <div>
+        <label>Bathrooms</label>
+        <input id="bathrooms" value="4">
+      </div>
+      <div>
+        <label>Floor</label>
+        <input id="floor" value="G+1">
+      </div>
+    </div>
 
-  <div class="share-box" id="shareBox"></div>
+    <div class="form-row">
+      <div>
+        <label>Size</label>
+        <input id="size" value="2,354 sq ft">
+      </div>
+      <div>
+        <label>View</label>
+        <input id="view" value="Community View">
+      </div>
+    </div>
+
+    <div class="form-full">
+      <label>Completion</label>
+      <input id="completion" value="Ready / Handover Soon">
+    </div>
+
+    <div class="section-title">Payment Details</div>
+
+    <div class="form-row">
+      <div>
+        <label>Original Unit Price</label>
+        <input id="unitPrice" type="number" value="1500000">
+      </div>
+      <div>
+        <label>Selling Price</label>
+        <input id="sellingPrice" type="number" value="2000000">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Paid to Developer</label>
+        <input id="paidAmount" type="number" value="1200000">
+      </div>
+      <div>
+        <label>Pending to Developer</label>
+        <input id="pendingAmount" type="number" value="300000">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>DLD %</label>
+        <input id="dldPercent" type="number" value="4">
+      </div>
+      <div>
+        <label>Brokerage %</label>
+        <input id="brokeragePercent" type="number" value="2">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>VAT on Brokerage %</label>
+        <input id="vatPercent" type="number" value="5">
+      </div>
+      <div>
+        <label>Trustee Fee</label>
+        <input id="trusteeFee" type="number" value="4200">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Title Deed Fee</label>
+        <input id="titleDeed" type="number" value="580">
+      </div>
+      <div>
+        <label>Other Charges</label>
+        <input id="otherCharges" type="number" value="0">
+      </div>
+    </div>
+
+    <div class="form-full">
+      <label>Notes</label>
+      <textarea id="notes">This breakdown is for illustration purposes only and final charges may vary based on developer, trustee office, DLD, and transaction terms.</textarea>
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="window.print()">Download PDF</button>
+      <button class="secondary" onclick="generateShareLink()">Generate Client Link</button>
+      <button class="secondary" onclick="resetForm()">Reset</button>
+    </div>
+
+    <div class="share-box" id="shareBox"></div>
+  </aside>
+
+  <main class="preview-wrap">
+    <section class="document" id="document">
+
+      <div class="doc-header">
+        <div class="brand">
+          <h2>BFG PROPERTIES</h2>
+          <p>Premium Property Investment Breakdown</p>
+        </div>
+        <div class="contact">
+          <div id="pAgent">Usama Bin Nusrat</div>
+          <div id="pAgency">BFG Properties</div>
+          <div id="pPhone">+971528176879</div>
+        </div>
+      </div>
+
+      <h1 id="pTitle">4-Bedroom - Raya, Ranches 3</h1>
+
+      <div class="info-grid">
+        <div class="info-box"><small>Project</small><strong id="pProject">RAYA</strong></div>
+        <div class="info-box"><small>Developer</small><strong id="pDeveloper">EMAAR</strong></div>
+        <div class="info-box"><small>Area</small><strong id="pArea">Arabian Ranches 3</strong></div>
+        <div class="info-box"><small>Type</small><strong id="pType">Townhouse</strong></div>
+        <div class="info-box"><small>Bedrooms</small><strong id="pBedrooms">4 + Maid's Room</strong></div>
+        <div class="info-box"><small>Bathrooms</small><strong id="pBathrooms">4</strong></div>
+        <div class="info-box"><small>Size</small><strong id="pSize">2,354 sq ft</strong></div>
+        <div class="info-box"><small>Floor</small><strong id="pFloor">G+1</strong></div>
+        <div class="info-box"><small>View</small><strong id="pView">Community View</strong></div>
+        <div class="info-box"><small>Completion</small><strong id="pCompletion">Ready / Handover Soon</strong></div>
+      </div>
+
+      <div class="block-title">Payment Breakdown</div>
+
+      <table class="table">
+        <tr class="shade">
+          <td>Original Unit Price</td>
+          <td id="pUnitPrice">AED 0</td>
+        </tr>
+        <tr>
+          <td>Selling Price</td>
+          <td id="pSellingPrice">AED 0</td>
+        </tr>
+        <tr>
+          <td>Seller Premium / Profit</td>
+          <td id="pPremium">AED 0</td>
+        </tr>
+        <tr>
+          <td>Paid to Developer</td>
+          <td id="pPaid">AED 0</td>
+        </tr>
+        <tr>
+          <td>Pending to Developer</td>
+          <td id="pPending">AED 0</td>
+        </tr>
+        <tr>
+          <td>DLD Fee</td>
+          <td id="pDld">AED 0</td>
+        </tr>
+        <tr>
+          <td>Trustee Office Fee</td>
+          <td id="pTrustee">AED 0</td>
+        </tr>
+        <tr>
+          <td>Title Deed Fee</td>
+          <td id="pTitleDeed">AED 0</td>
+        </tr>
+        <tr>
+          <td>Brokerage Fee + VAT</td>
+          <td id="pBrokerageVat">AED 0</td>
+        </tr>
+        <tr class="pink">
+          <td>Total on Transfer</td>
+          <td id="pTransfer">AED 0</td>
+        </tr>
+        <tr class="dark">
+          <td>Total Cost for Buyer</td>
+          <td id="pTotal">AED 0</td>
+        </tr>
+      </table>
+
+      <div class="notes" id="pNotes"></div>
+
+      <div class="footer">
+        <span>Prepared by BFG Properties</span>
+        <span>Dubai Property Breakdown</span>
+      </div>
+
+    </section>
+  </main>
+
 </div>
 
 <script>
-  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-  const SUPABASE_KEY = "sb_publishable_mM2UoFjMfo_eaUPkBd2Nmw_9KBPZEqh";
+const fields = [
+  "agentName", "agency", "phone",
+  "title", "project", "developer", "area", "type",
+  "bedrooms", "bathrooms", "floor", "size", "view", "completion",
+  "unitPrice", "sellingPrice", "paidAmount", "pendingAmount",
+  "dldPercent", "brokeragePercent", "vatPercent",
+  "trusteeFee", "titleDeed", "otherCharges", "notes"
+];
 
-  let supabaseClient = null;
+function getValue(id) {
+  return document.getElementById(id).value || "-";
+}
 
-  if (SUPABASE_URL && !SUPABASE_URL.includes("PASTE")) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
+function getNumber(id) {
+  return Number(document.getElementById(id).value) || 0;
+}
 
-  const ids = [
-    "propertyName",
-    "unitPrice",
-    "paidAmount",
-    "sellingPrice",
-    "pendingAmount",
-    "dldFee",
-    "dldType",
-    "brokerageFee",
-    "brokerageType",
-    "vatPercent",
-    "trusteeFee",
-    "titleDeed",
-    "otherCharges"
-  ];
+function money(value) {
+  return "AED " + Math.round(value).toLocaleString("en-AE");
+}
 
-  function num(id) {
-    return Number(document.getElementById(id).value) || 0;
-  }
+function updateText(previewId, inputId) {
+  document.getElementById(previewId).innerText = getValue(inputId);
+}
 
-  function val(id) {
-    return document.getElementById(id).value;
-  }
+function calculate() {
+  updateText("pAgent", "agentName");
+  updateText("pAgency", "agency");
+  updateText("pPhone", "phone");
+  updateText("pTitle", "title");
+  updateText("pProject", "project");
+  updateText("pDeveloper", "developer");
+  updateText("pArea", "area");
+  updateText("pType", "type");
+  updateText("pBedrooms", "bedrooms");
+  updateText("pBathrooms", "bathrooms");
+  updateText("pFloor", "floor");
+  updateText("pSize", "size");
+  updateText("pView", "view");
+  updateText("pCompletion", "completion");
+  updateText("pNotes", "notes");
 
-  function money(amount) {
-    return "AED " + Math.round(amount).toLocaleString("en-AE");
-  }
+  const unitPrice = getNumber("unitPrice");
+  const sellingPrice = getNumber("sellingPrice");
+  const paidAmount = getNumber("paidAmount");
+  const pendingAmount = getNumber("pendingAmount");
 
-  function getFee(value, type, base) {
-    return type === "percent" ? (base * value / 100) : value;
-  }
+  const dld = sellingPrice * getNumber("dldPercent") / 100;
+  const brokerage = sellingPrice * getNumber("brokeragePercent") / 100;
+  const vat = brokerage * getNumber("vatPercent") / 100;
+  const brokerageVat = brokerage + vat;
 
-  function calculate() {
-    const unitPrice = num("unitPrice");
-    const paidAmount = num("paidAmount");
-    const sellingPrice = num("sellingPrice");
-    const pendingAmount = num("pendingAmount");
+  const trustee = getNumber("trusteeFee");
+  const titleDeed = getNumber("titleDeed");
+  const other = getNumber("otherCharges");
 
-    const dld = getFee(num("dldFee"), val("dldType"), sellingPrice);
-    const brokerage = getFee(num("brokerageFee"), val("brokerageType"), sellingPrice);
-    const vat = brokerage * num("vatPercent") / 100;
+  const premium = sellingPrice - unitPrice;
 
-    const trustee = num("trusteeFee");
-    const title = num("titleDeed");
-    const other = num("otherCharges");
+  const totalOnTransfer =
+    paidAmount +
+    premium +
+    dld +
+    brokerageVat +
+    trustee +
+    titleDeed +
+    other;
 
-    const premium = sellingPrice - unitPrice;
+  const totalBuyerCost = totalOnTransfer + pendingAmount;
 
-    const totalBuyerPayable =
-      paidAmount +
-      premium +
-      pendingAmount +
-      dld +
-      brokerage +
-      vat +
-      trustee +
-      title +
-      other;
+  document.getElementById("pUnitPrice").innerText = money(unitPrice);
+  document.getElementById("pSellingPrice").innerText = money(sellingPrice);
+  document.getElementById("pPremium").innerText = money(premium);
+  document.getElementById("pPaid").innerText = money(paidAmount);
+  document.getElementById("pPending").innerText = money(pendingAmount);
+  document.getElementById("pDld").innerText = money(dld);
+  document.getElementById("pTrustee").innerText = money(trustee);
+  document.getElementById("pTitleDeed").innerText = money(titleDeed);
+  document.getElementById("pBrokerageVat").innerText = money(brokerageVat);
+  document.getElementById("pTransfer").innerText = money(totalOnTransfer);
+  document.getElementById("pTotal").innerText = money(totalBuyerCost);
+}
 
-    document.getElementById("rUnitPrice").innerText = money(unitPrice);
-    document.getElementById("rSellingPrice").innerText = money(sellingPrice);
-    document.getElementById("rPremium").innerText = money(premium);
-    document.getElementById("rPaid").innerText = money(paidAmount);
-    document.getElementById("rPending").innerText = money(pendingAmount);
-    document.getElementById("rDld").innerText = money(dld);
-    document.getElementById("rBrokerage").innerText = money(brokerage);
-    document.getElementById("rVat").innerText = money(vat);
-    document.getElementById("rTrustee").innerText = money(trustee);
-    document.getElementById("rTitle").innerText = money(title);
-    document.getElementById("rOther").innerText = money(other);
-    document.getElementById("rTotal").innerText = money(totalBuyerPayable);
-  }
+function generateShareLink() {
+  const data = {};
 
-  function generateShareLink() {
-    const data = {};
-
-    ids.forEach(id => {
-      data[id] = document.getElementById(id).value;
-    });
-
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-    const url = window.location.origin + window.location.pathname + "?data=" + encoded;
-
-    const box = document.getElementById("shareBox");
-    box.style.display = "block";
-    box.innerText = url;
-
-    navigator.clipboard.writeText(url);
-  }
-
-  function loadFromLink() {
-    const params = new URLSearchParams(window.location.search);
-    const data = params.get("data");
-
-    if (!data) return;
-
-    try {
-      const decoded = JSON.parse(decodeURIComponent(escape(atob(data))));
-
-      ids.forEach(id => {
-        if (decoded[id] !== undefined) {
-          document.getElementById(id).value = decoded[id];
-        }
-      });
-
-      calculate();
-    } catch (e) {
-      console.log("Invalid shared link");
-    }
-  }
-
-  function resetForm() {
-    location.href = window.location.pathname;
-  }
-
-  ids.forEach(id => {
-    document.getElementById(id).addEventListener("input", calculate);
-    document.getElementById(id).addEventListener("change", calculate);
+  fields.forEach(id => {
+    data[id] = document.getElementById(id).value;
   });
 
-  loadFromLink();
-  calculate();
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url = window.location.origin + window.location.pathname + "?data=" + encoded;
+
+  const box = document.getElementById("shareBox");
+  box.style.display = "block";
+  box.innerText = url;
+
+  navigator.clipboard.writeText(url);
+}
+
+function loadFromLink() {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get("data");
+
+  if (!data) return;
+
+  try {
+    const decoded = JSON.parse(decodeURIComponent(escape(atob(data))));
+
+    fields.forEach(id => {
+      if (decoded[id] !== undefined) {
+        document.getElementById(id).value = decoded[id];
+      }
+    });
+  } catch (e) {
+    console.log("Invalid link");
+  }
+}
+
+function resetForm() {
+  window.location.href = window.location.pathname;
+}
+
+fields.forEach(id => {
+  document.getElementById(id).addEventListener("input", calculate);
+  document.getElementById(id).addEventListener("change", calculate);
+});
+
+loadFromLink();
+calculate();
 </script>
 
 </body>
