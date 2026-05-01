@@ -1,682 +1,1257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Property Breakdown Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usama Database</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: #d8d8d8;
-  color: #111;
-}
+  <style>
+    * { box-sizing: border-box; }
 
-.app {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  min-height: 100vh;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
+        #05070c;
+      color: #e5e7eb;
+      font-family: Poppins, sans-serif;
+      padding: 22px;
+    }
 
-.sidebar {
-  background: #030303;
-  color: #fff;
-  padding: 28px 22px;
-  overflow-y: auto;
-  max-height: 100vh;
-}
+    .hidden { display: none !important; }
 
-.sidebar h1 {
-  font-size: 24px;
-  margin: 0 0 28px;
-}
+    .wrap { max-width: 1500px; margin: auto; }
 
-.section-title {
-  color: #d4af37;
-  font-size: 17px;
-  font-weight: 800;
-  margin: 28px 0 14px;
-}
+    h1 { margin: 0; font-size: 32px; font-weight: 700; }
 
-label {
-  display: block;
-  color: #c7c7c7;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 7px;
-}
+    .sub {
+      color: #a8b3c7;
+      margin: 10px 0 20px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
 
-input, select, textarea {
-  width: 100%;
-  background: #050505;
-  border: 1px solid #1d2940;
-  color: #fff;
-  padding: 12px 13px;
-  border-radius: 10px;
-  font-size: 14px;
-  outline: none;
-}
+    .mainHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
 
-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
+    .headerBtns {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
 
-input:focus, select:focus, textarea:focus {
-  border-color: #d4af37;
-}
+    .loginBox, .card {
+      background: rgba(3,7,18,.84);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 22px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.30);
+    }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-}
+    .loginBox {
+      max-width: 430px;
+      margin: 80px auto;
+      padding: 24px;
+    }
 
-.form-full {
-  margin-bottom: 14px;
-}
+    input, select, button, textarea {
+      font-family: Poppins, sans-serif;
+      outline: none;
+    }
 
-.actions {
-  display: grid;
-  gap: 10px;
-  margin-top: 24px;
-}
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(148,163,184,.24);
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+    }
 
-button {
-  border: none;
-  padding: 13px 15px;
-  border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-  font-size: 14px;
-}
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(37,99,235,.7);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
 
-.primary {
-  background: #d4af37;
-  color: #111;
-}
+    button {
+      cursor: pointer;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      border-radius: 12px;
+    }
 
-.secondary {
-  background: #161616;
-  color: #fff;
-  border: 1px solid #333;
-}
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
 
-.preview-wrap {
-  padding: 35px;
-  overflow: auto;
-}
+    .primaryBtn {
+      background: linear-gradient(135deg, #2563eb, #16a34a);
+      padding: 11px 16px;
+    }
 
-.document {
-  width: 794px;
-  min-height: 1123px;
-  margin: auto;
-  background: #fff;
-  padding: 46px 50px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
-}
+    .darkBtn {
+      background: #111827;
+      border: 1px solid rgba(148,163,184,.25);
+      padding: 10px 15px;
+    }
 
-.doc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 3px solid #111;
-  padding-bottom: 22px;
-  margin-bottom: 26px;
-}
+    .loginBox input { margin-bottom: 12px; }
 
-.brand h2 {
-  margin: 0;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: #d4af37;
-}
+    .loginError {
+      color: #f87171;
+      margin-top: 12px;
+      font-size: 13px;
+    }
 
-.brand p {
-  margin: 5px 0 0;
-  font-size: 11px;
-  color: #555;
-}
+    .card { padding: 22px; }
 
-.contact {
-  text-align: right;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #333;
-}
+    .filters {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
 
-.document h1 {
-  font-size: 34px;
-  margin: 0 0 24px;
-  letter-spacing: -1px;
-}
+    .actionsRow {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin: 6px 0 18px;
+      gap: 10px;
+    }
 
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+    .reset {
+      width: auto;
+      min-width: 150px;
+      height: 42px;
+      padding: 0 18px;
+      font-size: 14px;
+      background: linear-gradient(135deg, #2563eb, #16a34a);
+    }
 
-.info-box {
-  border: 1px solid #dfe3e8;
-  border-radius: 12px;
-  padding: 13px 14px;
-  min-height: 58px;
-}
+    .quickFilters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
 
-.info-box small {
-  display: block;
-  font-size: 9px;
-  color: #5f6b7a;
-  font-weight: 800;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
+    .quickFilters button {
+      background: #0b1020;
+      border: 1px solid rgba(148,163,184,.20);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
 
-.info-box strong {
-  font-size: 14px;
-}
+    .topInfo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0 14px;
+      color: #a8b3c7;
+      font-size: 14px;
+      gap: 12px;
+    }
 
-.block-title {
-  font-size: 22px;
-  font-weight: 900;
-  margin: 34px 0 12px;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 9px;
-}
+    .loadingBadge, .saveToast {
+      display: none;
+      background: rgba(37,99,235,.15);
+      border: 1px solid rgba(37,99,235,.35);
+      color: #bfdbfe;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
+    .loadingBadge.show, .saveToast.show { display: inline-block; }
 
-.table tr {
-  border-bottom: 1px solid #e1e5ea;
-}
+    .tablebox {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,.16);
+      min-height: 430px;
+      max-height: 70vh;
+      background: #020617;
+    }
 
-.table td {
-  padding: 11px 10px;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+    }
 
-.table td:last-child {
-  text-align: right;
-  font-weight: 800;
-}
+    th {
+      position: sticky;
+      top: 0;
+      background: #0b1020;
+      color: #d1d5db;
+      text-align: left;
+      font-size: 13px;
+      padding: 15px 16px;
+      z-index: 2;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(148,163,184,.12);
+    }
 
-.table .shade {
-  background: #f3f4f6;
-  font-weight: 800;
-}
+    td {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(148,163,184,.08);
+      font-size: 13px;
+      color: #e5e7eb;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
 
-.table .pink {
-  background: #fdeaea;
-  font-weight: 900;
-}
+    tr:hover { background: rgba(37,99,235,.08); }
 
-.table .dark {
-  background: #111;
-  color: #fff;
-  font-weight: 900;
-}
+    .waBtn {
+      display: inline-block;
+      padding: 9px 13px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
-.notes {
-  margin-top: 28px;
-  background: #fafafa;
-  border-left: 4px solid #d4af37;
-  padding: 14px 16px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #333;
-}
+    .statusSelect {
+      width: 150px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-.footer {
-  margin-top: 40px;
-  padding-top: 14px;
-  border-top: 1px solid #ddd;
-  font-size: 10px;
-  color: #777;
-  display: flex;
-  justify-content: space-between;
-}
+    .status-New { color: #cbd5e1; }
+    .status-ForSale { color: #22c55e; }
+    .status-ForRent { color: #86efac; }
+    .status-Sold { color: #ef4444; }
+    .status-CallBack { color: #f59e0b; }
+    .status-NoResponse { color: #eab308; }
+    .status-NotInterested { color: #f87171; }
+    .status-InvalidNumber { color: #94a3b8; }
 
-.share-box {
-  display: none;
-  margin-top: 14px;
-  padding: 12px;
-  background: #111;
-  border: 1px dashed #d4af37;
-  color: #fff;
-  border-radius: 10px;
-  font-size: 12px;
-  word-break: break-all;
-}
+    .remarkBox {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
 
-@media print {
-  body {
-    background: #fff;
-  }
+    .remarksInput {
+      background: #030712;
+      border: 1px solid rgba(148,163,184,.24);
+      color: #fff;
+      width: 360px;
+      height: 42px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+      resize: none;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: .15s ease;
+    }
 
-  .sidebar {
-    display: none;
-  }
+    .remarksInput:focus {
+      width: 480px;
+      height: 120px;
+      white-space: normal;
+      overflow-y: auto;
+      position: relative;
+      z-index: 5;
+    }
 
-  .app {
-    display: block;
-  }
+    .saveRemarkBtn {
+      display: none;
+      background: #16a34a;
+      padding: 10px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
 
-  .preview-wrap {
-    padding: 0;
-  }
+    .saveRemarkBtn.show { display: inline-block; }
 
-  .document {
-    box-shadow: none;
-    width: 100%;
-    min-height: auto;
-    padding: 35px 42px;
-  }
-}
+    .moreUnitBtn {
+      background: rgba(37,99,235,.15);
+      border: 1px solid rgba(37,99,235,.30);
+      color: #bfdbfe;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
 
-@media (max-width: 950px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
+    .mobileCards { display: none; }
 
-  .sidebar {
-    max-height: none;
-  }
+    .ownerCard {
+      background: #020617;
+      border: 1px solid rgba(148,163,184,.16);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
 
-  .document {
-    width: 100%;
-  }
-}
-</style>
+    .ownerTop {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .ownerName {
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    .unitBadge {
+      background: rgba(37,99,235,.18);
+      color: #bfdbfe;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .mobileLocation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15,23,42,.72);
+      border: 1px solid rgba(148,163,184,.14);
+      border-radius: 14px;
+      padding: 11px;
+      margin-bottom: 12px;
+    }
+
+    .locationText {
+      font-size: 13px;
+      line-height: 1.35;
+      color: #e5e7eb;
+    }
+
+    .locationText span {
+      display: block;
+      color: #94a3b8;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .infoLine {
+      font-size: 14px;
+      color: #e5e7eb;
+      margin: 10px 0;
+      line-height: 1.35;
+    }
+
+    .infoLine span {
+      color: #94a3b8;
+      font-size: 12px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .ownerCard .waBtn {
+      font-size: 12px;
+      padding: 9px 11px;
+    }
+
+    .ownerCard .remarksInput {
+      width: 100%;
+      height: 44px;
+      min-width: 100%;
+      white-space: nowrap;
+    }
+
+    .ownerCard .remarksInput:focus {
+      width: 100%;
+      height: 130px;
+      white-space: normal;
+    }
+
+    .ownerCard .remarkBox {
+      flex-direction: column;
+    }
+
+    .ownerCard .saveRemarkBtn {
+      width: 100%;
+    }
+
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 70px 20px;
+      font-size: 15px;
+    }
+
+    .skeleton {
+      height: 18px;
+      width: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #111827, #1f2937, #111827);
+      background-size: 200% 100%;
+      animation: shine 1.2s infinite;
+    }
+
+    @keyframes shine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .pager {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pager button {
+      width: auto;
+      min-width: 86px;
+      padding: 9px 13px;
+      background: #111827;
+      border: 1px solid rgba(148,163,184,.25);
+    }
+
+    .modalOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 18px;
+    }
+
+    .modalOverlay.show { display: flex; }
+
+    .modal {
+      background: #020617;
+      border: 1px solid rgba(148,163,184,.22);
+      border-radius: 18px;
+      padding: 18px;
+      width: min(520px, 100%);
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    .modal h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .modalRow {
+      border-top: 1px solid rgba(148,163,184,.12);
+      padding: 12px 0;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+
+    .modalActions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 800px) {
+      body {
+        padding: 14px;
+        background:
+          radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%),
+          #07111f;
+      }
+
+      .mainHeader {
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      h1 { font-size: 25px; }
+
+      .sub {
+        font-size: 13px;
+        margin: 8px 0 0;
+      }
+
+      .headerBtns {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .darkBtn, .primaryBtn {
+        padding: 9px 12px;
+        font-size: 12px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      #searchInput {
+        grid-column: span 2;
+      }
+
+      input, select {
+        padding: 12px;
+        font-size: 13px;
+        border-radius: 13px;
+      }
+
+      .quickFilters {
+        gap: 7px;
+      }
+
+      .quickFilters button {
+        font-size: 11px;
+        padding: 8px 10px;
+      }
+
+      .actionsRow {
+        justify-content: stretch;
+      }
+
+      .reset {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .topInfo {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 13px;
+      }
+
+      .tablebox { display: none; }
+      .mobileCards { display: block; }
+
+      .pager { gap: 10px; }
+
+      .pager button { min-width: 75px; }
+
+      .loginBox {
+        margin: 50px auto;
+        padding: 18px;
+      }
+
+      .statusSelect {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div id="loginView" class="loginBox">
+    <h1>Usama Database</h1>
+    <div class="sub">Login to access your database.</div>
 
-  <aside class="sidebar">
-    <h1>Property Breakdown Generator</h1>
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button class="primaryBtn" onclick="login()">Login</button>
 
-    <div class="section-title">Contact Info</div>
+    <div id="loginError" class="loginError"></div>
+  </div>
 
-    <div class="form-full">
-      <label>Name</label>
-      <input id="agentName" value="Usama Bin Nusrat">
-    </div>
-
-    <div class="form-full">
-      <label>Agency</label>
-      <input id="agency" value="BFG Properties">
-    </div>
-
-    <div class="form-full">
-      <label>WhatsApp / Contact Number</label>
-      <input id="phone" value="+971528176879">
-    </div>
-
-    <div class="section-title">Property Details</div>
-
-    <div class="form-full">
-      <label>Title</label>
-      <input id="title" value="4-Bedroom - Raya, Ranches 3">
-    </div>
-
-    <div class="form-row">
+  <div id="appView" class="wrap hidden">
+    <div class="mainHeader">
       <div>
-        <label>Project</label>
-        <input id="project" value="RAYA">
+        <h1>Usama Database</h1>
+        <div class="sub">Fast CRM database with filters, status, remarks and WhatsApp outreach.</div>
       </div>
-      <div>
-        <label>Developer</label>
-        <input id="developer" value="EMAAR">
+
+      <div class="headerBtns">
+        <button id="exportBtn" class="primaryBtn hidden" onclick="exportCSV()">Export CSV</button>
+        <button class="darkBtn" onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <div class="form-full">
-      <label>Area</label>
-      <input id="area" value="Arabian Ranches 3">
-    </div>
+    <div class="card">
+      <div class="filters">
+        <input id="searchInput" placeholder="Search owner, phone or unit..." />
 
-    <div class="form-row">
-      <div>
-        <label>Type</label>
-        <input id="type" value="Townhouse">
-      </div>
-      <div>
-        <label>Bedrooms</label>
-        <input id="bedrooms" value="4 + Maid's Room">
-      </div>
-    </div>
+        <select id="communityFilter">
+          <option value="">All Communities</option>
+        </select>
 
-    <div class="form-row">
-      <div>
-        <label>Bathrooms</label>
-        <input id="bathrooms" value="4">
-      </div>
-      <div>
-        <label>Floor</label>
-        <input id="floor" value="G+1">
-      </div>
-    </div>
+        <select id="clusterFilter">
+          <option value="">All Clusters</option>
+        </select>
 
-    <div class="form-row">
-      <div>
-        <label>Size</label>
-        <input id="size" value="2,354 sq ft">
-      </div>
-      <div>
-        <label>View</label>
-        <input id="view" value="Community View">
-      </div>
-    </div>
+        <input id="unitFilter" placeholder="Unit No." />
 
-    <div class="form-full">
-      <label>Completion</label>
-      <input id="completion" value="Ready / Handover Soon">
-    </div>
+        <select id="sourceFilter">
+          <option value="">All Sources</option>
+        </select>
 
-    <div class="section-title">Payment Details</div>
-
-    <div class="form-row">
-      <div>
-        <label>Original Unit Price</label>
-        <input id="unitPrice" type="number" value="1500000">
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option>New</option>
+          <option>For Sale</option>
+          <option>For Rent</option>
+          <option>Sold</option>
+          <option>Call Back</option>
+          <option>No Response</option>
+          <option>Not Interested</option>
+          <option>Invalid Number</option>
+        </select>
       </div>
-      <div>
-        <label>Selling Price</label>
-        <input id="sellingPrice" type="number" value="2000000">
-      </div>
-    </div>
 
-    <div class="form-row">
-      <div>
-        <label>Paid to Developer</label>
-        <input id="paidAmount" type="number" value="1200000">
+      <div class="quickFilters">
+        <button onclick="quickStatus('New')">New</button>
+        <button onclick="quickStatus('For Sale')">For Sale</button>
+        <button onclick="quickStatus('For Rent')">For Rent</button>
+        <button onclick="quickStatus('Sold')">Sold</button>
+        <button onclick="quickStatus('No Response')">No Response</button>
+        <button onclick="quickStatus('Invalid Number')">Invalid</button>
       </div>
-      <div>
-        <label>Pending to Developer</label>
-        <input id="pendingAmount" type="number" value="300000">
+
+      <div class="actionsRow">
+        <button class="reset" onclick="resetFilters()">Reset Filters</button>
       </div>
-    </div>
 
-    <div class="form-row">
-      <div>
-        <label>DLD %</label>
-        <input id="dldPercent" type="number" value="4">
-      </div>
-      <div>
-        <label>Brokerage %</label>
-        <input id="brokeragePercent" type="number" value="2">
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div>
-        <label>VAT on Brokerage %</label>
-        <input id="vatPercent" type="number" value="5">
-      </div>
-      <div>
-        <label>Trustee Fee</label>
-        <input id="trusteeFee" type="number" value="4200">
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div>
-        <label>Title Deed Fee</label>
-        <input id="titleDeed" type="number" value="580">
-      </div>
-      <div>
-        <label>Other Charges</label>
-        <input id="otherCharges" type="number" value="0">
-      </div>
-    </div>
-
-    <div class="form-full">
-      <label>Notes</label>
-      <textarea id="notes">This breakdown is for illustration purposes only and final charges may vary based on developer, trustee office, DLD, and transaction terms.</textarea>
-    </div>
-
-    <div class="actions">
-      <button class="primary" onclick="window.print()">Download PDF</button>
-      <button class="secondary" onclick="generateShareLink()">Generate Client Link</button>
-      <button class="secondary" onclick="resetForm()">Reset</button>
-    </div>
-
-    <div class="share-box" id="shareBox"></div>
-  </aside>
-
-  <main class="preview-wrap">
-    <section class="document" id="document">
-
-      <div class="doc-header">
-        <div class="brand">
-          <h2>BFG PROPERTIES</h2>
-          <p>Premium Property Investment Breakdown</p>
+      <div class="topInfo">
+        <div>
+          <span id="status">Preparing database...</span>
+          <span id="loadingBadge" class="loadingBadge">Loading data...</span>
+          <span id="saveToast" class="saveToast">Saved ✓</span>
         </div>
-        <div class="contact">
-          <div id="pAgent">Usama Bin Nusrat</div>
-          <div id="pAgency">BFG Properties</div>
-          <div id="pPhone">+971528176879</div>
-        </div>
+        <div>Showing 50 records per page</div>
       </div>
 
-      <h1 id="pTitle">4-Bedroom - Raya, Ranches 3</h1>
-
-      <div class="info-grid">
-        <div class="info-box"><small>Project</small><strong id="pProject">RAYA</strong></div>
-        <div class="info-box"><small>Developer</small><strong id="pDeveloper">EMAAR</strong></div>
-        <div class="info-box"><small>Area</small><strong id="pArea">Arabian Ranches 3</strong></div>
-        <div class="info-box"><small>Type</small><strong id="pType">Townhouse</strong></div>
-        <div class="info-box"><small>Bedrooms</small><strong id="pBedrooms">4 + Maid's Room</strong></div>
-        <div class="info-box"><small>Bathrooms</small><strong id="pBathrooms">4</strong></div>
-        <div class="info-box"><small>Size</small><strong id="pSize">2,354 sq ft</strong></div>
-        <div class="info-box"><small>Floor</small><strong id="pFloor">G+1</strong></div>
-        <div class="info-box"><small>View</small><strong id="pView">Community View</strong></div>
-        <div class="info-box"><small>Completion</small><strong id="pCompletion">Ready / Handover Soon</strong></div>
+      <div class="tablebox">
+        <table>
+          <thead>
+            <tr>
+              <th>Community</th>
+              <th>Cluster</th>
+              <th>Unit</th>
+              <th>Owner Name</th>
+              <th>WhatsApp</th>
+              <th>Status</th>
+              <th>Remarks</th>
+              <th>Last Contacted</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
       </div>
 
-      <div class="block-title">Payment Breakdown</div>
+      <div id="mobileCards" class="mobileCards"></div>
 
-      <table class="table">
-        <tr class="shade">
-          <td>Original Unit Price</td>
-          <td id="pUnitPrice">AED 0</td>
-        </tr>
-        <tr>
-          <td>Selling Price</td>
-          <td id="pSellingPrice">AED 0</td>
-        </tr>
-        <tr>
-          <td>Seller Premium / Profit</td>
-          <td id="pPremium">AED 0</td>
-        </tr>
-        <tr>
-          <td>Paid to Developer</td>
-          <td id="pPaid">AED 0</td>
-        </tr>
-        <tr>
-          <td>Pending to Developer</td>
-          <td id="pPending">AED 0</td>
-        </tr>
-        <tr>
-          <td>DLD Fee</td>
-          <td id="pDld">AED 0</td>
-        </tr>
-        <tr>
-          <td>Trustee Office Fee</td>
-          <td id="pTrustee">AED 0</td>
-        </tr>
-        <tr>
-          <td>Title Deed Fee</td>
-          <td id="pTitleDeed">AED 0</td>
-        </tr>
-        <tr>
-          <td>Brokerage Fee + VAT</td>
-          <td id="pBrokerageVat">AED 0</td>
-        </tr>
-        <tr class="pink">
-          <td>Total on Transfer</td>
-          <td id="pTransfer">AED 0</td>
-        </tr>
-        <tr class="dark">
-          <td>Total Cost for Buyer</td>
-          <td id="pTotal">AED 0</td>
-        </tr>
-      </table>
-
-      <div class="notes" id="pNotes"></div>
-
-      <div class="footer">
-        <span>Prepared by BFG Properties</span>
-        <span>Dubai Property Breakdown</span>
+      <div class="pager">
+        <button id="prevBtn" onclick="prevPage()">Previous</button>
+        <div id="pageInfo">1 / 1</div>
+        <button id="nextBtn" onclick="nextPage()">Next</button>
       </div>
+    </div>
+  </div>
 
-    </section>
-  </main>
+  <div id="propertiesModal" class="modalOverlay">
+    <div class="modal">
+      <h2 id="modalTitle">More Units</h2>
+      <div id="modalContent"></div>
+      <div class="modalActions">
+        <button class="darkBtn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
 
-</div>
+  <script>
+    const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
 
-<script>
-const fields = [
-  "agentName", "agency", "phone",
-  "title", "project", "developer", "area", "type",
-  "bedrooms", "bathrooms", "floor", "size", "view", "completion",
-  "unitPrice", "sellingPrice", "paidAmount", "pendingAmount",
-  "dldPercent", "brokeragePercent", "vatPercent",
-  "trusteeFee", "titleDeed", "otherCharges", "notes"
-];
+    const TABLE_NAME = "owners";
+    const PAGE_SIZE = 50;
 
-function getValue(id) {
-  return document.getElementById(id).value || "-";
-}
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function getNumber(id) {
-  return Number(document.getElementById(id).value) || 0;
-}
+    let currentPage = 0;
+    let totalCount = 0;
+    let debounceTimer = null;
+    let listenersReady = false;
+    let currentAccess = null;
+    let allMiniRows = [];
 
-function money(value) {
-  return "AED " + Math.round(value).toLocaleString("en-AE");
-}
+    const el = id => document.getElementById(id);
 
-function updateText(previewId, inputId) {
-  document.getElementById(previewId).innerText = getValue(inputId);
-}
+    async function checkSession() {
+      const { data } = await db.auth.getSession();
 
-function calculate() {
-  updateText("pAgent", "agentName");
-  updateText("pAgency", "agency");
-  updateText("pPhone", "phone");
-  updateText("pTitle", "title");
-  updateText("pProject", "project");
-  updateText("pDeveloper", "developer");
-  updateText("pArea", "area");
-  updateText("pType", "type");
-  updateText("pBedrooms", "bedrooms");
-  updateText("pBathrooms", "bathrooms");
-  updateText("pFloor", "floor");
-  updateText("pSize", "size");
-  updateText("pView", "view");
-  updateText("pCompletion", "completion");
-  updateText("pNotes", "notes");
-
-  const unitPrice = getNumber("unitPrice");
-  const sellingPrice = getNumber("sellingPrice");
-  const paidAmount = getNumber("paidAmount");
-  const pendingAmount = getNumber("pendingAmount");
-
-  const dld = sellingPrice * getNumber("dldPercent") / 100;
-  const brokerage = sellingPrice * getNumber("brokeragePercent") / 100;
-  const vat = brokerage * getNumber("vatPercent") / 100;
-  const brokerageVat = brokerage + vat;
-
-  const trustee = getNumber("trusteeFee");
-  const titleDeed = getNumber("titleDeed");
-  const other = getNumber("otherCharges");
-
-  const premium = sellingPrice - unitPrice;
-
-  const totalOnTransfer =
-    paidAmount +
-    premium +
-    dld +
-    brokerageVat +
-    trustee +
-    titleDeed +
-    other;
-
-  const totalBuyerCost = totalOnTransfer + pendingAmount;
-
-  document.getElementById("pUnitPrice").innerText = money(unitPrice);
-  document.getElementById("pSellingPrice").innerText = money(sellingPrice);
-  document.getElementById("pPremium").innerText = money(premium);
-  document.getElementById("pPaid").innerText = money(paidAmount);
-  document.getElementById("pPending").innerText = money(pendingAmount);
-  document.getElementById("pDld").innerText = money(dld);
-  document.getElementById("pTrustee").innerText = money(trustee);
-  document.getElementById("pTitleDeed").innerText = money(titleDeed);
-  document.getElementById("pBrokerageVat").innerText = money(brokerageVat);
-  document.getElementById("pTransfer").innerText = money(totalOnTransfer);
-  document.getElementById("pTotal").innerText = money(totalBuyerCost);
-}
-
-function generateShareLink() {
-  const data = {};
-
-  fields.forEach(id => {
-    data[id] = document.getElementById(id).value;
-  });
-
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const url = window.location.origin + window.location.pathname + "?data=" + encoded;
-
-  const box = document.getElementById("shareBox");
-  box.style.display = "block";
-  box.innerText = url;
-
-  navigator.clipboard.writeText(url);
-}
-
-function loadFromLink() {
-  const params = new URLSearchParams(window.location.search);
-  const data = params.get("data");
-
-  if (!data) return;
-
-  try {
-    const decoded = JSON.parse(decodeURIComponent(escape(atob(data))));
-
-    fields.forEach(id => {
-      if (decoded[id] !== undefined) {
-        document.getElementById(id).value = decoded[id];
+      if (!data.session) {
+        el("loginView").classList.remove("hidden");
+        el("appView").classList.add("hidden");
+        return;
       }
-    });
-  } catch (e) {
-    console.log("Invalid link");
-  }
-}
 
-function resetForm() {
-  window.location.href = window.location.pathname;
-}
+      const email = data.session.user.email;
 
-fields.forEach(id => {
-  document.getElementById(id).addEventListener("input", calculate);
-  document.getElementById(id).addEventListener("change", calculate);
-});
+      const { data: access } = await db
+        .from("user_access")
+        .select("*")
+        .eq("email", email)
+        .single();
 
-loadFromLink();
-calculate();
-</script>
+      currentAccess = access;
 
+      if (currentAccess?.can_export) {
+        el("exportBtn").classList.remove("hidden");
+      }
+
+      el("loginView").classList.add("hidden");
+      el("appView").classList.remove("hidden");
+
+      setupListeners();
+      await loadDropdowns();
+      loadData();
+    }
+
+    async function login() {
+      el("loginError").textContent = "";
+
+      const email = el("loginEmail").value.trim();
+      const password = el("loginPassword").value.trim();
+
+      if (!email || !password) {
+        el("loginError").textContent = "Enter email and password.";
+        return;
+      }
+
+      const { error } = await db.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        el("loginError").textContent = "Wrong email or password.";
+        return;
+      }
+
+      checkSession();
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      location.reload();
+    }
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function clean(value) {
+      if (value === null || value === undefined || value === "" || value === "EMPTY") return "-";
+      return String(value);
+    }
+
+    function get(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "" && row[key] !== "EMPTY") {
+          return row[key];
+        }
+      }
+      return "";
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatPhone(phone) {
+      let p = String(phone || "").replace(/[^\d]/g, "");
+      if (!p) return "";
+      if (p.startsWith("00")) p = p.substring(2);
+      if (p.length === 9 && p.startsWith("5")) p = "971" + p;
+      if (p.length === 10 && p.startsWith("05")) p = "971" + p.substring(1);
+      return p;
+    }
+
+    function statusClass(status) {
+      return "status-" + String(status || "New").replaceAll(" ", "");
+    }
+
+    function showSaved() {
+      el("saveToast").classList.add("show");
+      setTimeout(() => el("saveToast").classList.remove("show"), 1200);
+    }
+
+    async function markContacted(id) {
+      await db.from(TABLE_NAME).update({ last_contacted: today() }).eq("id", id);
+    }
+
+    function whatsappButton(row) {
+      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
+      const formatted = formatPhone(phone);
+
+      if (!formatted) return "-";
+
+      const owner = get(row, ["owner"]);
+      const unit = get(row, ["unit"]);
+      const cluster = get(row, ["cluster"]);
+      const community = get(row, ["community"]);
+
+      const msg = `Hello, Mr. ${owner || ""}
+
+Hope you're doing well.
+
+This is Usama from BFG Properties.
+
+I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${community}.
+
+Would you consider selling if you receive a strong offer?
+
+Looking forward to your kind response.
+
+Regards,
+Usama Bin Nusrat.`;
+
+      return `<a class="waBtn" target="_blank" onclick="markContacted(${row.id})" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">${escapeHtml(phone)}</a>`;
+    }
+
+    function showLoading() {
+      el("loadingBadge").classList.add("show");
+      el("status").textContent = "Loading database...";
+
+      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `
+        <tr>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+          <td><div class="skeleton"></div></td>
+        </tr>
+      `).join("");
+
+      el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() => `
+        <div class="ownerCard">
+          <div class="skeleton" style="height:22px;margin-bottom:12px;"></div>
+          <div class="skeleton" style="margin-bottom:10px;"></div>
+          <div class="skeleton" style="margin-bottom:10px;"></div>
+          <div class="skeleton"></div>
+        </div>
+      `).join("");
+    }
+
+    function hideLoading() {
+      el("loadingBadge").classList.remove("show");
+    }
+
+    function markRemarkDirty(btnId) {
+      el(btnId).classList.add("show");
+    }
+
+    async function saveRemarks(id, textareaId, btnId) {
+      const value = el(textareaId).value;
+
+      const { error } = await db
+        .from(TABLE_NAME)
+        .update({
+          remarks: value,
+          last_contacted: today()
+        })
+        .eq("id", id);
+
+      if (error) {
+        alert("Failed to update remarks");
+        return;
+      }
+
+      el(btnId).classList.remove("show");
+      showSaved();
+
+      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
+      if (lastCell) lastCell.textContent = today();
+    }
+
+    async function updateStatus(id, value) {
+      const { error } = await db
+        .from(TABLE_NAME)
+        .update({
+          status: value,
+          last_contacted: today()
+        })
+        .eq("id", id);
+
+      if (error) {
+        alert("Failed to update status");
+        return;
+      }
+
+      showSaved();
+
+      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
+      if (lastCell) lastCell.textContent = today();
+    }
+
+    function applyFilters(query) {
+      const search = el("searchInput").value.trim();
+      const community = el("communityFilter").value;
+      const cluster = el("clusterFilter").value;
+      const unit = el("unitFilter").value.trim();
+      const source = el("sourceFilter").value;
+      const status = el("statusFilter").value;
+
+      if (search) {
+        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone1.ilike.%${search}%,phone2.ilike.%${search}%`);
+      }
+
+      if (community) query = query.eq("community", community);
+      if (cluster) query = query.eq("cluster", cluster);
+      if (unit) query = query.ilike("unit", `%${unit}%`);
+      if (source) query = query.eq("data_source", source);
+      if (status) query = query.eq("status", status);
+
+      return query;
+    }
+
+    async function loadData() {
+      showLoading();
+
+      const from = currentPage * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      let query = db
+        .from(TABLE_NAME)
+        .select("*", { count: "exact" })
+        .range(from, to);
+
+      query = applyFilters(query);
+
+      query = query
+        .order("community", { ascending: true })
+        .order("cluster", { ascending: true })
+        .order("unit_sort", { ascending: true });
+
+      const { data, error, count } = await query;
+
+      hideLoading();
+
+      if (error) {
+        el("status").textContent = "Error loading data";
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`;
+        el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`;
+        return;
+      }
+
+      totalCount = count || 0;
+      renderData(data || []);
+
+      const start = totalCount === 0 ? 0 : from + 1;
+      const end = Math.min(to + 1, totalCount);
+      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+      el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`;
+      el("pageInfo").textContent = `${currentPage + 1} / ${totalPages}`;
+
+      el("prevBtn").disabled = currentPage === 0;
+      el("nextBtn").disabled = currentPage + 1 >= totalPages;
+    }
+
+    function statusDropdown(row) {
+      const current = clean(row.status) === "-" ? "New" : row.status;
+      const statuses = ["New", "For Sale", "For Rent", "Sold", "Call Back", "No Response", "Not Interested", "Invalid Number"];
+
+      return `
+        <select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">
+          ${statuses.map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}
+        </select>
+      `;
+    }
+
+    function remarksEditor(row, remarks, prefix) {
+      const textareaId = `${prefix}_remark_${row.id}`;
+      const btnId = `${prefix}_save_${row.id}`;
+
+      return `
+        <div class="remarkBox">
+          <textarea 
+            id="${textareaId}"
+            class="remarksInput"
+            placeholder="Add remarks..."
+            oninput="markRemarkDirty('${btnId}')"
+          >${escapeHtml(remarks)}</textarea>
+          <button id="${btnId}" class="saveRemarkBtn" onclick="saveRemarks(${row.id}, '${textareaId}', '${btnId}')">Save</button>
+        </div>
+      `;
+    }
+
+    function rowKey(row) {
+      const owner = String(get(row, ["owner"])).trim().toLowerCase();
+      const p1 = formatPhone(get(row, ["phone1"]));
+      const p2 = formatPhone(get(row, ["phone2"]));
+      return { owner, p1, p2 };
+    }
+
+    function getRelatedRows(row) {
+      const key = rowKey(row);
+
+      return allMiniRows.filter(x => {
+        const k = rowKey(x);
+
+        const sameOwner = key.owner && k.owner && key.owner === k.owner;
+        const samePhone1 = key.p1 && (key.p1 === k.p1 || key.p1 === k.p2);
+        const samePhone2 = key.p2 && (key.p2 === k.p1 || key.p2 === k.p2);
+
+        return sameOwner || samePhone1 || samePhone2;
+      });
+    }
+
+    function moreUnitButton(row) {
+      const related = getRelatedRows(row);
+      if (related.length <= 1) return "";
+      return `<button class="moreUnitBtn" onclick='openProperties(${JSON.stringify(row).replaceAll("'", "&#039;")})'>More Unit</button>`;
+    }
+
+    function renderData(rows) {
+      if (!rows.length) {
+        el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
+        el("mobileCards").innerHTML = `<div class="empty">No records found</div>`;
+        return;
+      }
+
+      el("tableBody").innerHTML = rows.map(row => {
+        const remarks = get(row, ["remarks"]);
+
+        return `
+          <tr>
+            <td>${escapeHtml(clean(row.community))}</td>
+            <td>${escapeHtml(clean(row.cluster))}</td>
+            <td>${escapeHtml(clean(row.unit))}</td>
+            <td>
+              ${escapeHtml(clean(row.owner))}
+              ${moreUnitButton(row)}
+            </td>
+            <td>${whatsappButton(row)}</td>
+            <td>${statusDropdown(row)}</td>
+            <td>${remarksEditor(row, remarks, "desk")}</td>
+            <td data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</td>
+          </tr>
+        `;
+      }).join("");
+
+      el("mobileCards").innerHTML = rows.map(row => {
+        const remarks = get(row, ["remarks"]);
+
+        return `
+          <div class="ownerCard">
+            <div class="ownerTop">
+              <div class="ownerName">
+                ${escapeHtml(clean(row.owner))}
+                ${moreUnitButton(row)}
+              </div>
+              <div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div>
+            </div>
+
+            <div class="mobileLocation">
+              <div class="locationText">
+                <span>Property</span>
+                ${escapeHtml(clean(row.community))} - ${escapeHtml(clean(row.cluster))}
+              </div>
+              ${whatsappButton(row)}
+            </div>
+
+            <div class="infoLine"><span>Status</span>${statusDropdown(row)}</div>
+            <div class="infoLine"><span>Remarks</span>${remarksEditor(row, remarks, "mob")}</div>
+            <div class="infoLine"><span>Last Contacted</span><span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function openProperties(row) {
+      const related = getRelatedRows(row);
+
+      el("modalTitle").textContent = `${clean(row.owner)} - More Units`;
+
+      if (!related.length) {
+        el("modalContent").innerHTML = `<div class="empty">No more units found</div>`;
+      } else {
+        el("modalContent").innerHTML = related
+          .sort((a, b) => String(a.unit_sort || a.unit).localeCompare(String(b.unit_sort || b.unit), undefined, { numeric: true }))
+          .map(x => `
+            <div class="modalRow">
+              ${escapeHtml(clean(x.community))} - ${escapeHtml(clean(x.cluster))} - Unit#${escapeHtml(clean(x.unit))}
+            </div>
+          `).join("");
+      }
+
+      el("propertiesModal").classList.add("show");
+    }
+
+    function closeModal() {
+      el("propertiesModal").classList.remove("show");
+    }
+
+    async function loadDropdowns() {
+      let allRows = [];
+      let from = 0;
+      const batchSize = 1000;
+
+      while (true) {
+        const { data, error } = await db
+          .from(TABLE_NAME)
+          .select("id, community, cluster, unit, unit_sort, owner, phone1, phone2, data_source")
+          .range(from, from + batchSize - 1);
+
+        if (error || !data || data.length === 0) break;
+
+        allRows = allRows.concat(data);
+
+        if (data.length < batchSize) break;
+        from += batchSize;
+      }
+
+      allMiniRows = allRows;
+
+      fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
+      fillSelect("clusterFilter", [...new Set(allRows.map(x => x.cluster).filter(Boolean))]);
+      fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
+    }
+
+    function fillSelect(id, values) {
+      const select = el(id);
+      const firstOption = select.children[0].outerHTML;
+
+      select.innerHTML = firstOption + values
+        .sort((a, b) => String(a).localeCompare(String(b)))
+        .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
+        .join("");
+    }
+
+    function quickStatus(status) {
+      el("statusFilter").value = status;
+      currentPage = 0;
+      loadData();
+    }
+
+    function resetFilters() {
+      el("searchInput").value = "";
+      el("communityFilter").value = "";
+      el("clusterFilter").value = "";
+      el("unitFilter").value = "";
+      el("sourceFilter").value = "";
+      el("statusFilter").value = "";
+      currentPage = 0;
+      loadData();
+    }
+
+    function nextPage() {
+      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+      if (currentPage + 1 >= totalPages) return;
+      currentPage++;
+      loadData();
+    }
+
+    function prevPage() {
+      if (currentPage === 0) return;
+      currentPage--;
+      loadData();
+    }
+
+    async function exportCSV() {
+      if (!currentAccess?.can_export) return;
+
+      let allRows = [];
+      let from = 0;
+      const batchSize = 1000;
+
+      while (true) {
+        const { data, error } = await db
+          .from(TABLE_NAME)
+          .select("community,cluster,unit,owner,phone1,phone2,remarks,data_source,status,last_contacted")
+          .range(from, from + batchSize - 1);
+
+        if (error) {
+          alert("Export failed");
+          return;
+        }
+
+        if (!data || data.length === 0) break;
+
+        allRows = allRows.concat(data);
+        if (data.length < batchSize) break;
+        from += batchSize;
+      }
+
+      const headers = ["community","cluster","unit","owner","phone1","phone2","remarks","data_source","status","last_contacted"];
+
+      const csv = [
+        headers.join(","),
+        ...allRows.map(row => headers.map(h => {
+          const value = row[h] ?? "";
+          return `"${String(value).replaceAll('"', '""')}"`;
+        }).join(","))
+      ].join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `usama_database_export_${today()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function setupListeners() {
+      if (listenersReady) return;
+      listenersReady = true;
+
+      ["searchInput", "unitFilter"].forEach(id => {
+        el(id).addEventListener("input", () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            currentPage = 0;
+            loadData();
+          }, 400);
+        });
+      });
+
+      ["communityFilter", "clusterFilter", "sourceFilter", "statusFilter"].forEach(id => {
+        el(id).addEventListener("change", () => {
+          currentPage = 0;
+          loadData();
+        });
+      });
+    }
+
+    checkSession();
+  </script>
 </body>
 </html>
