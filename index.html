@@ -1,961 +1,491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Property Breakdown Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Payment Calculator</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * { box-sizing: border-box; }
 
-:root{
-  --bg:#070b12;
-  --panel:#0f172a;
-  --panel-soft:#111827;
-  --border:#263244;
-  --gold:#d6b24a;
-  --blue:#2563eb;
-  --green:#16a34a;
-  --red:#991b1b;
-  --muted:#94a3b8;
-  --paper:#ffffff;
-  --ink:#111827;
-  --soft:#f8fafc;
-}
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: #f4f6f8;
+      color: #111827;
+      padding: 24px;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:#fff;
-}
+    .app {
+      max-width: 1100px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
 
-.app{
-  display:grid;
-  grid-template-columns:430px 1fr;
-  min-height:100vh;
-}
+    .header {
+      padding: 22px 26px;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: white;
+    }
 
-/* LEFT EDITOR */
-.editor{
-  background:linear-gradient(180deg,#111827,#070b12);
-  border-right:1px solid var(--border);
-  padding:22px;
-  height:100vh;
-  overflow:auto;
-  position:sticky;
-  top:0;
-}
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
 
-.editor h1{
-  font-size:21px;
-  margin:0 0 18px;
-  letter-spacing:-.4px;
-}
+    .header p {
+      margin: 6px 0 0;
+      color: #d1d5db;
+      font-size: 13px;
+    }
 
-.editor h2{
-  font-size:14px;
-  margin:24px 0 12px;
-  color:var(--gold);
-  text-transform:uppercase;
-  letter-spacing:.5px;
-}
+    .content {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
 
-label{
-  display:block;
-  font-size:12px;
-  font-weight:800;
-  color:var(--muted);
-  margin-bottom:6px;
-}
+    .card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 18px;
+    }
 
-input,textarea{
-  width:100%;
-  background:#05070d;
-  color:#fff;
-  border:1px solid var(--border);
-  border-radius:11px;
-  padding:11px 12px;
-  font-size:14px;
-  margin-bottom:12px;
-  outline:none;
-}
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      color: #111827;
+    }
 
-input:focus,textarea:focus{
-  border-color:var(--gold);
-}
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
 
-textarea{
-  min-height:78px;
-  resize:vertical;
-  line-height:1.45;
-}
+    input, select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 14px;
+      background: white;
+      outline: none;
+    }
 
-.two{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
+    input:focus, select:focus {
+      border-color: #111827;
+    }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
 
-button{
-  border:0;
-  border-radius:11px;
-  padding:12px 15px;
-  font-weight:900;
-  cursor:pointer;
-  font-size:13px;
-}
+    .full {
+      margin-bottom: 14px;
+    }
 
-.primary{background:var(--gold);color:#111}
-.blueBtn{background:var(--blue);color:#fff}
-.greenBtn{background:var(--green);color:#fff}
-.dark{background:#1e293b;color:#fff}
+    .result {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
 
-.status{
-  margin-top:12px;
-  color:var(--muted);
-  font-size:12px;
-  word-break:break-all;
-  line-height:1.5;
-}
+    .result:last-child { border-bottom: none; }
 
-.status a{
-  color:var(--gold);
-}
+    .result span:first-child {
+      color: #4b5563;
+    }
 
-/* PREVIEW */
-.preview-wrap{
-  background:#d9d9d9;
-  padding:24px;
-  overflow:auto;
-}
+    .result span:last-child {
+      font-weight: 700;
+      color: #111827;
+      text-align: right;
+    }
 
-.preview-page{
-  width:794px;
-  min-height:1123px;
-  background:var(--paper);
-  color:var(--ink);
-  margin:0 auto;
-  padding:24px 28px;
-  box-shadow:0 8px 30px rgba(0,0,0,.18);
-}
+    .total {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #111827;
+      color: white;
+    }
 
-.header-info{
-  text-align:left;
-  font-size:11.5px;
-  margin-bottom:10px;
-  color:#111;
-  line-height:1.45;
-}
+    .total div {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-.header-info strong{
-  font-weight:900;
-}
+    .actions {
+      padding: 0 24px 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-.preview-page h1{
-  font-size:24px;
-  line-height:1.12;
-  margin:0 0 16px;
-  font-weight:900;
-  letter-spacing:-.4px;
-}
+    button {
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
 
-.preview-page h2{
-  font-size:18px;
-  margin:18px 0 8px;
-  padding-bottom:6px;
-  border-bottom:1px solid #e5e7eb;
-  font-weight:900;
-  letter-spacing:-.3px;
-}
+    .primary {
+      background: #111827;
+      color: white;
+    }
 
-.info-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
 
-.info-card{
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:10px 12px;
-  min-height:54px;
-  background:#f9fafb;
-}
+    .share-box {
+      display: none;
+      margin: 0 24px 24px;
+      background: #f9fafb;
+      border: 1px dashed #9ca3af;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      word-break: break-all;
+    }
 
-.info-card b{
-  display:block;
-  color:#6b7280;
-  text-transform:uppercase;
-  font-size:9px;
-  letter-spacing:.5px;
-  margin-bottom:4px;
-  font-weight:900;
-}
+    @media print {
+      body { background: white; padding: 0; }
+      .actions, .share-box { display: none !important; }
+      .app { box-shadow: none; border: none; }
+    }
 
-.info-card span{
-  font-size:13px;
-  font-weight:900;
-}
-
-.desc{
-  margin:12px 0 2px;
-  padding:10px 12px;
-  border-left:4px solid #111827;
-  border-radius:8px;
-  font-size:13px;
-  line-height:1.42;
-}
-
-.breakdown{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:8px;
-  font-size:12px;
-}
-
-.breakdown td{
-  padding:7px 8px;
-  border-bottom:1px solid #e5e7eb;
-}
-
-.breakdown td:last-child{
-  text-align:right;
-  font-weight:900;
-}
-
-.soft{background:#f3f4f6;font-weight:900}
-.green{background:#ecfdf5;font-weight:900}
-.pink{background:#fef2f2;font-weight:900}
-
-.section{
-  break-inside:avoid;
-  page-break-inside:avoid;
-}
-
-.image-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.image-card{
-  width:100%;
-  aspect-ratio:4/3;
-  background:#f8fafc;
-  border-radius:11px;
-  overflow:hidden;
-  border:1px solid #e5e7eb;
-  position:relative;
-}
-
-.image-card img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-.plan-card img{
-  object-fit:contain!important;
-  background:#fff;
-}
-
-.remove-img{
-  position:absolute;
-  top:7px;
-  right:7px;
-  background:#111827;
-  color:#fff;
-  font-size:10px;
-  padding:5px 7px;
-  border-radius:7px;
-}
-
-.hidden{display:none}
-
-.whatsapp-client{
-  display:inline-block;
-  margin-top:10px;
-  background:var(--green);
-  color:#fff;
-  text-decoration:none;
-  padding:9px 15px;
-  border-radius:999px;
-  font-weight:900;
-  font-size:12px;
-}
-
-.installment-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 38px;
-  gap:8px;
-  margin-bottom:8px;
-}
-
-.installment-row input{margin-bottom:0}
-
-.installment-row button{
-  padding:8px;
-  background:var(--red);
-  color:white;
-}
-
-.small-help{
-  color:#64748b;
-  font-size:11px;
-  margin:-6px 0 10px;
-  line-height:1.4;
-}
-
-@media(max-width:1100px){
-  .app{grid-template-columns:1fr}
-  .editor{height:auto;position:relative}
-  .preview-page{width:100%}
-}
-</style>
+    @media (max-width: 850px) {
+      .content { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
+
 <div class="app">
-
-<div class="editor">
-<h1>Property Breakdown Generator</h1>
-
-<h2>Contact Info</h2>
-<label>Name</label>
-<input id="agentName" placeholder="Usama Bin Nusrat">
-
-<label>Agency</label>
-<input id="agencyName" placeholder="BFG Properties">
-
-<label>WhatsApp / Contact Number</label>
-<input id="contactNumber" placeholder="971528176879">
-
-<h2>Property Details</h2>
-<label>Title</label>
-<input id="projectTitle" placeholder="5-Bedroom - Farm Gardens, The Valley">
-
-<div class="two">
-  <div>
-    <label>Project</label>
-    <input id="project" placeholder="Farm Gardens">
+  <div class="header">
+    <h1>Client Payment Calculator</h1>
+    <p>Dubai Property Purchase Cost Breakdown</p>
   </div>
-  <div>
-    <label>Developer</label>
-    <input id="developer" placeholder="EMAAR">
+
+  <div class="content">
+    <div class="card">
+      <h2>Property Details</h2>
+
+      <div class="full">
+        <label>Project / Property Name</label>
+        <input id="propertyName" placeholder="Example: Emaar The Valley" />
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Unit Price AED</label>
+          <input id="unitPrice" type="number" value="2000000" />
+        </div>
+        <div>
+          <label>Paid to Developer AED</label>
+          <input id="paidAmount" type="number" value="1600000" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Selling Price AED</label>
+          <input id="sellingPrice" type="number" value="2500000" />
+        </div>
+        <div>
+          <label>Pending to Developer AED</label>
+          <input id="pendingAmount" type="number" value="400000" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>DLD Fee</label>
+          <input id="dldFee" type="number" value="4" />
+        </div>
+        <div>
+          <label>DLD Type</label>
+          <select id="dldType">
+            <option value="percent">Percentage %</option>
+            <option value="amount">Fixed Amount</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Brokerage</label>
+          <input id="brokerageFee" type="number" value="2" />
+        </div>
+        <div>
+          <label>Brokerage Type</label>
+          <select id="brokerageType">
+            <option value="percent">Percentage %</option>
+            <option value="amount">Fixed Amount</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>VAT on Brokerage %</label>
+          <input id="vatPercent" type="number" value="5" />
+        </div>
+        <div>
+          <label>Trustee Fee AED</label>
+          <input id="trusteeFee" type="number" value="4200" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Title Deed AED</label>
+          <input id="titleDeed" type="number" value="580" />
+        </div>
+        <div>
+          <label>Other Charges AED</label>
+          <input id="otherCharges" type="number" value="0" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Calculation Summary</h2>
+
+      <div class="result">
+        <span>Original Unit Price</span>
+        <span id="rUnitPrice">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Selling Price</span>
+        <span id="rSellingPrice">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Seller Premium / Profit</span>
+        <span id="rPremium">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Paid to Developer</span>
+        <span id="rPaid">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Pending to Developer</span>
+        <span id="rPending">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>DLD Fee</span>
+        <span id="rDld">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Brokerage Fee</span>
+        <span id="rBrokerage">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>VAT on Brokerage</span>
+        <span id="rVat">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Trustee Fee</span>
+        <span id="rTrustee">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Title Deed</span>
+        <span id="rTitle">AED 0</span>
+      </div>
+
+      <div class="result">
+        <span>Other Charges</span>
+        <span id="rOther">AED 0</span>
+      </div>
+
+      <div class="total">
+        <div>
+          <span>Total Buyer Payable</span>
+          <span id="rTotal">AED 0</span>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<label>Area</label>
-<input id="area" placeholder="The Valley">
-
-<div class="two">
-  <div>
-    <label>Type</label>
-    <input id="propertyType" placeholder="Villa">
+  <div class="actions">
+    <button class="primary" onclick="calculate()">Calculate</button>
+    <button class="secondary" onclick="generateShareLink()">Generate Client Link</button>
+    <button class="secondary" onclick="window.print()">Download PDF</button>
+    <button class="secondary" onclick="resetForm()">Reset</button>
   </div>
-  <div>
-    <label>Bedrooms</label>
-    <input id="bedrooms" placeholder="5-BR">
-  </div>
-</div>
 
-<div class="two">
-  <div>
-    <label>Bathrooms</label>
-    <input id="bathrooms" placeholder="6">
-  </div>
-  <div>
-    <label>Floor</label>
-    <input id="floor" placeholder="G+1">
-  </div>
-</div>
-
-<label>Size</label>
-<input id="size" placeholder="Plot: 10,008 sq ft • BUA: 5,657 sq ft">
-
-<div class="two">
-  <div>
-    <label>View</label>
-    <input id="view" placeholder="Community">
-  </div>
-  <div>
-    <label>Completion</label>
-    <input id="completion" placeholder="Aug-2025">
-  </div>
-</div>
-
-<label>Description</label>
-<textarea id="projectDescription" placeholder="Premium villa in a well-established Emaar community with strong end-user demand and long-term investment potential."></textarea>
-
-<h2>Payment Breakdown</h2>
-
-<label>Unit Price</label>
-<input id="unitPrice" type="number" placeholder="8600000">
-
-<label>Payment to Seller</label>
-<input id="paymentToSeller" type="number" placeholder="7340023">
-
-<div class="two">
-  <div>
-    <label>DLD %</label>
-    <input id="dldPercent" type="number" value="4">
-  </div>
-  <div>
-    <label>DLD Amount AED</label>
-    <input id="dldAmount" type="number" placeholder="Optional">
-  </div>
-</div>
-
-<div class="two">
-  <div>
-    <label>Brokerage %</label>
-    <input id="brokeragePercent" type="number" value="2">
-  </div>
-  <div>
-    <label>Brokerage Amount AED</label>
-    <input id="brokerageAmount" type="number" placeholder="Optional">
-  </div>
-</div>
-
-<div class="two">
-  <div>
-    <label>VAT on Brokerage %</label>
-    <input id="vatPercent" type="number" value="5">
-  </div>
-  <div>
-    <label>VAT Amount AED</label>
-    <input id="vatAmount" type="number" placeholder="Optional">
-  </div>
-</div>
-
-<div class="two">
-  <div>
-    <label>Trustee Fee AED</label>
-    <input id="trusteeFee" type="number" value="4200">
-  </div>
-  <div>
-    <label>Title Deed Fee AED</label>
-    <input id="titleDeedFee" type="number" value="580">
-  </div>
-</div>
-
-<div class="small-help">
-Manual AED amount overrides percentage. Brokerage total shown = Brokerage + VAT.
-</div>
-
-<h2>Pending / Installments Optional</h2>
-<div id="installmentsEditor"></div>
-<button class="dark" onclick="addInstallment()">+ Add Installment</button>
-
-<h2>Images</h2>
-<label>Floor Plans</label>
-<input id="floorPlansInput" type="file" accept="image/*" multiple>
-
-<label>Cluster / Master Plan Optional</label>
-<input id="clusterPlansInput" type="file" accept="image/*" multiple>
-
-<label>Property Images</label>
-<input id="projectImagesInput" type="file" accept="image/*" multiple>
-
-<div class="actions">
-  <button class="primary" onclick="saveProject()">Save / Update Link</button>
-  <button class="blueBtn" onclick="downloadPDF()">Generate PDF</button>
-  <button class="greenBtn" onclick="openWhatsApp()">WhatsApp Client</button>
-  <button class="dark" onclick="newCopy()">New Copy</button>
-  <button class="dark" onclick="clearAll()">Clear</button>
-</div>
-
-<div class="status" id="statusBox"></div>
-</div>
-
-<div class="preview-wrap">
-<div class="preview-page" id="pdfArea">
-
-<div class="header-info" id="headerInfo"></div>
-
-<h1 id="pTitle">Property Breakdown</h1>
-
-<div class="info-grid">
-  <div class="info-card"><b>Project</b><span id="pProject">-</span></div>
-  <div class="info-card"><b>Developer</b><span id="pDeveloper">-</span></div>
-  <div class="info-card"><b>Area</b><span id="pArea">-</span></div>
-  <div class="info-card"><b>Type</b><span id="pType">-</span></div>
-  <div class="info-card"><b>Bedrooms</b><span id="pBedrooms">-</span></div>
-  <div class="info-card"><b>Bathrooms</b><span id="pBathrooms">-</span></div>
-  <div class="info-card"><b>Size</b><span id="pSize">-</span></div>
-  <div class="info-card"><b>Floor</b><span id="pFloor">-</span></div>
-  <div class="info-card"><b>View</b><span id="pView">-</span></div>
-  <div class="info-card"><b>Completion</b><span id="pCompletion">-</span></div>
-</div>
-
-<div class="desc" id="pDescription"></div>
-
-<h2>Payment Breakdown</h2>
-<table class="breakdown" id="breakdownTable"></table>
-
-<div id="clientWhatsappBox"></div>
-
-<div class="section">
-  <h2>Floor Plans</h2>
-  <div class="image-grid" id="floorPlansPreview"></div>
-</div>
-
-<div class="section hidden" id="clusterSection">
-  <h2>Cluster / Master Plan</h2>
-  <div class="image-grid" id="clusterPlansPreview"></div>
-</div>
-
-<div class="section">
-  <h2>Property Images</h2>
-  <div class="image-grid" id="projectImagesPreview"></div>
-</div>
-
-</div>
-</div>
+  <div class="share-box" id="shareBox"></div>
 </div>
 
 <script>
-const SUPABASE_URL = "https://cowyowpcktpvnevrmfej.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
-const STORAGE_BUCKET = "presentation-images";
+  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+  const SUPABASE_KEY = "sb_publishable_mM2UoFjMfo_eaUPkBd2Nmw_9KBPZEqh";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentId = new URLSearchParams(window.location.search).get("id");
+  let supabaseClient = null;
 
-const data = {
-  floorPlans: [],
-  clusterPlans: [],
-  projectImages: [],
-  installments: []
-};
-
-const fields = [
-  "agentName","agencyName","contactNumber",
-  "projectTitle","project","developer","area",
-  "propertyType","bedrooms","bathrooms","size",
-  "floor","view","completion","projectDescription",
-  "unitPrice","paymentToSeller",
-  "dldPercent","dldAmount",
-  "brokeragePercent","brokerageAmount",
-  "vatPercent","vatAmount",
-  "trusteeFee","titleDeedFee"
-];
-
-function val(id){return document.getElementById(id).value.trim()}
-function num(id){return Number(val(id)||0)}
-
-function money(value){
-  return "AED " + Number(value||0).toLocaleString("en-AE",{maximumFractionDigits:0});
-}
-
-function set(id,value){
-  document.getElementById(id).innerText = value;
-}
-
-function status(msg){
-  document.getElementById("statusBox").innerHTML = msg || "";
-}
-
-function addInstallment(label="",amount=""){
-  data.installments.push({label,amount});
-  renderInstallmentsEditor();
-  updatePreview();
-}
-
-function removeInstallment(index){
-  data.installments.splice(index,1);
-  renderInstallmentsEditor();
-  updatePreview();
-}
-
-function renderInstallmentsEditor(){
-  document.getElementById("installmentsEditor").innerHTML =
-    data.installments.map((item,index)=>`
-      <div class="installment-row">
-        <input placeholder="Installment name" value="${escapeHtml(item.label||"")}" oninput="data.installments[${index}].label=this.value;updatePreview()">
-        <input type="number" placeholder="Amount" value="${escapeHtml(item.amount||"")}" oninput="data.installments[${index}].amount=this.value;updatePreview()">
-        <button onclick="removeInstallment(${index})">X</button>
-      </div>
-    `).join("");
-}
-
-function calculate(){
-  const unit = num("unitPrice");
-  const seller = num("paymentToSeller");
-
-  const dld = num("dldAmount") > 0
-    ? num("dldAmount")
-    : unit * num("dldPercent") / 100;
-
-  const brokerage = num("brokerageAmount") > 0
-    ? num("brokerageAmount")
-    : unit * num("brokeragePercent") / 100;
-
-  const vat = num("vatAmount") > 0
-    ? num("vatAmount")
-    : brokerage * num("vatPercent") / 100;
-
-  const brokerageVat = brokerage + vat;
-  const trustee = num("trusteeFee");
-  const title = num("titleDeedFee");
-
-  const transferFees = dld + trustee + title + brokerageVat;
-
-  const remaining = data.installments.reduce((sum,item)=>{
-    return sum + Number(item.amount || 0);
-  },0);
-
-  const total = seller + transferFees + remaining;
-
-  return {
-    unit,
-    seller,
-    dld,
-    brokerage,
-    vat,
-    brokerageVat,
-    trustee,
-    title,
-    transferFees,
-    remaining,
-    total
-  };
-}
-
-function updatePreview(){
-  const header = [];
-
-  if(val("agentName")) header.push(`<strong>Name:</strong> ${escapeHtml(val("agentName"))}`);
-  if(val("agencyName")) header.push(`<strong>Agency:</strong> ${escapeHtml(val("agencyName"))}`);
-  if(val("contactNumber")) header.push(`<strong>Contact:</strong> +${val("contactNumber").replace(/\D/g,"")}`);
-
-  document.getElementById("headerInfo").innerHTML = header.join("<br>");
-
-  set("pTitle", val("projectTitle") || "Property Breakdown");
-  set("pProject", val("project") || "-");
-  set("pDeveloper", val("developer") || "-");
-  set("pArea", val("area") || "-");
-  set("pType", val("propertyType") || "-");
-  set("pBedrooms", val("bedrooms") || "-");
-  set("pBathrooms", val("bathrooms") || "-");
-  set("pSize", val("size") || "-");
-  set("pFloor", val("floor") || "-");
-  set("pView", val("view") || "-");
-  set("pCompletion", val("completion") || "-");
-  set("pDescription", val("projectDescription") || "");
-
-  const c = calculate();
-
-  let rows = `
-    <tr class="soft"><td>Unit Price</td><td>${money(c.unit)}</td></tr>
-    <tr><td>Payment to Seller</td><td>${money(c.seller)}</td></tr>
-    <tr><td>DLD Fee</td><td>${money(c.dld)}</td></tr>
-    <tr><td>Trustee Office Fee</td><td>${money(c.trustee)}</td></tr>
-    <tr><td>Title Deed Fee</td><td>${money(c.title)}</td></tr>
-    <tr><td>Brokerage + VAT</td><td>${money(c.brokerageVat)}</td></tr>
-  `;
-
-  data.installments.forEach(item=>{
-    rows += `
-      <tr class="green">
-        <td>${escapeHtml(item.label || "Pending Payment")}</td>
-        <td>${money(item.amount)}</td>
-      </tr>
-    `;
-  });
-
-  rows += `
-    <tr class="pink"><td>Total Transfer Fees</td><td>${money(c.transferFees)}</td></tr>
-    ${c.remaining > 0 ? `<tr class="green"><td>Total Remaining Payment Plan</td><td>${money(c.remaining)}</td></tr>` : ""}
-    <tr class="soft"><td>Total Cost for Buyer</td><td>${money(c.total)}</td></tr>
-  `;
-
-  document.getElementById("breakdownTable").innerHTML = rows;
-
-  const phone = val("contactNumber").replace(/\D/g,"");
-
-  document.getElementById("clientWhatsappBox").innerHTML = phone
-    ? `<a class="whatsapp-client" target="_blank" href="https://wa.me/${phone}?text=${encodeURIComponent("Hi, I am interested in " + (val("projectTitle") || "this property"))}">WhatsApp Now</a>`
-    : "";
-
-  renderImages();
-}
-
-function imageHtml(item,type,index){
-  const src = typeof item === "string" ? item : item.url;
-  const planClass = type === "floorPlans" || type === "clusterPlans" ? "plan-card" : "";
-
-  return `
-    <div class="image-card ${planClass}">
-      <img src="${src}">
-      <button class="remove-img" onclick="removeImage('${type}',${index})">Remove</button>
-    </div>
-  `;
-}
-
-function renderImages(){
-  document.getElementById("floorPlansPreview").innerHTML =
-    data.floorPlans.map((src,index)=>imageHtml(src,"floorPlans",index)).join("");
-
-  document.getElementById("clusterPlansPreview").innerHTML =
-    data.clusterPlans.map((src,index)=>imageHtml(src,"clusterPlans",index)).join("");
-
-  document.getElementById("projectImagesPreview").innerHTML =
-    data.projectImages.map((src,index)=>imageHtml(src,"projectImages",index)).join("");
-
-  document.getElementById("clusterSection").classList.toggle(
-    "hidden",
-    data.clusterPlans.length === 0
-  );
-}
-
-function removeImage(type,index){
-  data[type].splice(index,1);
-  updatePreview();
-}
-
-async function uploadImages(input,type){
-  const files = Array.from(input.files);
-  if(!files.length) return;
-
-  status("Uploading images...");
-
-  for(const file of files){
-    const uploaded = await uploadOriginalToSupabase(file,type);
-    data[type].push(uploaded);
+  if (SUPABASE_URL && !SUPABASE_URL.includes("PASTE")) {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
 
-  input.value = "";
-  updatePreview();
-  status("Images uploaded. Click Save / Update Link.");
-}
+  const ids = [
+    "propertyName",
+    "unitPrice",
+    "paidAmount",
+    "sellingPrice",
+    "pendingAmount",
+    "dldFee",
+    "dldType",
+    "brokerageFee",
+    "brokerageType",
+    "vatPercent",
+    "trusteeFee",
+    "titleDeed",
+    "otherCharges"
+  ];
 
-async function uploadOriginalToSupabase(file,type){
-  const safeName = file.name.replace(/[^\w.\-]+/g,"-");
-  const path = `${currentId || "draft"}/${type}/${Date.now()}-${safeName}`;
-
-  const { error } = await sb.storage
-    .from(STORAGE_BUCKET)
-    .upload(path,file,{cacheControl:"3600",upsert:false});
-
-  if(error){
-    console.warn("Storage upload failed, using base64 fallback:", error.message);
-    return await readImageOriginal(file);
+  function num(id) {
+    return Number(document.getElementById(id).value) || 0;
   }
 
-  const { data:pub } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-  return {url:pub.publicUrl,path};
-}
-
-function readImageOriginal(file){
-  return new Promise(resolve=>{
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.readAsDataURL(file);
-  });
-}
-
-document.getElementById("floorPlansInput").addEventListener("change",function(){
-  uploadImages(this,"floorPlans");
-});
-
-document.getElementById("clusterPlansInput").addEventListener("change",function(){
-  uploadImages(this,"clusterPlans");
-});
-
-document.getElementById("projectImagesInput").addEventListener("change",function(){
-  uploadImages(this,"projectImages");
-});
-
-fields.forEach(id=>{
-  document.getElementById(id).addEventListener("input",updatePreview);
-});
-
-function collectPayload(){
-  const form = {};
-  fields.forEach(id=>form[id]=val(id));
-
-  form.floorPlans = data.floorPlans;
-  form.clusterPlans = data.clusterPlans;
-  form.projectImages = data.projectImages;
-  form.installments = data.installments;
-
-  return form;
-}
-
-async function saveProject(){
-  status("Saving...");
-
-  const form = collectPayload();
-  const title = val("projectTitle") || "Property Breakdown";
-
-  if(currentId){
-    const { error } = await sb
-      .from("presentations")
-      .update({title,form})
-      .eq("id",currentId);
-
-    if(error){
-      status("Save failed: " + error.message);
-      return;
-    }
-  }else{
-    const { data:res,error } = await sb
-      .from("presentations")
-      .insert([{title,form}])
-      .select("id")
-      .single();
-
-    if(error){
-      status("Save failed: " + error.message);
-      return;
-    }
-
-    currentId = res.id;
-    const newUrl = `${window.location.origin}${window.location.pathname}?id=${currentId}`;
-    window.history.replaceState({}, "", newUrl);
+  function val(id) {
+    return document.getElementById(id).value;
   }
 
-  const link = `${window.location.origin}${window.location.pathname}?id=${currentId}`;
-
-  status(`Saved ✅<br>Share/Edit Link:<br><a href="${link}" target="_blank">${link}</a>`);
-}
-
-async function loadProject(){
-  if(!currentId) return;
-
-  status("Loading saved presentation...");
-
-  const {data:res,error} = await sb
-    .from("presentations")
-    .select("id,title,form")
-    .eq("id",currentId)
-    .single();
-
-  if(error || !res){
-    status("Could not load saved project.");
-    return;
+  function money(amount) {
+    return "AED " + Math.round(amount).toLocaleString("en-AE");
   }
 
-  const f = res.form || {};
+  function getFee(value, type, base) {
+    return type === "percent" ? (base * value / 100) : value;
+  }
 
-  fields.forEach(id=>{
-    if(f[id] !== undefined && document.getElementById(id)){
-      document.getElementById(id).value = f[id];
-    }
-  });
+  function calculate() {
+    const unitPrice = num("unitPrice");
+    const paidAmount = num("paidAmount");
+    const sellingPrice = num("sellingPrice");
+    const pendingAmount = num("pendingAmount");
 
-  data.floorPlans = f.floorPlans || [];
-  data.clusterPlans = f.clusterPlans || [];
-  data.projectImages = f.projectImages || [];
-  data.installments = f.installments || [];
+    const dld = getFee(num("dldFee"), val("dldType"), sellingPrice);
+    const brokerage = getFee(num("brokerageFee"), val("brokerageType"), sellingPrice);
+    const vat = brokerage * num("vatPercent") / 100;
 
-  renderInstallmentsEditor();
-  updatePreview();
-  status("Loaded ✅");
-}
+    const trustee = num("trusteeFee");
+    const title = num("titleDeed");
+    const other = num("otherCharges");
 
-function downloadPDF(){
-  const element = document.getElementById("pdfArea");
+    const premium = sellingPrice - unitPrice;
 
-  document.querySelectorAll(".remove-img").forEach(btn=>{
-    btn.style.display = "none";
-  });
+    const totalBuyerPayable =
+      paidAmount +
+      premium +
+      pendingAmount +
+      dld +
+      brokerage +
+      vat +
+      trustee +
+      title +
+      other;
 
-  html2pdf().set({
-    margin:0,
-    filename:(val("projectTitle") || "property-breakdown") + ".pdf",
-    image:{type:"jpeg",quality:1},
-    html2canvas:{
-      scale:3,
-      useCORS:true,
-      backgroundColor:"#ffffff",
-      scrollY:0
-    },
-    jsPDF:{
-      unit:"px",
-      format:[794,1123],
-      orientation:"portrait"
-    },
-    pagebreak:{
-      mode:["css","legacy"]
-    }
-  }).from(element).save().then(()=>{
-    document.querySelectorAll(".remove-img").forEach(btn=>{
-      btn.style.display = "block";
+    document.getElementById("rUnitPrice").innerText = money(unitPrice);
+    document.getElementById("rSellingPrice").innerText = money(sellingPrice);
+    document.getElementById("rPremium").innerText = money(premium);
+    document.getElementById("rPaid").innerText = money(paidAmount);
+    document.getElementById("rPending").innerText = money(pendingAmount);
+    document.getElementById("rDld").innerText = money(dld);
+    document.getElementById("rBrokerage").innerText = money(brokerage);
+    document.getElementById("rVat").innerText = money(vat);
+    document.getElementById("rTrustee").innerText = money(trustee);
+    document.getElementById("rTitle").innerText = money(title);
+    document.getElementById("rOther").innerText = money(other);
+    document.getElementById("rTotal").innerText = money(totalBuyerPayable);
+  }
+
+  function generateShareLink() {
+    const data = {};
+
+    ids.forEach(id => {
+      data[id] = document.getElementById(id).value;
     });
-  });
-}
 
-function openWhatsApp(){
-  const phone = val("contactNumber").replace(/\D/g,"");
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    const url = window.location.origin + window.location.pathname + "?data=" + encoded;
 
-  if(!phone){
-    alert("Add your WhatsApp/contact number first.");
-    return;
+    const box = document.getElementById("shareBox");
+    box.style.display = "block";
+    box.innerText = url;
+
+    navigator.clipboard.writeText(url);
   }
 
-  const message = `Hi, I am interested in ${val("projectTitle") || "this property"}.`;
+  function loadFromLink() {
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get("data");
 
-  window.open(
-    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
-}
+    if (!data) return;
 
-function newCopy(){
-  currentId = null;
-  window.history.replaceState({}, "", window.location.pathname);
-  status("New copy mode. Click Save / Update Link to create a new saved link.");
-}
+    try {
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(data))));
 
-function clearAll(){
-  if(!confirm("Clear all fields and images?")) return;
+      ids.forEach(id => {
+        if (decoded[id] !== undefined) {
+          document.getElementById(id).value = decoded[id];
+        }
+      });
 
-  fields.forEach(id=>{
-    if(id === "dldPercent") document.getElementById(id).value = 4;
-    else if(id === "brokeragePercent") document.getElementById(id).value = 2;
-    else if(id === "vatPercent") document.getElementById(id).value = 5;
-    else if(id === "trusteeFee") document.getElementById(id).value = 4200;
-    else if(id === "titleDeedFee") document.getElementById(id).value = 580;
-    else document.getElementById(id).value = "";
+      calculate();
+    } catch (e) {
+      console.log("Invalid shared link");
+    }
+  }
+
+  function resetForm() {
+    location.href = window.location.pathname;
+  }
+
+  ids.forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
   });
 
-  data.floorPlans = [];
-  data.clusterPlans = [];
-  data.projectImages = [];
-  data.installments = [];
-
-  renderInstallmentsEditor();
-  updatePreview();
-  status("");
-}
-
-function escapeHtml(str){
-  return String(str||"")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-renderInstallmentsEditor();
-updatePreview();
-loadProject();
+  loadFromLink();
+  calculate();
 </script>
+
 </body>
 </html>
