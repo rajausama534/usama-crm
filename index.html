@@ -832,7 +832,7 @@ This is Usama from BFG Properties.
 
 I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${community}.
 
-Would you consider selling if you receive a strong offer?
+Are you interested in selling your property?
 
 Looking forward to your kind response.
 
@@ -1141,8 +1141,21 @@ Usama Bin Nusrat.`;
       allMiniRows = allRows;
 
       fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
-      fillSelect("clusterFilter", [...new Set(allRows.map(x => x.cluster).filter(Boolean))]);
+      updateClusterDropdown();
       fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
+    }
+
+    function updateClusterDropdown() {
+      const selectedCommunity = el("communityFilter").value;
+
+      const rows = selectedCommunity
+        ? allMiniRows.filter(x => x.community === selectedCommunity)
+        : allMiniRows;
+
+      const clusters = [...new Set(rows.map(x => x.cluster).filter(Boolean))];
+
+      fillSelect("clusterFilter", clusters);
+      el("clusterFilter").value = "";
     }
 
     function fillSelect(id, values) {
@@ -1164,6 +1177,7 @@ Usama Bin Nusrat.`;
     function resetFilters() {
       el("searchInput").value = "";
       el("communityFilter").value = "";
+      updateClusterDropdown();
       el("clusterFilter").value = "";
       el("unitFilter").value = "";
       el("sourceFilter").value = "";
@@ -1243,7 +1257,13 @@ Usama Bin Nusrat.`;
         });
       });
 
-      ["communityFilter", "clusterFilter", "sourceFilter", "statusFilter"].forEach(id => {
+      el("communityFilter").addEventListener("change", () => {
+        updateClusterDropdown();
+        currentPage = 0;
+        loadData();
+      });
+
+      ["clusterFilter", "sourceFilter", "statusFilter"].forEach(id => {
         el(id).addEventListener("change", () => {
           currentPage = 0;
           loadData();
