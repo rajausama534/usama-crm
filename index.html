@@ -93,6 +93,17 @@
     .formGrid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .formGrid label { font-size: 12px; color:#94a3b8; display:block; margin-bottom:5px; }
     .formFull { grid-column: 1 / -1; }
+    .columnList { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+    .columnItem { display:grid; grid-template-columns: 28px 1fr auto auto; align-items:center; gap:10px; background:#07111f; border:1px solid rgba(148,163,184,.16); border-radius:12px; padding:10px; }
+    .columnItem input { width:auto; }
+    .columnItem button { padding:7px 9px; font-size:11px; background:#111827; border:1px solid rgba(148,163,184,.22); }
+    .leadCellInput:disabled, .leadCellTextarea:disabled, .leadCellSelect:disabled { opacity:.78; cursor:not-allowed; border-color:transparent; background:transparent; box-shadow:none; padding-left:0; }
+    .leadActions { display:flex; gap:6px; justify-content:flex-end; min-width:190px; }
+    .leadActions button { white-space:nowrap; }
+    .saveRowBtn.hiddenAction { display:none; }
+    .actionsSticky { position: sticky; right: 0; background:#020617; z-index:3; }
+    th.actionsSticky { background:#0b1020; }
+    tr:hover .actionsSticky { background:#0b1730; }
     @media (max-width: 800px) {
       body { padding: 14px; background: radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%), #07111f; }
       .mainHeader { align-items: center; margin-bottom: 16px; }
@@ -203,9 +214,9 @@
       <div class="quickFilters">
         <button onclick="quickLeadStatus('New')">New</button><button onclick="quickLeadStatus('Contacted')">Contacted</button><button onclick="quickLeadStatus('Call Back')">Call Back</button><button onclick="quickLeadStatus('Interested')">Interested</button><button onclick="quickLeadStatus('Viewing')">Viewing</button><button onclick="quickLeadStatus('Negotiation')">Negotiation</button><button onclick="quickLeadStatus('Lost')">Lost</button>
       </div>
-      <div class="actionsRow"><button class="reset" onclick="resetLeadFilters()">Reset Filters</button></div>
+      <div class="actionsRow"><button class="darkBtn" onclick="openColumnModal()">Manage Columns</button><button class="reset" onclick="resetLeadFilters()">Reset Filters</button></div>
       <div class="topInfo"><div><span id="leadStatusText">Preparing leads...</span><span id="leadLoadingBadge" class="loadingBadge">Loading leads...</span><span id="leadSaveToast" class="saveToast">Saved ✓</span></div><div>Showing 50 records per page</div></div>
-      <div class="tablebox"><table class="leadsTable"><thead><tr><th>Actions</th><th>Received</th><th>Name</th><th>Phone</th><th>Email</th><th>Project Inquired</th><th>Budget</th><th>Property Type</th><th>Bedroom</th><th>Source</th><th>Status</th><th>Follow-up Date</th><th>Notes</th><th>Last Contacted</th><th>WhatsApp</th></tr></thead><tbody id="leadsTableBody"></tbody></table></div>
+      <div class="tablebox"><table class="leadsTable"><thead id="leadsTableHead"></thead><tbody id="leadsTableBody"></tbody></table></div>
       <div id="leadMobileCards" class="mobileCards"></div>
       <div class="pager"><button id="leadPrevBtn" onclick="prevLeadPage()">Previous</button><div id="leadPageInfo">1 / 1</div><button id="leadNextBtn" onclick="nextLeadPage()">Next</button></div>
     </div>
@@ -235,6 +246,19 @@
     </div>
   </div>
 
+  <div id="columnsModal" class="modalOverlay">
+    <div class="modal">
+      <h2>Manage Columns</h2>
+      <div class="sub" style="margin-bottom:10px;">Tick to show/hide columns. Use ↑ ↓ to arrange columns left or right. Actions stay fixed at the end.</div>
+      <div id="columnList" class="columnList"></div>
+      <div class="modalActions">
+        <button class="darkBtn" onclick="resetLeadColumns()">Reset</button>
+        <button class="darkBtn" onclick="closeColumnModal()">Cancel</button>
+        <button class="primaryBtn" onclick="saveColumnModal()">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
@@ -245,6 +269,25 @@
 
     let currentPage = 0, totalCount = 0, debounceTimer = null, listenersReady = false, currentAccess = null, allMiniRows = [];
     let leadPage = 0, leadTotalCount = 0, leadDebounceTimer = null, leadListenersReady = false, editingLeadId = null;
+    let editingLeadRows = new Set();
+    const LEAD_COLUMN_KEY = "usama_lead_columns_v2";
+    const defaultLeadColumns = [
+      { key:"lead_receive_date", label:"Received", visible:true, type:"date", cls:"miniInput dateInput" },
+      { key:"name", label:"Name", visible:true, type:"text", cls:"miniInput wideInput" },
+      { key:"phone", label:"Phone", visible:true, type:"text", cls:"miniInput" },
+      { key:"email", label:"Email", visible:false, type:"email", cls:"miniInput wideInput" },
+      { key:"project_inquired", label:"Project Inquired", visible:true, type:"text", cls:"miniInput wideInput" },
+      { key:"budget", label:"Budget", visible:true, type:"text", cls:"miniInput" },
+      { key:"property_type", label:"Property Type", visible:false, type:"text", cls:"miniInput" },
+      { key:"bedroom", label:"Bedroom", visible:true, type:"text", cls:"miniInput" },
+      { key:"source", label:"Source", visible:true, type:"text", cls:"miniInput" },
+      { key:"status", label:"Status", visible:true, type:"select", cls:"statusSelect" },
+      { key:"follow_up_date", label:"Follow-up Date", visible:true, type:"date", cls:"miniInput dateInput" },
+      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"notesInput" },
+      { key:"last_contacted", label:"Last Contacted", visible:true, type:"date", cls:"miniInput dateInput" },
+      { key:"whatsapp", label:"WhatsApp", visible:true, type:"button", cls:"" }
+    ];
+    let leadColumns = loadLeadColumns();
     const el = id => document.getElementById(id);
 
     async function checkSession() {
@@ -364,7 +407,24 @@
       ["clusterFilter", "sourceFilter", "statusFilter"].forEach(id => el(id).addEventListener("change", () => { currentPage = 0; loadData(); }));
     }
 
-    function showLeadLoading() { el("leadLoadingBadge").classList.add("show"); el("leadStatusText").textContent = "Loading leads..."; el("leadsTableBody").innerHTML = Array.from({length:8}).map(()=>`<tr>${Array.from({length:15}).map(()=>`<td><div class="skeleton"></div></td>`).join("")}</tr>`).join(""); }
+    function visibleLeadColumns() { return leadColumns.filter(c => c.visible); }
+    function loadLeadColumns() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LEAD_COLUMN_KEY) || "null");
+        if (!Array.isArray(saved)) return defaultLeadColumns.map(x => ({...x}));
+        const byKey = Object.fromEntries(defaultLeadColumns.map(c => [c.key, c]));
+        const merged = saved.filter(c => byKey[c.key]).map(c => ({...byKey[c.key], visible: c.visible !== false}));
+        defaultLeadColumns.forEach(c => { if (!merged.some(x => x.key === c.key)) merged.push({...c}); });
+        return merged;
+      } catch { return defaultLeadColumns.map(x => ({...x})); }
+    }
+    function saveLeadColumnsState() { localStorage.setItem(LEAD_COLUMN_KEY, JSON.stringify(leadColumns.map(({key,visible}) => ({key,visible})))); }
+    function showLeadLoading() {
+      el("leadLoadingBadge").classList.add("show");
+      el("leadStatusText").textContent = "Loading leads...";
+      const colCount = visibleLeadColumns().length + 1;
+      el("leadsTableBody").innerHTML = Array.from({length:8}).map(()=>`<tr>${Array.from({length:colCount}).map(()=>`<td><div class="skeleton"></div></td>`).join("")}</tr>`).join("");
+    }
     function hideLeadLoading() { el("leadLoadingBadge").classList.remove("show"); }
     function leadStatuses() { return ["New", "Contacted", "Call Back", "Interested", "Viewing", "Negotiation", "Lost"]; }
     function leadWhatsappButton(row) {
@@ -382,32 +442,89 @@
       showLeadLoading(); const from = leadPage * PAGE_SIZE, to = from + PAGE_SIZE - 1;
       let query = db.from(LEADS_TABLE).select("*", { count: "exact" }).range(from, to); query = applyLeadFilters(query); query = query.order("created_at", { ascending: false });
       const { data, error, count } = await query; hideLeadLoading();
-      if (error) { el("leadStatusText").textContent = "Error loading leads"; el("leadsTableBody").innerHTML = `<tr><td colspan="15" class="empty">Error: ${error.message}</td></tr>`; return; }
+      if (error) { el("leadStatusText").textContent = "Error loading leads"; el("leadsTableBody").innerHTML = `<tr><td colspan="${visibleLeadColumns().length + 1}" class="empty">Error: ${error.message}</td></tr>`; return; }
       leadTotalCount = count || 0; renderLeads(data || []);
       const start = leadTotalCount === 0 ? 0 : from + 1, end = Math.min(to + 1, leadTotalCount), totalPages = Math.max(1, Math.ceil(leadTotalCount / PAGE_SIZE));
       el("leadStatusText").textContent = `Showing ${start}-${end} of ${leadTotalCount} leads`; el("leadPageInfo").textContent = `${leadPage + 1} / ${totalPages}`; el("leadPrevBtn").disabled = leadPage === 0; el("leadNextBtn").disabled = leadPage + 1 >= totalPages;
     }
-    function leadInput(row, field, type="text", cls="miniInput") { return `<input class="${cls}" id="lead_${field}_${row.id}" type="${type}" value="${escapeHtml(row[field] || "")}" />`; }
-    function leadStatusSelect(row) { const current = row.status || "New"; return `<select class="statusSelect" id="lead_status_${row.id}">${leadStatuses().map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}</select>`; }
+    function renderLeadHead() {
+      el("leadsTableHead").innerHTML = `<tr>${visibleLeadColumns().map(c => `<th>${escapeHtml(c.label)}</th>`).join("")}<th class="actionsSticky">Actions</th></tr>`;
+    }
+    function leadInput(row, col) {
+      const disabled = editingLeadRows.has(row.id) ? "" : "disabled";
+      const value = escapeHtml(row[col.key] || "");
+      if (col.type === "button") return leadWhatsappButton(row);
+      if (col.type === "select") {
+        const current = row.status || "New";
+        return `<select ${disabled} class="leadCellSelect ${col.cls}" id="lead_status_${row.id}">${leadStatuses().map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}</select>`;
+      }
+      if (col.type === "textarea") return `<textarea ${disabled} class="leadCellTextarea ${col.cls}" id="lead_notes_${row.id}">${value}</textarea>`;
+      return `<input ${disabled} class="leadCellInput ${col.cls}" id="lead_${col.key}_${row.id}" type="${col.type}" value="${value}" />`;
+    }
     function renderLeads(rows) {
-      if (!rows.length) { el("leadsTableBody").innerHTML = `<tr><td colspan="15" class="empty">No leads found</td></tr>`; el("leadMobileCards").innerHTML = `<div class="empty">No leads found</div>`; return; }
+      renderLeadHead();
+      const colCount = visibleLeadColumns().length + 1;
+      if (!rows.length) { el("leadsTableBody").innerHTML = `<tr><td colspan="${colCount}" class="empty">No leads found</td></tr>`; el("leadMobileCards").innerHTML = `<div class="empty">No leads found</div>`; return; }
+      const cols = visibleLeadColumns();
       el("leadsTableBody").innerHTML = rows.map(row => `<tr>
-        <td><button class="saveRowBtn" onclick="saveLeadRow('${row.id}')">Save</button><button class="deleteRowBtn" onclick="deleteLead('${row.id}')">Delete</button></td>
-        <td>${leadInput(row,"lead_receive_date","date","miniInput dateInput")}</td><td>${leadInput(row,"name","text","miniInput wideInput")}</td><td>${leadInput(row,"phone")}</td><td>${leadInput(row,"email","email","miniInput wideInput")}</td><td>${leadInput(row,"project_inquired","text","miniInput wideInput")}</td><td>${leadInput(row,"budget")}</td><td>${leadInput(row,"property_type")}</td><td>${leadInput(row,"bedroom")}</td><td>${leadInput(row,"source")}</td><td>${leadStatusSelect(row)}</td><td>${leadInput(row,"follow_up_date","date","miniInput dateInput")}</td><td><textarea class="notesInput" id="lead_notes_${row.id}">${escapeHtml(row.notes || "")}</textarea></td><td>${leadInput(row,"last_contacted","date","miniInput dateInput")}</td><td>${leadWhatsappButton(row)}</td>
+        ${cols.map(col => `<td>${leadInput(row, col)}</td>`).join("")}
+        <td class="actionsSticky"><div class="leadActions">
+          <button class="editBtn" onclick="enableLeadEdit('${row.id}')">Edit</button>
+          <button id="save_lead_${row.id}" class="saveRowBtn ${editingLeadRows.has(row.id) ? "" : "hiddenAction"}" onclick="saveLeadRow('${row.id}')">Save</button>
+          <button class="deleteRowBtn" onclick="deleteLead('${row.id}')">Delete</button>
+        </div></td>
       </tr>`).join("");
       el("leadMobileCards").innerHTML = rows.map(row => `<div class="leadCard"><div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.name))}</div><div class="unitBadge">${escapeHtml(clean(row.status || "New"))}</div></div><div class="infoLine"><span>Phone</span>${escapeHtml(clean(row.phone))}</div><div class="infoLine"><span>Email</span>${escapeHtml(clean(row.email))}</div><div class="infoLine"><span>Project</span>${escapeHtml(clean(row.project_inquired))}</div><div class="infoLine"><span>Budget</span>${escapeHtml(clean(row.budget))}</div><div class="infoLine"><span>Follow-up</span>${escapeHtml(clean(row.follow_up_date))}</div><div class="actionsRow" style="justify-content:flex-start"><button class="primaryBtn" onclick='openLeadModal(${JSON.stringify(row).replaceAll("'", "&#039;")})'>Edit</button>${leadWhatsappButton(row)}<button class="deleteRowBtn" onclick="deleteLead('${row.id}')">Delete</button></div></div>`).join("");
+    }
+    function enableLeadEdit(id) {
+      editingLeadRows.add(id);
+      document.querySelectorAll(`[id$="_${id}"]`).forEach(node => { if (node.closest("#leadsTableBody")) node.disabled = false; });
+      const saveBtn = el(`save_lead_${id}`); if (saveBtn) saveBtn.classList.remove("hiddenAction");
     }
     async function saveLeadRow(id) {
       const payload = readLeadRowPayload(id);
       const { error } = await db.from(LEADS_TABLE).update(payload).eq("id", id);
       if (error) { alert("Failed to save lead: " + error.message); return; }
+      editingLeadRows.delete(id);
       showLeadSaved(); await loadLeadSources(); loadLeads();
     }
     function readLeadRowPayload(id) {
       const fields = ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"];
       const payload = {};
-      fields.forEach(f => { const node = el(`lead_${f}_${id}`); if (!node) return; payload[f] = node.value || null; });
+      fields.forEach(f => { const node = el(`lead_${f}_${id}`); if (node) payload[f] = node.value || null; });
+      const statusNode = el(`lead_status_${id}`); if (statusNode) payload.status = statusNode.value || null;
+      const notesNode = el(`lead_notes_${id}`); if (notesNode) payload.notes = notesNode.value || null;
       return payload;
+    }
+    function openColumnModal() {
+      renderColumnList();
+      el("columnsModal").classList.add("show");
+    }
+    function closeColumnModal() { el("columnsModal").classList.remove("show"); }
+    function renderColumnList() {
+      el("columnList").innerHTML = leadColumns.map((c, i) => `<div class="columnItem">
+        <input type="checkbox" id="col_${c.key}" ${c.visible ? "checked" : ""}>
+        <label for="col_${c.key}">${escapeHtml(c.label)}</label>
+        <button onclick="moveLeadColumn(${i}, -1)">↑</button>
+        <button onclick="moveLeadColumn(${i}, 1)">↓</button>
+      </div>`).join("");
+    }
+    function moveLeadColumn(index, dir) {
+      const next = index + dir;
+      if (next < 0 || next >= leadColumns.length) return;
+      [leadColumns[index], leadColumns[next]] = [leadColumns[next], leadColumns[index]];
+      renderColumnList();
+    }
+    function saveColumnModal() {
+      leadColumns.forEach(c => { const node = el(`col_${c.key}`); if (node) c.visible = node.checked; });
+      saveLeadColumnsState();
+      closeColumnModal();
+      loadLeads();
+    }
+    function resetLeadColumns() {
+      leadColumns = defaultLeadColumns.map(x => ({...x}));
+      saveLeadColumnsState();
+      renderColumnList();
     }
     function openLeadModal(row = null) {
       editingLeadId = row?.id || null; el("leadModalTitle").textContent = editingLeadId ? "Edit Lead" : "Add Lead";
