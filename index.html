@@ -62,6 +62,10 @@
     .dateInput { min-width: 150px; }
     .wideInput { min-width: 210px; }
     .notesInput { min-width: 260px; height: 38px; padding: 9px 10px; border-radius: 10px; resize: vertical; }
+    .leadNotesBox { min-width: 360px; width: 360px; height: 42px; }
+    .leadNotesBox:focus { width: 520px; height: 120px; white-space: normal; overflow-y: auto; position: relative; z-index: 5; }
+    .leadDropdown { min-width: 150px; padding: 9px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+    .leadDropdown:disabled { appearance: none; -webkit-appearance: none; }
     .saveRowBtn { background:#16a34a; padding: 9px 12px; font-size: 12px; margin-right: 6px; }
     .editBtn { background:#2563eb; padding: 9px 12px; font-size: 12px; margin-right: 6px; }
     .deleteRowBtn { background:#7f1d1d; padding: 9px 12px; font-size: 12px; }
@@ -234,9 +238,9 @@
         <div><label>Email</label><input id="form_email" type="email" placeholder="Email"></div>
         <div><label>Project Inquired</label><input id="form_project_inquired" placeholder="Project / community"></div>
         <div><label>Budget</label><input id="form_budget" placeholder="e.g. 3M"></div>
-        <div><label>Property Type</label><input id="form_property_type" placeholder="Apartment / Villa / Townhouse"></div>
-        <div><label>Bedroom</label><input id="form_bedroom" placeholder="1BR / 2BR / 4BR"></div>
-        <div><label>Source</label><input id="form_source" placeholder="Bayut / PF / Meta / Agent"></div>
+        <div><label>Property Type</label><select id="form_property_type"><option value="">Select Type</option><option>Apartment</option><option>Villa</option><option>Townhouse</option><option>Penthouse</option><option>Plot</option><option>Commercial</option></select></div>
+        <div><label>Bedroom</label><select id="form_bedroom"><option value="">Select Bedroom</option><option>Studio</option><option>1BR</option><option>2BR</option><option>3BR</option><option>4BR</option><option>5BR</option><option>6BR</option><option>7BR+</option></select></div>
+        <div><label>Source</label><select id="form_source"><option value="">Select Source</option><option>Bayut</option><option>Property Finder</option><option>Meta Ads</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Referral</option><option>Agent</option><option>Broker</option><option>Walk-in</option><option>Other</option></select></div>
         <div><label>Status</label><select id="form_status"><option>New</option><option>Contacted</option><option>Call Back</option><option>Interested</option><option>Viewing</option><option>Negotiation</option><option>Lost</option></select></div>
         <div><label>Follow-up Date</label><input id="form_follow_up_date" type="date"></div>
         <div><label>Last Contacted</label><input id="form_last_contacted" type="date"></div>
@@ -278,12 +282,12 @@
       { key:"email", label:"Email", visible:false, type:"email", cls:"miniInput wideInput" },
       { key:"project_inquired", label:"Project Inquired", visible:true, type:"text", cls:"miniInput wideInput" },
       { key:"budget", label:"Budget", visible:true, type:"text", cls:"miniInput" },
-      { key:"property_type", label:"Property Type", visible:false, type:"text", cls:"miniInput" },
-      { key:"bedroom", label:"Bedroom", visible:true, type:"text", cls:"miniInput" },
-      { key:"source", label:"Source", visible:true, type:"text", cls:"miniInput" },
+      { key:"property_type", label:"Property Type", visible:false, type:"select", cls:"leadDropdown" },
+      { key:"bedroom", label:"Bedroom", visible:true, type:"select", cls:"leadDropdown" },
+      { key:"source", label:"Source", visible:true, type:"select", cls:"leadDropdown" },
       { key:"status", label:"Status", visible:true, type:"select", cls:"statusSelect" },
       { key:"follow_up_date", label:"Follow-up Date", visible:true, type:"date", cls:"miniInput dateInput" },
-      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"notesInput" },
+      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"remarksInput leadNotesBox" },
       { key:"last_contacted", label:"Last Contacted", visible:true, type:"date", cls:"miniInput dateInput" },
       { key:"whatsapp", label:"WhatsApp", visible:true, type:"button", cls:"" }
     ];
@@ -427,6 +431,15 @@
     }
     function hideLeadLoading() { el("leadLoadingBadge").classList.remove("show"); }
     function leadStatuses() { return ["New", "Contacted", "Call Back", "Interested", "Viewing", "Negotiation", "Lost"]; }
+    function leadDropdownOptions(key) {
+      const options = {
+        status: leadStatuses(),
+        property_type: ["", "Apartment", "Villa", "Townhouse", "Penthouse", "Plot", "Commercial"],
+        bedroom: ["", "Studio", "1BR", "2BR", "3BR", "4BR", "5BR", "6BR", "7BR+"],
+        source: ["", "Bayut", "Property Finder", "Meta Ads", "Instagram", "TikTok", "WhatsApp", "Referral", "Agent", "Broker", "Walk-in", "Other"]
+      };
+      return options[key] || [];
+    }
     function leadWhatsappButton(row) {
       const formatted = formatPhone(row.phone); if (!formatted) return "-";
       const msg = `Hello ${row.name || ""},\n\nThis is Usama from BFG Properties.\n\nYou inquired about ${row.project_inquired || "a property"}. When is a good time to discuss your requirement?\n\nRegards,\nUsama Bin Nusrat.`;
@@ -452,13 +465,23 @@
     }
     function leadInput(row, col) {
       const disabled = editingLeadRows.has(row.id) ? "" : "disabled";
-      const value = escapeHtml(row[col.key] || "");
+      const rawValue = row[col.key] || "";
+      const value = escapeHtml(rawValue);
+
       if (col.type === "button") return leadWhatsappButton(row);
+
       if (col.type === "select") {
-        const current = row.status || "New";
-        return `<select ${disabled} class="leadCellSelect ${col.cls}" id="lead_status_${row.id}">${leadStatuses().map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}</select>`;
+        const current = col.key === "status" ? (row.status || "New") : rawValue;
+        const id = col.key === "status" ? `lead_status_${row.id}` : `lead_${col.key}_${row.id}`;
+        return `<select ${disabled} class="leadCellSelect ${col.cls}" id="${id}">
+          ${leadDropdownOptions(col.key).map(s => `<option value="${escapeHtml(s)}" ${s === current ? "selected" : ""}>${escapeHtml(s || "Select")}</option>`).join("")}
+        </select>`;
       }
-      if (col.type === "textarea") return `<textarea ${disabled} class="leadCellTextarea ${col.cls}" id="lead_notes_${row.id}">${value}</textarea>`;
+
+      if (col.type === "textarea") {
+        return `<textarea ${disabled} class="leadCellTextarea ${col.cls}" id="lead_notes_${row.id}" placeholder="Add notes...">${value}</textarea>`;
+      }
+
       return `<input ${disabled} class="leadCellInput ${col.cls}" id="lead_${col.key}_${row.id}" type="${col.type}" value="${value}" />`;
     }
     function renderLeads(rows) {
