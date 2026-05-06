@@ -464,25 +464,63 @@
       el("leadsTableHead").innerHTML = `<tr>${visibleLeadColumns().map(c => `<th>${escapeHtml(c.label)}</th>`).join("")}<th class="actionsSticky">Actions</th></tr>`;
     }
     function leadInput(row, col) {
-      const disabled = editingLeadRows.has(row.id) ? "" : "disabled";
       const rawValue = row[col.key] || "";
       const value = escapeHtml(rawValue);
 
       if (col.type === "button") return leadWhatsappButton(row);
 
+      // Dropdown fields are always editable, same like owner status dropdown
       if (col.type === "select") {
         const current = col.key === "status" ? (row.status || "New") : rawValue;
         const id = col.key === "status" ? `lead_status_${row.id}` : `lead_${col.key}_${row.id}`;
-        return `<select ${disabled} class="leadCellSelect ${col.cls}" id="${id}">
+        return `<select class="leadCellSelect ${col.cls}" id="${id}" onchange="saveLeadField('${row.id}', '${col.key}', this.value)">
           ${leadDropdownOptions(col.key).map(s => `<option value="${escapeHtml(s)}" ${s === current ? "selected" : ""}>${escapeHtml(s || "Select")}</option>`).join("")}
         </select>`;
       }
 
+      // Notes stays editable with its own Save button, same style as owner remarks
       if (col.type === "textarea") {
-        return `<textarea ${disabled} class="leadCellTextarea ${col.cls}" id="lead_notes_${row.id}" placeholder="Add notes...">${value}</textarea>`;
+        const textareaId = `lead_notes_${row.id}`;
+        const btnId = `lead_notes_save_${row.id}`;
+        return `<div class="remarkBox">
+          <textarea
+            class="remarksInput leadNotesBox"
+            id="${textareaId}"
+            placeholder="Add notes..."
+            oninput="markRemarkDirty('${btnId}')"
+          >${value}</textarea>
+          <button id="${btnId}" class="saveRemarkBtn" onclick="saveLeadNotes('${row.id}', '${textareaId}', '${btnId}')">Save</button>
+        </div>`;
       }
 
+      // Other fields stay locked until Edit is clicked
+      const disabled = editingLeadRows.has(row.id) ? "" : "disabled";
       return `<input ${disabled} class="leadCellInput ${col.cls}" id="lead_${col.key}_${row.id}" type="${col.type}" value="${value}" />`;
+    }
+
+    async function saveLeadField(id, field, value) {
+      const payload = { [field]: value || null, last_contacted: today() };
+      const { error } = await db.from(LEADS_TABLE).update(payload).eq("id", id);
+      if (error) {
+        alert("Failed to save lead: " + error.message);
+        return;
+      }
+      showLeadSaved();
+      const lastCell = document.querySelector(`[data-lead-last-contacted="${id}"]`);
+      if (lastCell) lastCell.textContent = today();
+    }
+
+    async function saveLeadNotes(id, textareaId, btnId) {
+      const value = el(textareaId).value;
+      const { error } = await db.from(LEADS_TABLE).update({ notes: value, last_contacted: today() }).eq("id", id);
+      if (error) {
+        alert("Failed to save notes: " + error.message);
+        return;
+      }
+      el(btnId).classList.remove("show");
+      showLeadSaved();
+      const lastCell = document.querySelector(`[data-lead-last-contacted="${id}"]`);
+      if (lastCell) lastCell.textContent = today();
     }
     function renderLeads(rows) {
       renderLeadHead();
