@@ -9,217 +9,333 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; }
 
+    * { box-sizing: border-box; }
     :root{
       --bg:#05070c;
-      --panel:#070b14;
-      --panel2:#0a101d;
-      --line:rgba(148,163,184,.16);
-      --line2:rgba(148,163,184,.10);
-      --text:#f4f7fb;
-      --muted:#9aa8bd;
-      --muted2:#728197;
+      --panel:#030712;
+      --panel2:#050914;
+      --line:rgba(148,163,184,.14);
+      --line2:rgba(148,163,184,.08);
+      --text:#eef4ff;
+      --muted:#94a3b8;
+      --input:#020617;
       --blue:#2563eb;
-      --green:#16a34a;
-      --red:#dc2626;
+      --green:#10b981;
+      --red:#ef4444;
     }
-
     body {
       margin:0;
       min-height:100vh;
       background:
         radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 34%),
         radial-gradient(circle at top right, rgba(16,185,129,.10), transparent 30%),
-        linear-gradient(180deg,#05070c,#03050a 55%,#05070c);
+        #05070c;
       color:var(--text);
       font-family:Poppins, sans-serif;
       padding:22px;
     }
-
-    .hidden { display:none!important; }
-    .wrap { max-width:1600px; margin:auto; }
-    h1 { margin:0; font-size:31px; font-weight:800; letter-spacing:-.7px; }
+    .hidden { display:none !important; }
+    .wrap { max-width:1780px; margin:auto; }
+    h1 { margin:0; font-size:30px; font-weight:700; letter-spacing:-.4px; }
     h2 { margin:0 0 12px; }
-    .sub { color:var(--muted); margin:8px 0 20px; font-size:14px; line-height:1.5; }
-
-    .mainHeader { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:20px; }
+    .sub { color:#9ca8bd; margin:8px 0 18px; font-size:14px; line-height:1.45; }
+    .mainHeader { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
     .headerBtns { display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
-
-    .loginBox,.card{
-      background:rgba(3,7,18,.86);
-      border:1px solid rgba(148,163,184,.16);
-      border-radius:24px;
-      box-shadow:0 22px 80px rgba(0,0,0,.34);
+    .loginBox, .card {
+      background:rgba(3,7,18,.88);
+      border:1px solid rgba(148,163,184,.14);
+      border-radius:22px;
+      box-shadow:0 20px 70px rgba(0,0,0,.28);
     }
-    .loginBox{max-width:430px;margin:80px auto;padding:24px;}
-    .choiceBox{max-width:820px;margin:80px auto;padding:28px;}
-    .choiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
-    .choiceCard{background:#050916;border:1px solid rgba(148,163,184,.16);border-radius:18px;padding:22px;cursor:pointer;transition:.16s;}
-    .choiceCard:hover{border-color:rgba(37,99,235,.75);transform:translateY(-2px);}
-    .choiceCard h2{font-size:22px;}
-    .choiceCard p{color:#94a3b8;margin:8px 0 16px;}
+    .loginBox { max-width:430px; margin:80px auto; padding:24px; }
+    .choiceBox { max-width:820px; margin:80px auto; padding:28px; }
+    .choiceGrid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+    .choiceCard { background:#020617; border:1px solid rgba(148,163,184,.16); border-radius:18px; padding:22px; cursor:pointer; transition:.15s; }
+    .choiceCard:hover { border-color:rgba(37,99,235,.75); transform:translateY(-2px); }
+    .choiceCard h2 { font-size:22px; }
+    .choiceCard p { color:#94a3b8; margin:8px 0 16px; }
 
-    input,select,button,textarea{font-family:Poppins,sans-serif;outline:none;}
-    input,select,textarea{
+    input, select, button, textarea { font-family:Poppins, sans-serif; outline:none; }
+    input, select, textarea {
       width:100%;
-      border:1px solid rgba(148,163,184,.17);
-      background:#050815;
-      color:#f8fafc;
-      border-radius:14px;
-      padding:13px 14px;
-      font-size:14px;
-      transition:.15s;
+      border:1px solid rgba(148,163,184,.16);
+      background:#020617;
+      color:#eef4ff;
+      border-radius:13px;
+      padding:11px 12px;
+      font-size:13px;
     }
-    input::placeholder,textarea::placeholder{color:#6f7e93;}
-    input:focus,select:focus,textarea:focus{border-color:rgba(37,99,235,.70);box-shadow:0 0 0 3px rgba(37,99,235,.13);}
-    select option{background:#111827;color:#f8fafc;}
+    input::placeholder, textarea::placeholder{ color:#6f7f99; }
+    input:focus, select:focus, textarea:focus {
+      border-color:rgba(59,130,246,.65);
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+    select option{ background:#111827; color:#f8fafc; }
 
-    button{cursor:pointer;border:none;color:#fff;font-weight:800;border-radius:12px;}
-    button:disabled{opacity:.45;cursor:not-allowed;}
-    .primaryBtn{background:linear-gradient(135deg,#2563eb,#059669);padding:11px 16px;}
-    .darkBtn{background:#070b16;border:1px solid rgba(148,163,184,.22);padding:10px 15px;}
-    .dangerBtn{background:#7f1d1d;border:1px solid rgba(248,113,113,.35);padding:10px 15px;}
-    .loginBox input{margin-bottom:12px;}
-    .loginError{color:#f87171;margin-top:12px;font-size:13px;}
-    .card{padding:22px;}
+    button { cursor:pointer; border:none; color:#fff; font-weight:700; border-radius:12px; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .primaryBtn { background:linear-gradient(135deg,#2563eb,#059669); padding:10px 15px; }
+    .darkBtn { background:#070b14; border:1px solid rgba(148,163,184,.20); padding:10px 14px; }
+    .dangerBtn { background:#7f1d1d; border:1px solid rgba(248,113,113,.35); padding:10px 15px; }
 
-    .filters{display:grid;grid-template-columns:1.35fr 1fr 1fr .95fr 1fr 1fr;gap:14px;margin-bottom:18px;}
-    .leadFilters{grid-template-columns:1.55fr 1fr 1fr 1fr 1fr;}
-    .actionsRow{display:flex;justify-content:flex-end;align-items:center;margin:8px 0 18px;gap:10px;flex-wrap:wrap;}
-    .reset{width:auto;min-width:150px;height:42px;padding:0 18px;font-size:14px;background:linear-gradient(135deg,#2563eb,#059669);}
-    .quickFilters{display:none!important;}
-    .topInfo{display:flex;justify-content:space-between;align-items:center;margin:10px 0 14px;color:#aab6c8;font-size:14px;gap:12px;}
-    .loadingBadge,.saveToast{display:none;background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.35);color:#bfdbfe;padding:7px 11px;border-radius:999px;font-size:12px;margin-left:8px;}
-    .loadingBadge.show,.saveToast.show{display:inline-block;}
+    .loginBox input { margin-bottom:12px; }
+    .loginError { color:#f87171; margin-top:12px; font-size:13px; }
+    .card { padding:22px; }
 
-    .tablebox{
+    .filters { display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .leadFilters { grid-template-columns:1.4fr .9fr .9fr .9fr .9fr; }
+    .actionsRow { display:flex; justify-content:flex-end; align-items:center; margin:6px 0 18px; gap:10px; flex-wrap:wrap; }
+    .reset { width:auto; min-width:145px; height:40px; padding:0 18px; font-size:13px; background:linear-gradient(135deg,#2563eb,#059669); }
+    .quickFilters { display:none !important; }
+    .topInfo { display:flex; justify-content:space-between; align-items:center; margin:10px 0 12px; color:#a8b3c7; font-size:13px; gap:12px; }
+
+    .loadingBadge, .saveToast {
+      display:none; background:rgba(37,99,235,.15); border:1px solid rgba(37,99,235,.35);
+      color:#bfdbfe; padding:7px 11px; border-radius:999px; font-size:12px; margin-left:8px;
+    }
+    .loadingBadge.show, .saveToast.show { display:inline-block; }
+
+    .tablebox {
       overflow:auto;
       border-radius:18px;
-      border:1px solid rgba(148,163,184,.14);
+      border:1px solid rgba(148,163,184,.12);
       min-height:430px;
       max-height:70vh;
-      background:#03060d;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      background:#020617;
+      scrollbar-color:#12315a #020617;
+      scrollbar-width:thin;
     }
-    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;min-width:1180px;}
-    .leadsTable{min-width:1240px;}
-    .ownersTable{min-width:1180px;}
+    .tablebox::-webkit-scrollbar{ height:9px; width:9px; }
+    .tablebox::-webkit-scrollbar-track{ background:#020617; }
+    .tablebox::-webkit-scrollbar-thumb{ background:#173253; border-radius:99px; }
 
-    th{
-      position:sticky;top:0;background:#0a1324;color:#f8fafc;text-align:left;font-size:13px;
-      padding:15px 16px;z-index:2;white-space:nowrap;border-bottom:1px solid rgba(148,163,184,.14);font-weight:800;
+    table {
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      table-layout:fixed;
+      min-width:1100px;
     }
-    th.resizable{position:sticky;}
-    .col-resizer{position:absolute;right:0;top:0;width:7px;height:100%;cursor:col-resize;user-select:none;opacity:.0;background:rgba(59,130,246,.45);}
-    th:hover .col-resizer{opacity:.75;}
-    td{padding:10px 16px;border-top:1px solid rgba(148,163,184,.075);font-size:13px;color:#dce5f2;white-space:nowrap;vertical-align:middle;}
-    tbody tr{background:#03060d;}
-    tbody tr:hover td{background:#071427;}
+    .leadsTable { min-width:1120px; }
 
-    .ownerNameCell{display:flex;align-items:center;gap:8px;max-width:260px;overflow:hidden;text-overflow:ellipsis;}
-    .cellText{display:block;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-
-    .waBtn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:999px;background:#0f9f62;color:white;text-decoration:none;font-weight:800;font-size:12px;white-space:nowrap;}
-
-    .statusSelect{width:145px;min-width:145px;padding:9px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid rgba(148,163,184,.18);background:#111827;color:#e5e7eb;}
-    .miniInput{min-width:120px;padding:9px 10px;border-radius:12px;font-size:12px;background:#050815;border-color:rgba(148,163,184,.12);}
-    .dateInput{min-width:136px;}
-    .wideInput{min-width:170px;}
-    .leadDropdown{min-width:138px;padding:9px 10px;border-radius:12px;font-size:12px;font-weight:700;}
-    .leadDropdown:disabled{appearance:none;-webkit-appearance:none;}
-
-    .leadCellInput:disabled,.leadCellTextarea:disabled,.leadCellSelect:disabled{opacity:.95;cursor:not-allowed;border-color:rgba(148,163,184,.10);background:#05070e;box-shadow:none;color:#d8e0ed;}
-
-    .remarkBox{display:flex;gap:8px;align-items:flex-start;}
-    .remarksInput,.leadNotesBox{
-      background:#050815;border:1px solid rgba(148,163,184,.13);color:#e9eef7;width:280px;min-width:220px;height:38px;
-      padding:9px 11px;border-radius:12px;font-size:13px;line-height:1.4;resize:none;overflow:hidden;white-space:nowrap;transition:.15s ease;
+    th {
+      position:sticky;
+      top:0;
+      background:#08111f;
+      color:#f8fafc;
+      text-align:left;
+      font-size:13px;
+      padding:12px 12px;
+      z-index:2;
+      white-space:nowrap;
+      border-bottom:1px solid rgba(148,163,184,.13);
+      font-weight:700;
     }
-    .remarksInput:focus,.leadNotesBox:focus{width:420px;height:96px;white-space:normal;overflow-y:auto;position:relative;z-index:8;background:#060b17;}
-    .saveRemarkBtn{display:none;background:#16a34a;padding:9px 11px;font-size:12px;white-space:nowrap;border-radius:10px;}
-    .saveRemarkBtn.show{display:inline-block;}
-
-    .moreUnitBtn{background:rgba(37,99,235,.14);border:1px solid rgba(37,99,235,.35);color:#bfdbfe;padding:5px 8px;border-radius:999px;font-size:10.5px;font-weight:800;white-space:nowrap;}
-
-    .iconBtn{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid rgba(148,163,184,.16);background:#0b1220;color:#dbeafe;font-size:15px;padding:0;}
-    .iconBtn:hover{background:#111c31;}
-    .iconBtn.editIcon{color:#93c5fd;}
-    .iconBtn.deleteIcon{color:#fecaca;background:rgba(127,29,29,.30);border-color:rgba(239,68,68,.25);}
-    .iconBtn.saveIcon{color:#bbf7d0;background:rgba(22,163,74,.18);border-color:rgba(34,197,94,.25);}
-    .saveRowBtn.hiddenAction{display:none;}
-    .leadActions{display:flex;gap:7px;justify-content:flex-end;min-width:120px;}
-    .leadActions button{white-space:nowrap;}
-
-    .actionsSticky{position:sticky;right:0;background:#03060d;z-index:3;box-shadow:-14px 0 24px rgba(0,0,0,.35);}
-    th.actionsSticky{background:#0a1324;z-index:4;}
-    tr:hover .actionsSticky{background:#071427;}
-
-    .status-New{background:#0b1d38!important;border-color:#1d4ed8!important;color:#bfdbfe!important;}
-    .status-Contacted{background:#082719!important;border-color:#15803d!important;color:#bbf7d0!important;}
-    .status-CallBack{background:#2b1b08!important;border-color:#c2410c!important;color:#fed7aa!important;}
-    .status-Interested{background:#23113f!important;border-color:#7e22ce!important;color:#e9d5ff!important;}
-    .status-Viewing{background:#082f49!important;border-color:#0284c7!important;color:#bae6fd!important;}
-    .status-Negotiation{background:#2a2105!important;border-color:#a16207!important;color:#fef3c7!important;}
-    .status-Lost{background:#350b0b!important;border-color:#b91c1c!important;color:#fecaca!important;}
-    .status-ForSale{background:#082719!important;border-color:#15803d!important;color:#bbf7d0!important;}
-    .status-ForRent{background:#0b1d38!important;border-color:#1d4ed8!important;color:#bfdbfe!important;}
-    .status-Sold{background:#350b0b!important;border-color:#b91c1c!important;color:#fecaca!important;}
-    .status-NoResponse{background:#202636!important;border-color:#64748b!important;color:#e2e8f0!important;}
-    .status-NotInterested{background:#3a1020!important;border-color:#be123c!important;color:#fecdd3!important;}
-    .status-InvalidNumber{background:#181b22!important;border-color:#475569!important;color:#cbd5e1!important;}
-
-    .mobileCards{display:none;}
-    .ownerCard,.leadCard{background:#020617;border:1px solid rgba(148,163,184,.16);border-radius:18px;padding:14px;margin-bottom:12px;}
-    .ownerTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;}
-    .ownerName{font-weight:700;font-size:16px;line-height:1.3;}
-    .unitBadge{background:rgba(37,99,235,.18);color:#bfdbfe;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
-    .mobileLocation{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.14);border-radius:14px;padding:11px;margin-bottom:12px;}
-    .locationText{font-size:13px;line-height:1.35;color:#e5e7eb;}
-    .locationText span,.infoLine span{display:block;color:#94a3b8;font-size:11px;margin-bottom:3px;}
-    .infoLine{font-size:14px;color:#e5e7eb;margin:10px 0;line-height:1.35;}
-    .empty{text-align:center;color:#94a3b8;padding:70px 20px;font-size:15px;}
-    .skeleton{height:18px;width:100%;border-radius:8px;background:linear-gradient(90deg,#111827,#1f2937,#111827);background-size:200% 100%;animation:shine 1.2s infinite;}
-    @keyframes shine{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-    .pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:16px;color:#e5e7eb;font-size:13px;font-weight:700;}
-    .pager button{width:auto;min-width:86px;padding:9px 13px;background:#111827;border:1px solid rgba(148,163,184,.25);}
-
-    .modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100;padding:18px;}
-    .modalOverlay.show{display:flex;}
-    .modal{background:#020617;border:1px solid rgba(148,163,184,.22);border-radius:18px;padding:18px;width:min(760px,100%);max-height:86vh;overflow:auto;}
-    .modalRow{border-top:1px solid rgba(148,163,184,.12);padding:12px 0;font-size:14px;color:#e5e7eb;}
-    .modalActions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px;}
-    .formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .formGrid label{font-size:12px;color:#94a3b8;display:block;margin-bottom:5px;}
-    .formFull{grid-column:1 / -1;}
-    .columnList{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
-    .columnItem{display:grid;grid-template-columns:28px 1fr auto auto;align-items:center;gap:10px;background:#07111f;border:1px solid rgba(148,163,184,.16);border-radius:12px;padding:10px;}
-    .columnItem input{width:auto;}
-    .columnItem button{padding:7px 9px;font-size:11px;background:#111827;border:1px solid rgba(148,163,184,.22);}
-
-    .tablebox::-webkit-scrollbar{height:10px;width:10px;}
-    .tablebox::-webkit-scrollbar-track{background:#020617;}
-    .tablebox::-webkit-scrollbar-thumb{background:#263449;border-radius:20px;}
-
-    @media(max-width:800px){
-      body{padding:14px;background:radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%),#07111f;}
-      .mainHeader{align-items:center;margin-bottom:16px;}
-      h1{font-size:25px;}
-      .sub{font-size:13px;margin:8px 0 0;}
-      .headerBtns{flex-direction:column;align-items:flex-end;}
-      .darkBtn,.primaryBtn{padding:9px 12px;font-size:12px;}
-      .card{padding:14px;border-radius:18px;}
-      .filters,.leadFilters,.choiceGrid,.formGrid{grid-template-columns:1fr;}
-      #searchInput,.formFull{grid-column:auto;}
-      input,select{padding:12px;font-size:13px;border-radius:13px;}
-      .actionsRow{justify-content:stretch;}
-      .reset{width:100%;min-width:unset;}
-      .topInfo{flex-direction:column;align-items:flex-start;font-size:13px;}
-      .tablebox{display:none;}
-      .mobileCards{display:block;}
-      .loginBox,.choiceBox{margin:50px auto;padding:18px;}
-      .statusSelect{width:100%;}
+    td {
+      padding:10px 12px;
+      border-top:1px solid rgba(148,163,184,.055);
+      font-size:13px;
+      color:#dbe4f0;
+      white-space:nowrap;
+      vertical-align:middle;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
+    tr:hover td { background:rgba(37,99,235,.055); }
+
+    .resizable-th{ position:sticky; }
+    .resize-handle{
+      position:absolute;
+      right:0;
+      top:0;
+      width:7px;
+      height:100%;
+      cursor:col-resize;
+      user-select:none;
+      touch-action:none;
+    }
+    .resize-handle:hover{ background:rgba(59,130,246,.35); }
+
+    .cellBox,
+    .leadCellInput,
+    .miniInput{
+      width:100%;
+      min-width:0 !important;
+      height:38px;
+      padding:8px 10px;
+      border-radius:11px;
+      font-size:13px;
+      background:#030712 !important;
+      border:1px solid rgba(148,163,184,.09) !important;
+      color:#e5edf8 !important;
+    }
+    .leadCellInput:disabled{
+      opacity:1 !important;
+      cursor:default;
+      -webkit-text-fill-color:#dbe4f0;
+    }
+
+    .waBtn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      max-width:100%;
+      height:38px;
+      padding:0 12px;
+      border-radius:11px;
+      background:#059669;
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      font-size:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .statusSelect, .leadDropdown {
+      width:100%;
+      min-width:0 !important;
+      height:38px;
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.16);
+      background:#050814;
+      color:#e5e7eb;
+    }
+
+    .status-New{ background:rgba(59,130,246,.11)!important; border-color:rgba(59,130,246,.35)!important; color:#bfdbfe!important; }
+    .status-Contacted{ background:rgba(16,185,129,.11)!important; border-color:rgba(16,185,129,.38)!important; color:#a7f3d0!important; }
+    .status-CallBack{ background:rgba(245,158,11,.12)!important; border-color:rgba(245,158,11,.38)!important; color:#fde68a!important; }
+    .status-Interested{ background:rgba(139,92,246,.12)!important; border-color:rgba(139,92,246,.40)!important; color:#ddd6fe!important; }
+    .status-Viewing{ background:rgba(6,182,212,.12)!important; border-color:rgba(6,182,212,.38)!important; color:#a5f3fc!important; }
+    .status-Negotiation{ background:rgba(234,179,8,.12)!important; border-color:rgba(234,179,8,.38)!important; color:#fef3c7!important; }
+    .status-Lost{ background:rgba(239,68,68,.11)!important; border-color:rgba(239,68,68,.38)!important; color:#fecaca!important; }
+
+    .status-ForSale{ background:rgba(16,185,129,.11)!important; border-color:rgba(16,185,129,.38)!important; color:#a7f3d0!important; }
+    .status-ForRent{ background:rgba(59,130,246,.11)!important; border-color:rgba(59,130,246,.35)!important; color:#bfdbfe!important; }
+    .status-Sold{ background:rgba(239,68,68,.11)!important; border-color:rgba(239,68,68,.38)!important; color:#fecaca!important; }
+    .status-NoResponse{ background:rgba(100,116,139,.13)!important; border-color:rgba(148,163,184,.32)!important; color:#e2e8f0!important; }
+    .status-NotInterested{ background:rgba(244,63,94,.12)!important; border-color:rgba(244,63,94,.38)!important; color:#fecdd3!important; }
+    .status-InvalidNumber{ background:rgba(75,85,99,.14)!important; border-color:rgba(107,114,128,.35)!important; color:#cbd5e1!important; }
+
+    .remarkBox { display:flex; gap:7px; align-items:center; width:100%; }
+    .remarksInput, .leadNotesBox {
+      width:100%;
+      min-width:0 !important;
+      height:38px;
+      padding:8px 10px;
+      border-radius:11px;
+      font-size:13px;
+      line-height:1.35;
+      resize:none;
+      overflow:hidden;
+      white-space:nowrap;
+      background:#030712 !important;
+      border:1px solid rgba(148,163,184,.09) !important;
+      color:#f1f5f9 !important;
+      transition:.15s ease;
+    }
+    .remarksInput:focus, .leadNotesBox:focus {
+      height:86px;
+      white-space:normal;
+      overflow-y:auto;
+      position:relative;
+      z-index:8;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+    .saveRemarkBtn { display:none; background:#059669; padding:8px 10px; font-size:11px; white-space:nowrap; border-radius:10px; }
+    .saveRemarkBtn.show { display:inline-block; }
+
+    .iconBtn{
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+      border-radius:10px;
+      background:#07111f;
+      border:1px solid rgba(148,163,184,.16);
+      color:#bfdbfe;
+      font-size:14px;
+      line-height:1;
+    }
+    .iconBtn:hover{ border-color:rgba(59,130,246,.45); background:#0b1730; }
+    .iconBtn.dangerIcon{ color:#fecaca; border-color:rgba(239,68,68,.28); background:rgba(127,29,29,.20); }
+    .iconBtn.dangerIcon:hover{ background:rgba(127,29,29,.34); }
+    .saveRowBtn { background:#059669; padding:8px 11px; font-size:12px; border-radius:10px; }
+    .saveRowBtn.hiddenAction { display:none; }
+
+    .leadActions { display:flex; gap:7px; justify-content:flex-start; align-items:center; min-width:80px; }
+    .actionsSticky { position:sticky; right:0; background:#020617; z-index:3; box-shadow:-8px 0 14px rgba(0,0,0,.28); }
+    th.actionsSticky { background:#08111f; }
+    tr:hover .actionsSticky { background:#06101f; }
+
+    .moreUnitBtn {
+      background:rgba(37,99,235,.13);
+      border:1px solid rgba(37,99,235,.30);
+      color:#bfdbfe;
+      padding:5px 8px;
+      border-radius:999px;
+      font-size:10px;
+      margin-left:8px;
+      vertical-align:middle;
+      white-space:nowrap;
+    }
+
+    .mobileCards { display:none; }
+    .ownerCard, .leadCard { background:#020617; border:1px solid rgba(148,163,184,.16); border-radius:18px; padding:14px; margin-bottom:12px; }
+    .ownerTop { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px; }
+    .ownerName { font-weight:700; font-size:16px; line-height:1.3; }
+    .unitBadge { background:rgba(37,99,235,.18); color:#bfdbfe; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap; }
+    .mobileLocation { display:flex; justify-content:space-between; align-items:center; gap:10px; background:rgba(15,23,42,.72); border:1px solid rgba(148,163,184,.14); border-radius:14px; padding:11px; margin-bottom:12px; }
+    .locationText { font-size:13px; line-height:1.35; color:#e5e7eb; }
+    .locationText span, .infoLine span { display:block; color:#94a3b8; font-size:11px; margin-bottom:3px; }
+    .infoLine { font-size:14px; color:#e5e7eb; margin:10px 0; line-height:1.35; }
+    .empty { text-align:center; color:#94a3b8; padding:70px 20px; font-size:15px; }
+    .skeleton { height:18px; width:100%; border-radius:8px; background:linear-gradient(90deg,#111827,#1f2937,#111827); background-size:200% 100%; animation:shine 1.2s infinite; }
+    @keyframes shine { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+    .pager { display:flex; justify-content:center; align-items:center; gap:14px; margin-top:16px; color:#e5e7eb; font-size:13px; font-weight:700; }
+    .pager button { width:auto; min-width:86px; padding:9px 13px; background:#070b14; border:1px solid rgba(148,163,184,.20); }
+
+    .modalOverlay { position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:100; padding:18px; }
+    .modalOverlay.show { display:flex; }
+    .modal { background:#020617; border:1px solid rgba(148,163,184,.22); border-radius:18px; padding:18px; width:min(760px,100%); max-height:86vh; overflow:auto; }
+    .modalRow { border-top:1px solid rgba(148,163,184,.12); padding:12px 0; font-size:14px; color:#e5e7eb; }
+    .modalActions { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+    .formGrid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .formGrid label { font-size:12px; color:#94a3b8; display:block; margin-bottom:5px; }
+    .formFull { grid-column:1 / -1; }
+    .columnList { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+    .columnItem { display:grid; grid-template-columns:28px 1fr auto auto; align-items:center; gap:10px; background:#07111f; border:1px solid rgba(148,163,184,.16); border-radius:12px; padding:10px; }
+    .columnItem input { width:auto; }
+    .columnItem button { padding:7px 9px; font-size:11px; background:#111827; border:1px solid rgba(148,163,184,.22); }
+
+    @media (max-width:800px) {
+      body { padding:14px; background:radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%), #07111f; }
+      .mainHeader { align-items:center; margin-bottom:16px; }
+      h1 { font-size:25px; }
+      .sub { font-size:13px; margin:8px 0 0; }
+      .headerBtns { flex-direction:column; align-items:flex-end; }
+      .darkBtn, .primaryBtn { padding:9px 12px; font-size:12px; }
+      .card { padding:14px; border-radius:18px; }
+      .filters, .leadFilters, .choiceGrid, .formGrid { grid-template-columns:1fr; }
+      #searchInput, .formFull { grid-column:auto; }
+      input, select { padding:12px; font-size:13px; border-radius:13px; }
+      .actionsRow { justify-content:stretch; }
+      .reset { width:100%; min-width:unset; }
+      .topInfo { flex-direction:column; align-items:flex-start; font-size:13px; }
+      .tablebox { display:none; }
+      .mobileCards { display:block; }
+      .loginBox, .choiceBox { margin:50px auto; padding:18px; }
+      .statusSelect { width:100%; }
+    }
+
   </style>
 </head>
 
@@ -275,9 +391,12 @@
           <option value="">All Statuses</option><option>New</option><option>For Sale</option><option>For Rent</option><option>Sold</option><option>Call Back</option><option>No Response</option><option>Not Interested</option><option>Invalid Number</option>
         </select>
       </div>
-      <div class="actionsRow"><button class="darkBtn" onclick="openColumnModal('owners')">Manage Columns</button><button class="reset" onclick="resetFilters()">Reset Filters</button></div>
+      <div class="quickFilters">
+        <button onclick="quickStatus('New')">New</button><button onclick="quickStatus('For Sale')">For Sale</button><button onclick="quickStatus('For Rent')">For Rent</button><button onclick="quickStatus('Sold')">Sold</button><button onclick="quickStatus('No Response')">No Response</button><button onclick="quickStatus('Invalid Number')">Invalid</button>
+      </div>
+      <div class="actionsRow"><button class="darkBtn" onclick="openOwnerColumnModal()">Manage Columns</button><button class="reset" onclick="resetFilters()">Reset Filters</button></div>
       <div class="topInfo"><div><span id="status">Preparing database...</span><span id="loadingBadge" class="loadingBadge">Loading data...</span><span id="saveToast" class="saveToast">Saved ✓</span></div><div>Showing 50 records per page</div></div>
-      <div class="tablebox"><table class="ownersTable"><thead id="ownersTableHead"></thead><tbody id="tableBody"></tbody></table></div>
+      <div class="tablebox"><table id="ownersTable"><thead id="ownersTableHead"></thead><tbody id="tableBody"></tbody></table></div>
       <div id="mobileCards" class="mobileCards"></div>
       <div class="pager"><button id="prevBtn" onclick="prevPage()">Previous</button><div id="pageInfo">1 / 1</div><button id="nextBtn" onclick="nextPage()">Next</button></div>
     </div>
@@ -305,7 +424,10 @@
         <input id="leadProjectFilter" placeholder="Project" />
         <input id="leadFollowUpFilter" type="date" />
       </div>
-      <div class="actionsRow"><button class="darkBtn" onclick="openColumnModal('leads')">Manage Columns</button><button class="reset" onclick="resetLeadFilters()">Reset Filters</button></div>
+      <div class="quickFilters">
+        <button onclick="quickLeadStatus('New')">New</button><button onclick="quickLeadStatus('Contacted')">Contacted</button><button onclick="quickLeadStatus('Call Back')">Call Back</button><button onclick="quickLeadStatus('Interested')">Interested</button><button onclick="quickLeadStatus('Viewing')">Viewing</button><button onclick="quickLeadStatus('Negotiation')">Negotiation</button><button onclick="quickLeadStatus('Lost')">Lost</button>
+      </div>
+      <div class="actionsRow"><button class="darkBtn" onclick="openColumnModal()">Manage Columns</button><button class="reset" onclick="resetLeadFilters()">Reset Filters</button></div>
       <div class="topInfo"><div><span id="leadStatusText">Preparing leads...</span><span id="leadLoadingBadge" class="loadingBadge">Loading leads...</span><span id="leadSaveToast" class="saveToast">Saved ✓</span></div><div>Showing 50 records per page</div></div>
       <div class="tablebox"><table class="leadsTable"><thead id="leadsTableHead"></thead><tbody id="leadsTableBody"></tbody></table></div>
       <div id="leadMobileCards" class="mobileCards"></div>
@@ -340,10 +462,10 @@
   <div id="columnsModal" class="modalOverlay">
     <div class="modal">
       <h2 id="columnsModalTitle">Manage Columns</h2>
-      <div class="sub" style="margin-bottom:10px;">Tick to show/hide columns. Use ↑ ↓ to arrange columns left or right. Actions stay fixed at the end.</div>
+      <div class="sub" style="margin-bottom:10px;">Tick to show/hide columns. Use ↑ ↓ to arrange columns left or right.</div>
       <div id="columnList" class="columnList"></div>
       <div class="modalActions">
-        <button class="darkBtn" onclick="resetActiveColumns()">Reset</button>
+        <button class="darkBtn" onclick="resetLeadColumns()">Reset</button>
         <button class="darkBtn" onclick="closeColumnModal()">Cancel</button>
         <button class="primaryBtn" onclick="saveColumnModal()">Apply</button>
       </div>
@@ -360,36 +482,36 @@
 
     let currentPage = 0, totalCount = 0, debounceTimer = null, listenersReady = false, currentAccess = null, allMiniRows = [];
     let leadPage = 0, leadTotalCount = 0, leadDebounceTimer = null, leadListenersReady = false, editingLeadId = null;
-    let activeColumnMode = "leads";
-    const OWNER_COLUMN_KEY = "usama_owner_columns_v1";
-    const defaultOwnerColumns = [
-      { key:"community", label:"Community", visible:true, type:"text" },
-      { key:"cluster", label:"Cluster", visible:true, type:"text" },
-      { key:"unit", label:"Unit", visible:true, type:"text" },
-      { key:"owner", label:"Owner Name", visible:true, type:"owner" },
-      { key:"whatsapp", label:"WhatsApp", visible:true, type:"whatsapp" },
-      { key:"status", label:"Status", visible:true, type:"status" },
-      { key:"remarks", label:"Remarks", visible:true, type:"remarks" },
-      { key:"last_contacted", label:"Last Contacted", visible:true, type:"last_contacted" }
-    ];
-    let ownerColumns = loadOwnerColumns();
     let editingLeadRows = new Set();
     const LEAD_COLUMN_KEY = "usama_lead_columns_v2";
+    const defaultOwnerColumns = [
+      { key:"community", label:"Community", visible:true, width:150 },
+      { key:"cluster", label:"Cluster", visible:true, width:150 },
+      { key:"unit", label:"Unit", visible:true, width:90 },
+      { key:"owner", label:"Owner Name", visible:true, width:210 },
+      { key:"whatsapp", label:"WhatsApp", visible:true, width:140 },
+      { key:"status", label:"Status", visible:true, width:150 },
+      { key:"remarks", label:"Remarks", visible:true, width:280 },
+      { key:"last_contacted", label:"Last Contacted", visible:true, width:135 }
+    ];
+    const OWNER_COLUMN_KEY = "usama_owner_columns_v1";
+    let ownerColumns = loadOwnerColumns();
+
     const defaultLeadColumns = [
-      { key:"lead_receive_date", label:"Received", visible:true, type:"date", cls:"miniInput dateInput" },
-      { key:"name", label:"Name", visible:true, type:"text", cls:"miniInput wideInput" },
-      { key:"phone", label:"Phone", visible:true, type:"text", cls:"miniInput" },
-      { key:"email", label:"Email", visible:false, type:"email", cls:"miniInput wideInput" },
-      { key:"project_inquired", label:"Project Inquired", visible:true, type:"text", cls:"miniInput wideInput" },
-      { key:"budget", label:"Budget", visible:true, type:"text", cls:"miniInput" },
-      { key:"property_type", label:"Property Type", visible:false, type:"select", cls:"leadDropdown" },
-      { key:"bedroom", label:"Bedroom", visible:true, type:"select", cls:"leadDropdown" },
-      { key:"source", label:"Source", visible:true, type:"select", cls:"leadDropdown" },
-      { key:"status", label:"Status", visible:true, type:"select", cls:"statusSelect" },
-      { key:"follow_up_date", label:"Follow-up Date", visible:true, type:"date", cls:"miniInput dateInput" },
-      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"remarksInput leadNotesBox" },
-      { key:"last_contacted", label:"Last Contacted", visible:true, type:"date", cls:"miniInput dateInput" },
-      { key:"whatsapp", label:"WhatsApp", visible:true, type:"button", cls:"" }
+      { key:"name", label:"Name", visible:true, type:"text", cls:"cellBox", width:170 },
+      { key:"phone", label:"Phone", visible:true, type:"text", cls:"cellBox", width:140 },
+      { key:"project_inquired", label:"Project Inquired", visible:true, type:"text", cls:"cellBox", width:190 },
+      { key:"budget", label:"Budget", visible:true, type:"text", cls:"cellBox", width:95 },
+      { key:"status", label:"Status", visible:true, type:"select", cls:"statusSelect", width:150 },
+      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"remarksInput leadNotesBox", width:260 },
+      { key:"lead_receive_date", label:"Received", visible:false, type:"date", cls:"cellBox", width:130 },
+      { key:"email", label:"Email", visible:false, type:"email", cls:"cellBox", width:190 },
+      { key:"property_type", label:"Property Type", visible:false, type:"select", cls:"leadDropdown", width:150 },
+      { key:"bedroom", label:"Bedroom", visible:false, type:"select", cls:"leadDropdown", width:110 },
+      { key:"source", label:"Source", visible:false, type:"select", cls:"leadDropdown", width:140 },
+      { key:"follow_up_date", label:"Follow-up Date", visible:false, type:"date", cls:"cellBox", width:135 },
+      { key:"last_contacted", label:"Last Contacted", visible:false, type:"date", cls:"cellBox", width:135 },
+      { key:"whatsapp", label:"WhatsApp", visible:false, type:"button", cls:"", width:120 }
     ];
     let leadColumns = loadLeadColumns();
     const el = id => document.getElementById(id);
@@ -415,27 +537,7 @@
       if (!email || !password) { el("loginError").textContent = "Enter email and password."; return; }
       const { error } = await db.auth.signInWithPassword({ email, password });
       if (error) { el("loginError").textContent = "Wrong email or password."; return; }
-  
-    function startColumnResize(event, handle) {
-      event.preventDefault();
-      event.stopPropagation();
-      const th = handle.closest("th");
-      const startX = event.pageX;
-      const startWidth = th.offsetWidth;
-      function onMove(e) {
-        const width = Math.max(90, startWidth + (e.pageX - startX));
-        th.style.width = width + "px";
-        th.style.minWidth = width + "px";
-      }
-      function onUp() {
-        document.removeEventListener("mousemove", onMove);
-        document.removeEventListener("mouseup", onUp);
-      }
-      document.addEventListener("mousemove", onMove);
-      document.addEventListener("mouseup", onUp);
-    }
-
-    checkSession();
+      checkSession();
     }
     async function logout() { await db.auth.signOut(); location.reload(); }
     function today() { return new Date().toISOString().slice(0, 10); }
@@ -456,7 +558,7 @@
     }
     function showLoading() {
       el("loadingBadge").classList.add("show"); el("status").textContent = "Loading database...";
-      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `<tr>${Array.from({length:8}).map(()=>`<td><div class="skeleton"></div></td>`).join("")}</tr>`).join("");
+      const ownerColCount = visibleOwnerColumns().length; renderOwnerHead(); el("tableBody").innerHTML = Array.from({ length: 8 }).map(() => `<tr>${Array.from({length:ownerColCount}).map(()=>`<td><div class="skeleton"></div></td>`).join("")}</tr>`).join("");
       el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() => `<div class="ownerCard"><div class="skeleton" style="height:22px;margin-bottom:12px;"></div><div class="skeleton" style="margin-bottom:10px;"></div><div class="skeleton"></div></div>`).join("");
     }
     function hideLoading() { el("loadingBadge").classList.remove("show"); }
@@ -481,7 +583,7 @@
       showLoading(); const from = currentPage * PAGE_SIZE, to = from + PAGE_SIZE - 1;
       let query = db.from(TABLE_NAME).select("*", { count: "exact" }).range(from, to); query = applyFilters(query); query = query.order("community", { ascending: true }).order("cluster", { ascending: true }).order("unit_sort", { ascending: true });
       const { data, error, count } = await query; hideLoading();
-      if (error) { el("status").textContent = "Error loading data"; el("tableBody").innerHTML = `<tr><td colspan="8" class="empty">Error: ${error.message}</td></tr>`; el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`; return; }
+      if (error) { el("status").textContent = "Error loading data"; el("tableBody").innerHTML = `<tr><td colspan="${visibleOwnerColumns().length}" class="empty">Error: ${error.message}</td></tr>`; el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`; return; }
       totalCount = count || 0; renderData(data || []);
       const start = totalCount === 0 ? 0 : from + 1, end = Math.min(to + 1, totalCount), totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
       el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`; el("pageInfo").textContent = `${currentPage + 1} / ${totalPages}`; el("prevBtn").disabled = currentPage === 0; el("nextBtn").disabled = currentPage + 1 >= totalPages;
@@ -497,39 +599,33 @@
     function rowKey(row) { const owner = String(get(row, ["owner"])).trim().toLowerCase(), p1 = formatPhone(get(row, ["phone1"])), p2 = formatPhone(get(row, ["phone2"])); return { owner, p1, p2 }; }
     function getRelatedRows(row) { const key = rowKey(row); return allMiniRows.filter(x => { const k = rowKey(x); return (key.owner && k.owner && key.owner === k.owner) || (key.p1 && (key.p1 === k.p1 || key.p1 === k.p2)) || (key.p2 && (key.p2 === k.p1 || key.p2 === k.p2)); }); }
     function moreUnitButton(row) { const related = getRelatedRows(row); if (related.length <= 1) return ""; return `<button class="moreUnitBtn" onclick='openProperties(${JSON.stringify(row).replaceAll("'", "&#039;")})'>More Unit</button>`; }
-    function thHtml(label) {
-      return `<th class="resizable">${escapeHtml(label)}<span class="col-resizer" onmousedown="startColumnResize(event, this)"></span></th>`;
-    }
-
     function renderOwnerHead() {
-      el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c => thHtml(c.label)).join("")}</tr>`;
+      el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c => `<th class="resizable-th" data-table="owner" data-key="${c.key}" style="width:${c.width}px">${escapeHtml(c.label)}<span class="resize-handle" onmousedown="startColumnResize(event, 'owner', '${c.key}')"></span></th>`).join("")}</tr>`;
+      const minWidth = visibleOwnerColumns().reduce((sum,c)=>sum+(Number(c.width)||120),0);
+      const table = document.getElementById("ownersTable");
+      if (table) table.style.minWidth = Math.max(980, minWidth) + "px";
     }
-
     function ownerCell(row, col) {
-      if (col.type === "owner") {
-        return `<div class="ownerNameCell"><span class="cellText">${escapeHtml(clean(row.owner))}</span>${moreUnitButton(row)}</div>`;
-      }
-      if (col.type === "whatsapp") return whatsappButton(row);
-      if (col.type === "status") return statusDropdown(row);
-      if (col.type === "remarks") return remarksEditor(row, get(row, ["remarks"]), "desk");
-      if (col.type === "last_contacted") return `<span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span>`;
-      return `<span class="cellText">${escapeHtml(clean(row[col.key]))}</span>`;
+      if (col.key === "community") return escapeHtml(clean(row.community));
+      if (col.key === "cluster") return escapeHtml(clean(row.cluster));
+      if (col.key === "unit") return escapeHtml(clean(row.unit));
+      if (col.key === "owner") return `${escapeHtml(clean(row.owner))}${moreUnitButton(row)}`;
+      if (col.key === "whatsapp") return whatsappButton(row);
+      if (col.key === "status") return statusDropdown(row);
+      if (col.key === "remarks") return remarksEditor(row, get(row, ["remarks"]), "desk");
+      if (col.key === "last_contacted") return `<span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span>`;
+      return "-";
     }
-
     function renderData(rows) {
       renderOwnerHead();
-      const colCount = visibleOwnerColumns().length || 1;
+      const cols = visibleOwnerColumns();
       if (!rows.length) {
-        el("tableBody").innerHTML = `<tr><td colspan="${colCount}" class="empty">No records found</td></tr>`;
+        el("tableBody").innerHTML = `<tr><td colspan="${cols.length}" class="empty">No records found</td></tr>`;
         el("mobileCards").innerHTML = `<div class="empty">No records found</div>`;
         return;
       }
-      const cols = visibleOwnerColumns();
-      el("tableBody").innerHTML = rows.map(row => `<tr>${cols.map(col => `<td>${ownerCell(row, col)}</td>`).join("")}</tr>`).join("");
-      el("mobileCards").innerHTML = rows.map(row => {
-        const remarks = get(row, ["remarks"]);
-        return `<div class="ownerCard"><div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.owner))}${moreUnitButton(row)}</div><div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div></div><div class="mobileLocation"><div class="locationText"><span>Property</span>${escapeHtml(clean(row.community))} - ${escapeHtml(clean(row.cluster))}</div>${whatsappButton(row)}</div><div class="infoLine"><span>Status</span>${statusDropdown(row)}</div><div class="infoLine"><span>Remarks</span>${remarksEditor(row, remarks, "mob")}</div><div class="infoLine"><span>Last Contacted</span><span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span></div></div>`;
-      }).join("");
+      el("tableBody").innerHTML = rows.map(row => `<tr>${cols.map(col => `<td style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`).join("");
+      el("mobileCards").innerHTML = rows.map(row => { const remarks = get(row, ["remarks"]); return `<div class="ownerCard"><div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.owner))}${moreUnitButton(row)}</div><div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div></div><div class="mobileLocation"><div class="locationText"><span>Property</span>${escapeHtml(clean(row.community))} - ${escapeHtml(clean(row.cluster))}</div>${whatsappButton(row)}</div><div class="infoLine"><span>Status</span>${statusDropdown(row)}</div><div class="infoLine"><span>Remarks</span>${remarksEditor(row, remarks, "mob")}</div><div class="infoLine"><span>Last Contacted</span><span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span></div></div>`; }).join("");
     }
     async function openProperties(row) {
       const related = getRelatedRows(row); el("modalTitle").textContent = `${clean(row.owner)} - More Units`;
@@ -560,30 +656,34 @@
       ["clusterFilter", "sourceFilter", "statusFilter"].forEach(id => el(id).addEventListener("change", () => { currentPage = 0; loadData(); }));
     }
 
-    function visibleLeadColumns() { return leadColumns.filter(c => c.visible); }
+    
     function visibleOwnerColumns() { return ownerColumns.filter(c => c.visible); }
     function loadOwnerColumns() {
       try {
         const saved = JSON.parse(localStorage.getItem(OWNER_COLUMN_KEY) || "null");
         if (!Array.isArray(saved)) return defaultOwnerColumns.map(x => ({...x}));
         const byKey = Object.fromEntries(defaultOwnerColumns.map(c => [c.key, c]));
-        const merged = saved.filter(c => byKey[c.key]).map(c => ({...byKey[c.key], visible: c.visible !== false}));
+        const merged = saved.filter(c => byKey[c.key]).map(c => ({...byKey[c.key], visible:c.visible !== false, width:Number(c.width || byKey[c.key].width)}));
         defaultOwnerColumns.forEach(c => { if (!merged.some(x => x.key === c.key)) merged.push({...c}); });
         return merged;
       } catch { return defaultOwnerColumns.map(x => ({...x})); }
     }
-    function saveOwnerColumnsState() { localStorage.setItem(OWNER_COLUMN_KEY, JSON.stringify(ownerColumns.map(({key,visible}) => ({key,visible})))); }
+    function saveOwnerColumnsState() {
+      localStorage.setItem(OWNER_COLUMN_KEY, JSON.stringify(ownerColumns.map(({key,visible,width}) => ({key,visible,width}))));
+    }
+
+    function visibleLeadColumns() { return leadColumns.filter(c => c.visible); }
     function loadLeadColumns() {
       try {
         const saved = JSON.parse(localStorage.getItem(LEAD_COLUMN_KEY) || "null");
         if (!Array.isArray(saved)) return defaultLeadColumns.map(x => ({...x}));
         const byKey = Object.fromEntries(defaultLeadColumns.map(c => [c.key, c]));
-        const merged = saved.filter(c => byKey[c.key]).map(c => ({...byKey[c.key], visible: c.visible !== false}));
+        const merged = saved.filter(c => byKey[c.key]).map(c => ({...byKey[c.key], visible: c.visible !== false, width:Number(c.width || byKey[c.key].width)}));
         defaultLeadColumns.forEach(c => { if (!merged.some(x => x.key === c.key)) merged.push({...c}); });
         return merged;
       } catch { return defaultLeadColumns.map(x => ({...x})); }
     }
-    function saveLeadColumnsState() { localStorage.setItem(LEAD_COLUMN_KEY, JSON.stringify(leadColumns.map(({key,visible}) => ({key,visible})))); }
+    function saveLeadColumnsState() { localStorage.setItem(LEAD_COLUMN_KEY, JSON.stringify(leadColumns.map(({key,visible,width}) => ({key,visible,width})))); }
     function showLeadLoading() {
       el("leadLoadingBadge").classList.add("show");
       el("leadStatusText").textContent = "Loading leads...";
@@ -622,7 +722,11 @@
       el("leadStatusText").textContent = `Showing ${start}-${end} of ${leadTotalCount} leads`; el("leadPageInfo").textContent = `${leadPage + 1} / ${totalPages}`; el("leadPrevBtn").disabled = leadPage === 0; el("leadNextBtn").disabled = leadPage + 1 >= totalPages;
     }
     function renderLeadHead() {
-      el("leadsTableHead").innerHTML = `<tr>${visibleLeadColumns().map(c => thHtml(c.label)).join("")}<th class="actionsSticky resizable">Actions<span class="col-resizer" onmousedown="startColumnResize(event, this)"></span></th></tr>`;
+      const cols = visibleLeadColumns();
+      el("leadsTableHead").innerHTML = `<tr>${cols.map(c => `<th class="resizable-th" data-table="lead" data-key="${c.key}" style="width:${c.width}px">${escapeHtml(c.label)}<span class="resize-handle" onmousedown="startColumnResize(event, 'lead', '${c.key}')"></span></th>`).join("")}<th class="actionsSticky" style="width:92px">Actions</th></tr>`;
+      const minWidth = cols.reduce((sum,c)=>sum+(Number(c.width)||120),0) + 92;
+      const table = document.querySelector(".leadsTable");
+      if (table) table.style.minWidth = Math.max(960, minWidth) + "px";
     }
     function leadInput(row, col) {
       const rawValue = row[col.key] || "";
@@ -634,7 +738,11 @@
       if (col.type === "select") {
         const current = col.key === "status" ? (row.status || "New") : rawValue;
         const id = col.key === "status" ? `lead_status_${row.id}` : `lead_${col.key}_${row.id}`;
-        return `<select class="leadCellSelect ${col.cls}" id="${id}" onchange="saveLeadField('${row.id}', '${col.key}', this.value)">
+        const colorClass = col.key === "status" ? statusClass(current) : "";
+        const changeCode = col.key === "status"
+          ? `saveLeadField('${row.id}', '${col.key}', this.value); this.className='leadCellSelect ${col.cls} ' + statusClass(this.value);`
+          : `saveLeadField('${row.id}', '${col.key}', this.value)`;
+        return `<select class="leadCellSelect ${col.cls} ${colorClass}" id="${id}" onchange="${changeCode}">
           ${leadDropdownOptions(col.key).map(s => `<option value="${escapeHtml(s)}" ${s === current ? "selected" : ""}>${escapeHtml(s || "Select")}</option>`).join("")}
         </select>`;
       }
@@ -689,11 +797,11 @@
       if (!rows.length) { el("leadsTableBody").innerHTML = `<tr><td colspan="${colCount}" class="empty">No leads found</td></tr>`; el("leadMobileCards").innerHTML = `<div class="empty">No leads found</div>`; return; }
       const cols = visibleLeadColumns();
       el("leadsTableBody").innerHTML = rows.map(row => `<tr>
-        ${cols.map(col => `<td>${leadInput(row, col)}</td>`).join("")}
-        <td class="actionsSticky"><div class="leadActions">
-          <button class="iconBtn editIcon" title="Edit" onclick="enableLeadEdit('${row.id}')">✎</button>
-          <button id="save_lead_${row.id}" class="iconBtn saveIcon saveRowBtn ${editingLeadRows.has(row.id) ? "" : "hiddenAction"}" title="Save" onclick="saveLeadRow('${row.id}')">✓</button>
-          <button class="iconBtn deleteIcon" title="Delete" onclick="deleteLead('${row.id}')">⌫</button>
+        ${cols.map(col => `<td style="width:${col.width}px">${leadInput(row, col)}</td>`).join("")}
+        <td class="actionsSticky" style="width:92px"><div class="leadActions">
+          <button class="iconBtn" title="Edit" onclick="enableLeadEdit('${row.id}')">✎</button>
+          <button id="save_lead_${row.id}" class="saveRowBtn ${editingLeadRows.has(row.id) ? "" : "hiddenAction"}" onclick="saveLeadRow('${row.id}')">Save</button>
+          <button class="iconBtn dangerIcon" title="Delete" onclick="deleteLead('${row.id}')">⌫</button>
         </div></td>
       </tr>`).join("");
       el("leadMobileCards").innerHTML = rows.map(row => `<div class="leadCard"><div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.name))}</div><div class="unitBadge">${escapeHtml(clean(row.status || "New"))}</div></div><div class="infoLine"><span>Phone</span>${escapeHtml(clean(row.phone))}</div><div class="infoLine"><span>Email</span>${escapeHtml(clean(row.email))}</div><div class="infoLine"><span>Project</span>${escapeHtml(clean(row.project_inquired))}</div><div class="infoLine"><span>Budget</span>${escapeHtml(clean(row.budget))}</div><div class="infoLine"><span>Follow-up</span>${escapeHtml(clean(row.follow_up_date))}</div><div class="actionsRow" style="justify-content:flex-start"><button class="primaryBtn" onclick='openLeadModal(${JSON.stringify(row).replaceAll("'", "&#039;")})'>Edit</button>${leadWhatsappButton(row)}<button class="deleteRowBtn" onclick="deleteLead('${row.id}')">Delete</button></div></div>`).join("");
@@ -718,17 +826,26 @@
       const notesNode = el(`lead_notes_${id}`); if (notesNode) payload.notes = notesNode.value || null;
       return payload;
     }
-    function openColumnModal(mode = "leads") {
-      activeColumnMode = mode;
-      el("columnsModalTitle").textContent = mode === "owners" ? "Manage Owner Columns" : "Manage Lead Columns";
+    let activeColumnMode = "lead";
+    function getActiveColumns() { return activeColumnMode === "owner" ? ownerColumns : leadColumns; }
+    function setActiveColumns(cols) { if (activeColumnMode === "owner") ownerColumns = cols; else leadColumns = cols; }
+    function saveActiveColumnsState() { activeColumnMode === "owner" ? saveOwnerColumnsState() : saveLeadColumnsState(); }
+
+    function openOwnerColumnModal() {
+      activeColumnMode = "owner";
+      el("columnsModalTitle").textContent = "Manage Owner Columns";
+      renderColumnList();
+      el("columnsModal").classList.add("show");
+    }
+    function openColumnModal() {
+      activeColumnMode = "lead";
+      el("columnsModalTitle").textContent = "Manage Lead Columns";
       renderColumnList();
       el("columnsModal").classList.add("show");
     }
     function closeColumnModal() { el("columnsModal").classList.remove("show"); }
-    function currentColumns() { return activeColumnMode === "owners" ? ownerColumns : leadColumns; }
-    function currentDefaultColumns() { return activeColumnMode === "owners" ? defaultOwnerColumns : defaultLeadColumns; }
     function renderColumnList() {
-      const cols = currentColumns();
+      const cols = getActiveColumns();
       el("columnList").innerHTML = cols.map((c, i) => `<div class="columnItem">
         <input type="checkbox" id="col_${c.key}" ${c.visible ? "checked" : ""}>
         <label for="col_${c.key}">${escapeHtml(c.label)}</label>
@@ -737,20 +854,24 @@
       </div>`).join("");
     }
     function moveColumn(index, dir) {
-      const cols = currentColumns();
+      const cols = getActiveColumns();
       const next = index + dir;
       if (next < 0 || next >= cols.length) return;
       [cols[index], cols[next]] = [cols[next], cols[index]];
+      setActiveColumns(cols);
       renderColumnList();
     }
+    function moveLeadColumn(index, dir) { moveColumn(index, dir); }
     function saveColumnModal() {
-      const cols = currentColumns();
+      const cols = getActiveColumns();
       cols.forEach(c => { const node = el(`col_${c.key}`); if (node) c.visible = node.checked; });
-      if (activeColumnMode === "owners") { saveOwnerColumnsState(); closeColumnModal(); loadData(); }
-      else { saveLeadColumnsState(); closeColumnModal(); loadLeads(); }
+      setActiveColumns(cols);
+      saveActiveColumnsState();
+      closeColumnModal();
+      activeColumnMode === "owner" ? loadData() : loadLeads();
     }
-    function resetActiveColumns() {
-      if (activeColumnMode === "owners") {
+    function resetLeadColumns() {
+      if (activeColumnMode === "owner") {
         ownerColumns = defaultOwnerColumns.map(x => ({...x}));
         saveOwnerColumnsState();
       } else {
@@ -759,7 +880,6 @@
       }
       renderColumnList();
     }
-    function resetLeadColumns() { activeColumnMode = "leads"; resetActiveColumns(); }
     function openLeadModal(row = null) {
       editingLeadId = row?.id || null; el("leadModalTitle").textContent = editingLeadId ? "Edit Lead" : "Add Lead";
       const fields = ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"];
@@ -803,24 +923,42 @@
       ["leadStatusFilter", "leadSourceFilter", "leadFollowUpFilter"].forEach(id => el(id).addEventListener("change", () => { leadPage = 0; loadLeads(); }));
     }
 
-
-    function startColumnResize(event, handle) {
+    let activeResize = null;
+    function startColumnResize(event, tableType, key) {
       event.preventDefault();
       event.stopPropagation();
-      const th = handle.closest("th");
-      const startX = event.pageX;
-      const startWidth = th.offsetWidth;
-      function onMove(e) {
-        const width = Math.max(90, startWidth + (e.pageX - startX));
-        th.style.width = width + "px";
-        th.style.minWidth = width + "px";
+      const cols = tableType === "owner" ? ownerColumns : leadColumns;
+      const col = cols.find(c => c.key === key);
+      if (!col) return;
+      activeResize = {
+        tableType,
+        key,
+        startX: event.clientX,
+        startWidth: Number(col.width || 140)
+      };
+      document.addEventListener("mousemove", onColumnResize);
+      document.addEventListener("mouseup", stopColumnResize);
+    }
+    function onColumnResize(event) {
+      if (!activeResize) return;
+      const cols = activeResize.tableType === "owner" ? ownerColumns : leadColumns;
+      const col = cols.find(c => c.key === activeResize.key);
+      if (!col) return;
+      const nextWidth = Math.max(80, Math.min(520, activeResize.startWidth + (event.clientX - activeResize.startX)));
+      col.width = nextWidth;
+      if (activeResize.tableType === "owner") {
+        saveOwnerColumnsState();
+        renderOwnerHead();
+      } else {
+        saveLeadColumnsState();
+        renderLeadHead();
       }
-      function onUp() {
-        document.removeEventListener("mousemove", onMove);
-        document.removeEventListener("mouseup", onUp);
-      }
-      document.addEventListener("mousemove", onMove);
-      document.addEventListener("mouseup", onUp);
+      document.querySelectorAll(`[data-table="${activeResize.tableType}"][data-key="${activeResize.key}"]`).forEach(th => th.style.width = nextWidth + "px");
+    }
+    function stopColumnResize() {
+      document.removeEventListener("mousemove", onColumnResize);
+      document.removeEventListener("mouseup", stopColumnResize);
+      activeResize = null;
     }
 
     checkSession();
