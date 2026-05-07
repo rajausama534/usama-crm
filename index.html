@@ -108,6 +108,277 @@
     .actionsSticky { position: sticky; right: 0; background:#020617; z-index:3; }
     th.actionsSticky { background:#0b1020; }
     tr:hover .actionsSticky { background:#0b1730; }
+
+
+    /* =====================================================
+       FIXED UI: TIGHTER COLUMNS + BETTER COLORS + STATUS BADGES
+       Added for Leads CRM and Owner Database
+    ===================================================== */
+
+    .wrap { max-width: 1600px; }
+
+    .card {
+      background: rgba(3,7,18,.88);
+      border-color: rgba(148,163,184,.14);
+    }
+
+    .tablebox {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: #040816;
+      min-height: 430px;
+      max-height: 72vh;
+      box-shadow: 0 12px 45px rgba(0,0,0,.24);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+      min-width: 1180px;
+    }
+
+    .leadsTable {
+      min-width: 1220px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      background: #081120;
+      color: #f8fafc;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .15px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      font-size: 13px;
+      color: #dbe4f0;
+      white-space: nowrap;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    tr:hover td { background: rgba(37,99,235,.055); }
+
+    .leadsTable th,
+    .leadsTable td { min-width: 95px; }
+
+    .leadsTable th:nth-child(1), .leadsTable td:nth-child(1) { width: 180px; }
+    .leadsTable th:nth-child(2), .leadsTable td:nth-child(2) { width: 145px; }
+    .leadsTable th:nth-child(3), .leadsTable td:nth-child(3) { width: 210px; }
+    .leadsTable th:nth-child(4), .leadsTable td:nth-child(4) { width: 105px; }
+    .leadsTable th:nth-child(5), .leadsTable td:nth-child(5) { width: 160px; }
+    .leadsTable th:nth-child(6), .leadsTable td:nth-child(6) { width: 240px; }
+    .leadsTable th:nth-child(7), .leadsTable td:nth-child(7) { width: 175px; }
+
+    input,
+    select,
+    textarea {
+      background: #0b1120 !important;
+      border: 1px solid rgba(255,255,255,.09) !important;
+      color: #f8fafc !important;
+      border-radius: 12px;
+      outline: none;
+      transition: .15s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(59,130,246,.58) !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.14) !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #7c8aa0; }
+
+    select { background: #111827 !important; color: #fff !important; }
+    select option { background: #111827; color: #fff; }
+
+    .miniInput,
+    .statusSelect,
+    .leadDropdown,
+    .remarksInput {
+      background: #0b1120 !important;
+      border: 1px solid rgba(255,255,255,.09) !important;
+      color: #f8fafc !important;
+    }
+
+    .statusSelect,
+    .leadDropdown {
+      width: 150px;
+      min-width: 150px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .miniInput { min-width: 120px; padding: 10px 11px; border-radius: 12px; font-size: 13px; }
+    .wideInput { min-width: 165px; }
+    .dateInput { min-width: 135px; }
+
+    .remarksInput,
+    .leadNotesBox {
+      width: 220px !important;
+      min-width: 220px !important;
+      height: 42px;
+      color: #f8fafc !important;
+      line-height: 1.45;
+      resize: none;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .remarksInput:focus,
+    .leadNotesBox:focus {
+      width: 420px !important;
+      height: 120px;
+      white-space: normal;
+      overflow-y: auto;
+      position: relative;
+      z-index: 20;
+    }
+
+    .status-New {
+      background: rgba(59,130,246,.16) !important;
+      border-color: rgba(59,130,246,.48) !important;
+      color: #93c5fd !important;
+    }
+
+    .status-Contacted,
+    .status-ForSale {
+      background: rgba(34,197,94,.16) !important;
+      border-color: rgba(34,197,94,.48) !important;
+      color: #86efac !important;
+    }
+
+    .status-CallBack {
+      background: rgba(249,115,22,.16) !important;
+      border-color: rgba(249,115,22,.48) !important;
+      color: #fdba74 !important;
+    }
+
+    .status-Interested {
+      background: rgba(168,85,247,.16) !important;
+      border-color: rgba(168,85,247,.48) !important;
+      color: #d8b4fe !important;
+    }
+
+    .status-Viewing,
+    .status-ForRent {
+      background: rgba(14,165,233,.16) !important;
+      border-color: rgba(14,165,233,.48) !important;
+      color: #7dd3fc !important;
+    }
+
+    .status-Negotiation {
+      background: rgba(234,179,8,.18) !important;
+      border-color: rgba(234,179,8,.50) !important;
+      color: #fde68a !important;
+    }
+
+    .status-Lost,
+    .status-Sold {
+      background: rgba(239,68,68,.16) !important;
+      border-color: rgba(239,68,68,.48) !important;
+      color: #fca5a5 !important;
+    }
+
+    .status-NoResponse {
+      background: rgba(107,114,128,.18) !important;
+      border-color: rgba(107,114,128,.48) !important;
+      color: #d1d5db !important;
+    }
+
+    .status-NotInterested {
+      background: rgba(244,63,94,.16) !important;
+      border-color: rgba(244,63,94,.48) !important;
+      color: #fda4af !important;
+    }
+
+    .status-InvalidNumber {
+      background: rgba(75,85,99,.18) !important;
+      border-color: rgba(75,85,99,.48) !important;
+      color: #cbd5e1 !important;
+    }
+
+    .waBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .editBtn,
+    .saveRowBtn,
+    .deleteRowBtn {
+      padding: 10px 14px;
+      font-size: 12px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+    }
+
+    .editBtn { background: #2563eb; }
+    .saveRowBtn { background: #16a34a; }
+    .deleteRowBtn { background: #b91c1c; }
+
+    .actionsSticky {
+      position: sticky;
+      right: 0;
+      z-index: 6;
+      background: #040816;
+      box-shadow: -10px 0 18px rgba(4,8,22,.88);
+    }
+
+    th.actionsSticky { background: #081120; z-index: 12; }
+    tr:hover .actionsSticky { background: #071426; }
+
+    .resizable-table th { position: sticky; }
+    .colResizer {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 7px;
+      height: 100%;
+      cursor: col-resize;
+      user-select: none;
+      z-index: 30;
+    }
+
+    .colResizer:hover { background: rgba(59,130,246,.45); }
+    body.resizing-col { cursor: col-resize; user-select: none; }
+
+    .tablebox::-webkit-scrollbar { height: 10px; width: 10px; }
+    .tablebox::-webkit-scrollbar-track { background: #020617; }
+    .tablebox::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 20px; }
+
+    @media (max-width: 800px) {
+      .leadsTable { min-width: 1150px; }
+      th, td { padding: 11px 12px; }
+      .tablebox { display: none; }
+    }
+
     @media (max-width: 800px) {
       body { padding: 14px; background: radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%), #07111f; }
       .mainHeader { align-items: center; margin-bottom: 16px; }
@@ -462,6 +733,7 @@
     }
     function renderLeadHead() {
       el("leadsTableHead").innerHTML = `<tr>${visibleLeadColumns().map(c => `<th>${escapeHtml(c.label)}</th>`).join("")}<th class="actionsSticky">Actions</th></tr>`;
+      setTimeout(() => makeTableResizable(".leadsTable", "usama_leads_col_widths_v1"), 0);
     }
     function leadInput(row, col) {
       const rawValue = row[col.key] || "";
@@ -473,7 +745,8 @@
       if (col.type === "select") {
         const current = col.key === "status" ? (row.status || "New") : rawValue;
         const id = col.key === "status" ? `lead_status_${row.id}` : `lead_${col.key}_${row.id}`;
-        return `<select class="leadCellSelect ${col.cls}" id="${id}" onchange="saveLeadField('${row.id}', '${col.key}', this.value)">
+        const statusColorClass = col.key === "status" ? statusClass(current) : "";
+        return `<select class="leadCellSelect ${col.cls} ${statusColorClass}" id="${id}" onchange="saveLeadField('${row.id}', '${col.key}', this.value); if ('${col.key}' === 'status') this.className='leadCellSelect ${col.cls} ' + statusClass(this.value);">
           ${leadDropdownOptions(col.key).map(s => `<option value="${escapeHtml(s)}" ${s === current ? "selected" : ""}>${escapeHtml(s || "Select")}</option>`).join("")}
         </select>`;
       }
@@ -628,6 +901,63 @@
       if (leadListenersReady) return; leadListenersReady = true;
       ["leadSearchInput", "leadProjectFilter"].forEach(id => el(id).addEventListener("input", () => { clearTimeout(leadDebounceTimer); leadDebounceTimer = setTimeout(() => { leadPage = 0; loadLeads(); }, 400); }));
       ["leadStatusFilter", "leadSourceFilter", "leadFollowUpFilter"].forEach(id => el(id).addEventListener("change", () => { leadPage = 0; loadLeads(); }));
+    }
+
+
+    function makeTableResizable(tableSelector, storageKey) {
+      const table = document.querySelector(tableSelector);
+      if (!table) return;
+      table.classList.add("resizable-table");
+
+      const headers = Array.from(table.querySelectorAll("thead th"));
+      if (!headers.length) return;
+
+      let savedWidths = {};
+      try { savedWidths = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch { savedWidths = {}; }
+
+      headers.forEach((th, index) => {
+        th.style.position = "sticky";
+        if (savedWidths[index]) {
+          th.style.width = savedWidths[index] + "px";
+          th.style.minWidth = savedWidths[index] + "px";
+        }
+
+        th.querySelectorAll(".colResizer").forEach(x => x.remove());
+        if (th.classList.contains("actionsSticky")) return;
+
+        const grip = document.createElement("span");
+        grip.className = "colResizer";
+        th.appendChild(grip);
+
+        let startX = 0;
+        let startWidth = 0;
+
+        grip.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          startX = event.pageX;
+          startWidth = th.offsetWidth;
+          document.body.classList.add("resizing-col");
+
+          const onMove = (moveEvent) => {
+            const newWidth = Math.max(90, startWidth + (moveEvent.pageX - startX));
+            th.style.width = newWidth + "px";
+            th.style.minWidth = newWidth + "px";
+          };
+
+          const onUp = () => {
+            document.body.classList.remove("resizing-col");
+            const widths = {};
+            headers.forEach((header, i) => widths[i] = header.offsetWidth);
+            localStorage.setItem(storageKey, JSON.stringify(widths));
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("mouseup", onUp);
+          };
+
+          document.addEventListener("mousemove", onMove);
+          document.addEventListener("mouseup", onUp);
+        });
+      });
     }
 
     checkSession();
