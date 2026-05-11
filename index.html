@@ -1661,18 +1661,22 @@ Would you consider selling if you receive a strong offer?`;
       const unit = get(row, ["unit"]);
       const cluster = get(row, ["cluster"]);
       const community = get(row, ["community"]);
-      const agentName = getWhatsappAgentName();
-      const company = getWhatsappCompany();
-      const messageBody = getWhatsappMessageBody();
+      const firstName = owner ? String(owner).trim().split(" ")[0] : "";
 
-      return `Hello Mr. ${owner || ""},
+      return `Hello Mr. ${firstName},
 
-${messageBody}
+Hope you're doing well.
 
-Regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
+This is Usama from BFG Properties.
+
+I’m reaching out regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
+
+Would you consider selling if you receive a strong offer?
+
+Waiting for your kind response.
 
 Regards,
-${agentName}${company ? `\n${company}` : ""}`;
+Usama Bin Nusrat`;
     }
 
     function whatsappButton(row) {
