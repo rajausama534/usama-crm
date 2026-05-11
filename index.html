@@ -80,7 +80,7 @@ export default function App() {
 
   async function loadProfile(userId) {
     const { data, error } = await supabase
-      .from("profiles")
+      .from("user_access")
       .select("*")
       .eq("id", userId)
       .single();
@@ -166,7 +166,7 @@ export default function App() {
 
   async function saveWhatsappSettings() {
     const { error } = await supabase
-      .from("profiles")
+      .from("user_access")
       .update({
         whatsapp_agent_name: whatsappAgentName,
         whatsapp_company: whatsappCompany,
