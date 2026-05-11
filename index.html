@@ -1102,6 +1102,7 @@
       </div>
 
       <div class="actionsRow">
+        <button class="darkBtn" onclick="openWhatsappMessageModal()">Edit WhatsApp</button>
         <button class="darkBtn" onclick="openOwnerColumnModal()">Manage Columns</button>
         <button class="reset" onclick="resetFilters()">Reset Filters</button>
       </div>
@@ -1319,6 +1320,41 @@
     </div>
   </div>
 
+  <div id="whatsappModal" class="modalOverlay">
+    <div class="modal">
+      <h2>Edit WhatsApp Message</h2>
+      <div class="sub">Owner name and property details will be added automatically from the database.</div>
+
+      <div class="formGrid">
+        <div>
+          <label>Agent Name</label>
+          <input id="wa_agent_name" placeholder="Usama Bin Nusrat" />
+        </div>
+
+        <div>
+          <label>Company Optional</label>
+          <input id="wa_company" placeholder="BFG Properties" />
+        </div>
+
+        <div class="formFull">
+          <label>Message</label>
+          <textarea id="wa_message" rows="7" placeholder="Write your message here..."></textarea>
+        </div>
+      </div>
+
+      <div class="timelineBox">
+        <h2>Preview</h2>
+        <div id="wa_preview" style="white-space:pre-line;color:#dbe4f0;font-size:14px;line-height:1.6;"></div>
+      </div>
+
+      <div class="modalActions">
+        <button class="darkBtn" onclick="closeWhatsappMessageModal()">Cancel</button>
+        <button class="darkBtn" onclick="resetWhatsappMessageForm()">Reset</button>
+        <button class="primaryBtn" onclick="saveWhatsappSettings()">Save WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
@@ -1336,6 +1372,12 @@
     let listenersReady = false;
     let currentAccess = null;
     let allMiniRows = [];
+
+    const DEFAULT_WHATSAPP_MESSAGE = `Hope you're doing well.
+
+I’m reaching out regarding your property.
+
+Would you consider selling if you receive a strong offer?`;
 
     let leadPage = 0;
     let leadTotalCount = 0;
@@ -1383,6 +1425,12 @@
     const el = id => document.getElementById(id);
 
     checkSession();
+
+    document.addEventListener("input", function(e) {
+      if (["wa_agent_name", "wa_company", "wa_message"].includes(e.target.id)) {
+        updateWhatsappPreview();
+      }
+    });
 
     async function checkSession() {
       const { data } = await db.auth.getSession();
@@ -1596,26 +1644,35 @@
       await db.from(TABLE_NAME).update({ last_contacted: today() }).eq("id", id);
     }
 
+    function getWhatsappAgentName() {
+      return (currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "").trim();
+    }
+
+    function getWhatsappCompany() {
+      return (currentAccess?.whatsapp_company || "").trim();
+    }
+
+    function getWhatsappMessageBody() {
+      return (currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE).trim();
+    }
+
     function buildOwnerMessage(row) {
       const owner = get(row, ["owner"]);
       const unit = get(row, ["unit"]);
       const cluster = get(row, ["cluster"]);
       const community = get(row, ["community"]);
+      const agentName = getWhatsappAgentName();
+      const company = getWhatsappCompany();
+      const messageBody = getWhatsappMessageBody();
 
-      return `Hello, Mr. ${owner || ""}
+      return `Hello Mr. ${owner || ""},
 
-Hope you're doing well.
+${messageBody}
 
-This is Usama from BFG Properties.
-
-I'm reaching out regarding your property in ${cluster} (Unit ${unit}), ${community}.
-
-Are you interested in selling your property?
-
-Looking forward to your kind response.
+Regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
 
 Regards,
-Usama Bin Nusrat.`;
+${agentName}${company ? `\n${company}` : ""}`;
     }
 
     function whatsappButton(row) {
@@ -1627,6 +1684,60 @@ Usama Bin Nusrat.`;
       const msg = buildOwnerMessage(row);
 
       return `<a class="waBtn" target="_blank" onclick="markContacted(${row.id})" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
+    }
+
+    function openWhatsappMessageModal() {
+      el("wa_agent_name").value = currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "";
+      el("wa_company").value = currentAccess?.whatsapp_company || "";
+      el("wa_message").value = currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE;
+      updateWhatsappPreview();
+      el("whatsappModal").classList.add("show");
+    }
+
+    function closeWhatsappMessageModal() {
+      el("whatsappModal").classList.remove("show");
+    }
+
+    function resetWhatsappMessageForm() {
+      el("wa_message").value = DEFAULT_WHATSAPP_MESSAGE;
+      updateWhatsappPreview();
+    }
+
+    function updateWhatsappPreview() {
+      const agentName = el("wa_agent_name")?.value || "Agent Name";
+      const company = el("wa_company")?.value || "";
+      const messageBody = el("wa_message")?.value || DEFAULT_WHATSAPP_MESSAGE;
+
+      el("wa_preview").textContent = `Hello Mr. Owner Name,
+
+${messageBody}
+
+Regarding your property in Cluster, Unit #101, Community.
+
+Regards,
+${agentName}${company ? `\n${company}` : ""}`;
+    }
+
+    async function saveWhatsappSettings() {
+      const whatsapp_agent_name = el("wa_agent_name").value.trim();
+      const whatsapp_company = el("wa_company").value.trim();
+      const whatsapp_message = el("wa_message").value.trim();
+
+      const { data, error } = await db
+        .from("user_access")
+        .update({ whatsapp_agent_name, whatsapp_company, whatsapp_message })
+        .eq("email", currentUserEmail)
+        .select("*")
+        .single();
+
+      if (error) {
+        alert("Failed to save WhatsApp settings. Make sure SQL columns exist in user_access.");
+        return;
+      }
+
+      currentAccess = data || { ...currentAccess, whatsapp_agent_name, whatsapp_company, whatsapp_message };
+      closeWhatsappMessageModal();
+      showSaved();
     }
 
     function callButton(row) {
