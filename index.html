@@ -1018,7 +1018,7 @@
     <h1>Usama Database</h1>
     <div class="sub">Choose your workspace.</div>
 
-    <div class="dashboardCards" id="homeKpis">
+    <div class="dashboardCards adminOnly" id="homeKpis">
       <div class="kpiCard"><div class="kpiLabel">Owners</div><div class="kpiValue" id="homeOwners">-</div><div class="kpiHint">Database records</div></div>
       <div class="kpiCard"><div class="kpiLabel">For Sale</div><div class="kpiValue" id="homeSale">-</div><div class="kpiHint">Seller opportunities</div></div>
       <div class="kpiCard"><div class="kpiLabel">For Rent</div><div class="kpiValue" id="homeRent">-</div><div class="kpiHint">Rental opportunities</div></div>
@@ -1028,13 +1028,13 @@
     </div>
 
     <div class="choiceGrid">
-      <div class="choiceCard" onclick="showOwnersView()">
+      <div class="choiceCard" id="ownersChoiceCard" onclick="showOwnersView()">
         <h2>Owner Database</h2>
         <p>Search owners, units, status, remarks, quick actions and WhatsApp outreach.</p>
         <button class="primaryBtn">Open Database</button>
       </div>
 
-      <div class="choiceCard" onclick="showLeadsView()">
+      <div class="choiceCard adminOnly" id="leadsChoiceCard" onclick="showLeadsView()">
         <h2>Leads CRM</h2>
         <p>Manage leads, requirements, follow-ups, status, notes and WhatsApp outreach.</p>
         <button class="primaryBtn">Open Leads</button>
@@ -1042,7 +1042,7 @@
     </div>
 
     <div class="modalActions">
-      <button class="darkBtn" onclick="refreshHomeKpis()">Refresh Stats</button>
+      <button class="darkBtn adminOnly" onclick="refreshHomeKpis()">Refresh Stats</button>
       <button class="darkBtn" onclick="logout()">Logout</button>
     </div>
   </div>
@@ -1055,8 +1055,8 @@
       </div>
 
       <div class="headerBtns">
-        <button class="darkBtn" onclick="showChoiceView()">Dashboard</button>
-        <button class="primaryBtn" onclick="showLeadsView()">Leads CRM</button>
+        <button class="darkBtn adminOnly" onclick="showChoiceView()">Dashboard</button>
+        <button class="primaryBtn adminOnly" onclick="showLeadsView()">Leads CRM</button>
         <button id="exportBtn" class="primaryBtn hidden" onclick="exportCSV()">Export CSV</button>
         <button class="darkBtn" onclick="logout()">Logout</button>
       </div>
@@ -1139,7 +1139,7 @@
       </div>
 
       <div class="headerBtns">
-        <button class="darkBtn" onclick="showChoiceView()">Dashboard</button>
+        <button class="darkBtn adminOnly" onclick="showChoiceView()">Dashboard</button>
         <button class="primaryBtn" onclick="showOwnersView()">Owner Database</button>
         <button class="primaryBtn" onclick="openLeadModal()">+ Add Lead</button>
         <button class="primaryBtn" onclick="exportLeadsCSV()">Export Leads</button>
@@ -1325,6 +1325,9 @@
     const TABLE_NAME = "owners";
     const LEADS_TABLE = "leads";
     const PAGE_SIZE = 50;
+    const ADMIN_EMAIL = "thechussar@gmail.com";
+    let currentUserEmail = "";
+    let isAdmin = false;
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentPage = 0;
@@ -1390,16 +1393,27 @@
       }
 
       const email = data.session.user.email;
+      currentUserEmail = email;
+      isAdmin = email === ADMIN_EMAIL;
+      window.isAdmin = isAdmin;
+
       const { data: access } = await db.from("user_access").select("*").eq("email", email).single();
 
-      currentAccess = access;
+      currentAccess = access || {};
+      applyRoleUI();
 
-      if (currentAccess?.can_export) {
+      if (isAdmin || currentAccess?.can_export) {
         el("exportBtn").classList.remove("hidden");
+      } else {
+        el("exportBtn").classList.add("hidden");
       }
 
-      showChoiceView();
-      refreshHomeKpis();
+      if (isAdmin) {
+        showChoiceView();
+        refreshHomeKpis();
+      } else {
+        showOwnersView();
+      }
     }
 
     function showOnly(viewId) {
@@ -1407,12 +1421,29 @@
       el(viewId).classList.remove("hidden");
     }
 
+    function applyRoleUI() {
+      document.querySelectorAll(".adminOnly").forEach(node => {
+        node.style.display = isAdmin ? "" : "none";
+      });
+    }
+
+    function ownerRemarkValue(row) {
+      if (isAdmin) return get(row, ["admin_remarks", "remarks"]);
+      return get(row, ["agent_remarks"]);
+    }
+
     function showChoiceView() {
+      if (!isAdmin) {
+        showOwnersView();
+        return;
+      }
+      applyRoleUI();
       showOnly("choiceView");
       refreshHomeKpis();
     }
 
     async function showOwnersView() {
+      applyRoleUI();
       showOnly("appView");
       setupListeners();
       await loadDropdowns();
@@ -1421,6 +1452,11 @@
     }
 
     async function showLeadsView() {
+      if (!isAdmin) {
+        showOwnersView();
+        return;
+      }
+      applyRoleUI();
       showOnly("leadsView");
       setupLeadListeners();
       await loadLeadSources();
@@ -1509,9 +1545,15 @@
         const sale = await countRows(TABLE_NAME, "status", "For Sale");
         const rent = await countRows(TABLE_NAME, "status", "For Rent");
         const call = await countRows(TABLE_NAME, "status", "Call Back");
-        const leads = await countRows(LEADS_TABLE);
-        const interested = await countRows(LEADS_TABLE, "status", "Interested");
-        const viewing = await countRows(LEADS_TABLE, "status", "Viewing");
+        let leads = 0;
+        let interested = 0;
+        let viewing = 0;
+
+        if (isAdmin) {
+          leads = await countRows(LEADS_TABLE);
+          interested = await countRows(LEADS_TABLE, "status", "Interested");
+          viewing = await countRows(LEADS_TABLE, "status", "Viewing");
+        }
 
         safeText("homeOwners", owners);
         safeText("homeSale", sale);
@@ -1640,10 +1682,13 @@ Usama Bin Nusrat.`;
     async function saveRemarks(id, textareaId, btnId) {
       const value = el(textareaId).value;
 
-      const { error } = await db.from(TABLE_NAME).update({
-        remarks: value,
+      const remarkColumn = isAdmin ? "admin_remarks" : "agent_remarks";
+      const updatePayload = {
+        [remarkColumn]: value,
         last_contacted: today()
-      }).eq("id", id);
+      };
+
+      const { error } = await db.from(TABLE_NAME).update(updatePayload).eq("id", id);
 
       if (error) {
         alert("Failed to update remarks");
@@ -1806,7 +1851,7 @@ Usama Bin Nusrat.`;
       if (col.key === "owner") return `${escapeHtml(clean(row.owner))}${profileButton(row)}${moreUnitButton(row)}`;
       if (col.key === "whatsapp") return whatsappButton(row);
       if (col.key === "status") return statusDropdown(row);
-      if (col.key === "remarks") return remarksEditor(row, get(row, ["remarks"]), "desk");
+      if (col.key === "remarks") return remarksEditor(row, ownerRemarkValue(row), "desk");
       if (col.key === "last_contacted") return `<span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span>`;
       if (col.key === "actions") return `<div style="display:flex;gap:7px;">${callButton(row)}${copyPhoneButton(row)}</div>`;
       return "-";
@@ -1828,7 +1873,7 @@ Usama Bin Nusrat.`;
       ).join("");
 
       el("mobileCards").innerHTML = rows.map(row => {
-        const remarks = get(row, ["remarks"]);
+        const remarks = ownerRemarkValue(row);
 
         return `<div class="ownerCard">
           <div class="ownerTop">
@@ -1867,7 +1912,7 @@ Usama Bin Nusrat.`;
 
       const phone1 = get(row, ["phone1"]);
       const phone2 = get(row, ["phone2"]);
-      const remarks = get(row, ["remarks"]);
+      const remarks = ownerRemarkValue(row);
 
       el("profileContent").innerHTML = `
         <div class="profileHeader">
@@ -2032,7 +2077,7 @@ Usama Bin Nusrat.`;
 
       while (true) {
         const { data, error } = await db.from(TABLE_NAME)
-          .select("community,cluster,unit,owner,phone1,phone2,remarks,data_source,status,last_contacted")
+          .select("community,cluster,unit,owner,phone1,phone2,remarks,admin_remarks,agent_remarks,data_source,status,last_contacted")
           .range(from, from + batchSize - 1);
 
         if (error) {
@@ -2048,7 +2093,7 @@ Usama Bin Nusrat.`;
         from += batchSize;
       }
 
-      downloadCSV("owner_database_export", ["community","cluster","unit","owner","phone1","phone2","remarks","data_source","status","last_contacted"], allRows);
+      downloadCSV("owner_database_export", ["community","cluster","unit","owner","phone1","phone2","remarks","admin_remarks","agent_remarks","data_source","status","last_contacted"], allRows);
     }
 
     function setupListeners() {
@@ -2209,6 +2254,7 @@ Usama Bin Nusrat.`;
     }
 
     async function loadLeads() {
+      if (!isAdmin) return;
       showLeadLoading();
 
       const from = leadPage * PAGE_SIZE;
@@ -2501,6 +2547,7 @@ Usama Bin Nusrat.`;
     }
 
     function openLeadModal(row = null) {
+      if (!isAdmin) return;
       editingLeadId = row?.id || null;
       el("leadModalTitle").textContent = editingLeadId ? "Edit Lead" : "Add Lead";
 
@@ -2592,6 +2639,7 @@ Usama Bin Nusrat.`;
     }
 
     async function exportLeadsCSV() {
+      if (!isAdmin) return;
       let allRows = [];
       let from = 0;
       const batchSize = 1000;
