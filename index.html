@@ -5,7 +5,10 @@ import "./App.css";
 const SUPABASE_URL = "YOUR_SUPABASE_URL";
 const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
 const DEFAULT_MESSAGE = `Hope you're doing well.
 
@@ -15,70 +18,65 @@ Would you consider selling if you receive a strong offer?`;
 
 export default function App() {
   const [session, setSession] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] =
+    useState(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [owners, setOwners] = useState([]);
-  const [leads, setLeads] = useState([]);
-
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("owners");
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [communityFilter, setCommunityFilter] = useState("All");
-  const [clusterFilter, setClusterFilter] = useState("All");
 
-  const [editingRemark, setEditingRemark] = useState(null);
-  const [remarkText, setRemarkText] = useState("");
+  const [showWhatsappEditor, setShowWhatsappEditor] =
+    useState(false);
 
-  const [showWhatsappEditor, setShowWhatsappEditor] = useState(false);
-  const [whatsappAgentName, setWhatsappAgentName] = useState("");
-  const [whatsappCompany, setWhatsappCompany] = useState("");
-  const [whatsappMessage, setWhatsappMessage] = useState(DEFAULT_MESSAGE);
+  const [whatsappAgentName, setWhatsappAgentName] =
+    useState("");
 
-  const isAdmin = userProfile?.role === "admin";
-  const isAgent = userProfile?.role === "agent";
+  const [whatsappCompany, setWhatsappCompany] =
+    useState("");
+
+  const [whatsappMessage, setWhatsappMessage] =
+    useState(DEFAULT_MESSAGE);
 
   useEffect(() => {
-    init();
+    checkSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        setSession(newSession);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
 
-        if (newSession?.user?.id) {
-          await loadProfile(newSession.user.id);
+        if (session?.user?.id) {
+          await loadUser(session.user.id);
         } else {
           setUserProfile(null);
           setOwners([]);
-          setLeads([]);
         }
       }
     );
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  async function init() {
-    setLoading(true);
+  async function checkSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    const { data } = await supabase.auth.getSession();
+    setSession(session);
 
-    setSession(data.session);
-
-    if (data.session?.user?.id) {
-      await loadProfile(data.session.user.id);
+    if (session?.user?.id) {
+      await loadUser(session.user.id);
     }
 
     setLoading(false);
   }
 
-  async function loadProfile(userId) {
+  async function loadUser(userId) {
     const { data, error } = await supabase
       .from("user_access")
       .select("*")
@@ -87,73 +85,48 @@ export default function App() {
 
     if (error) {
       console.error(error);
-      alert("Profile not found. Please add this user in profiles table.");
       return;
     }
 
     setUserProfile(data);
 
-    setWhatsappAgentName(data.whatsapp_agent_name || data.full_name || "");
-    setWhatsappCompany(data.whatsapp_company || "");
-    setWhatsappMessage(data.whatsapp_message || DEFAULT_MESSAGE);
+    setWhatsappAgentName(
+      data.whatsapp_agent_name || ""
+    );
 
-    setActiveTab("owners");
+    setWhatsappCompany(
+      data.whatsapp_company || ""
+    );
 
-    await loadOwners(data);
+    setWhatsappMessage(
+      data.whatsapp_message || DEFAULT_MESSAGE
+    );
 
-    if (data.role === "admin") {
-      await loadLeads();
-    }
+    await loadOwners();
   }
 
-  async function loadOwners(profile = userProfile) {
-    let query = supabase
+  async function loadOwners() {
+    const { data, error } = await supabase
       .from("owners")
       .select("*")
       .order("id", { ascending: false });
 
-    if (profile?.role === "agent") {
-      if (profile.allowed_communities?.length) {
-        query = query.in("community", profile.allowed_communities);
-      }
-
-      if (profile.allowed_clusters?.length) {
-        query = query.in("cluster", profile.allowed_clusters);
-      }
-    }
-
-    const { data, error } = await query;
-
     if (error) {
       console.error(error);
-      alert("Error loading owners.");
       return;
     }
 
     setOwners(data || []);
   }
 
-  async function loadLeads() {
-    const { data, error } = await supabase
-      .from("leads")
-      .select("*")
-      .order("id", { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setLeads(data || []);
-  }
-
   async function login(e) {
     e.preventDefault();
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (error) {
       alert(error.message);
@@ -168,151 +141,108 @@ export default function App() {
     const { error } = await supabase
       .from("user_access")
       .update({
-        whatsapp_agent_name: whatsappAgentName,
+        whatsapp_agent_name:
+          whatsappAgentName,
         whatsapp_company: whatsappCompany,
         whatsapp_message: whatsappMessage,
       })
       .eq("id", session.user.id);
 
     if (error) {
-      console.error(error);
-      alert("Could not save WhatsApp settings.");
+      alert("Error saving settings");
       return;
     }
 
+    alert("Saved");
     setShowWhatsappEditor(false);
-    alert("WhatsApp settings saved.");
   }
 
   function cleanPhone(phone) {
-    return String(phone || "").replace(/[^\d]/g, "");
+    return String(phone || "").replace(
+      /[^\d]/g,
+      ""
+    );
   }
 
   function buildWhatsappMessage(owner) {
-    const ownerName = owner.owner_name || owner.owner || "";
-    const community = owner.community || "";
-    const cluster = owner.cluster || owner.tower || "";
-    const unit = owner.unit || owner.unit_number || "";
-    const agentName = whatsappAgentName || userProfile?.full_name || "";
-
-    return `Hello Mr. ${ownerName},
+    return `Hello Mr. ${
+      owner.owner_name || ""
+    },
 
 ${whatsappMessage}
 
-Regarding your property in ${cluster}, Unit #${unit}, ${community}.
+Regarding your property in ${
+      owner.cluster || ""
+    }, Unit #${owner.unit || ""}, ${
+      owner.community || ""
+    }.
 
 Regards,
-${agentName}${whatsappCompany ? `\n${whatsappCompany}` : ""}`;
+${whatsappAgentName}
+${
+  whatsappCompany
+    ? whatsappCompany
+    : ""
+}`;
   }
 
   function openWhatsapp(owner) {
-    const phone = cleanPhone(owner.whatsapp || owner.phone || owner.mobile);
-
-    if (!phone) {
-      alert("No WhatsApp number found.");
-      return;
-    }
-
-    const message = encodeURIComponent(buildWhatsappMessage(owner));
-
-    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
-  }
-
-  async function saveRemark() {
-    if (!editingRemark) return;
-
-    const column = isAdmin ? "manager_remarks" : "agent_remarks";
-
-    const { error } = await supabase
-      .from("owners")
-      .update({ [column]: remarkText })
-      .eq("id", editingRemark.id);
-
-    if (error) {
-      console.error(error);
-      alert("Could not save remark.");
-      return;
-    }
-
-    setOwners((prev) =>
-      prev.map((owner) =>
-        owner.id === editingRemark.id
-          ? { ...owner, [column]: remarkText }
-          : owner
-      )
+    const phone = cleanPhone(
+      owner.whatsapp || owner.phone
     );
 
-    setEditingRemark(null);
-    setRemarkText("");
+    if (!phone) {
+      alert("No number");
+      return;
+    }
+
+    const message = encodeURIComponent(
+      buildWhatsappMessage(owner)
+    );
+
+    window.open(
+      `https://wa.me/${phone}?text=${message}`,
+      "_blank"
+    );
   }
 
   const filteredOwners = useMemo(() => {
     return owners.filter((owner) => {
-      const searchableText = `
+      const text = `
         ${owner.owner_name || ""}
-        ${owner.owner || ""}
         ${owner.community || ""}
         ${owner.cluster || ""}
-        ${owner.tower || ""}
         ${owner.unit || ""}
-        ${owner.whatsapp || ""}
-        ${owner.phone || ""}
-        ${owner.status || ""}
       `.toLowerCase();
 
-      const matchesSearch = searchableText.includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "All" || owner.status === statusFilter;
-      const matchesCommunity =
-        communityFilter === "All" || owner.community === communityFilter;
-      const matchesCluster =
-        clusterFilter === "All" ||
-        owner.cluster === clusterFilter ||
-        owner.tower === clusterFilter;
-
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesCommunity &&
-        matchesCluster
+      return text.includes(
+        search.toLowerCase()
       );
     });
-  }, [owners, search, statusFilter, communityFilter, clusterFilter]);
-
-  const communities = [
-    "All",
-    ...new Set(owners.map((owner) => owner.community).filter(Boolean)),
-  ];
-
-  const clusters = [
-    "All",
-    ...new Set(
-      owners
-        .map((owner) => owner.cluster || owner.tower)
-        .filter(Boolean)
-    ),
-  ];
-
-  const statuses = [
-    "All",
-    ...new Set(owners.map((owner) => owner.status).filter(Boolean)),
-  ];
+  }, [owners, search]);
 
   if (loading) {
-    return <div className="center">Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!session) {
     return (
       <div className="login-page">
-        <form className="login-box" onSubmit={login}>
-          <h1>Usama Bin Nusrat Database</h1>
+        <form
+          className="login-box"
+          onSubmit={login}
+        >
+          <h1>
+            Usama Bin Nusrat Database
+          </h1>
 
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             required
           />
 
@@ -320,11 +250,15 @@ ${agentName}${whatsappCompany ? `\n${whatsappCompany}` : ""}`;
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
             required
           />
 
-          <button type="submit">Login</button>
+          <button type="submit">
+            Login
+          </button>
         </form>
       </div>
     );
@@ -332,305 +266,147 @@ ${agentName}${whatsappCompany ? `\n${whatsappCompany}` : ""}`;
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div>
-          <h1>Usama Bin Nusrat Database</h1>
-          <p>{isAdmin ? "Admin Access" : "Agent Access"}</p>
-        </div>
+      <div className="topbar">
+        <h1>
+          Usama Bin Nusrat Database
+        </h1>
 
         <div className="top-actions">
-          <button onClick={() => setShowWhatsappEditor(true)}>
+          <button
+            onClick={() =>
+              setShowWhatsappEditor(true)
+            }
+          >
             Edit WhatsApp
           </button>
 
-          <button className="danger" onClick={logout}>
+          <button onClick={logout}>
             Logout
           </button>
         </div>
-      </header>
+      </div>
 
-      {isAdmin && (
-        <div className="tabs">
-          <button
-            className={activeTab === "owners" ? "active" : ""}
-            onClick={() => setActiveTab("owners")}
-          >
-            Owners
-          </button>
+      <div className="filters">
+        <input
+          placeholder="Search..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+        />
+      </div>
 
-          <button
-            className={activeTab === "leads" ? "active" : ""}
-            onClick={() => setActiveTab("leads")}
-          >
-            Leads
-          </button>
-        </div>
-      )}
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Community</th>
+              <th>Cluster</th>
+              <th>Unit</th>
+              <th>Owner</th>
+              <th>WhatsApp</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-      {activeTab === "owners" && (
-        <>
-          <div className="filters">
-            <input
-              placeholder="Search owner, unit, phone..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <tbody>
+            {filteredOwners.map((owner) => (
+              <tr key={owner.id}>
+                <td>{owner.community}</td>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+                <td>
+                  {owner.cluster}
+                </td>
 
-            <select
-              value={communityFilter}
-              onChange={(e) => setCommunityFilter(e.target.value)}
-            >
-              {communities.map((community) => (
-                <option key={community} value={community}>
-                  {community}
-                </option>
-              ))}
-            </select>
+                <td>{owner.unit}</td>
 
-            <select
-              value={clusterFilter}
-              onChange={(e) => setClusterFilter(e.target.value)}
-            >
-              {clusters.map((cluster) => (
-                <option key={cluster} value={cluster}>
-                  {cluster}
-                </option>
-              ))}
-            </select>
-          </div>
+                <td>
+                  {owner.owner_name}
+                </td>
 
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Community</th>
-                  <th>Cluster/Tower</th>
-                  <th>Unit</th>
-                  <th>Owner</th>
-                  <th>WhatsApp</th>
-                  <th>Status</th>
-                  <th>Agent Remarks</th>
-                  {isAdmin && <th>Manager Remarks</th>}
-                  <th>Action</th>
-                </tr>
-              </thead>
+                <td>
+                  {owner.whatsapp}
+                </td>
 
-              <tbody>
-                {filteredOwners.map((owner) => (
-                  <tr key={owner.id}>
-                    <td>{owner.community}</td>
-                    <td>{owner.cluster || owner.tower}</td>
-                    <td>{owner.unit || owner.unit_number}</td>
-                    <td>{owner.owner_name || owner.owner}</td>
-
-                    <td>
-                      <button
-                        className="link-btn"
-                        onClick={() => openWhatsapp(owner)}
-                      >
-                        {owner.whatsapp || owner.phone || owner.mobile}
-                      </button>
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status ${String(owner.status || "")
-                          .toLowerCase()
-                          .replaceAll(" ", "-")}`}
-                      >
-                        {owner.status}
-                      </span>
-                    </td>
-
-                    <td>
-                      <button
-                        className="small"
-                        onClick={() => {
-                          setEditingRemark(owner);
-                          setRemarkText(owner.agent_remarks || "");
-                        }}
-                      >
-                        {owner.agent_remarks ? "Edit" : "Add"}
-                      </button>
-                    </td>
-
-                    {isAdmin && (
-                      <td>
-                        <button
-                          className="small"
-                          onClick={() => {
-                            setEditingRemark(owner);
-                            setRemarkText(owner.manager_remarks || "");
-                          }}
-                        >
-                          {owner.manager_remarks ? "Edit" : "Add"}
-                        </button>
-                      </td>
-                    )}
-
-                    <td>
-                      <button onClick={() => openWhatsapp(owner)}>
-                        WhatsApp
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-
-                {!filteredOwners.length && (
-                  <tr>
-                    <td colSpan={isAdmin ? 9 : 8} className="empty">
-                      No owners found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {isAdmin && activeTab === "leads" && (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Project</th>
-                <th>Budget</th>
-                <th>Status</th>
-                <th>Notes</th>
+                <td>
+                  <button
+                    onClick={() =>
+                      openWhatsapp(owner)
+                    }
+                  >
+                    WhatsApp
+                  </button>
+                </td>
               </tr>
-            </thead>
-
-            <tbody>
-              {leads.map((lead) => (
-                <tr key={lead.id}>
-                  <td>{lead.lead_receive_date}</td>
-                  <td>{lead.name}</td>
-                  <td>{lead.phone}</td>
-                  <td>{lead.project_inquired}</td>
-                  <td>{lead.budget}</td>
-                  <td>{lead.status}</td>
-                  <td>{lead.notes}</td>
-                </tr>
-              ))}
-
-              {!leads.length && (
-                <tr>
-                  <td colSpan="7" className="empty">
-                    No leads found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {editingRemark && (
-        <div className="modal-bg">
-          <div className="modal">
-            <h2>Edit Remark</h2>
-
-            <textarea
-              value={remarkText}
-              onChange={(e) => setRemarkText(e.target.value)}
-              rows={8}
-            />
-
-            <div className="modal-actions">
-              <button onClick={saveRemark}>Save</button>
-
-              <button
-                className="danger"
-                onClick={() => {
-                  setEditingRemark(null);
-                  setRemarkText("");
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {showWhatsappEditor && (
         <div className="modal-bg">
-          <div className="modal large">
-            <h2>Edit WhatsApp Message</h2>
+          <div className="modal">
+            <h2>
+              Edit WhatsApp Message
+            </h2>
 
-            <label>Agent Name</label>
+            <label>
+              Agent Name
+            </label>
+
             <input
               type="text"
               value={whatsappAgentName}
-              onChange={(e) => setWhatsappAgentName(e.target.value)}
-              placeholder="Usama Bin Nusrat"
+              onChange={(e) =>
+                setWhatsappAgentName(
+                  e.target.value
+                )
+              }
             />
 
-            <label>Company Optional</label>
+            <label>
+              Company Optional
+            </label>
+
             <input
               type="text"
               value={whatsappCompany}
-              onChange={(e) => setWhatsappCompany(e.target.value)}
-              placeholder="BFG Properties"
+              onChange={(e) =>
+                setWhatsappCompany(
+                  e.target.value
+                )
+              }
             />
 
-            <label>Message</label>
+            <label>
+              Message
+            </label>
+
             <textarea
-              rows={10}
+              rows={8}
               value={whatsappMessage}
-              onChange={(e) => setWhatsappMessage(e.target.value)}
-              placeholder="Write your WhatsApp message here..."
+              onChange={(e) =>
+                setWhatsappMessage(
+                  e.target.value
+                )
+              }
             />
-
-            <div className="preview-box">
-              <strong>Preview:</strong>
-              <p>
-                Hello Mr. Owner Name,
-                <br />
-                <br />
-                {whatsappMessage}
-                <br />
-                <br />
-                Regarding your property in Cluster, Unit #101, Community.
-                <br />
-                <br />
-                Regards,
-                <br />
-                {whatsappAgentName || "Agent Name"}
-                {whatsappCompany && (
-                  <>
-                    <br />
-                    {whatsappCompany}
-                  </>
-                )}
-              </p>
-            </div>
 
             <div className="modal-actions">
-              <button onClick={saveWhatsappSettings}>Save</button>
-
-              <button onClick={() => setWhatsappMessage(DEFAULT_MESSAGE)}>
-                Reset Message
+              <button
+                onClick={
+                  saveWhatsappSettings
+                }
+              >
+                Save
               </button>
 
               <button
-                className="danger"
-                onClick={() => setShowWhatsappEditor(false)}
+                onClick={() =>
+                  setShowWhatsappEditor(
+                    false
+                  )
+                }
               >
                 Cancel
               </button>
