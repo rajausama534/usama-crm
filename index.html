@@ -1,2867 +1,752 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usama Database</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    :root {
-      --bg:#05070c;
-      --panel:#030712;
-      --panel2:#050914;
-      --card:#020617;
-      --line:rgba(148,163,184,.14);
-      --line2:rgba(148,163,184,.08);
-      --text:#eef4ff;
-      --muted:#94a3b8;
-      --blue:#2563eb;
-      --green:#10b981;
-      --red:#ef4444;
-      --yellow:#f59e0b;
-      --purple:#8b5cf6;
-      --cyan:#06b6d4;
-    }
-
-    body {
-      margin:0;
-      min-height:100vh;
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 35%),
-        radial-gradient(circle at top right, rgba(16,185,129,.12), transparent 30%),
-        radial-gradient(circle at bottom, rgba(139,92,246,.08), transparent 32%),
-        var(--bg);
-      color:var(--text);
-      font-family:Poppins, sans-serif;
-      padding:22px;
-    }
-
-    .hidden { display:none !important; }
-    .wrap { max-width:1780px; margin:auto; }
-
-    h1 {
-      margin:0;
-      font-size:30px;
-      font-weight:700;
-      letter-spacing:-.5px;
-    }
-
-    h2 { margin:0 0 12px; }
-
-    .sub {
-      color:#9ca8bd;
-      margin:8px 0 18px;
-      font-size:14px;
-      line-height:1.45;
-    }
-
-    .mainHeader {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:18px;
-      margin-bottom:18px;
-    }
-
-    .headerBtns {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .loginBox,
-    .card,
-    .choiceBox {
-      background:rgba(3,7,18,.88);
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:0 20px 70px rgba(0,0,0,.30);
-      backdrop-filter:blur(14px);
-    }
-
-    .loginBox {
-      max-width:430px;
-      margin:80px auto;
-      padding:24px;
-    }
-
-    .choiceBox {
-      max-width:980px;
-      margin:70px auto;
-      padding:28px;
-    }
-
-    .choiceGrid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:18px;
-    }
-
-    .choiceCard {
-      background:linear-gradient(180deg, #020617, #050914);
-      border:1px solid rgba(148,163,184,.16);
-      border-radius:20px;
-      padding:24px;
-      cursor:pointer;
-      transition:.18s ease;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .choiceCard::before {
-      content:"";
-      position:absolute;
-      inset:auto -40px -50px auto;
-      width:140px;
-      height:140px;
-      background:rgba(37,99,235,.16);
-      filter:blur(30px);
-    }
-
-    .choiceCard:hover {
-      border-color:rgba(37,99,235,.75);
-      transform:translateY(-3px);
-    }
-
-    .choiceCard h2 { font-size:22px; }
-    .choiceCard p { color:#94a3b8; margin:8px 0 16px; }
-
-    input, select, button, textarea {
-      font-family:Poppins, sans-serif;
-      outline:none;
-    }
-
-    input, select, textarea {
-      width:100%;
-      border:1px solid rgba(148,163,184,.16);
-      background:#020617;
-      color:#eef4ff;
-      border-radius:13px;
-      padding:11px 12px;
-      font-size:13px;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color:#6f7f99;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color:rgba(59,130,246,.65);
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
-    }
-
-    select option {
-      background:#111827;
-      color:#f8fafc;
-    }
-
-    button {
-      cursor:pointer;
-      border:none;
-      color:#fff;
-      font-weight:700;
-      border-radius:12px;
-      transition:.15s ease;
-    }
-
-    button:hover {
-      transform:translateY(-1px);
-    }
-
-    button:disabled {
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
-    }
-
-    .primaryBtn {
-      background:linear-gradient(135deg,#2563eb,#059669);
-      padding:10px 15px;
-    }
-
-    .darkBtn {
-      background:#070b14;
-      border:1px solid rgba(148,163,184,.20);
-      padding:10px 14px;
-    }
-
-    .dangerBtn {
-      background:#7f1d1d;
-      border:1px solid rgba(248,113,113,.35);
-      padding:10px 15px;
-    }
-
-    .loginBox input { margin-bottom:12px; }
-    .loginError { color:#f87171; margin-top:12px; font-size:13px; }
-    .card { padding:22px; }
-
-    .dashboardCards {
-      display:grid;
-      grid-template-columns:repeat(6, 1fr);
-      gap:12px;
-      margin-bottom:16px;
-    }
-
-    .kpiCard {
-      background:linear-gradient(180deg, rgba(15,23,42,.92), rgba(2,6,23,.92));
-      border:1px solid rgba(148,163,184,.14);
-      border-radius:18px;
-      padding:15px;
-      min-height:92px;
-    }
-
-    .kpiLabel {
-      color:#94a3b8;
-      font-size:12px;
-      margin-bottom:8px;
-    }
-
-    .kpiValue {
-      font-size:25px;
-      font-weight:700;
-      letter-spacing:-.4px;
-    }
-
-    .kpiHint {
-      margin-top:5px;
-      font-size:11px;
-      color:#64748b;
-    }
-
-    .filters {
-      display:grid;
-      grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    .leadFilters {
-      grid-template-columns:1.4fr .9fr .9fr .9fr .9fr;
-    }
-
-    .actionsRow {
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
-      margin:6px 0 18px;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .reset {
-      width:auto;
-      min-width:145px;
-      height:40px;
-      padding:0 18px;
-      font-size:13px;
-      background:linear-gradient(135deg,#2563eb,#059669);
-    }
-
-    .quickFilters {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin:0 0 14px;
-    }
-
-    .quickFilters button {
-      background:#07111f;
-      border:1px solid rgba(148,163,184,.18);
-      color:#cbd5e1;
-      padding:8px 11px;
-      font-size:12px;
-      border-radius:999px;
-    }
-
-    .quickFilters button:hover {
-      border-color:rgba(59,130,246,.55);
-      color:#fff;
-    }
-
-    .topInfo {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin:10px 0 12px;
-      color:#a8b3c7;
-      font-size:13px;
-      gap:12px;
-    }
-
-    .loadingBadge,
-    .saveToast {
-      display:none;
-      background:rgba(37,99,235,.15);
-      border:1px solid rgba(37,99,235,.35);
-      color:#bfdbfe;
-      padding:7px 11px;
-      border-radius:999px;
-      font-size:12px;
-      margin-left:8px;
-    }
-
-    .loadingBadge.show,
-    .saveToast.show {
-      display:inline-block;
-    }
-
-    .tablebox {
-      overflow:auto;
-      border-radius:18px;
-      border:1px solid rgba(148,163,184,.12);
-      min-height:430px;
-      max-height:70vh;
-      background:#020617;
-      scrollbar-color:#12315a #020617;
-      scrollbar-width:thin;
-    }
-
-    .tablebox::-webkit-scrollbar {
-      height:9px;
-      width:9px;
-    }
-
-    .tablebox::-webkit-scrollbar-track { background:#020617; }
-    .tablebox::-webkit-scrollbar-thumb {
-      background:#173253;
-      border-radius:99px;
-    }
-
-    table {
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      table-layout:fixed;
-      min-width:1100px;
-    }
-
-    .leadsTable { min-width:1120px; }
-
-    th {
-      position:sticky;
-      top:0;
-      background:#08111f;
-      color:#f8fafc;
-      text-align:left;
-      font-size:13px;
-      padding:12px 12px;
-      z-index:2;
-      white-space:nowrap;
-      border-bottom:1px solid rgba(148,163,184,.13);
-      font-weight:700;
-    }
-
-    td {
-      padding:10px 12px;
-      border-top:1px solid rgba(148,163,184,.055);
-      font-size:13px;
-      color:#dbe4f0;
-      white-space:nowrap;
-      vertical-align:middle;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    tr:hover td {
-      background:rgba(37,99,235,.055);
-    }
-
-    .resizable-th { position:sticky; }
-
-    .resize-handle {
-      position:absolute;
-      right:0;
-      top:0;
-      width:7px;
-      height:100%;
-      cursor:col-resize;
-      user-select:none;
-      touch-action:none;
-    }
-
-    .resize-handle:hover {
-      background:rgba(59,130,246,.35);
-    }
-
-    .cellBox,
-    .leadCellInput,
-    .miniInput {
-      width:100%;
-      min-width:0 !important;
-      height:38px;
-      padding:8px 10px;
-      border-radius:11px;
-      font-size:13px;
-      background:#030712 !important;
-      border:1px solid rgba(148,163,184,.09) !important;
-      color:#e5edf8 !important;
-    }
-
-    .leadCellInput:disabled {
-      opacity:1 !important;
-      cursor:default;
-      -webkit-text-fill-color:#dbe4f0;
-    }
-
-    .waBtn,
-    .callBtn,
-    .copyBtn {
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      max-width:100%;
-      height:38px;
-      padding:0 12px;
-      border-radius:11px;
-      color:#fff;
-      text-decoration:none;
-      font-weight:700;
-      font-size:12px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    .waBtn { background:#059669; }
-    .callBtn { background:#2563eb; }
-    .copyBtn { background:#111827; }
-
-    .statusSelect,
-    .leadDropdown {
-      width:100%;
-      min-width:0 !important;
-      height:38px;
-      padding:8px 11px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      border:1px solid rgba(148,163,184,.16);
-      background:#050814;
-      color:#e5e7eb;
-    }
-
-    .status-New { background:rgba(59,130,246,.11)!important; border-color:rgba(59,130,246,.35)!important; color:#bfdbfe!important; }
-    .status-Contacted { background:rgba(16,185,129,.11)!important; border-color:rgba(16,185,129,.38)!important; color:#a7f3d0!important; }
-    .status-CallBack { background:rgba(245,158,11,.12)!important; border-color:rgba(245,158,11,.38)!important; color:#fde68a!important; }
-    .status-Interested { background:rgba(139,92,246,.12)!important; border-color:rgba(139,92,246,.40)!important; color:#ddd6fe!important; }
-    .status-Viewing { background:rgba(6,182,212,.12)!important; border-color:rgba(6,182,212,.38)!important; color:#a5f3fc!important; }
-    .status-Negotiation { background:rgba(234,179,8,.12)!important; border-color:rgba(234,179,8,.38)!important; color:#fef3c7!important; }
-    .status-Lost { background:rgba(239,68,68,.11)!important; border-color:rgba(239,68,68,.38)!important; color:#fecaca!important; }
-
-    .status-ForSale { background:rgba(16,185,129,.11)!important; border-color:rgba(16,185,129,.38)!important; color:#a7f3d0!important; }
-    .status-ForRent { background:rgba(59,130,246,.11)!important; border-color:rgba(59,130,246,.35)!important; color:#bfdbfe!important; }
-    .status-Sold { background:rgba(239,68,68,.11)!important; border-color:rgba(239,68,68,.38)!important; color:#fecaca!important; }
-    .status-NoResponse { background:rgba(100,116,139,.13)!important; border-color:rgba(148,163,184,.32)!important; color:#e2e8f0!important; }
-    .status-NotInterested { background:rgba(244,63,94,.12)!important; border-color:rgba(244,63,94,.38)!important; color:#fecdd3!important; }
-    .status-InvalidNumber { background:rgba(75,85,99,.14)!important; border-color:rgba(107,114,128,.35)!important; color:#cbd5e1!important; }
-        .remarkBox {
-      display:flex;
-      gap:7px;
-      align-items:center;
-      width:100%;
-    }
-
-    .remarksInput,
-    .leadNotesBox {
-      width:100%;
-      min-width:0 !important;
-      height:38px;
-      padding:8px 10px;
-      border-radius:11px;
-      font-size:13px;
-      line-height:1.35;
-      resize:none;
-      overflow:hidden;
-      white-space:nowrap;
-      background:#030712 !important;
-      border:1px solid rgba(148,163,184,.09) !important;
-      color:#f1f5f9 !important;
-      transition:.15s ease;
-    }
-
-    .remarksInput:focus,
-    .leadNotesBox:focus {
-      height:86px;
-      white-space:normal;
-      overflow-y:auto;
-      position:relative;
-      z-index:8;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
-    }
-
-    .saveRemarkBtn {
-      display:none;
-      background:#059669;
-      padding:8px 10px;
-      font-size:11px;
-      white-space:nowrap;
-      border-radius:10px;
-    }
-
-    .saveRemarkBtn.show {
-      display:inline-block;
-    }
-
-    .iconBtn {
-      width:34px;
-      height:34px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:0;
-      border-radius:10px;
-      background:#07111f;
-      border:1px solid rgba(148,163,184,.16);
-      color:#bfdbfe;
-      font-size:14px;
-      line-height:1;
-    }
-
-    .iconBtn:hover {
-      border-color:rgba(59,130,246,.45);
-      background:#0b1730;
-    }
-
-    .iconBtn.dangerIcon {
-      color:#fecaca;
-      border-color:rgba(239,68,68,.28);
-      background:rgba(127,29,29,.20);
-    }
-
-    .iconBtn.dangerIcon:hover {
-      background:rgba(127,29,29,.34);
-    }
-
-    .saveRowBtn {
-      background:#059669;
-      padding:8px 11px;
-      font-size:12px;
-      border-radius:10px;
-    }
-
-    .saveRowBtn.hiddenAction {
-      display:none;
-    }
-
-    .leadActions {
-      display:flex;
-      gap:7px;
-      justify-content:flex-start;
-      align-items:center;
-      min-width:80px;
-    }
-
-    .actionsSticky {
-      position:sticky;
-      right:0;
-      background:#020617;
-      z-index:3;
-      box-shadow:-8px 0 14px rgba(0,0,0,.28);
-    }
-
-    th.actionsSticky { background:#08111f; }
-    tr:hover .actionsSticky { background:#06101f; }
-
-    .moreUnitBtn,
-    .profileBtn {
-      background:rgba(37,99,235,.13);
-      border:1px solid rgba(37,99,235,.30);
-      color:#bfdbfe;
-      padding:5px 8px;
-      border-radius:999px;
-      font-size:10px;
-      margin-left:8px;
-      vertical-align:middle;
-      white-space:nowrap;
-    }
-
-    .profileBtn {
-      background:rgba(16,185,129,.12);
-      border-color:rgba(16,185,129,.30);
-      color:#a7f3d0;
-    }
-
-    .mobileCards { display:none; }
-
-    .ownerCard,
-    .leadCard {
-      background:linear-gradient(180deg, #020617, #050914);
-      border:1px solid rgba(148,163,184,.16);
-      border-radius:18px;
-      padding:14px;
-      margin-bottom:12px;
-      box-shadow:0 10px 28px rgba(0,0,0,.20);
-    }
-
-    .ownerTop {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .ownerName {
-      font-weight:700;
-      font-size:16px;
-      line-height:1.3;
-    }
-
-    .unitBadge {
-      background:rgba(37,99,235,.18);
-      color:#bfdbfe;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .mobileLocation {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      background:rgba(15,23,42,.72);
-      border:1px solid rgba(148,163,184,.14);
-      border-radius:14px;
-      padding:11px;
-      margin-bottom:12px;
-    }
-
-    .locationText {
-      font-size:13px;
-      line-height:1.35;
-      color:#e5e7eb;
-    }
-
-    .locationText span,
-    .infoLine span {
-      display:block;
-      color:#94a3b8;
-      font-size:11px;
-      margin-bottom:3px;
-    }
-
-    .infoLine {
-      font-size:14px;
-      color:#e5e7eb;
-      margin:10px 0;
-      line-height:1.35;
-    }
-
-    .mobileActionGrid {
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:8px;
-      margin-top:12px;
-    }
-
-    .empty {
-      text-align:center;
-      color:#94a3b8;
-      padding:70px 20px;
-      font-size:15px;
-    }
-
-    .skeleton {
-      height:18px;
-      width:100%;
-      border-radius:8px;
-      background:linear-gradient(90deg,#111827,#1f2937,#111827);
-      background-size:200% 100%;
-      animation:shine 1.2s infinite;
-    }
-
-    @keyframes shine {
-      0% { background-position:200% 0; }
-      100% { background-position:-200% 0; }
-    }
-
-    .pager {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:14px;
-      margin-top:16px;
-      color:#e5e7eb;
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .pager button {
-      width:auto;
-      min-width:86px;
-      padding:9px 13px;
-      background:#070b14;
-      border:1px solid rgba(148,163,184,.20);
-    }
-
-    .modalOverlay {
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.68);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:100;
-      padding:18px;
-    }
-
-    .modalOverlay.show { display:flex; }
-
-    .modal {
-      background:#020617;
-      border:1px solid rgba(148,163,184,.22);
-      border-radius:20px;
-      padding:18px;
-      width:min(860px,100%);
-      max-height:86vh;
-      overflow:auto;
-      box-shadow:0 24px 90px rgba(0,0,0,.45);
-    }
-
-    .profileModal {
-      width:min(980px,100%);
-    }
-
-    .profileHeader {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:14px;
-      padding-bottom:14px;
-      border-bottom:1px solid rgba(148,163,184,.14);
-      margin-bottom:14px;
-    }
-
-    .profileTitle {
-      font-size:24px;
-      font-weight:700;
-      letter-spacing:-.3px;
-    }
-
-    .profileSub {
-      color:#94a3b8;
-      font-size:13px;
-      margin-top:5px;
-    }
-
-    .profileGrid {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    .profileBox {
-      background:#050914;
-      border:1px solid rgba(148,163,184,.14);
-      border-radius:16px;
-      padding:13px;
-    }
-
-    .profileBox label {
-      display:block;
-      color:#94a3b8;
-      font-size:11px;
-      margin-bottom:5px;
-    }
-
-    .profileBox div {
-      font-size:14px;
-      font-weight:600;
-      color:#e5e7eb;
-      word-break:break-word;
-    }
-
-    .timelineBox {
-      background:#050914;
-      border:1px solid rgba(148,163,184,.14);
-      border-radius:16px;
-      padding:14px;
-      margin-top:14px;
-    }
-
-    .timelineItem {
-      border-left:2px solid rgba(37,99,235,.45);
-      padding:0 0 12px 12px;
-      margin-left:5px;
-      color:#dbe4f0;
-      font-size:13px;
-    }
-
-    .timelineItem:last-child {
-      padding-bottom:0;
-    }
-
-    .timelineDate {
-      color:#94a3b8;
-      font-size:11px;
-      margin-bottom:3px;
-    }
-
-    .modalRow {
-      border-top:1px solid rgba(148,163,184,.12);
-      padding:12px 0;
-      font-size:14px;
-      color:#e5e7eb;
-    }
-
-    .modalActions {
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-
-    .formGrid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .formGrid label {
-      font-size:12px;
-      color:#94a3b8;
-      display:block;
-      margin-bottom:5px;
-    }
-
-    .formFull { grid-column:1 / -1; }
-
-    .columnList {
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-top:12px;
-    }
-
-    .columnItem {
-      display:grid;
-      grid-template-columns:28px 1fr auto auto;
-      align-items:center;
-      gap:10px;
-      background:#07111f;
-      border:1px solid rgba(148,163,184,.16);
-      border-radius:12px;
-      padding:10px;
-    }
-
-    .columnItem input { width:auto; }
-
-    .columnItem button {
-      padding:7px 9px;
-      font-size:11px;
-      background:#111827;
-      border:1px solid rgba(148,163,184,.22);
-    }
-
-    .deleteRowBtn {
-      background:#7f1d1d;
-      padding:9px 12px;
-      border:1px solid rgba(248,113,113,.30);
-    }
-
-    @media (max-width:1000px) {
-      .dashboardCards {
-        grid-template-columns:repeat(3,1fr);
-      }
-
-      .profileGrid {
-        grid-template-columns:1fr 1fr;
-      }
-    }
-
-    @media (max-width:800px) {
-      body {
-        padding:14px;
-        background:radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 45%), #07111f;
-      }
-
-      .mainHeader {
-        align-items:flex-start;
-        margin-bottom:16px;
-        flex-direction:column;
-      }
-
-      h1 { font-size:25px; }
-
-      .sub {
-        font-size:13px;
-        margin:8px 0 0;
-      }
-
-      .headerBtns {
-        width:100%;
-        display:grid;
-        grid-template-columns:1fr 1fr;
-      }
-
-      .headerBtns button {
-        width:100%;
-      }
-
-      .darkBtn,
-      .primaryBtn {
-        padding:10px 12px;
-        font-size:12px;
-      }
-
-      .card {
-        padding:14px;
-        border-radius:18px;
-      }
-
-      .dashboardCards {
-        grid-template-columns:1fr 1fr;
-      }
-
-      .filters,
-      .leadFilters,
-      .choiceGrid,
-      .formGrid,
-      .profileGrid {
-        grid-template-columns:1fr;
-      }
-
-      #searchInput,
-      .formFull {
-        grid-column:auto;
-      }
-
-      input,
-      select,
-      textarea {
-        padding:12px;
-        font-size:13px;
-        border-radius:13px;
-      }
-
-      .actionsRow {
-        justify-content:stretch;
-      }
-
-      .actionsRow button,
-      .reset {
-        width:100%;
-        min-width:unset;
-      }
-
-      .quickFilters {
-        overflow-x:auto;
-        flex-wrap:nowrap;
-        padding-bottom:4px;
-      }
-
-      .quickFilters button {
-        flex:0 0 auto;
-      }
-
-      .topInfo {
-        flex-direction:column;
-        align-items:flex-start;
-        font-size:13px;
-      }
-
-      .tablebox { display:none; }
-      .mobileCards { display:block; }
-
-      .loginBox,
-      .choiceBox {
-        margin:50px auto;
-        padding:18px;
-      }
-
-      .statusSelect { width:100%; }
-
-      .modal {
-        padding:15px;
-        border-radius:18px;
-      }
-
-      .profileHeader {
-        flex-direction:column;
-      }
-
-      .mobileActionGrid {
-        grid-template-columns:1fr;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Usama Bin Nusrat Database</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:#0b1120;
+  color:white;
+}
+
+.hidden{
+  display:none !important;
+}
+
+header{
+  padding:18px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(15,23,42,.95);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+header h1{
+  font-size:22px;
+  font-weight:600;
+}
+
+.container{
+  padding:20px;
+}
+
+button{
+  border:none;
+  outline:none;
+  cursor:pointer;
+  border-radius:10px;
+  padding:10px 16px;
+  font-weight:600;
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+.primary{
+  background:#2563eb;
+  color:white;
+}
+
+.green{
+  background:#16a34a;
+  color:white;
+}
+
+.red{
+  background:#dc2626;
+  color:white;
+}
+
+.gray{
+  background:#475569;
+  color:white;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#111827;
+  color:white;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#2563eb;
+}
+
+.login-box{
+  width:100%;
+  max-width:400px;
+  margin:100px auto;
+  background:rgba(17,24,39,.95);
+  border:1px solid rgba(255,255,255,.08);
+  padding:24px;
+  border-radius:20px;
+}
+
+.login-box h2{
+  margin-bottom:20px;
+}
+
+.filters{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.table-wrapper{
+  overflow:auto;
+  border-radius:18px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#111827;
+}
+
+th{
+  background:#1e293b;
+  padding:14px;
+  text-align:left;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+td{
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:13px;
+  white-space:nowrap;
+}
+
+tr:hover{
+  background:#182234;
+}
+
+.status{
+  padding:6px 10px;
+  border-radius:30px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.sale{
+  background:#15803d;
+}
+
+.rent{
+  background:#65a30d;
+  color:black;
+}
+
+.sold{
+  background:#dc2626;
+}
+
+.other{
+  background:#475569;
+}
+
+.action-buttons{
+  display:flex;
+  gap:8px;
+}
+
+.whatsapp-btn{
+  background:#16a34a;
+}
+
+.pagination{
+  margin-top:20px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  z-index:1000;
+}
+
+.modal-content{
+  width:100%;
+  max-width:600px;
+  background:#111827;
+  border-radius:20px;
+  padding:24px;
+}
+
+.modal-content h3{
+  margin-bottom:15px;
+}
+
+@media(max-width:768px){
+
+  .table-wrapper{
+    display:none;
+  }
+
+  .mobile-cards{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .card{
+    background:#111827;
+    border-radius:18px;
+    padding:16px;
+    border:1px solid rgba(255,255,255,.06);
+  }
+
+  .card h3{
+    margin-bottom:8px;
+  }
+
+  .desktop-only{
+    display:none;
+  }
+}
+
+@media(min-width:769px){
+  .mobile-cards{
+    display:none;
+  }
+}
+
+</style>
 </head>
 
 <body>
-  <div id="loginView" class="loginBox">
-    <h1>Usama Database</h1>
-    <div class="sub">Login to access your database.</div>
-    <input id="loginEmail" type="email" placeholder="Email" />
-    <input id="loginPassword" type="password" placeholder="Password" />
-    <button class="primaryBtn" onclick="login()">Login</button>
-    <div id="loginError" class="loginError"></div>
+
+<div id="loginPage">
+
+  <div class="login-box">
+
+    <h2>Login</h2>
+
+    <input type="email" id="email" placeholder="Email">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <button class="primary" style="width:100%;margin-top:10px;" onclick="login()">
+      Login
+    </button>
+
   </div>
 
-  <div id="choiceView" class="choiceBox hidden">
-    <h1>Usama Database</h1>
-    <div class="sub">Choose your workspace.</div>
+</div>
 
-    <div class="dashboardCards adminOnly" id="homeKpis">
-      <div class="kpiCard"><div class="kpiLabel">Owners</div><div class="kpiValue" id="homeOwners">-</div><div class="kpiHint">Database records</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Sale</div><div class="kpiValue" id="homeSale">-</div><div class="kpiHint">Seller opportunities</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Rent</div><div class="kpiValue" id="homeRent">-</div><div class="kpiHint">Rental opportunities</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Call Back</div><div class="kpiValue" id="homeCallBack">-</div><div class="kpiHint">Need action</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Leads</div><div class="kpiValue" id="homeLeads">-</div><div class="kpiHint">CRM records</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Hot Leads</div><div class="kpiValue" id="homeHotLeads">-</div><div class="kpiHint">Interested + viewing</div></div>
-    </div>
+<div id="appPage" class="hidden">
 
-    <div class="choiceGrid">
-      <div class="choiceCard" id="ownersChoiceCard" onclick="showOwnersView()">
-        <h2>Owner Database</h2>
-        <p>Search owners, units, status, remarks, quick actions and WhatsApp outreach.</p>
-        <button class="primaryBtn">Open Database</button>
-      </div>
+<header>
 
-      <div class="choiceCard adminOnly" id="leadsChoiceCard" onclick="showLeadsView()">
-        <h2>Leads CRM</h2>
-        <p>Manage leads, requirements, follow-ups, status, notes and WhatsApp outreach.</p>
-        <button class="primaryBtn">Open Leads</button>
-      </div>
-    </div>
+  <h1>Usama Bin Nusrat Database</h1>
 
-    <div class="modalActions">
-      <button class="darkBtn adminOnly" onclick="refreshHomeKpis()">Refresh Stats</button>
-      <button class="darkBtn" onclick="logout()">Logout</button>
-    </div>
+  <div style="display:flex;gap:10px;">
+
+    <button class="green" onclick="openAddModal()">
+      Add Owner
+    </button>
+
+    <button class="red" onclick="logout()">
+      Logout
+    </button>
+
   </div>
 
-  <div id="appView" class="wrap hidden">
-    <div class="mainHeader">
-      <div>
-        <h1>Owner Database</h1>
-        <div class="sub">Owner intelligence with filters, profile view, remarks, status and WhatsApp outreach.</div>
-      </div>
+</header>
 
-      <div class="headerBtns">
-        <button class="darkBtn adminOnly" onclick="showChoiceView()">Dashboard</button>
-        <button class="primaryBtn adminOnly" onclick="showLeadsView()">Leads CRM</button>
-        <button id="exportBtn" class="primaryBtn hidden" onclick="exportCSV()">Export CSV</button>
-        <button class="darkBtn" onclick="logout()">Logout</button>
-      </div>
-    </div>
+<div class="container">
 
-    <div class="dashboardCards">
-      <div class="kpiCard"><div class="kpiLabel">Total Records</div><div class="kpiValue" id="ownerKpiTotal">-</div><div class="kpiHint">All owners</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Sale</div><div class="kpiValue" id="ownerKpiSale">-</div><div class="kpiHint">Sales stock</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Rent</div><div class="kpiValue" id="ownerKpiRent">-</div><div class="kpiHint">Rental stock</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Call Back</div><div class="kpiValue" id="ownerKpiCall">-</div><div class="kpiHint">Follow-up needed</div></div>
-      <div class="kpiCard"><div class="kpiLabel">No Response</div><div class="kpiValue" id="ownerKpiNoResp">-</div><div class="kpiHint">Try later</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Invalid</div><div class="kpiValue" id="ownerKpiInvalid">-</div><div class="kpiHint">Bad numbers</div></div>
-    </div>
+<div class="filters">
 
-    <div class="card">
-      <div class="filters">
-        <input id="searchInput" placeholder="Search owner, phone or unit..." />
-        <select id="communityFilter"><option value="">All Communities</option></select>
-        <select id="clusterFilter"><option value="">All Clusters</option></select>
-        <input id="unitFilter" placeholder="Unit No." />
-        <select id="sourceFilter"><option value="">All Sources</option></select>
-        <select id="statusFilter">
-          <option value="">All Statuses</option>
-          <option>New</option>
-          <option>For Sale</option>
-          <option>For Rent</option>
-          <option>Sold</option>
-          <option>Call Back</option>
-          <option>No Response</option>
-          <option>Not Interested</option>
-          <option>Invalid Number</option>
-        </select>
-      </div>
+<input type="text" id="searchInput" placeholder="Search..." onkeyup="filterData()">
 
-      <div class="quickFilters">
-        <button onclick="quickStatus('New')">New</button>
-        <button onclick="quickStatus('For Sale')">For Sale</button>
-        <button onclick="quickStatus('For Rent')">For Rent</button>
-        <button onclick="quickStatus('Sold')">Sold</button>
-        <button onclick="quickStatus('Call Back')">Call Back</button>
-        <button onclick="quickStatus('No Response')">No Response</button>
-        <button onclick="quickStatus('Invalid Number')">Invalid</button>
-      </div>
+<select id="statusFilter" onchange="filterData()">
+<option value="">All Status</option>
+<option>For Sale</option>
+<option>For Rent</option>
+<option>Sold</option>
+<option>No Response</option>
+<option>Call Back</option>
+<option>Not Interested</option>
+</select>
 
-      <div class="actionsRow">
-        <button class="darkBtn" onclick="openWhatsappMessageModal()">Edit WhatsApp</button>
-        <button class="darkBtn" onclick="openOwnerColumnModal()">Manage Columns</button>
-        <button class="reset" onclick="resetFilters()">Reset Filters</button>
-      </div>
+<select id="communityFilter" onchange="filterData()">
+<option value="">All Communities</option>
+</select>
 
-      <div class="topInfo">
-        <div>
-          <span id="status">Preparing database...</span>
-          <span id="loadingBadge" class="loadingBadge">Loading data...</span>
-          <span id="saveToast" class="saveToast">Saved ✓</span>
+</div>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Community</th>
+<th>Cluster</th>
+<th>Unit</th>
+<th>Owner</th>
+<th>Phone</th>
+<th>Status</th>
+<th>Remarks</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+<div class="mobile-cards" id="mobileCards"></div>
+
+<div class="pagination">
+
+<button class="gray" onclick="prevPage()">Previous</button>
+
+<span id="pageInfo">1</span>
+
+<button class="gray" onclick="nextPage()">Next</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal hidden" id="ownerModal">
+
+<div class="modal-content">
+
+<h3 id="modalTitle">Add Owner</h3>
+
+<input type="hidden" id="ownerId">
+
+<input id="community" placeholder="Community">
+
+<input id="cluster" placeholder="Cluster">
+
+<input id="unit" placeholder="Unit">
+
+<input id="ownerName" placeholder="Owner Name">
+
+<input id="phone" placeholder="Phone">
+
+<select id="status">
+<option>For Sale</option>
+<option>For Rent</option>
+<option>Sold</option>
+<option>No Response</option>
+<option>Call Back</option>
+<option>Not Interested</option>
+</select>
+
+<textarea id="remarks" placeholder="Remarks"></textarea>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+
+<button class="primary" onclick="saveOwner()">
+Save
+</button>
+
+<button class="gray" onclick="closeModal()">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const supabaseUrl = 'https://vnydxkmhrcesdffpfjpc.supabase.co';
+
+const supabaseKey = 'sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I';
+
+const supabase = window.supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+);
+
+let allData = [];
+let filteredData = [];
+
+let currentPage = 1;
+const rowsPerPage = 100;
+
+async function login(){
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  initApp();
+}
+
+async function logout(){
+
+  await supabase.auth.signOut();
+  location.reload();
+}
+
+async function initApp(){
+
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appPage').classList.remove('hidden');
+
+  loadOwners();
+}
+
+async function loadOwners(){
+
+  const { data, error } = await supabase
+    .from('owners')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  if(error){
+    console.log(error);
+    return;
+  }
+
+  allData = data || [];
+  filteredData = [...allData];
+
+  populateCommunities();
+
+  renderData();
+}
+
+function populateCommunities(){
+
+  const filter = document.getElementById('communityFilter');
+
+  const unique = [...new Set(allData.map(i => i.community).filter(Boolean))];
+
+  unique.forEach(c => {
+
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.innerText = c;
+
+    filter.appendChild(opt);
+
+  });
+
+}
+
+function filterData(){
+
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  const status = document.getElementById('statusFilter').value;
+
+  const community = document.getElementById('communityFilter').value;
+
+  filteredData = allData.filter(item => {
+
+    const text = `
+      ${item.community || ''}
+      ${item.cluster || ''}
+      ${item.unit || ''}
+      ${item.owner_name || ''}
+      ${item.phone || ''}
+      ${item.remarks || ''}
+    `.toLowerCase();
+
+    const matchSearch = text.includes(search);
+
+    const matchStatus = !status || item.status === status;
+
+    const matchCommunity = !community || item.community === community;
+
+    return matchSearch && matchStatus && matchCommunity;
+
+  });
+
+  currentPage = 1;
+
+  renderData();
+}
+
+function renderData(){
+
+  const tbody = document.getElementById('tableBody');
+
+  const mobile = document.getElementById('mobileCards');
+
+  tbody.innerHTML = '';
+  mobile.innerHTML = '';
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+
+  const pageData = filteredData.slice(start,end);
+
+  pageData.forEach(item => {
+
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${item.community || ''}</td>
+      <td>${item.cluster || ''}</td>
+      <td>${item.unit || ''}</td>
+      <td>${item.owner_name || ''}</td>
+      <td>${item.phone || ''}</td>
+      <td>${statusBadge(item.status)}</td>
+      <td>${item.remarks || ''}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="primary" onclick='editOwner(${JSON.stringify(item)})'>Edit</button>
+          <button class="whatsapp-btn" onclick='sendWhatsApp(${JSON.stringify(item)})'>WA</button>
         </div>
-        <div>Showing 50 records per page</div>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+    const card = document.createElement('div');
+
+    card.className = 'card';
+
+    card.innerHTML = `
+      <h3>${item.owner_name || ''}</h3>
+      <p><b>Community:</b> ${item.community || ''}</p>
+      <p><b>Cluster:</b> ${item.cluster || ''}</p>
+      <p><b>Unit:</b> ${item.unit || ''}</p>
+      <p><b>Phone:</b> ${item.phone || ''}</p>
+      <p>${statusBadge(item.status)}</p>
+
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="primary" onclick='editOwner(${JSON.stringify(item)})'>Edit</button>
+        <button class="whatsapp-btn" onclick='sendWhatsApp(${JSON.stringify(item)})'>WA</button>
       </div>
+    `;
 
-      <div class="tablebox">
-        <table id="ownersTable">
-          <thead id="ownersTableHead"></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-
-      <div id="mobileCards" class="mobileCards"></div>
-
-      <div class="pager">
-        <button id="prevBtn" onclick="prevPage()">Previous</button>
-        <div id="pageInfo">1 / 1</div>
-        <button id="nextBtn" onclick="nextPage()">Next</button>
-      </div>
-    </div>
-  </div>
-    <div id="leadsView" class="wrap hidden">
-    <div class="mainHeader">
-      <div>
-        <h1>Leads CRM</h1>
-        <div class="sub">Manage lead details, follow-ups, notes and WhatsApp outreach.</div>
-      </div>
-
-      <div class="headerBtns">
-        <button class="darkBtn adminOnly" onclick="showChoiceView()">Dashboard</button>
-        <button class="primaryBtn" onclick="showOwnersView()">Owner Database</button>
-        <button class="primaryBtn" onclick="openLeadModal()">+ Add Lead</button>
-        <button class="primaryBtn" onclick="exportLeadsCSV()">Export Leads</button>
-        <button class="darkBtn" onclick="logout()">Logout</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="filters leadFilters">
-        <input id="leadSearchInput" placeholder="Search name, phone, email or project..." />
-        <select id="leadStatusFilter">
-          <option value="">All Statuses</option>
-          <option>New</option>
-          <option>Contacted</option>
-          <option>Call Back</option>
-          <option>Interested</option>
-          <option>Viewing</option>
-          <option>Negotiation</option>
-          <option>Lost</option>
-        </select>
-        <select id="leadSourceFilter"><option value="">All Sources</option></select>
-        <input id="leadProjectFilter" placeholder="Project" />
-        <input id="leadFollowUpFilter" type="date" />
-      </div>
-
-      <div class="quickFilters">
-        <button onclick="quickLeadStatus('New')">New</button>
-        <button onclick="quickLeadStatus('Contacted')">Contacted</button>
-        <button onclick="quickLeadStatus('Call Back')">Call Back</button>
-        <button onclick="quickLeadStatus('Interested')">Interested</button>
-        <button onclick="quickLeadStatus('Viewing')">Viewing</button>
-        <button onclick="quickLeadStatus('Negotiation')">Negotiation</button>
-        <button onclick="quickLeadStatus('Lost')">Lost</button>
-      </div>
-
-      <div class="actionsRow">
-        <button class="darkBtn" onclick="openColumnModal()">Manage Columns</button>
-        <button class="reset" onclick="resetLeadFilters()">Reset Filters</button>
-      </div>
-
-      <div class="topInfo">
-        <div>
-          <span id="leadStatusText">Preparing leads...</span>
-          <span id="leadLoadingBadge" class="loadingBadge">Loading leads...</span>
-          <span id="leadSaveToast" class="saveToast">Saved ✓</span>
-        </div>
-        <div>Showing 50 records per page</div>
-      </div>
-
-      <div class="tablebox">
-        <table class="leadsTable">
-          <thead id="leadsTableHead"></thead>
-          <tbody id="leadsTableBody"></tbody>
-        </table>
-      </div>
-
-      <div id="leadMobileCards" class="mobileCards"></div>
-
-      <div class="pager">
-        <button id="leadPrevBtn" onclick="prevLeadPage()">Previous</button>
-        <div id="leadPageInfo">1 / 1</div>
-        <button id="leadNextBtn" onclick="nextLeadPage()">Next</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="modalOverlay">
-    <div class="modal profileModal">
-      <div id="profileContent"></div>
-    </div>
-  </div>
-
-  <div id="propertiesModal" class="modalOverlay">
-    <div class="modal">
-      <h2 id="modalTitle">More Units</h2>
-      <div id="modalContent"></div>
-      <div class="modalActions">
-        <button class="darkBtn" onclick="closeModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="leadModal" class="modalOverlay">
-    <div class="modal">
-      <h2 id="leadModalTitle">Add Lead</h2>
-
-      <div class="formGrid">
-        <div><label>Lead Receive Date</label><input id="form_lead_receive_date" type="date"></div>
-        <div><label>Name</label><input id="form_name" placeholder="Client / Agent name"></div>
-        <div><label>Phone</label><input id="form_phone" placeholder="9715xxxxxxx"></div>
-        <div><label>Email</label><input id="form_email" type="email" placeholder="Email"></div>
-        <div><label>Project Inquired</label><input id="form_project_inquired" placeholder="Project / community"></div>
-        <div><label>Budget</label><input id="form_budget" placeholder="e.g. 3M"></div>
-
-        <div>
-          <label>Property Type</label>
-          <select id="form_property_type">
-            <option value="">Select Type</option>
-            <option>Apartment</option>
-            <option>Villa</option>
-            <option>Townhouse</option>
-            <option>Penthouse</option>
-            <option>Plot</option>
-            <option>Commercial</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Bedroom</label>
-          <select id="form_bedroom">
-            <option value="">Select Bedroom</option>
-            <option>Studio</option>
-            <option>1BR</option>
-            <option>2BR</option>
-            <option>3BR</option>
-            <option>4BR</option>
-            <option>5BR</option>
-            <option>6BR</option>
-            <option>7BR+</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Source</label>
-          <select id="form_source">
-            <option value="">Select Source</option>
-            <option>Bayut</option>
-            <option>Property Finder</option>
-            <option>Meta Ads</option>
-            <option>Instagram</option>
-            <option>TikTok</option>
-            <option>WhatsApp</option>
-            <option>Referral</option>
-            <option>Agent</option>
-            <option>Broker</option>
-            <option>Walk-in</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Status</label>
-          <select id="form_status">
-            <option>New</option>
-            <option>Contacted</option>
-            <option>Call Back</option>
-            <option>Interested</option>
-            <option>Viewing</option>
-            <option>Negotiation</option>
-            <option>Lost</option>
-          </select>
-        </div>
-
-        <div><label>Follow-up Date</label><input id="form_follow_up_date" type="date"></div>
-        <div><label>Last Contacted</label><input id="form_last_contacted" type="date"></div>
-        <div class="formFull"><label>Notes</label><textarea id="form_notes" rows="4" placeholder="Notes"></textarea></div>
-      </div>
-
-      <div class="modalActions">
-        <button class="darkBtn" onclick="closeLeadModal()">Cancel</button>
-        <button class="primaryBtn" onclick="saveLeadFromModal()">Save Lead</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="columnsModal" class="modalOverlay">
-    <div class="modal">
-      <h2 id="columnsModalTitle">Manage Columns</h2>
-      <div class="sub" style="margin-bottom:10px;">Tick to show/hide columns. Use ↑ ↓ to arrange columns.</div>
-      <div id="columnList" class="columnList"></div>
-
-      <div class="modalActions">
-        <button class="darkBtn" onclick="resetLeadColumns()">Reset</button>
-        <button class="darkBtn" onclick="closeColumnModal()">Cancel</button>
-        <button class="primaryBtn" onclick="saveColumnModal()">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="whatsappModal" class="modalOverlay">
-    <div class="modal">
-      <h2>Edit WhatsApp Message</h2>
-      <div class="sub">Owner name and property details will be added automatically from the database.</div>
-
-      <div class="formGrid">
-        <div>
-          <label>Agent Name</label>
-          <input id="wa_agent_name" placeholder="Usama Bin Nusrat" />
-        </div>
-
-        <div>
-          <label>Company Optional</label>
-          <input id="wa_company" placeholder="BFG Properties" />
-        </div>
-
-        <div class="formFull">
-          <label>Message</label>
-          <textarea id="wa_message" rows="7" placeholder="Write your message here..."></textarea>
-        </div>
-      </div>
-
-      <div class="timelineBox">
-        <h2>Preview</h2>
-        <div id="wa_preview" style="white-space:pre-line;color:#dbe4f0;font-size:14px;line-height:1.6;"></div>
-      </div>
-
-      <div class="modalActions">
-        <button class="darkBtn" onclick="closeWhatsappMessageModal()">Cancel</button>
-        <button class="darkBtn" onclick="resetWhatsappMessageForm()">Reset</button>
-        <button class="primaryBtn" onclick="saveWhatsappSettings()">Save WhatsApp</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
-    const TABLE_NAME = "owners";
-    const LEADS_TABLE = "leads";
-    const PAGE_SIZE = 50;
-    const ADMIN_EMAIL = "thechussar@gmail.com";
-    let currentUserEmail = "";
-    let isAdmin = false;
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let currentPage = 0;
-    let totalCount = 0;
-    let debounceTimer = null;
-    let listenersReady = false;
-    let currentAccess = null;
-    let allMiniRows = [];
-
-    const DEFAULT_WHATSAPP_MESSAGE = `Hope you're doing well.
-
-I’m reaching out regarding your property.
-
-Would you consider selling if you receive a strong offer?`;
-
-    let leadPage = 0;
-    let leadTotalCount = 0;
-    let leadDebounceTimer = null;
-    let leadListenersReady = false;
-    let editingLeadId = null;
-    let editingLeadRows = new Set();
-
-    const OWNER_COLUMN_KEY = "usama_owner_columns_v2";
-    const LEAD_COLUMN_KEY = "usama_lead_columns_v3";
-
-    const defaultOwnerColumns = [
-      { key:"community", label:"Community", visible:true, width:150 },
-      { key:"cluster", label:"Cluster", visible:true, width:150 },
-      { key:"unit", label:"Unit", visible:true, width:90 },
-      { key:"owner", label:"Owner Name", visible:true, width:240 },
-      { key:"whatsapp", label:"WhatsApp", visible:true, width:130 },
-      { key:"status", label:"Status", visible:true, width:150 },
-      { key:"remarks", label:"Remarks", visible:true, width:280 },
-      { key:"last_contacted", label:"Last Contacted", visible:true, width:135 },
-      { key:"actions", label:"Actions", visible:true, width:170 }
-    ];
-
-    const defaultLeadColumns = [
-      { key:"name", label:"Name", visible:true, type:"text", cls:"cellBox", width:170 },
-      { key:"phone", label:"Phone", visible:true, type:"text", cls:"cellBox", width:140 },
-      { key:"project_inquired", label:"Project Inquired", visible:true, type:"text", cls:"cellBox", width:190 },
-      { key:"budget", label:"Budget", visible:true, type:"text", cls:"cellBox", width:95 },
-      { key:"status", label:"Status", visible:true, type:"select", cls:"statusSelect", width:150 },
-      { key:"notes", label:"Notes", visible:true, type:"textarea", cls:"remarksInput leadNotesBox", width:260 },
-      { key:"lead_receive_date", label:"Received", visible:false, type:"date", cls:"cellBox", width:130 },
-      { key:"email", label:"Email", visible:false, type:"email", cls:"cellBox", width:190 },
-      { key:"property_type", label:"Property Type", visible:false, type:"select", cls:"leadDropdown", width:150 },
-      { key:"bedroom", label:"Bedroom", visible:false, type:"select", cls:"leadDropdown", width:110 },
-      { key:"source", label:"Source", visible:false, type:"select", cls:"leadDropdown", width:140 },
-      { key:"follow_up_date", label:"Follow-up Date", visible:false, type:"date", cls:"cellBox", width:135 },
-      { key:"last_contacted", label:"Last Contacted", visible:false, type:"date", cls:"cellBox", width:135 },
-      { key:"whatsapp", label:"WhatsApp", visible:false, type:"button", cls:"", width:120 }
-    ];
-
-    let ownerColumns = loadOwnerColumns();
-    let leadColumns = loadLeadColumns();
-    let activeColumnMode = "lead";
-
-    const el = id => document.getElementById(id);
-
-    checkSession();
-
-    document.addEventListener("input", function(e) {
-      if (["wa_agent_name", "wa_company", "wa_message"].includes(e.target.id)) {
-        updateWhatsappPreview();
-      }
-    });
-
-    async function checkSession() {
-      const { data } = await db.auth.getSession();
-
-      if (!data.session) {
-        showOnly("loginView");
-        return;
-      }
-
-      const email = data.session.user.email;
-      currentUserEmail = email;
-      isAdmin = email === ADMIN_EMAIL;
-      window.isAdmin = isAdmin;
-
-      const { data: access } = await db.from("user_access").select("*").eq("email", email).single();
-
-      currentAccess = access || {};
-      applyRoleUI();
-
-      if (isAdmin || currentAccess?.can_export) {
-        el("exportBtn").classList.remove("hidden");
-      } else {
-        el("exportBtn").classList.add("hidden");
-      }
-
-      if (isAdmin) {
-        showChoiceView();
-        refreshHomeKpis();
-      } else {
-        showOwnersView();
-      }
-    }
-
-    function showOnly(viewId) {
-      ["loginView","choiceView","appView","leadsView"].forEach(id => el(id).classList.add("hidden"));
-      el(viewId).classList.remove("hidden");
-    }
-
-    function applyRoleUI() {
-      document.querySelectorAll(".adminOnly").forEach(node => {
-        node.style.display = isAdmin ? "" : "none";
-      });
-    }
-
-    function ownerRemarkValue(row) {
-      if (isAdmin) return get(row, ["admin_remarks", "remarks"]);
-      return get(row, ["agent_remarks"]);
-    }
-
-    function showChoiceView() {
-      if (!isAdmin) {
-        showOwnersView();
-        return;
-      }
-      applyRoleUI();
-      showOnly("choiceView");
-      refreshHomeKpis();
-    }
-
-    async function showOwnersView() {
-      applyRoleUI();
-      showOnly("appView");
-      setupListeners();
-      await loadDropdowns();
-      await loadOwnerKpis();
-      loadData();
-    }
-
-    async function showLeadsView() {
-      if (!isAdmin) {
-        showOwnersView();
-        return;
-      }
-      applyRoleUI();
-      showOnly("leadsView");
-      setupLeadListeners();
-      await loadLeadSources();
-      loadLeads();
-    }
-
-    async function login() {
-      el("loginError").textContent = "";
-
-      const email = el("loginEmail").value.trim();
-      const password = el("loginPassword").value.trim();
-
-      if (!email || !password) {
-        el("loginError").textContent = "Enter email and password.";
-        return;
-      }
-
-      const { error } = await db.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        el("loginError").textContent = "Wrong email or password.";
-        return;
-      }
-
-      checkSession();
-    }
-
-    async function logout() {
-      await db.auth.signOut();
-      location.reload();
-    }
-
-    function today() {
-      return new Date().toISOString().slice(0, 10);
-    }
-
-    function clean(value) {
-      if (value === null || value === undefined || value === "" || value === "EMPTY") return "-";
-      return String(value);
-    }
-
-    function get(row, keys) {
-      for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== "" && row[key] !== "EMPTY") {
-          return row[key];
-        }
-      }
-      return "";
-    }
-
-    function escapeHtml(text) {
-      return String(text || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function formatPhone(phone) {
-      let p = String(phone || "").replace(/[^\d]/g, "");
-      if (!p) return "";
-      if (p.startsWith("00")) p = p.substring(2);
-      if (p.length === 9 && p.startsWith("5")) p = "971" + p;
-      if (p.length === 10 && p.startsWith("05")) p = "971" + p.substring(1);
-      return p;
-    }
-
-    function statusClass(status) {
-      return "status-" + String(status || "New").replaceAll(" ", "");
-    }
-
-    function showSaved() {
-      el("saveToast").classList.add("show");
-      setTimeout(() => el("saveToast").classList.remove("show"), 1200);
-    }
-
-    function showLeadSaved() {
-      el("leadSaveToast").classList.add("show");
-      setTimeout(() => el("leadSaveToast").classList.remove("show"), 1200);
-    }
-
-    async function refreshHomeKpis() {
-      try {
-        const owners = await countRows(TABLE_NAME);
-        const sale = await countRows(TABLE_NAME, "status", "For Sale");
-        const rent = await countRows(TABLE_NAME, "status", "For Rent");
-        const call = await countRows(TABLE_NAME, "status", "Call Back");
-        let leads = 0;
-        let interested = 0;
-        let viewing = 0;
-
-        if (isAdmin) {
-          leads = await countRows(LEADS_TABLE);
-          interested = await countRows(LEADS_TABLE, "status", "Interested");
-          viewing = await countRows(LEADS_TABLE, "status", "Viewing");
-        }
-
-        safeText("homeOwners", owners);
-        safeText("homeSale", sale);
-        safeText("homeRent", rent);
-        safeText("homeCallBack", call);
-        safeText("homeLeads", leads);
-        safeText("homeHotLeads", Number(interested || 0) + Number(viewing || 0));
-      } catch {}
-    }
-
-    async function loadOwnerKpis() {
-      const total = await countRows(TABLE_NAME);
-      const sale = await countRows(TABLE_NAME, "status", "For Sale");
-      const rent = await countRows(TABLE_NAME, "status", "For Rent");
-      const call = await countRows(TABLE_NAME, "status", "Call Back");
-      const noResp = await countRows(TABLE_NAME, "status", "No Response");
-      const invalid = await countRows(TABLE_NAME, "status", "Invalid Number");
-
-      safeText("ownerKpiTotal", total);
-      safeText("ownerKpiSale", sale);
-      safeText("ownerKpiRent", rent);
-      safeText("ownerKpiCall", call);
-      safeText("ownerKpiNoResp", noResp);
-      safeText("ownerKpiInvalid", invalid);
-    }
-
-    async function countRows(table, field = null, value = null) {
-      let q = db.from(table).select("*", { count:"exact", head:true });
-      if (field && value) q = q.eq(field, value);
-      const { count } = await q;
-      return count || 0;
-    }
-
-    function safeText(id, value) {
-      const node = el(id);
-      if (node) node.textContent = value;
-    }
-
-    async function markContacted(id) {
-      await db.from(TABLE_NAME).update({ last_contacted: today() }).eq("id", id);
-    }
-
-    function getWhatsappAgentName() {
-      return (currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "").trim();
-    }
-
-    function getWhatsappCompany() {
-      return (currentAccess?.whatsapp_company || "").trim();
-    }
-
-    function getWhatsappMessageBody() {
-      return (currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE).trim();
-    }
-
-    function buildOwnerMessage(row) {
-      const owner = get(row, ["owner"]);
-      const unit = get(row, ["unit"]);
-      const cluster = get(row, ["cluster"]);
-      const community = get(row, ["community"]);
-      const agentName = getWhatsappAgentName();
-      const company = getWhatsappCompany();
-      const messageBody = getWhatsappMessageBody();
-
-      return `Hello Mr. ${owner || ""},
-
-${messageBody}
-
-Regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
-
-Regards,
-${agentName}${company ? `\n${company}` : ""}`;
-    }
-
-    function whatsappButton(row) {
-      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
-      const formatted = formatPhone(phone);
-
-      if (!formatted) return "-";
-
-      const msg = buildOwnerMessage(row);
-
-      return `<a class="waBtn" target="_blank" onclick="markContacted(${row.id})" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
-    }
-
-    function openWhatsappMessageModal() {
-      el("wa_agent_name").value = currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "";
-      el("wa_company").value = currentAccess?.whatsapp_company || "";
-      el("wa_message").value = currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE;
-      updateWhatsappPreview();
-      el("whatsappModal").classList.add("show");
-    }
-
-    function closeWhatsappMessageModal() {
-      el("whatsappModal").classList.remove("show");
-    }
-
-    function resetWhatsappMessageForm() {
-      el("wa_message").value = DEFAULT_WHATSAPP_MESSAGE;
-      updateWhatsappPreview();
-    }
-
-    function updateWhatsappPreview() {
-      const agentName = el("wa_agent_name")?.value || "Agent Name";
-      const company = el("wa_company")?.value || "";
-      const messageBody = el("wa_message")?.value || DEFAULT_WHATSAPP_MESSAGE;
-
-      el("wa_preview").textContent = `Hello Mr. Owner Name,
-
-${messageBody}
-
-Regarding your property in Cluster, Unit #101, Community.
-
-Regards,
-${agentName}${company ? `\n${company}` : ""}`;
-    }
-
-    async function saveWhatsappSettings() {
-      const whatsapp_agent_name = el("wa_agent_name").value.trim();
-      const whatsapp_company = el("wa_company").value.trim();
-      const whatsapp_message = el("wa_message").value.trim();
-
-      const { data, error } = await db
-        .from("user_access")
-        .update({ whatsapp_agent_name, whatsapp_company, whatsapp_message })
-        .eq("email", currentUserEmail)
-        .select("*")
-        .single();
-
-      if (error) {
-        alert("Failed to save WhatsApp settings. Make sure SQL columns exist in user_access.");
-        return;
-      }
-
-      currentAccess = data || { ...currentAccess, whatsapp_agent_name, whatsapp_company, whatsapp_message };
-      closeWhatsappMessageModal();
-      showSaved();
-    }
-
-    function callButton(row) {
-      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
-      const formatted = formatPhone(phone);
-
-      if (!formatted) return "";
-
-      return `<a class="callBtn" href="tel:+${formatted}">Call</a>`;
-    }
-
-    function copyPhoneButton(row) {
-      const phone = get(row, ["phone1", "phone2", "phone", "mobile", "contact"]);
-      if (!phone) return "";
-
-      return `<button class="copyBtn" onclick="copyText('${escapeHtml(phone)}')">Copy</button>`;
-    }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        showSaved();
-      } catch {
-        alert("Copy failed");
-      }
-    }
-
-    function showLoading() {
-      el("loadingBadge").classList.add("show");
-      el("status").textContent = "Loading database...";
-
-      const ownerColCount = visibleOwnerColumns().length;
-
-      renderOwnerHead();
-
-      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() =>
-        `<tr>${Array.from({length:ownerColCount}).map(() => `<td><div class="skeleton"></div></td>`).join("")}</tr>`
-      ).join("");
-
-      el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() =>
-        `<div class="ownerCard"><div class="skeleton" style="height:22px;margin-bottom:12px;"></div><div class="skeleton" style="margin-bottom:10px;"></div><div class="skeleton"></div></div>`
-      ).join("");
-    }
-
-    function hideLoading() {
-      el("loadingBadge").classList.remove("show");
-    }
-
-    function markRemarkDirty(btnId) {
-      el(btnId).classList.add("show");
-    }
-
-    async function saveRemarks(id, textareaId, btnId) {
-      const value = el(textareaId).value;
-
-      const remarkColumn = isAdmin ? "admin_remarks" : "agent_remarks";
-      const updatePayload = {
-        [remarkColumn]: value,
-        last_contacted: today()
-      };
-
-      const { error } = await db.from(TABLE_NAME).update(updatePayload).eq("id", id);
-
-      if (error) {
-        alert("Failed to update remarks");
-        return;
-      }
-
-      el(btnId).classList.remove("show");
-      showSaved();
-
-      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    async function updateStatus(id, value) {
-      const { error } = await db.from(TABLE_NAME).update({
-        status: value,
-        last_contacted: today()
-      }).eq("id", id);
-
-      if (error) {
-        alert("Failed to update status");
-        return;
-      }
-
-      showSaved();
-      loadOwnerKpis();
-
-      const lastCell = document.querySelector(`[data-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    function applyFilters(query) {
-      const search = el("searchInput").value.trim();
-      const community = el("communityFilter").value;
-      const cluster = el("clusterFilter").value;
-      const unit = el("unitFilter").value.trim();
-      const source = el("sourceFilter").value;
-      const status = el("statusFilter").value;
-
-      if (search) {
-        query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone1.ilike.%${search}%,phone2.ilike.%${search}%`);
-      }
-
-      if (community) query = query.eq("community", community);
-      if (cluster) query = query.eq("cluster", cluster);
-      if (unit) query = query.ilike("unit", `%${unit}%`);
-      if (source) query = query.eq("data_source", source);
-      if (status) query = query.eq("status", status);
-
-      return query;
-    }
-
-    async function loadData() {
-      showLoading();
-
-      const from = currentPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-
-      let query = db.from(TABLE_NAME).select("*", { count:"exact" }).range(from, to);
-
-      query = applyFilters(query);
-
-      query = query
-        .order("community", { ascending:true })
-        .order("cluster", { ascending:true })
-        .order("unit_sort", { ascending:true });
-
-      const { data, error, count } = await query;
-
-      hideLoading();
-
-      if (error) {
-        el("status").textContent = "Error loading data";
-        el("tableBody").innerHTML = `<tr><td colspan="${visibleOwnerColumns().length}" class="empty">Error: ${error.message}</td></tr>`;
-        el("mobileCards").innerHTML = `<div class="empty">Error: ${error.message}</div>`;
-        return;
-      }
-
-      totalCount = count || 0;
-      renderData(data || []);
-
-      const start = totalCount === 0 ? 0 : from + 1;
-      const end = Math.min(to + 1, totalCount);
-      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-
-      el("status").textContent = `Showing ${start}-${end} of ${totalCount} records`;
-      el("pageInfo").textContent = `${currentPage + 1} / ${totalPages}`;
-      el("prevBtn").disabled = currentPage === 0;
-      el("nextBtn").disabled = currentPage + 1 >= totalPages;
-    }
-
-    function statusDropdown(row) {
-      const current = clean(row.status) === "-" ? "New" : row.status;
-      const statuses = ["New", "For Sale", "For Rent", "Sold", "Call Back", "No Response", "Not Interested", "Invalid Number"];
-
-      return `<select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">
-        ${statuses.map(s => `<option ${s === current ? "selected" : ""}>${s}</option>`).join("")}
-      </select>`;
-    }
-
-    function remarksEditor(row, remarks, prefix) {
-      const textareaId = `${prefix}_remark_${row.id}`;
-      const btnId = `${prefix}_save_${row.id}`;
-
-      return `<div class="remarkBox">
-        <textarea id="${textareaId}" class="remarksInput" placeholder="Add remarks..." oninput="markRemarkDirty('${btnId}')">${escapeHtml(remarks)}</textarea>
-        <button id="${btnId}" class="saveRemarkBtn" onclick="saveRemarks(${row.id}, '${textareaId}', '${btnId}')">Save</button>
-      </div>`;
-    }
-
-    function rowKey(row) {
-      const owner = String(get(row, ["owner"])).trim().toLowerCase();
-      const p1 = formatPhone(get(row, ["phone1"]));
-      const p2 = formatPhone(get(row, ["phone2"]));
-      return { owner, p1, p2 };
-    }
-
-    function getRelatedRows(row) {
-      const key = rowKey(row);
-
-      return allMiniRows.filter(x => {
-        const k = rowKey(x);
-
-        return (
-          (key.owner && k.owner && key.owner === k.owner) ||
-          (key.p1 && (key.p1 === k.p1 || key.p1 === k.p2)) ||
-          (key.p2 && (key.p2 === k.p1 || key.p2 === k.p2))
-        );
-      });
-    }
-
-    function moreUnitButton(row) {
-      const related = getRelatedRows(row);
-      if (related.length <= 1) return "";
-      return `<button class="moreUnitBtn" onclick='openProperties(${JSON.stringify(row).replaceAll("'", "&#039;")})'>More Unit</button>`;
-    }
-
-    function profileButton(row) {
-      return `<button class="profileBtn" onclick='openOwnerProfile(${JSON.stringify(row).replaceAll("'", "&#039;")})'>Profile</button>`;
-    }
-
-    function renderOwnerHead() {
-      el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c =>
-        `<th class="resizable-th" data-table="owner" data-key="${c.key}" style="width:${c.width}px">
-          ${escapeHtml(c.label)}
-          <span class="resize-handle" onmousedown="startColumnResize(event, 'owner', '${c.key}')"></span>
-        </th>`
-      ).join("")}</tr>`;
-
-      const minWidth = visibleOwnerColumns().reduce((sum,c) => sum + (Number(c.width) || 120), 0);
-      const table = document.getElementById("ownersTable");
-
-      if (table) table.style.minWidth = Math.max(980, minWidth) + "px";
-    }
-
-    function ownerCell(row, col) {
-      if (col.key === "community") return escapeHtml(clean(row.community));
-      if (col.key === "cluster") return escapeHtml(clean(row.cluster));
-      if (col.key === "unit") return escapeHtml(clean(row.unit));
-      if (col.key === "owner") return `${escapeHtml(clean(row.owner))}${profileButton(row)}${moreUnitButton(row)}`;
-      if (col.key === "whatsapp") return whatsappButton(row);
-      if (col.key === "status") return statusDropdown(row);
-      if (col.key === "remarks") return remarksEditor(row, ownerRemarkValue(row), "desk");
-      if (col.key === "last_contacted") return `<span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span>`;
-      if (col.key === "actions") return `<div style="display:flex;gap:7px;">${callButton(row)}${copyPhoneButton(row)}</div>`;
-      return "-";
-    }
-
-    function renderData(rows) {
-      renderOwnerHead();
-
-      const cols = visibleOwnerColumns();
-
-      if (!rows.length) {
-        el("tableBody").innerHTML = `<tr><td colspan="${cols.length}" class="empty">No records found</td></tr>`;
-        el("mobileCards").innerHTML = `<div class="empty">No records found</div>`;
-        return;
-      }
-
-      el("tableBody").innerHTML = rows.map(row =>
-        `<tr>${cols.map(col => `<td style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`
-      ).join("");
-
-      el("mobileCards").innerHTML = rows.map(row => {
-        const remarks = ownerRemarkValue(row);
-
-        return `<div class="ownerCard">
-          <div class="ownerTop">
-            <div class="ownerName">${escapeHtml(clean(row.owner))}</div>
-            <div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div>
-          </div>
-
-          <div class="mobileLocation">
-            <div class="locationText">
-              <span>Property</span>
-              ${escapeHtml(clean(row.community))} - ${escapeHtml(clean(row.cluster))}
-            </div>
-          </div>
-
-          <div class="infoLine"><span>Status</span>${statusDropdown(row)}</div>
-          <div class="infoLine"><span>Remarks</span>${remarksEditor(row, remarks, "mob")}</div>
-          <div class="infoLine"><span>Last Contacted</span><span data-last-contacted="${row.id}">${escapeHtml(clean(row.last_contacted))}</span></div>
-
-          <div class="mobileActionGrid">
-            ${whatsappButton(row)}
-            ${callButton(row)}
-            ${copyPhoneButton(row)}
-          </div>
-
-          <div class="actionsRow" style="justify-content:flex-start;margin-bottom:0;">
-            <button class="primaryBtn" onclick='openOwnerProfile(${JSON.stringify(row).replaceAll("'", "&#039;")})'>Open Profile</button>
-          </div>
-        </div>`;
-      }).join("");
-    }
-
-    async function openOwnerProfile(row) {
-      const related = getRelatedRows(row).sort((a,b) =>
-        String(a.unit_sort || a.unit).localeCompare(String(b.unit_sort || b.unit), undefined, {numeric:true})
-      );
-
-      const phone1 = get(row, ["phone1"]);
-      const phone2 = get(row, ["phone2"]);
-      const remarks = ownerRemarkValue(row);
-
-      el("profileContent").innerHTML = `
-        <div class="profileHeader">
-          <div>
-            <div class="profileTitle">${escapeHtml(clean(row.owner))}</div>
-            <div class="profileSub">${escapeHtml(clean(row.community))} • ${escapeHtml(clean(row.cluster))} • Unit ${escapeHtml(clean(row.unit))}</div>
-          </div>
-
-          <div class="modalActions" style="margin-top:0;">
-            ${whatsappButton(row)}
-            ${callButton(row)}
-            <button class="darkBtn" onclick="closeOwnerProfile()">Close</button>
-          </div>
-        </div>
-
-        <div class="profileGrid">
-          <div class="profileBox"><label>Owner Name</label><div>${escapeHtml(clean(row.owner))}</div></div>
-          <div class="profileBox"><label>Phone 1</label><div>${escapeHtml(clean(phone1))}</div></div>
-          <div class="profileBox"><label>Phone 2</label><div>${escapeHtml(clean(phone2))}</div></div>
-          <div class="profileBox"><label>Community</label><div>${escapeHtml(clean(row.community))}</div></div>
-          <div class="profileBox"><label>Cluster</label><div>${escapeHtml(clean(row.cluster))}</div></div>
-          <div class="profileBox"><label>Unit</label><div>${escapeHtml(clean(row.unit))}</div></div>
-          <div class="profileBox"><label>Status</label><div>${escapeHtml(clean(row.status))}</div></div>
-          <div class="profileBox"><label>Source</label><div>${escapeHtml(clean(row.data_source))}</div></div>
-          <div class="profileBox"><label>Last Contacted</label><div>${escapeHtml(clean(row.last_contacted))}</div></div>
-        </div>
-
-        <div class="timelineBox">
-          <h2>Remarks</h2>
-          <div style="color:#dbe4f0;font-size:14px;line-height:1.6;">${escapeHtml(clean(remarks))}</div>
-        </div>
-
-        <div class="timelineBox">
-          <h2>Related Units</h2>
-          ${
-            related.length
-              ? related.map(x => `<div class="modalRow">${escapeHtml(clean(x.community))} - ${escapeHtml(clean(x.cluster))} - Unit#${escapeHtml(clean(x.unit))} - ${escapeHtml(clean(x.status))}</div>`).join("")
-              : `<div class="empty">No related units found</div>`
-          }
-        </div>
-
-        <div class="timelineBox">
-          <h2>Activity Timeline</h2>
-          <div class="timelineItem">
-            <div class="timelineDate">${escapeHtml(clean(row.last_contacted))}</div>
-            <div>Last contact / latest update recorded.</div>
-          </div>
-          <div class="timelineItem">
-            <div class="timelineDate">${escapeHtml(clean(row.data_source))}</div>
-            <div>Owner data source imported.</div>
-          </div>
-        </div>
-      `;
-
-      el("profileModal").classList.add("show");
-    }
-
-    function closeOwnerProfile() {
-      el("profileModal").classList.remove("show");
-    }
-
-    async function openProperties(row) {
-      const related = getRelatedRows(row);
-
-      el("modalTitle").textContent = `${clean(row.owner)} - More Units`;
-
-      el("modalContent").innerHTML = !related.length
-        ? `<div class="empty">No more units found</div>`
-        : related.sort((a,b) =>
-            String(a.unit_sort || a.unit).localeCompare(String(b.unit_sort || b.unit), undefined, {numeric:true})
-          ).map(x =>
-            `<div class="modalRow">${escapeHtml(clean(x.community))} - ${escapeHtml(clean(x.cluster))} - Unit#${escapeHtml(clean(x.unit))}</div>`
-          ).join("");
-
-      el("propertiesModal").classList.add("show");
-    }
-
-    function closeModal() {
-      el("propertiesModal").classList.remove("show");
-    }
-
-    async function loadDropdowns() {
-      let allRows = [];
-      let from = 0;
-      const batchSize = 1000;
-
-      while (true) {
-        const { data, error } = await db.from(TABLE_NAME)
-          .select("id, community, cluster, unit, unit_sort, owner, phone1, phone2, data_source, status, last_contacted")
-          .range(from, from + batchSize - 1);
-
-        if (error || !data || data.length === 0) break;
-
-        allRows = allRows.concat(data);
-
-        if (data.length < batchSize) break;
-        from += batchSize;
-      }
-
-      allMiniRows = allRows;
-
-      fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
-      updateClusterDropdown();
-      fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
-    }
-
-    function updateClusterDropdown() {
-      const selectedCommunity = el("communityFilter").value;
-      const rows = selectedCommunity ? allMiniRows.filter(x => x.community === selectedCommunity) : allMiniRows;
-
-      fillSelect("clusterFilter", [...new Set(rows.map(x => x.cluster).filter(Boolean))]);
-      el("clusterFilter").value = "";
-    }
-
-    function fillSelect(id, values) {
-      const select = el(id);
-      const firstOption = select.children[0].outerHTML;
-
-      select.innerHTML = firstOption + values
-        .sort((a,b) => String(a).localeCompare(String(b)))
-        .map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
-        .join("");
-    }
-
-    function quickStatus(status) {
-      el("statusFilter").value = status;
-      currentPage = 0;
-      loadData();
-    }
-
-    function resetFilters() {
-      el("searchInput").value = "";
-      el("communityFilter").value = "";
-      updateClusterDropdown();
-      el("clusterFilter").value = "";
-      el("unitFilter").value = "";
-      el("sourceFilter").value = "";
-      el("statusFilter").value = "";
-      currentPage = 0;
-      loadData();
-    }
-
-    function nextPage() {
-      const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-      if (currentPage + 1 >= totalPages) return;
-      currentPage++;
-      loadData();
-    }
-
-    function prevPage() {
-      if (currentPage === 0) return;
-      currentPage--;
-      loadData();
-    }
-
-    async function exportCSV() {
-      if (!currentAccess?.can_export) return;
-
-      let allRows = [];
-      let from = 0;
-      const batchSize = 1000;
-
-      while (true) {
-        const { data, error } = await db.from(TABLE_NAME)
-          .select("community,cluster,unit,owner,phone1,phone2,remarks,admin_remarks,agent_remarks,data_source,status,last_contacted")
-          .range(from, from + batchSize - 1);
-
-        if (error) {
-          alert("Export failed");
-          return;
-        }
-
-        if (!data || data.length === 0) break;
-
-        allRows = allRows.concat(data);
-
-        if (data.length < batchSize) break;
-        from += batchSize;
-      }
-
-      downloadCSV("owner_database_export", ["community","cluster","unit","owner","phone1","phone2","remarks","admin_remarks","agent_remarks","data_source","status","last_contacted"], allRows);
-    }
-
-    function setupListeners() {
-      if (listenersReady) return;
-      listenersReady = true;
-
-      ["searchInput", "unitFilter"].forEach(id => {
-        el(id).addEventListener("input", () => {
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(() => {
-            currentPage = 0;
-            loadData();
-          }, 400);
-        });
-      });
-
-      el("communityFilter").addEventListener("change", () => {
-        updateClusterDropdown();
-        currentPage = 0;
-        loadData();
-      });
-
-      ["clusterFilter", "sourceFilter", "statusFilter"].forEach(id => {
-        el(id).addEventListener("change", () => {
-          currentPage = 0;
-          loadData();
-        });
-      });
-    }
-
-    function visibleOwnerColumns() {
-      return ownerColumns.filter(c => c.visible);
-    }
-
-    function loadOwnerColumns() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(OWNER_COLUMN_KEY) || "null");
-
-        if (!Array.isArray(saved)) return defaultOwnerColumns.map(x => ({...x}));
-
-        const byKey = Object.fromEntries(defaultOwnerColumns.map(c => [c.key, c]));
-
-        const merged = saved
-          .filter(c => byKey[c.key])
-          .map(c => ({...byKey[c.key], visible:c.visible !== false, width:Number(c.width || byKey[c.key].width)}));
-
-        defaultOwnerColumns.forEach(c => {
-          if (!merged.some(x => x.key === c.key)) merged.push({...c});
-        });
-
-        return merged;
-      } catch {
-        return defaultOwnerColumns.map(x => ({...x}));
-      }
-    }
-
-    function saveOwnerColumnsState() {
-      localStorage.setItem(OWNER_COLUMN_KEY, JSON.stringify(ownerColumns.map(({key,visible,width}) => ({key,visible,width}))));
-    }
-
-    function visibleLeadColumns() {
-      return leadColumns.filter(c => c.visible);
-    }
-
-    function loadLeadColumns() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(LEAD_COLUMN_KEY) || "null");
-
-        if (!Array.isArray(saved)) return defaultLeadColumns.map(x => ({...x}));
-
-        const byKey = Object.fromEntries(defaultLeadColumns.map(c => [c.key, c]));
-
-        const merged = saved
-          .filter(c => byKey[c.key])
-          .map(c => ({...byKey[c.key], visible:c.visible !== false, width:Number(c.width || byKey[c.key].width)}));
-
-        defaultLeadColumns.forEach(c => {
-          if (!merged.some(x => x.key === c.key)) merged.push({...c});
-        });
-
-        return merged;
-      } catch {
-        return defaultLeadColumns.map(x => ({...x}));
-      }
-    }
-
-    function saveLeadColumnsState() {
-      localStorage.setItem(LEAD_COLUMN_KEY, JSON.stringify(leadColumns.map(({key,visible,width}) => ({key,visible,width}))));
-    }
-
-    function showLeadLoading() {
-      el("leadLoadingBadge").classList.add("show");
-      el("leadStatusText").textContent = "Loading leads...";
-
-      const colCount = visibleLeadColumns().length + 1;
-
-      el("leadsTableBody").innerHTML = Array.from({length:8}).map(() =>
-        `<tr>${Array.from({length:colCount}).map(() => `<td><div class="skeleton"></div></td>`).join("")}</tr>`
-      ).join("");
-    }
-
-    function hideLeadLoading() {
-      el("leadLoadingBadge").classList.remove("show");
-    }
-
-    function leadStatuses() {
-      return ["New", "Contacted", "Call Back", "Interested", "Viewing", "Negotiation", "Lost"];
-    }
-
-    function leadDropdownOptions(key) {
-      const options = {
-        status: leadStatuses(),
-        property_type: ["", "Apartment", "Villa", "Townhouse", "Penthouse", "Plot", "Commercial"],
-        bedroom: ["", "Studio", "1BR", "2BR", "3BR", "4BR", "5BR", "6BR", "7BR+"],
-        source: ["", "Bayut", "Property Finder", "Meta Ads", "Instagram", "TikTok", "WhatsApp", "Referral", "Agent", "Broker", "Walk-in", "Other"]
-      };
-
-      return options[key] || [];
-    }
-
-    function leadWhatsappButton(row) {
-      const formatted = formatPhone(row.phone);
-      if (!formatted) return "-";
-
-      const msg = `Hello ${row.name || ""},
+    mobile.appendChild(card);
+
+  });
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  document.getElementById('pageInfo').innerText =
+    `${currentPage} / ${totalPages || 1}`;
+}
+
+function statusBadge(status){
+
+  let cls = 'other';
+
+  if(status === 'For Sale') cls = 'sale';
+  if(status === 'For Rent') cls = 'rent';
+  if(status === 'Sold') cls = 'sold';
+
+  return `<span class="status ${cls}">${status || '-'}</span>`;
+}
+
+function nextPage(){
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  if(currentPage < totalPages){
+
+    currentPage++;
+    renderData();
+
+  }
+}
+
+function prevPage(){
+
+  if(currentPage > 1){
+
+    currentPage--;
+    renderData();
+
+  }
+}
+
+function openAddModal(){
+
+  document.getElementById('modalTitle').innerText = 'Add Owner';
+
+  document.getElementById('ownerId').value = '';
+
+  clearModal();
+
+  document.getElementById('ownerModal').classList.remove('hidden');
+}
+
+function closeModal(){
+
+  document.getElementById('ownerModal').classList.add('hidden');
+}
+
+function clearModal(){
+
+  document.getElementById('community').value = '';
+  document.getElementById('cluster').value = '';
+  document.getElementById('unit').value = '';
+  document.getElementById('ownerName').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('remarks').value = '';
+}
+
+function editOwner(item){
+
+  document.getElementById('modalTitle').innerText = 'Edit Owner';
+
+  document.getElementById('ownerId').value = item.id;
+
+  document.getElementById('community').value = item.community || '';
+  document.getElementById('cluster').value = item.cluster || '';
+  document.getElementById('unit').value = item.unit || '';
+  document.getElementById('ownerName').value = item.owner_name || '';
+  document.getElementById('phone').value = item.phone || '';
+  document.getElementById('status').value = item.status || '';
+  document.getElementById('remarks').value = item.remarks || '';
+
+  document.getElementById('ownerModal').classList.remove('hidden');
+}
+
+async function saveOwner(){
+
+  const id = document.getElementById('ownerId').value;
+
+  const payload = {
+
+    community:document.getElementById('community').value,
+    cluster:document.getElementById('cluster').value,
+    unit:document.getElementById('unit').value,
+    owner_name:document.getElementById('ownerName').value,
+    phone:document.getElementById('phone').value,
+    status:document.getElementById('status').value,
+    remarks:document.getElementById('remarks').value
+
+  };
+
+  let response;
+
+  if(id){
+
+    response = await supabase
+      .from('owners')
+      .update(payload)
+      .eq('id',id);
+
+  }else{
+
+    response = await supabase
+      .from('owners')
+      .insert([payload]);
+
+  }
+
+  if(response.error){
+
+    alert(response.error.message);
+    return;
+
+  }
+
+  closeModal();
+
+  loadOwners();
+}
+
+function sendWhatsApp(item){
+
+  const firstName = (item.owner_name || '').split(' ')[0];
+
+  const msg = `
+Hello Mr. ${firstName}
+
+Hope you're doing well.
 
 This is Usama from BFG Properties.
 
-You inquired about ${row.project_inquired || "a property"}. When is a good time to discuss your requirement?
+I’m reaching out regarding your property in ${item.cluster || ''} (Unit #${item.unit || ''}), ${item.community || ''}.
+
+Would you consider selling if you receive a strong offer?
+
+Waiting for your kind response.
 
 Regards,
-Usama Bin Nusrat.`;
+Usama Bin Nusrat
+`;
 
-      return `<a class="waBtn" target="_blank" onclick="markLeadContacted('${row.id}')" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
-    }
+  window.open(
+    `https://wa.me/${item.phone}?text=${encodeURIComponent(msg)}`,
+    '_blank'
+  );
+}
 
-    async function markLeadContacted(id) {
-      await db.from(LEADS_TABLE).update({ last_contacted: today() }).eq("id", id);
-    }
+async function checkUser(){
 
-    function applyLeadFilters(query) {
-      const search = el("leadSearchInput").value.trim();
-      const status = el("leadStatusFilter").value;
-      const source = el("leadSourceFilter").value;
-      const project = el("leadProjectFilter").value.trim();
-      const followUp = el("leadFollowUpFilter").value;
+  const { data } = await supabase.auth.getSession();
 
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%,project_inquired.ilike.%${search}%`);
-      }
+  if(data.session){
 
-      if (status) query = query.eq("status", status);
-      if (source) query = query.eq("source", source);
-      if (project) query = query.ilike("project_inquired", `%${project}%`);
-      if (followUp) query = query.eq("follow_up_date", followUp);
+    initApp();
 
-      return query;
-    }
+  }
+}
 
-    async function loadLeads() {
-      if (!isAdmin) return;
-      showLeadLoading();
+checkUser();
 
-      const from = leadPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+</script>
 
-      let query = db.from(LEADS_TABLE).select("*", { count:"exact" }).range(from, to);
-
-      query = applyLeadFilters(query);
-      query = query.order("created_at", { ascending:false });
-
-      const { data, error, count } = await query;
-
-      hideLeadLoading();
-
-      if (error) {
-        el("leadStatusText").textContent = "Error loading leads";
-        el("leadsTableBody").innerHTML = `<tr><td colspan="${visibleLeadColumns().length + 1}" class="empty">Error: ${error.message}</td></tr>`;
-        return;
-      }
-
-      leadTotalCount = count || 0;
-      renderLeads(data || []);
-
-      const start = leadTotalCount === 0 ? 0 : from + 1;
-      const end = Math.min(to + 1, leadTotalCount);
-      const totalPages = Math.max(1, Math.ceil(leadTotalCount / PAGE_SIZE));
-
-      el("leadStatusText").textContent = `Showing ${start}-${end} of ${leadTotalCount} leads`;
-      el("leadPageInfo").textContent = `${leadPage + 1} / ${totalPages}`;
-      el("leadPrevBtn").disabled = leadPage === 0;
-      el("leadNextBtn").disabled = leadPage + 1 >= totalPages;
-    }
-
-    function renderLeadHead() {
-      const cols = visibleLeadColumns();
-
-      el("leadsTableHead").innerHTML = `<tr>${cols.map(c =>
-        `<th class="resizable-th" data-table="lead" data-key="${c.key}" style="width:${c.width}px">
-          ${escapeHtml(c.label)}
-          <span class="resize-handle" onmousedown="startColumnResize(event, 'lead', '${c.key}')"></span>
-        </th>`
-      ).join("")}<th class="actionsSticky" style="width:92px">Actions</th></tr>`;
-
-      const minWidth = cols.reduce((sum,c) => sum + (Number(c.width) || 120), 0) + 92;
-      const table = document.querySelector(".leadsTable");
-
-      if (table) table.style.minWidth = Math.max(960, minWidth) + "px";
-    }
-
-    function leadInput(row, col) {
-      const rawValue = row[col.key] || "";
-      const value = escapeHtml(rawValue);
-
-      if (col.type === "button") return leadWhatsappButton(row);
-
-      if (col.type === "select") {
-        const current = col.key === "status" ? (row.status || "New") : rawValue;
-        const id = col.key === "status" ? `lead_status_${row.id}` : `lead_${col.key}_${row.id}`;
-        const colorClass = col.key === "status" ? statusClass(current) : "";
-
-        const changeCode = col.key === "status"
-          ? `saveLeadField('${row.id}', '${col.key}', this.value); this.className='leadCellSelect ${col.cls} ' + statusClass(this.value);`
-          : `saveLeadField('${row.id}', '${col.key}', this.value)`;
-
-        return `<select class="leadCellSelect ${col.cls} ${colorClass}" id="${id}" onchange="${changeCode}">
-          ${leadDropdownOptions(col.key).map(s => `<option value="${escapeHtml(s)}" ${s === current ? "selected" : ""}>${escapeHtml(s || "Select")}</option>`).join("")}
-        </select>`;
-      }
-
-      if (col.type === "textarea") {
-        const textareaId = `lead_notes_${row.id}`;
-        const btnId = `lead_notes_save_${row.id}`;
-
-        return `<div class="remarkBox">
-          <textarea class="remarksInput leadNotesBox" id="${textareaId}" placeholder="Add notes..." oninput="markRemarkDirty('${btnId}')">${value}</textarea>
-          <button id="${btnId}" class="saveRemarkBtn" onclick="saveLeadNotes('${row.id}', '${textareaId}', '${btnId}')">Save</button>
-        </div>`;
-      }
-
-      const disabled = editingLeadRows.has(row.id) ? "" : "disabled";
-
-      return `<input ${disabled} class="leadCellInput ${col.cls}" id="lead_${col.key}_${row.id}" type="${col.type}" value="${value}" />`;
-    }
-
-    async function saveLeadField(id, field, value) {
-      const payload = { [field]: value || null, last_contacted: today() };
-
-      const { error } = await db.from(LEADS_TABLE).update(payload).eq("id", id);
-
-      if (error) {
-        alert("Failed to save lead: " + error.message);
-        return;
-      }
-
-      showLeadSaved();
-
-      const lastCell = document.querySelector(`[data-lead-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    async function saveLeadNotes(id, textareaId, btnId) {
-      const value = el(textareaId).value;
-
-      const { error } = await db.from(LEADS_TABLE).update({
-        notes: value,
-        last_contacted: today()
-      }).eq("id", id);
-
-      if (error) {
-        alert("Failed to save notes: " + error.message);
-        return;
-      }
-
-      el(btnId).classList.remove("show");
-      showLeadSaved();
-
-      const lastCell = document.querySelector(`[data-lead-last-contacted="${id}"]`);
-      if (lastCell) lastCell.textContent = today();
-    }
-
-    function renderLeads(rows) {
-      renderLeadHead();
-
-      const colCount = visibleLeadColumns().length + 1;
-
-      if (!rows.length) {
-        el("leadsTableBody").innerHTML = `<tr><td colspan="${colCount}" class="empty">No leads found</td></tr>`;
-        el("leadMobileCards").innerHTML = `<div class="empty">No leads found</div>`;
-        return;
-      }
-
-      const cols = visibleLeadColumns();
-
-      el("leadsTableBody").innerHTML = rows.map(row => `<tr>
-        ${cols.map(col => `<td style="width:${col.width}px">${leadInput(row, col)}</td>`).join("")}
-        <td class="actionsSticky" style="width:92px">
-          <div class="leadActions">
-            <button class="iconBtn" title="Edit" onclick="enableLeadEdit('${row.id}')">✎</button>
-            <button id="save_lead_${row.id}" class="saveRowBtn ${editingLeadRows.has(row.id) ? "" : "hiddenAction"}" onclick="saveLeadRow('${row.id}')">Save</button>
-            <button class="iconBtn dangerIcon" title="Delete" onclick="deleteLead('${row.id}')">⌫</button>
-          </div>
-        </td>
-      </tr>`).join("");
-
-      el("leadMobileCards").innerHTML = rows.map(row => `<div class="leadCard">
-        <div class="ownerTop">
-          <div class="ownerName">${escapeHtml(clean(row.name))}</div>
-          <div class="unitBadge">${escapeHtml(clean(row.status || "New"))}</div>
-        </div>
-
-        <div class="infoLine"><span>Phone</span>${escapeHtml(clean(row.phone))}</div>
-        <div class="infoLine"><span>Email</span>${escapeHtml(clean(row.email))}</div>
-        <div class="infoLine"><span>Project</span>${escapeHtml(clean(row.project_inquired))}</div>
-        <div class="infoLine"><span>Budget</span>${escapeHtml(clean(row.budget))}</div>
-        <div class="infoLine"><span>Follow-up</span>${escapeHtml(clean(row.follow_up_date))}</div>
-
-        <div class="mobileActionGrid">
-          <button class="primaryBtn" onclick='openLeadModal(${JSON.stringify(row).replaceAll("'", "&#039;")})'>Edit</button>
-          ${leadWhatsappButton(row)}
-          <button class="deleteRowBtn" onclick="deleteLead('${row.id}')">Delete</button>
-        </div>
-      </div>`).join("");
-    }
-
-    function enableLeadEdit(id) {
-      editingLeadRows.add(id);
-
-      document.querySelectorAll(`[id$="_${id}"]`).forEach(node => {
-        if (node.closest("#leadsTableBody")) node.disabled = false;
-      });
-
-      const saveBtn = el(`save_lead_${id}`);
-      if (saveBtn) saveBtn.classList.remove("hiddenAction");
-    }
-
-    async function saveLeadRow(id) {
-      const payload = readLeadRowPayload(id);
-
-      const { error } = await db.from(LEADS_TABLE).update(payload).eq("id", id);
-
-      if (error) {
-        alert("Failed to save lead: " + error.message);
-        return;
-      }
-
-      editingLeadRows.delete(id);
-      showLeadSaved();
-
-      await loadLeadSources();
-      loadLeads();
-    }
-
-    function readLeadRowPayload(id) {
-      const fields = ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"];
-      const payload = {};
-
-      fields.forEach(f => {
-        const node = el(`lead_${f}_${id}`);
-        if (node) payload[f] = node.value || null;
-      });
-
-      const statusNode = el(`lead_status_${id}`);
-      if (statusNode) payload.status = statusNode.value || null;
-
-      const notesNode = el(`lead_notes_${id}`);
-      if (notesNode) payload.notes = notesNode.value || null;
-
-      return payload;
-    }
-
-    function getActiveColumns() {
-      return activeColumnMode === "owner" ? ownerColumns : leadColumns;
-    }
-
-    function setActiveColumns(cols) {
-      if (activeColumnMode === "owner") ownerColumns = cols;
-      else leadColumns = cols;
-    }
-
-    function saveActiveColumnsState() {
-      activeColumnMode === "owner" ? saveOwnerColumnsState() : saveLeadColumnsState();
-    }
-
-    function openOwnerColumnModal() {
-      activeColumnMode = "owner";
-      el("columnsModalTitle").textContent = "Manage Owner Columns";
-      renderColumnList();
-      el("columnsModal").classList.add("show");
-    }
-
-    function openColumnModal() {
-      activeColumnMode = "lead";
-      el("columnsModalTitle").textContent = "Manage Lead Columns";
-      renderColumnList();
-      el("columnsModal").classList.add("show");
-    }
-
-    function closeColumnModal() {
-      el("columnsModal").classList.remove("show");
-    }
-
-    function renderColumnList() {
-      const cols = getActiveColumns();
-
-      el("columnList").innerHTML = cols.map((c, i) => `<div class="columnItem">
-        <input type="checkbox" id="col_${c.key}" ${c.visible ? "checked" : ""}>
-        <label for="col_${c.key}">${escapeHtml(c.label)}</label>
-        <button onclick="moveColumn(${i}, -1)">↑</button>
-        <button onclick="moveColumn(${i}, 1)">↓</button>
-      </div>`).join("");
-    }
-
-    function moveColumn(index, dir) {
-      const cols = getActiveColumns();
-      const next = index + dir;
-
-      if (next < 0 || next >= cols.length) return;
-
-      [cols[index], cols[next]] = [cols[next], cols[index]];
-
-      setActiveColumns(cols);
-      renderColumnList();
-    }
-
-    function saveColumnModal() {
-      const cols = getActiveColumns();
-
-      cols.forEach(c => {
-        const node = el(`col_${c.key}`);
-        if (node) c.visible = node.checked;
-      });
-
-      setActiveColumns(cols);
-      saveActiveColumnsState();
-      closeColumnModal();
-
-      activeColumnMode === "owner" ? loadData() : loadLeads();
-    }
-
-    function resetLeadColumns() {
-      if (activeColumnMode === "owner") {
-        ownerColumns = defaultOwnerColumns.map(x => ({...x}));
-        saveOwnerColumnsState();
-      } else {
-        leadColumns = defaultLeadColumns.map(x => ({...x}));
-        saveLeadColumnsState();
-      }
-
-      renderColumnList();
-    }
-
-    function openLeadModal(row = null) {
-      if (!isAdmin) return;
-      editingLeadId = row?.id || null;
-      el("leadModalTitle").textContent = editingLeadId ? "Edit Lead" : "Add Lead";
-
-      const fields = ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"];
-
-      fields.forEach(f => {
-        const node = el(`form_${f}`);
-        if (node) {
-          node.value = row?.[f] || (f === "lead_receive_date" && !row ? today() : f === "status" && !row ? "New" : "");
-        }
-      });
-
-      el("leadModal").classList.add("show");
-    }
-
-    function closeLeadModal() {
-      el("leadModal").classList.remove("show");
-      editingLeadId = null;
-    }
-
-    async function saveLeadFromModal() {
-      const fields = ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"];
-      const payload = {};
-
-      fields.forEach(f => payload[f] = el(`form_${f}`).value || null);
-
-      const result = editingLeadId
-        ? await db.from(LEADS_TABLE).update(payload).eq("id", editingLeadId)
-        : await db.from(LEADS_TABLE).insert([payload]);
-
-      if (result.error) {
-        alert("Failed to save lead: " + result.error.message);
-        return;
-      }
-
-      closeLeadModal();
-      showLeadSaved();
-
-      await loadLeadSources();
-      loadLeads();
-    }
-
-    async function deleteLead(id) {
-      if (!confirm("Delete this lead?")) return;
-
-      const { error } = await db.from(LEADS_TABLE).delete().eq("id", id);
-
-      if (error) {
-        alert("Failed to delete lead: " + error.message);
-        return;
-      }
-
-      showLeadSaved();
-      loadLeads();
-    }
-
-    async function loadLeadSources() {
-      const { data } = await db.from(LEADS_TABLE).select("source").not("source", "is", null).limit(1000);
-      fillSelect("leadSourceFilter", [...new Set((data || []).map(x => x.source).filter(Boolean))]);
-    }
-
-    function quickLeadStatus(status) {
-      el("leadStatusFilter").value = status;
-      leadPage = 0;
-      loadLeads();
-    }
-
-    function resetLeadFilters() {
-      el("leadSearchInput").value = "";
-      el("leadStatusFilter").value = "";
-      el("leadSourceFilter").value = "";
-      el("leadProjectFilter").value = "";
-      el("leadFollowUpFilter").value = "";
-      leadPage = 0;
-      loadLeads();
-    }
-
-    function nextLeadPage() {
-      const totalPages = Math.max(1, Math.ceil(leadTotalCount / PAGE_SIZE));
-      if (leadPage + 1 >= totalPages) return;
-      leadPage++;
-      loadLeads();
-    }
-
-    function prevLeadPage() {
-      if (leadPage === 0) return;
-      leadPage--;
-      loadLeads();
-    }
-
-    async function exportLeadsCSV() {
-      if (!isAdmin) return;
-      let allRows = [];
-      let from = 0;
-      const batchSize = 1000;
-
-      while (true) {
-        const { data, error } = await db.from(LEADS_TABLE)
-          .select("lead_receive_date,name,phone,email,project_inquired,budget,property_type,bedroom,source,status,follow_up_date,notes,last_contacted")
-          .range(from, from + batchSize - 1);
-
-        if (error) {
-          alert("Export failed");
-          return;
-        }
-
-        if (!data || data.length === 0) break;
-
-        allRows = allRows.concat(data);
-
-        if (data.length < batchSize) break;
-        from += batchSize;
-      }
-
-      downloadCSV("leads_export", ["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","notes","last_contacted"], allRows);
-    }
-
-    function setupLeadListeners() {
-      if (leadListenersReady) return;
-      leadListenersReady = true;
-
-      ["leadSearchInput", "leadProjectFilter"].forEach(id => {
-        el(id).addEventListener("input", () => {
-          clearTimeout(leadDebounceTimer);
-          leadDebounceTimer = setTimeout(() => {
-            leadPage = 0;
-            loadLeads();
-          }, 400);
-        });
-      });
-
-      ["leadStatusFilter", "leadSourceFilter", "leadFollowUpFilter"].forEach(id => {
-        el(id).addEventListener("change", () => {
-          leadPage = 0;
-          loadLeads();
-        });
-      });
-    }
-
-    function downloadCSV(filename, headers, rows) {
-      const csv = [
-        headers.join(","),
-        ...rows.map(row => headers.map(h => `"${String(row[h] ?? "").replaceAll('"', '""')}"`).join(","))
-      ].join("\n");
-
-      const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `${filename}_${today()}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      URL.revokeObjectURL(url);
-    }
-
-    let resizing = null;
-
-    function startColumnResize(e, table, key) {
-      e.preventDefault();
-
-      const cols = table === "owner" ? ownerColumns : leadColumns;
-      const col = cols.find(c => c.key === key);
-
-      if (!col) return;
-
-      resizing = {
-        table,
-        key,
-        startX: e.clientX,
-        startWidth: Number(col.width || 120)
-      };
-
-      document.addEventListener("mousemove", onColumnResize);
-      document.addEventListener("mouseup", stopColumnResize);
-    }
-
-    function onColumnResize(e) {
-      if (!resizing) return;
-
-      const cols = resizing.table === "owner" ? ownerColumns : leadColumns;
-      const col = cols.find(c => c.key === resizing.key);
-
-      if (!col) return;
-
-      col.width = Math.max(70, resizing.startWidth + (e.clientX - resizing.startX));
-
-      if (resizing.table === "owner") {
-        saveOwnerColumnsState();
-        renderOwnerHead();
-      } else {
-        saveLeadColumnsState();
-        renderLeadHead();
-      }
-    }
-
-    function stopColumnResize() {
-      resizing = null;
-      document.removeEventListener("mousemove", onColumnResize);
-      document.removeEventListener("mouseup", stopColumnResize);
-    }
-  </script>
 </body>
 </html>
