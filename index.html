@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usama Database</title>
+  <title>Property Database</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1006,7 +1006,7 @@
 
 <body>
   <div id="loginView" class="loginBox">
-    <h1>Usama Database</h1>
+    <h1>Property Owner Database</h1>
     <div class="sub">Login to access your database.</div>
     <input id="loginEmail" type="email" placeholder="Email" />
     <input id="loginPassword" type="password" placeholder="Password" />
@@ -1015,7 +1015,7 @@
   </div>
 
   <div id="choiceView" class="choiceBox hidden">
-    <h1>Usama Database</h1>
+    <h1>Property Owner Database</h1>
     <div class="sub">Choose your workspace.</div>
 
     <div class="dashboardCards adminOnly" id="homeKpis">
@@ -1323,22 +1323,27 @@
   <div id="whatsappModal" class="modalOverlay">
     <div class="modal">
       <h2>Edit WhatsApp Message</h2>
-      <div class="sub">Owner name and property details will be added automatically from the database.</div>
+      <div class="sub">Greeting, agent name, company and custom message are editable. Owner name and property details come automatically from the selected database row.</div>
 
       <div class="formGrid">
         <div>
-          <label>Agent Name</label>
-          <input id="wa_agent_name" placeholder="Usama Bin Nusrat" />
+          <label>Greeting</label>
+          <input id="wa_greeting" placeholder="Hello / Good morning / Assalamualaikum" />
         </div>
 
         <div>
+          <label>Agent Name</label>
+          <input id="wa_agent_name" placeholder="Usama" />
+        </div>
+
+        <div class="formFull">
           <label>Company Optional</label>
           <input id="wa_company" placeholder="BFG Properties" />
         </div>
 
         <div class="formFull">
-          <label>Message</label>
-          <textarea id="wa_message" rows="7" placeholder="Write your message here..."></textarea>
+          <label>Your Message</label>
+          <textarea id="wa_message" rows="6" placeholder="Type your custom message here..."></textarea>
         </div>
       </div>
 
@@ -1350,7 +1355,7 @@
       <div class="modalActions">
         <button class="darkBtn" onclick="closeWhatsappMessageModal()">Cancel</button>
         <button class="darkBtn" onclick="resetWhatsappMessageForm()">Reset</button>
-        <button class="primaryBtn" onclick="saveWhatsappSettings()">Save WhatsApp</button>
+        <button class="primaryBtn" onclick="saveWhatsappSettings()">Save Template</button>
       </div>
     </div>
   </div>
@@ -1373,11 +1378,16 @@
     let currentAccess = null;
     let allMiniRows = [];
 
-    const DEFAULT_WHATSAPP_MESSAGE = `Hope you're doing well.
+    const WHATSAPP_TEMPLATE_KEY = "usama_whatsapp_template_v1";
 
-I’m reaching out regarding your property.
+    const DEFAULT_WHATSAPP_TEMPLATE = {
+      greeting: "Hello",
+      agentName: "Usama",
+      company: "BFG Properties",
+      message: "Would you consider selling if you receive a strong offer?"
+    };
 
-Would you consider selling if you receive a strong offer?`;
+    const DEFAULT_WHATSAPP_MESSAGE = DEFAULT_WHATSAPP_TEMPLATE.message;
 
     let leadPage = 0;
     let leadTotalCount = 0;
@@ -1427,7 +1437,7 @@ Would you consider selling if you receive a strong offer?`;
     checkSession();
 
     document.addEventListener("input", function(e) {
-      if (["wa_agent_name", "wa_company", "wa_message"].includes(e.target.id)) {
+      if (["wa_greeting", "wa_agent_name", "wa_company", "wa_message"].includes(e.target.id)) {
         updateWhatsappPreview();
       }
     });
@@ -1650,39 +1660,65 @@ Would you consider selling if you receive a strong offer?`;
       await db.from(TABLE_NAME).update({ last_contacted: today() }).eq("id", id);
     }
 
+    function getSavedWhatsappTemplate() {
+      const fallbackAgentName = (currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || DEFAULT_WHATSAPP_TEMPLATE.agentName).trim();
+
+      const fallback = {
+        greeting: DEFAULT_WHATSAPP_TEMPLATE.greeting,
+        agentName: fallbackAgentName || DEFAULT_WHATSAPP_TEMPLATE.agentName,
+        company: (currentAccess?.whatsapp_company || DEFAULT_WHATSAPP_TEMPLATE.company).trim(),
+        message: (currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_TEMPLATE.message).trim()
+      };
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(WHATSAPP_TEMPLATE_KEY) || "null");
+        if (!saved) return fallback;
+
+        return {
+          greeting: (saved.greeting || fallback.greeting).trim(),
+          agentName: (saved.agentName || fallback.agentName).trim(),
+          company: (saved.company ?? fallback.company).trim(),
+          message: (saved.message || fallback.message).trim()
+        };
+      } catch {
+        return fallback;
+      }
+    }
+
     function getWhatsappAgentName() {
-      return (currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "").trim();
+      return getSavedWhatsappTemplate().agentName;
     }
 
     function getWhatsappCompany() {
-      return (currentAccess?.whatsapp_company || "").trim();
+      return getSavedWhatsappTemplate().company;
     }
 
     function getWhatsappMessageBody() {
-      return (currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE).trim();
+      return getSavedWhatsappTemplate().message;
     }
 
     function buildOwnerMessage(row) {
+      const template = getSavedWhatsappTemplate();
       const owner = get(row, ["owner"]);
       const unit = get(row, ["unit"]);
       const cluster = get(row, ["cluster"]);
       const community = get(row, ["community"]);
-      const firstName = owner ? String(owner).trim().split(" ")[0] : "";
+      const firstName = owner ? String(owner).trim().split(" ")[0] : "Owner";
+      const agentName = template.agentName || "Agent";
+      const introLine = template.company
+        ? `This is ${agentName} from ${template.company}.`
+        : `This is ${agentName}.`;
 
-      return `Hello Mr. ${firstName},
+      return `${template.greeting || "Hello"} Mr. ${firstName},
 
-Hope you're doing well.
+${introLine}
 
-This is Usama from BFG Properties.
+I'm reaching out regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
 
-I’m reaching out regarding your property in ${cluster || ""}, Unit #${unit || ""}, ${community || ""}.
-
-Would you consider selling if you receive a strong offer?
-
-Waiting for your kind response.
+${template.message || ""}
 
 Regards,
-Usama Bin Nusrat`;
+${agentName}`;
     }
 
     function whatsappButton(row) {
@@ -1697,9 +1733,11 @@ Usama Bin Nusrat`;
     }
 
     function openWhatsappMessageModal() {
-      el("wa_agent_name").value = currentAccess?.whatsapp_agent_name || currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "";
-      el("wa_company").value = currentAccess?.whatsapp_company || "";
-      el("wa_message").value = currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_MESSAGE;
+      const template = getSavedWhatsappTemplate();
+      el("wa_greeting").value = template.greeting;
+      el("wa_agent_name").value = template.agentName;
+      el("wa_company").value = template.company;
+      el("wa_message").value = template.message;
       updateWhatsappPreview();
       el("whatsappModal").classList.add("show");
     }
@@ -1709,43 +1747,49 @@ Usama Bin Nusrat`;
     }
 
     function resetWhatsappMessageForm() {
-      el("wa_message").value = DEFAULT_WHATSAPP_MESSAGE;
+      el("wa_greeting").value = DEFAULT_WHATSAPP_TEMPLATE.greeting;
+      el("wa_agent_name").value = DEFAULT_WHATSAPP_TEMPLATE.agentName;
+      el("wa_company").value = DEFAULT_WHATSAPP_TEMPLATE.company;
+      el("wa_message").value = DEFAULT_WHATSAPP_TEMPLATE.message;
       updateWhatsappPreview();
     }
 
     function updateWhatsappPreview() {
-      const agentName = el("wa_agent_name")?.value || "Agent Name";
-      const company = el("wa_company")?.value || "";
-      const messageBody = el("wa_message")?.value || DEFAULT_WHATSAPP_MESSAGE;
+      const greeting = (el("wa_greeting")?.value || "Hello").trim();
+      const agentName = (el("wa_agent_name")?.value || "Agent Name").trim();
+      const company = (el("wa_company")?.value || "").trim();
+      const messageBody = (el("wa_message")?.value || DEFAULT_WHATSAPP_TEMPLATE.message).trim();
+      const introLine = company ? `This is ${agentName} from ${company}.` : `This is ${agentName}.`;
 
-      el("wa_preview").textContent = `Hello Mr. Owner Name,
+      el("wa_preview").textContent = `${greeting} Mr. Owner Name,
+
+${introLine}
+
+I'm reaching out regarding your property in Cluster/Tower, Unit #101, Community.
 
 ${messageBody}
 
-Regarding your property in Cluster, Unit #101, Community.
-
 Regards,
-${agentName}${company ? `\n${company}` : ""}`;
+${agentName}`;
     }
 
-    async function saveWhatsappSettings() {
-      const whatsapp_agent_name = el("wa_agent_name").value.trim();
-      const whatsapp_company = el("wa_company").value.trim();
-      const whatsapp_message = el("wa_message").value.trim();
+    function saveWhatsappSettings() {
+      const template = {
+        greeting: el("wa_greeting").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.greeting,
+        agentName: el("wa_agent_name").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.agentName,
+        company: el("wa_company").value.trim(),
+        message: el("wa_message").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.message
+      };
 
-      const { data, error } = await db
-        .from("user_access")
-        .update({ whatsapp_agent_name, whatsapp_company, whatsapp_message })
-        .eq("email", currentUserEmail)
-        .select("*")
-        .single();
+      localStorage.setItem(WHATSAPP_TEMPLATE_KEY, JSON.stringify(template));
 
-      if (error) {
-        alert("Failed to save WhatsApp settings. Make sure SQL columns exist in user_access.");
-        return;
-      }
+      currentAccess = {
+        ...currentAccess,
+        whatsapp_agent_name: template.agentName,
+        whatsapp_company: template.company,
+        whatsapp_message: template.message
+      };
 
-      currentAccess = data || { ...currentAccess, whatsapp_agent_name, whatsapp_company, whatsapp_message };
       closeWhatsappMessageModal();
       showSaved();
     }
