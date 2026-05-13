@@ -1630,7 +1630,13 @@ Would you consider selling if you receive a strong offer?`;
 
     async function countRows(table, field = null, value = null) {
       let q = db.from(table).select("*", { count:"exact", head:true });
+
+      if (table === TABLE_NAME) {
+        q = applyAccessFilter(q);
+      }
+
       if (field && value) q = q.eq(field, value);
+
       const { count } = await q;
       return count || 0;
     }
@@ -1835,6 +1841,41 @@ ${agentName}${company ? `\n${company}` : ""}`;
       if (lastCell) lastCell.textContent = today();
     }
 
+    function pgInList(values) {
+      return values
+        .filter(Boolean)
+        .map(v => `"${String(v).replaceAll('"', '\"')}"`)
+        .join(",");
+    }
+
+    function applyAccessFilter(query) {
+      if (isAdmin) return query;
+
+      const assignedCommunities = Array.isArray(currentAccess?.assigned_communities)
+        ? currentAccess.assigned_communities.filter(Boolean)
+        : [];
+
+      const assignedClusters = Array.isArray(currentAccess?.assigned_clusters)
+        ? currentAccess.assigned_clusters.filter(Boolean)
+        : [];
+
+      if (!assignedCommunities.length && !assignedClusters.length) {
+        return query.eq("id", "__no_access__");
+      }
+
+      const rules = [];
+
+      if (assignedCommunities.length) {
+        rules.push(`community.in.(${pgInList(assignedCommunities)})`);
+      }
+
+      if (assignedClusters.length) {
+        rules.push(`cluster.in.(${pgInList(assignedClusters)})`);
+      }
+
+      return query.or(rules.join(","));
+    }
+
     function applyFilters(query) {
       const search = el("searchInput").value.trim();
       const community = el("communityFilter").value;
@@ -1864,6 +1905,7 @@ ${agentName}${company ? `\n${company}` : ""}`;
 
       let query = db.from(TABLE_NAME).select("*", { count:"exact" }).range(from, to);
 
+      query = applyAccessFilter(query);
       query = applyFilters(query);
 
       query = query
@@ -2115,9 +2157,13 @@ ${agentName}${company ? `\n${company}` : ""}`;
       const batchSize = 1000;
 
       while (true) {
-        const { data, error } = await db.from(TABLE_NAME)
+        let q = db.from(TABLE_NAME)
           .select("id, community, cluster, unit, unit_sort, owner, phone1, phone2, data_source, status, last_contacted")
           .range(from, from + batchSize - 1);
+
+        q = applyAccessFilter(q);
+
+        const { data, error } = await q;
 
         if (error || !data || data.length === 0) break;
 
@@ -2184,16 +2230,20 @@ ${agentName}${company ? `\n${company}` : ""}`;
     }
 
     async function exportCSV() {
-      if (!currentAccess?.can_export) return;
+      if (!isAdmin && !currentAccess?.can_export) return;
 
       let allRows = [];
       let from = 0;
       const batchSize = 1000;
 
       while (true) {
-        const { data, error } = await db.from(TABLE_NAME)
+        let q = db.from(TABLE_NAME)
           .select("community,cluster,unit,owner,phone1,phone2,remarks,admin_remarks,agent_remarks,data_source,status,last_contacted")
           .range(from, from + batchSize - 1);
+
+        q = applyAccessFilter(q);
+
+        const { data, error } = await q;
 
         if (error) {
           alert("Export failed");
