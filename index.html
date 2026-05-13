@@ -1841,13 +1841,6 @@ ${agentName}${company ? `\n${company}` : ""}`;
       if (lastCell) lastCell.textContent = today();
     }
 
-    function pgInList(values) {
-      return values
-        .filter(Boolean)
-        .map(v => `"${String(v).replaceAll('"', '\"')}"`)
-        .join(",");
-    }
-
     function applyAccessFilter(query) {
       if (isAdmin) return query;
 
@@ -1859,21 +1852,30 @@ ${agentName}${company ? `\n${company}` : ""}`;
         ? currentAccess.assigned_clusters.filter(Boolean)
         : [];
 
-      if (!assignedCommunities.length && !assignedClusters.length) {
-        return query.eq("id", "__no_access__");
+      const hasCommunities = assignedCommunities.length > 0;
+      const hasClusters = assignedClusters.length > 0;
+
+      // No assigned access: return no rows without causing bigint/text error.
+      if (!hasCommunities && !hasClusters) {
+        return query.eq("id", -999999999);
       }
 
-      const rules = [];
-
-      if (assignedCommunities.length) {
-        rules.push(`community.in.(${pgInList(assignedCommunities)})`);
+      // Community access OR cluster access.
+      if (hasCommunities && hasClusters) {
+        return query.or(
+          `community.in.(${assignedCommunities.map(v => `"${String(v).replaceAll('"', '\"')}"`).join(",")}),cluster.in.(${assignedClusters.map(v => `"${String(v).replaceAll('"', '\"')}"`).join(",")})`
+        );
       }
 
-      if (assignedClusters.length) {
-        rules.push(`cluster.in.(${pgInList(assignedClusters)})`);
+      if (hasCommunities) {
+        return query.in("community", assignedCommunities);
       }
 
-      return query.or(rules.join(","));
+      if (hasClusters) {
+        return query.in("cluster", assignedClusters);
+      }
+
+      return query.eq("id", -999999999);
     }
 
     function applyFilters(query) {
