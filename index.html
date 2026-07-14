@@ -1001,6 +1001,19 @@
         grid-template-columns:1fr;
       }
     }
+
+
+    /* ===== CRM UPGRADE: status, remarks, kanban, timeline, reminders, broadcast ===== */
+    .viewSwitch{display:flex;gap:8px;flex-wrap:wrap}
+    .viewSwitch button.active{background:linear-gradient(135deg,#2563eb,#059669);border-color:transparent}
+    .remarksRead{width:100%;min-height:48px;max-height:72px;overflow:hidden;white-space:normal;line-height:1.45;padding:9px 10px;border:1px solid rgba(148,163,184,.10);background:#030712;border-radius:11px;color:#e5edf8;cursor:pointer}
+    .remarksRead:hover{border-color:rgba(59,130,246,.45)}
+    .statusManagerRow{display:flex;gap:8px;margin-top:12px}.statusManagerRow input{flex:1}
+    .statusChipList{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.statusChip{display:inline-flex;align-items:center;gap:7px;background:#07111f;border:1px solid rgba(148,163,184,.18);padding:7px 9px;border-radius:999px;font-size:12px}.statusChip button{background:transparent;color:#fecaca;padding:0 2px}
+    .kanbanBoard{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 16px;min-height:560px}.kanbanCol{flex:0 0 300px;background:#050914;border:1px solid rgba(148,163,184,.14);border-radius:18px;padding:12px}.kanbanHead{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:10px}.kanbanCount{background:#111827;padding:4px 8px;border-radius:999px;font-size:11px;color:#cbd5e1}.kanbanDrop{min-height:500px}.kanbanCard{background:#020617;border:1px solid rgba(148,163,184,.16);border-radius:14px;padding:12px;margin-bottom:10px;cursor:grab}.kanbanCard:active{cursor:grabbing}.kanbanCard.dragging{opacity:.45}.kanbanCardTitle{font-weight:700;margin-bottom:6px}.kanbanMeta{font-size:12px;color:#94a3b8;line-height:1.6}.kanbanActions{display:flex;gap:7px;margin-top:10px}.kanbanActions button,.kanbanActions a{flex:1;text-align:center}
+    .leadDetailGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.activityComposer{background:#050914;border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:14px}.activityList{margin-top:12px}.activityEntry{border-left:2px solid rgba(37,99,235,.55);padding:0 0 14px 12px;margin-left:5px}.activityEntry:last-child{padding-bottom:0}.activityTop{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px}.activityType{font-weight:700}.activityTime{font-size:11px;color:#94a3b8}.activityText{white-space:pre-wrap;color:#dbe4f0;font-size:13px;line-height:1.55}.reminderPanel{background:#050914;border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:14px;margin-bottom:14px}.reminderGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.reminderCard{background:#020617;border:1px solid rgba(148,163,184,.14);border-radius:14px;padding:12px;cursor:pointer}.reminderCard.overdue{border-color:rgba(239,68,68,.45)}.reminderCard.todayDue{border-color:rgba(245,158,11,.5)}.reminderTitle{font-weight:700}.reminderMeta{font-size:12px;color:#94a3b8;margin-top:5px}.broadcastBar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:11px 12px;background:#050914;border:1px solid rgba(148,163,184,.14);border-radius:14px}.broadcastProgress{height:10px;background:#111827;border-radius:999px;overflow:hidden;margin:10px 0}.broadcastProgress>div{height:100%;background:linear-gradient(90deg,#2563eb,#10b981);width:0}.ownerSelect{width:18px;height:18px;accent-color:#2563eb}.broadcastQueue{max-height:280px;overflow:auto;border:1px solid rgba(148,163,184,.12);border-radius:12px}.broadcastQueueRow{display:grid;grid-template-columns:1fr 120px;gap:10px;padding:9px 11px;border-top:1px solid rgba(148,163,184,.08);font-size:12px}.broadcastQueueRow:first-child{border-top:none}.badgeOk{color:#a7f3d0}.badgeWait{color:#fde68a}.badgeSkip{color:#fecaca}.followupAlert{position:fixed;right:18px;bottom:18px;z-index:150;width:min(390px,calc(100vw - 36px));background:#08111f;border:1px solid rgba(245,158,11,.45);border-radius:16px;padding:14px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
+    @media(max-width:800px){.leadDetailGrid,.reminderGrid{grid-template-columns:1fr}.kanbanCol{flex-basis:86vw}.broadcastQueueRow{grid-template-columns:1fr}}
+
   </style>
 </head>
 
@@ -1103,6 +1116,8 @@
 
       <div class="actionsRow">
         <button class="darkBtn" onclick="openWhatsappMessageModal()">Edit WhatsApp</button>
+        <button class="darkBtn" onclick="openOwnerStatusModal()">Manage Statuses</button>
+        <button class="primaryBtn" onclick="openBroadcastModal()">WhatsApp Broadcast</button>
         <button class="darkBtn" onclick="openOwnerColumnModal()">Manage Columns</button>
         <button class="reset" onclick="resetFilters()">Reset Filters</button>
       </div>
@@ -1142,10 +1157,19 @@
       <div class="headerBtns">
         <button class="darkBtn adminOnly" onclick="showChoiceView()">Dashboard</button>
         <button class="primaryBtn" onclick="showOwnersView()">Owner Database</button>
+        <div class="viewSwitch"><button id="tableViewBtn" class="darkBtn active" onclick="setLeadView('table')">Table</button><button id="kanbanViewBtn" class="darkBtn" onclick="setLeadView('kanban')">Kanban</button></div>
         <button class="primaryBtn" onclick="openLeadModal()">+ Add Lead</button>
         <button class="primaryBtn" onclick="exportLeadsCSV()">Export Leads</button>
         <button class="darkBtn" onclick="logout()">Logout</button>
       </div>
+    </div>
+
+    <div id="followupDashboard" class="reminderPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
+        <div><h2 style="margin:0">Follow-up Reminders</h2><div class="sub" style="margin:4px 0 0">Overdue, today and upcoming callbacks.</div></div>
+        <button class="darkBtn" onclick="loadFollowupDashboard()">Refresh</button>
+      </div>
+      <div id="followupCards" class="reminderGrid"><div class="empty">Loading reminders...</div></div>
     </div>
 
     <div class="card">
@@ -1195,6 +1219,14 @@
           <thead id="leadsTableHead"></thead>
           <tbody id="leadsTableBody"></tbody>
         </table>
+      </div>
+
+      <div id="kanbanWrap" class="hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px;">
+          <div class="sub" style="margin:0">Drag a lead to another stage to update its status.</div>
+          <button class="darkBtn" onclick="openPipelineModal()">Manage Pipeline Stages</button>
+        </div>
+        <div id="kanbanBoard" class="kanbanBoard"></div>
       </div>
 
       <div id="leadMobileCards" class="mobileCards"></div>
@@ -1295,6 +1327,9 @@
         </div>
 
         <div><label>Follow-up Date</label><input id="form_follow_up_date" type="date"></div>
+        <div><label>Follow-up Time</label><input id="form_follow_up_time" type="time"></div>
+        <div><label>Reminder Type</label><select id="form_reminder_type"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>General Follow-up</option></select></div>
+        <div><label>Reminder Note</label><input id="form_reminder_note" placeholder="What do you need to do?"></div>
         <div><label>Last Contacted</label><input id="form_last_contacted" type="date"></div>
         <div class="formFull"><label>Notes</label><textarea id="form_notes" rows="4" placeholder="Notes"></textarea></div>
       </div>
@@ -1319,6 +1354,17 @@
       </div>
     </div>
   </div>
+
+
+  <div id="ownerStatusModal" class="modalOverlay"><div class="modal"><h2>Manage Owner Statuses</h2><div class="sub">Add reusable statuses such as Rented, Agent or Follow Up Later.</div><div class="statusManagerRow"><input id="newOwnerStatus" placeholder="New status name"><button class="primaryBtn" onclick="addOwnerStatus()">Add Status</button></div><div id="ownerStatusChipList" class="statusChipList"></div><div class="modalActions"><button class="darkBtn" onclick="closeOwnerStatusModal()">Close</button></div></div></div>
+
+  <div id="pipelineModal" class="modalOverlay"><div class="modal"><h2>Manage Pipeline Stages</h2><div class="sub">Stages are used in the lead status dropdown and Kanban board.</div><div class="statusManagerRow"><input id="newPipelineStage" placeholder="New stage name"><button class="primaryBtn" onclick="addPipelineStage()">Add Stage</button></div><div id="pipelineChipList" class="statusChipList"></div><div class="modalActions"><button class="darkBtn" onclick="closePipelineModal()">Close</button></div></div></div>
+
+  <div id="remarkModal" class="modalOverlay"><div class="modal"><h2>Owner Remark</h2><textarea id="remarkModalText" rows="8" placeholder="Add or edit the latest remark"></textarea><input id="remarkModalOwnerId" type="hidden"><div class="modalActions"><button class="darkBtn" onclick="closeRemarkModal()">Cancel</button><button class="primaryBtn" onclick="saveRemarkModal()">Save Remark</button></div></div></div>
+
+  <div id="leadDetailModal" class="modalOverlay"><div class="modal profileModal"><div id="leadDetailContent"></div></div></div>
+
+  <div id="broadcastModal" class="modalOverlay"><div class="modal profileModal"><h2>WhatsApp Broadcast</h2><div class="sub">Choose current page selections or every owner matching the active filters. Messages open one by one in WhatsApp; this browser code does not bypass WhatsApp limits or send invisibly.</div><div class="formGrid"><div><label>Recipients</label><select id="broadcastScope"><option value="selected">Selected owners</option><option value="filtered">All owners matching current filters</option></select></div><div><label>Delay between opening chats</label><select id="broadcastDelay"><option value="3000">3 seconds</option><option value="5000" selected>5 seconds</option><option value="8000">8 seconds</option></select></div><div class="formFull"><label>Message body</label><textarea id="broadcastMessage" rows="6" placeholder="Use {first_name}, {owner}, {unit}, {cluster}, {community}"></textarea></div></div><div class="broadcastProgress"><div id="broadcastProgressBar"></div></div><div id="broadcastProgressText" class="sub" style="margin:0 0 10px">Ready.</div><div id="broadcastQueue" class="broadcastQueue"></div><div class="modalActions"><button class="dangerBtn" onclick="stopBroadcast()">Stop</button><button class="darkBtn" onclick="closeBroadcastModal()">Close</button><button class="primaryBtn" onclick="startBroadcast()">Start Broadcast</button></div></div></div>
 
   <div id="whatsappModal" class="modalOverlay">
     <div class="modal">
@@ -1936,7 +1982,7 @@ ${agentName}`;
 
       if (community) query = query.eq("community", community);
       if (cluster) query = query.eq("cluster", cluster);
-      if (unit) query = query.ilike("unit", `%${unit}%`);
+      if (unit) query = query.eq("unit", unit);
       if (source) query = query.eq("data_source", source);
       if (status) query = query.eq("status", status);
 
@@ -2962,6 +3008,107 @@ Usama Bin Nusrat.`;
       document.removeEventListener("mousemove", onColumnResize);
       document.removeEventListener("mouseup", stopColumnResize);
     }
+
+
+    // ===== CRM UPGRADE LOGIC =====
+    const OWNER_STATUS_KEY = "usama_owner_custom_statuses_v1";
+    const PIPELINE_STAGE_KEY = "usama_lead_pipeline_stages_v1";
+    const DEFAULT_OWNER_STATUSES = ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
+    const DEFAULT_PIPELINE_STAGES = ["New","Contacted","Call Back","Interested","Viewing","Negotiation","Won","Lost"];
+    let leadViewMode = "table";
+    let selectedOwnerIds = new Set();
+    let currentOwnerPageRows = [];
+    let broadcastStopRequested = false;
+    let activeLeadDetailId = null;
+
+    function uniqClean(values){ return [...new Set((values||[]).map(v=>String(v||"").trim()).filter(Boolean))]; }
+    function getOwnerStatuses(){ try{return uniqClean([...DEFAULT_OWNER_STATUSES,...JSON.parse(localStorage.getItem(OWNER_STATUS_KEY)||"[]")]);}catch{return [...DEFAULT_OWNER_STATUSES];} }
+    function getPipelineStages(){ try{return uniqClean([...DEFAULT_PIPELINE_STAGES,...JSON.parse(localStorage.getItem(PIPELINE_STAGE_KEY)||"[]")]);}catch{return [...DEFAULT_PIPELINE_STAGES];} }
+    function saveCustomOwnerStatuses(values){ localStorage.setItem(OWNER_STATUS_KEY,JSON.stringify(uniqClean(values.filter(v=>!DEFAULT_OWNER_STATUSES.includes(v))))); refreshOwnerStatusUI(); }
+    function savePipelineStages(values){ localStorage.setItem(PIPELINE_STAGE_KEY,JSON.stringify(uniqClean(values))); refreshLeadStatusUI(); }
+
+    function openOwnerStatusModal(){ renderOwnerStatusChips(); el("ownerStatusModal").classList.add("show"); }
+    function closeOwnerStatusModal(){ el("ownerStatusModal").classList.remove("show"); }
+    function renderOwnerStatusChips(){ el("ownerStatusChipList").innerHTML=getOwnerStatuses().map(s=>`<span class="statusChip">${escapeHtml(s)}${DEFAULT_OWNER_STATUSES.includes(s)?"":`<button onclick="removeOwnerStatus('${escapeHtml(s)}')">×</button>`}</span>`).join(""); }
+    function addOwnerStatus(){ const v=el("newOwnerStatus").value.trim(); if(!v)return; saveCustomOwnerStatuses([...getOwnerStatuses(),v]); el("newOwnerStatus").value=""; renderOwnerStatusChips(); }
+    function removeOwnerStatus(v){ saveCustomOwnerStatuses(getOwnerStatuses().filter(x=>x!==v)); renderOwnerStatusChips(); }
+    function refreshOwnerStatusUI(){
+      const current=el("statusFilter")?.value||"";
+      if(el("statusFilter")) el("statusFilter").innerHTML=`<option value="">All Statuses</option>`+getOwnerStatuses().map(s=>`<option ${s===current?"selected":""}>${escapeHtml(s)}</option>`).join("");
+      document.querySelectorAll(".quickFilters").forEach((box,i)=>{ if(i===0) box.innerHTML=getOwnerStatuses().map(s=>`<button onclick="quickStatus('${escapeHtml(s)}')">${escapeHtml(s)}</button>`).join(""); });
+    }
+
+    const _oldStatusDropdown = statusDropdown;
+    statusDropdown = function(row){ const current=clean(row.status)==="-"?"New":row.status; return `<select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">${getOwnerStatuses().map(s=>`<option ${s===current?"selected":""}>${escapeHtml(s)}</option>`).join("")}</select>`; };
+
+    function openRemarkModal(id, value){ el("remarkModalOwnerId").value=id; el("remarkModalText").value=value||""; el("remarkModal").classList.add("show"); }
+    function closeRemarkModal(){ el("remarkModal").classList.remove("show"); }
+    async function saveRemarkModal(){ const id=el("remarkModalOwnerId").value; const remarkColumn=isAdmin?"admin_remarks":"agent_remarks"; const value=el("remarkModalText").value; const {error}=await db.from(TABLE_NAME).update({[remarkColumn]:value,last_contacted:today()}).eq("id",id); if(error){alert(error.message);return;} closeRemarkModal();showSaved();loadData(); }
+    remarksEditor = function(row, remarks, prefix){ return `<div class="remarksRead" title="Click to read or edit full remark" onclick='openRemarkModal(${JSON.stringify(String(row.id))}, ${JSON.stringify(String(remarks||""))})'>${escapeHtml(remarks||"No remark yet")}</div>`; };
+
+    function refreshLeadStatusUI(){
+      const stages=getPipelineStages(); const cur=el("leadStatusFilter")?.value||"";
+      if(el("leadStatusFilter")) el("leadStatusFilter").innerHTML=`<option value="">All Statuses</option>`+stages.map(s=>`<option ${s===cur?"selected":""}>${escapeHtml(s)}</option>`).join("");
+      if(el("form_status")) { const v=el("form_status").value||"New"; el("form_status").innerHTML=stages.map(s=>`<option ${s===v?"selected":""}>${escapeHtml(s)}</option>`).join(""); }
+    }
+    function openPipelineModal(){ renderPipelineChips(); el("pipelineModal").classList.add("show"); }
+    function closePipelineModal(){ el("pipelineModal").classList.remove("show"); }
+    function renderPipelineChips(){ el("pipelineChipList").innerHTML=getPipelineStages().map(s=>`<span class="statusChip">${escapeHtml(s)}<button onclick="removePipelineStage('${escapeHtml(s)}')">×</button></span>`).join(""); }
+    function addPipelineStage(){ const v=el("newPipelineStage").value.trim(); if(!v)return; savePipelineStages([...getPipelineStages(),v]); el("newPipelineStage").value=""; renderPipelineChips(); if(leadViewMode==="kanban")loadKanban(); }
+    function removePipelineStage(v){ if(!confirm(`Remove stage "${v}"? Existing leads keep that status until changed.`))return; savePipelineStages(getPipelineStages().filter(x=>x!==v)); renderPipelineChips(); if(leadViewMode==="kanban")loadKanban(); }
+
+    const _oldLeadDropdownOptions=leadDropdownOptions;
+    leadDropdownOptions=function(field){ if(field==="status")return getPipelineStages(); return _oldLeadDropdownOptions(field); };
+
+    function setLeadView(mode){ leadViewMode=mode; const tableBox=document.querySelector("#leadsView .tablebox"); const mobile=el("leadMobileCards"); const pager=document.querySelector("#leadsView .pager"); const kanban=el("kanbanWrap"); el("tableViewBtn").classList.toggle("active",mode==="table"); el("kanbanViewBtn").classList.toggle("active",mode==="kanban"); if(mode==="kanban"){tableBox.classList.add("hidden");mobile.classList.add("hidden");pager.classList.add("hidden");kanban.classList.remove("hidden");loadKanban();}else{tableBox.classList.remove("hidden");kanban.classList.add("hidden");pager.classList.remove("hidden");if(window.innerWidth<=800)mobile.classList.remove("hidden");loadLeads();} }
+
+    async function fetchFilteredLeads(limit=1000){ let q=db.from(LEADS_TABLE).select("*").limit(limit); q=applyLeadFilters(q); q=q.order("created_at",{ascending:false}); const {data,error}=await q; if(error){alert(error.message);return [];} return data||[]; }
+    async function loadKanban(){ if(!isAdmin)return; const rows=await fetchFilteredLeads(2000); const stages=uniqClean([...getPipelineStages(),...rows.map(r=>r.status||"New")]); el("kanbanBoard").innerHTML=stages.map(stage=>{const items=rows.filter(r=>(r.status||"New")===stage);return `<div class="kanbanCol"><div class="kanbanHead"><span>${escapeHtml(stage)}</span><span class="kanbanCount">${items.length}</span></div><div class="kanbanDrop" ondragover="event.preventDefault()" ondrop="dropLeadToStage(event,'${escapeHtml(stage)}')">${items.map(kanbanCardHtml).join("")}</div></div>`;}).join(""); }
+    function kanbanCardHtml(row){ return `<div class="kanbanCard" draggable="true" ondragstart="startLeadDrag(event,'${row.id}')"><div class="kanbanCardTitle">${escapeHtml(clean(row.name))}</div><div class="kanbanMeta">${escapeHtml(clean(row.project_inquired))}<br>Budget: ${escapeHtml(clean(row.budget))}<br>Follow-up: ${escapeHtml(clean(row.follow_up_date))} ${escapeHtml(row.follow_up_time||"")}</div><div class="kanbanActions"><button class="darkBtn" onclick="openLeadDetail('${row.id}')">Open</button>${leadWhatsappButton(row)}</div></div>`; }
+    function startLeadDrag(e,id){ e.dataTransfer.setData("text/plain",id); e.currentTarget.classList.add("dragging"); setTimeout(()=>e.currentTarget.classList.remove("dragging"),300); }
+    async function dropLeadToStage(e,stage){ e.preventDefault(); const id=e.dataTransfer.getData("text/plain"); if(!id)return; const {data:old}=await db.from(LEADS_TABLE).select("status").eq("id",id).single(); const {error}=await db.from(LEADS_TABLE).update({status:stage,last_contacted:today()}).eq("id",id); if(error){alert(error.message);return;} await logLeadActivity(id,"Status Change",`Status changed from ${old?.status||"-"} to ${stage}.`); showLeadSaved(); loadKanban(); loadFollowupDashboard(); }
+
+    async function logLeadActivity(leadId,type,details){ const {error}=await db.from("lead_activities").insert([{lead_id:leadId,activity_type:type,details,created_by:currentUserEmail||null}]); if(error) console.warn("Activity log failed",error.message); }
+    async function openLeadDetail(id){ activeLeadDetailId=id; const [{data:lead,error},{data:acts}]=await Promise.all([db.from(LEADS_TABLE).select("*").eq("id",id).single(),db.from("lead_activities").select("*").eq("lead_id",id).order("created_at",{ascending:false})]); if(error){alert(error.message);return;} renderLeadDetail(lead,acts||[]); el("leadDetailModal").classList.add("show"); }
+    function closeLeadDetail(){ el("leadDetailModal").classList.remove("show"); activeLeadDetailId=null; }
+    function renderLeadDetail(lead,acts){ el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Follow-up</label><div>${escapeHtml(clean(lead.follow_up_date))} ${escapeHtml(lead.follow_up_time||"")}</div></div><div class="profileBox"><label>Reminder</label><div>${escapeHtml(lead.reminder_type||"Call")} — ${escapeHtml(lead.reminder_note||"")}</div></div></div><div class="modalActions"><button class="primaryBtn" onclick="markFollowupDone('${lead.id}')">Mark Follow-up Done</button></div></div></div>`; }
+    async function addLeadActivity(id){ const type=el("activityType").value; const details=el("activityDetails").value.trim(); const when=el("activityWhen").value; if(!details){alert("Write the discussion first.");return;} const payload={lead_id:id,activity_type:type,details,created_by:currentUserEmail||null}; if(when)payload.created_at=new Date(when).toISOString(); const {error}=await db.from("lead_activities").insert([payload]); if(error){alert(error.message);return;} await db.from(LEADS_TABLE).update({last_contacted:today()}).eq("id",id); openLeadDetail(id); }
+    async function markFollowupDone(id){ await logLeadActivity(id,"Follow-up Completed","Follow-up marked as completed."); const {error}=await db.from(LEADS_TABLE).update({follow_up_date:null,follow_up_time:null,reminder_note:null}).eq("id",id); if(error){alert(error.message);return;} closeLeadDetail();loadFollowupDashboard();if(leadViewMode==="kanban")loadKanban();else loadLeads(); }
+
+    async function loadFollowupDashboard(){ if(!isAdmin)return; const todayStr=today(); const future=new Date();future.setDate(future.getDate()+7);const futureStr=future.toISOString().slice(0,10); const {data,error}=await db.from(LEADS_TABLE).select("id,name,phone,project_inquired,follow_up_date,follow_up_time,reminder_type,reminder_note,status").not("follow_up_date","is",null).lte("follow_up_date",futureStr).order("follow_up_date",{ascending:true}).limit(50); if(error){el("followupCards").innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;return;} const rows=data||[]; const overdue=rows.filter(r=>r.follow_up_date<todayStr);const due=rows.filter(r=>r.follow_up_date===todayStr);const upcoming=rows.filter(r=>r.follow_up_date>todayStr); const card=(title,list,cls)=>`<div class="reminderCard ${cls}" onclick="${list[0]?`openLeadDetail('${list[0].id}')`:''}"><div class="reminderTitle">${title}: ${list.length}</div><div class="reminderMeta">${list.slice(0,3).map(x=>`${escapeHtml(x.name||"Unnamed")} — ${escapeHtml(x.follow_up_time||x.follow_up_date)}`).join("<br>")||"Nothing due"}</div></div>`; el("followupCards").innerHTML=card("Overdue",overdue,"overdue")+card("Today",due,"todayDue")+card("Next 7 Days",upcoming,""); if(overdue.length||due.length)showFollowupAlert(overdue,due); }
+    function showFollowupAlert(overdue,due){ if(document.getElementById("followupAlert"))return; const box=document.createElement("div");box.id="followupAlert";box.className="followupAlert";box.innerHTML=`<div style="font-weight:700">Follow-up reminder</div><div class="sub" style="margin:5px 0 10px">${due.length} due today · ${overdue.length} overdue</div><button class="darkBtn" onclick="this.parentElement.remove();document.getElementById('followupDashboard').scrollIntoView({behavior:'smooth'})">View Follow-ups</button>`;document.body.appendChild(box); }
+
+    // Add Open button to desktop lead actions.
+    const _oldRenderLeads=renderLeads;
+    renderLeads=function(rows){ _oldRenderLeads(rows); rows.forEach(row=>{ const saveBtn=el(`save_lead_${row.id}`); const actions=saveBtn?.parentElement; if(actions&&!actions.querySelector('.openLeadDetailBtn')){ const b=document.createElement('button');b.className='iconBtn openLeadDetailBtn';b.title='Open lead history';b.textContent='☰';b.onclick=()=>openLeadDetail(String(row.id));actions.insertBefore(b,actions.firstChild);} }); };
+
+    // Track status changes in activity history.
+    const _oldSaveLeadField=saveLeadField;
+    saveLeadField=async function(id,field,value){ let oldValue=null; if(field==="status"){const {data}=await db.from(LEADS_TABLE).select("status").eq("id",id).single();oldValue=data?.status;} await _oldSaveLeadField(id,field,value); if(field==="status"&&oldValue!==value)await logLeadActivity(id,"Status Change",`Status changed from ${oldValue||"-"} to ${value}.`); };
+
+    // Extend lead modal payload with reminder fields.
+    const _oldOpenLeadModal=openLeadModal;
+    openLeadModal=function(row=null){ _oldOpenLeadModal(row); ["follow_up_time","reminder_type","reminder_note"].forEach(f=>{const n=el(`form_${f}`);if(n)n.value=row?.[f]||(f==="reminder_type"?"Call":"");}); refreshLeadStatusUI(); };
+    const _oldSaveLeadFromModal=saveLeadFromModal;
+    saveLeadFromModal=async function(){ const oldId=editingLeadId; const oldStatus=oldId?(await db.from(LEADS_TABLE).select("status").eq("id",oldId).single()).data?.status:null; const fields=["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","follow_up_time","reminder_type","reminder_note","notes","last_contacted"]; const payload={};fields.forEach(f=>payload[f]=el(`form_${f}`)?.value||null); let result; if(editingLeadId){result=await db.from(LEADS_TABLE).update(payload).eq("id",editingLeadId);}else{result=await db.from(LEADS_TABLE).insert([payload]).select("id").single();} if(result.error){alert("Failed to save lead: "+result.error.message);return;} const id=oldId||result.data?.id; if(id){if(!oldId)await logLeadActivity(id,"Lead Created","Lead added to the CRM.");else if(oldStatus!==payload.status)await logLeadActivity(id,"Status Change",`Status changed from ${oldStatus||"-"} to ${payload.status||"-"}.`);} closeLeadModal();showLeadSaved();await loadLeadSources();loadFollowupDashboard();leadViewMode==="kanban"?loadKanban():loadLeads(); };
+
+    // Owner selection + broadcast. Selection is added to each rendered desktop/mobile row.
+    const _oldRenderData=renderData;
+    renderData=function(rows){ currentOwnerPageRows=rows||[]; _oldRenderData(rows); const headRow=el("ownersTableHead")?.querySelector("tr"); if(headRow&&!headRow.querySelector('.selectOwnerHead')){ const th=document.createElement('th');th.className='selectOwnerHead';th.style.width='48px';th.innerHTML='<input class="ownerSelect" type="checkbox" onchange="toggleCurrentPageOwners(this.checked)">';headRow.insertBefore(th,headRow.firstChild);} const bodyRows=[...el("tableBody").querySelectorAll("tr")];bodyRows.forEach((tr,i)=>{const row=rows[i];if(!row)return;const td=document.createElement('td');td.style.width='48px';td.innerHTML=`<input class="ownerSelect" type="checkbox" ${selectedOwnerIds.has(String(row.id))?'checked':''} onchange="toggleOwnerSelection('${row.id}',this.checked)">`;tr.insertBefore(td,tr.firstChild);}); };
+    function toggleOwnerSelection(id,checked){ checked?selectedOwnerIds.add(String(id)):selectedOwnerIds.delete(String(id)); }
+    function toggleCurrentPageOwners(checked){ currentOwnerPageRows.forEach(r=>checked?selectedOwnerIds.add(String(r.id)):selectedOwnerIds.delete(String(r.id))); loadData(); }
+    function openBroadcastModal(){ const t=getSavedWhatsappTemplate(); el("broadcastMessage").value=t.message||DEFAULT_WHATSAPP_MESSAGE; el("broadcastProgressBar").style.width="0%";el("broadcastProgressText").textContent=`${selectedOwnerIds.size} owners currently selected.`;el("broadcastQueue").innerHTML="";el("broadcastModal").classList.add("show"); }
+    function closeBroadcastModal(){ el("broadcastModal").classList.remove("show"); }
+    function stopBroadcast(){ broadcastStopRequested=true;el("broadcastProgressText").textContent="Stopping after current recipient..."; }
+    function applyBroadcastTemplate(text,row){const owner=get(row,["owner"]);const first=owner?String(owner).trim().split(/\s+/)[0]:"Owner";return String(text||"").replaceAll("{first_name}",first).replaceAll("{owner}",owner||"").replaceAll("{unit}",get(row,["unit"])||"").replaceAll("{cluster}",get(row,["cluster"])||"").replaceAll("{community}",get(row,["community"])||"");}
+    async function fetchFilteredOwnersForBroadcast(){let all=[];let from=0;const batch=1000;while(true){let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").range(from,from+batch-1);q=applyAccessFilter(q);q=applyFilters(q);const {data,error}=await q;if(error){alert(error.message);return [];}all=all.concat(data||[]);if(!data||data.length<batch)break;from+=batch;}return all;}
+    async function startBroadcast(){broadcastStopRequested=false;const scope=el("broadcastScope").value;let rows;if(scope==="filtered")rows=await fetchFilteredOwnersForBroadcast();else{const ids=[...selectedOwnerIds];if(!ids.length){alert("Select at least one owner first.");return;}const {data,error}=await db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").in("id",ids);if(error){alert(error.message);return;}rows=data||[];} const seen=new Set();rows=rows.filter(r=>{const p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"]));if(!p||seen.has(p))return false;seen.add(p);return true;});const base=el("broadcastMessage").value.trim();const delay=Number(el("broadcastDelay").value||5000);el("broadcastQueue").innerHTML=rows.map(r=>`<div class="broadcastQueueRow" id="bq_${r.id}"><span>${escapeHtml(clean(r.owner))} · ${escapeHtml(clean(r.unit))}</span><span class="badgeWait">Waiting</span></div>`).join("");for(let i=0;i<rows.length;i++){if(broadcastStopRequested)break;const r=rows[i];const p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"]));const msg=applyBroadcastTemplate(base,r);const win=window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,"_blank");const statusNode=el(`bq_${r.id}`)?.lastElementChild;if(statusNode){statusNode.textContent=win?"Opened":"Popup blocked";statusNode.className=win?"badgeOk":"badgeSkip";}await db.from("whatsapp_broadcast_log").insert([{owner_id:r.id,phone:p,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);await db.from(TABLE_NAME).update({last_contacted:today()}).eq("id",r.id);const pct=Math.round(((i+1)/rows.length)*100);el("broadcastProgressBar").style.width=pct+"%";el("broadcastProgressText").textContent=`Processed ${i+1} of ${rows.length}.`;if(i<rows.length-1)await new Promise(res=>setTimeout(res,delay));} }
+
+    // Enhance showLeadsView and startup UI.
+    const _oldShowLeadsView=showLeadsView;
+    showLeadsView=async function(){ await _oldShowLeadsView(); refreshLeadStatusUI(); loadFollowupDashboard(); if(leadViewMode==="kanban")setLeadView("kanban"); };
+    refreshOwnerStatusUI(); refreshLeadStatusUI();
+
   </script>
 </body>
 </html>
