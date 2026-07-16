@@ -1306,6 +1306,385 @@
       .calendarItemV5 span:last-child{grid-column:2}
     }
 
+
+/* =========================================================
+   USAMA CRM V6 — final visual and layout corrections
+   ========================================================= */
+:root{
+  --u6-bg:#070a10;
+  --u6-panel:#0d121b;
+  --u6-panel-2:#111823;
+  --u6-line:#273142;
+  --u6-soft-line:rgba(148,163,184,.12);
+  --u6-text:#eef3f8;
+  --u6-muted:#9ca8b8;
+  --u6-accent:#2ec8b7;
+  --u6-accent-2:#8f4b86;
+}
+
+body{
+  font-size:14px!important;
+  line-height:1.45;
+}
+
+h1{font-size:25px!important}
+h2{font-size:19px!important}
+button,input,select,textarea{font-size:13px!important}
+
+.primaryBtn,.darkBtn,.dangerBtn,.reset{
+  min-height:36px;
+  padding:8px 12px!important;
+  font-size:12.5px!important;
+}
+
+.card{
+  padding:16px!important;
+}
+
+/* Home launcher keeps large icons but cleaner proportions */
+.crmAppLauncher{
+  grid-template-columns:repeat(4,168px)!important;
+  gap:44px!important;
+  padding:88px 24px!important;
+}
+.crmAppIcon{
+  width:122px!important;
+  height:122px!important;
+  border-radius:20px!important;
+  background:linear-gradient(155deg,#101b28,#0b111a)!important;
+  border-color:#304155!important;
+}
+.crmAppTile{
+  font-size:15px!important;
+}
+
+/* Headers */
+.mainHeader,.compactPageHeader{
+  min-height:62px!important;
+}
+.mainHeader h1,.compactPageHeader h1{
+  font-size:23px!important;
+}
+
+/* Tables: readable, balanced and no merged columns */
+.tablebox{
+  overflow:auto!important;
+}
+#ownersTable{
+  table-layout:auto!important;
+  min-width:1370px!important;
+}
+#ownersTable th,
+#ownersTable td{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  vertical-align:middle!important;
+}
+#ownersTable th{
+  font-size:12px!important;
+  padding:12px 11px!important;
+}
+#ownersTable td{
+  font-size:13px!important;
+  padding:10px 11px!important;
+  min-height:54px!important;
+  line-height:1.35!important;
+}
+
+/* Default owner column widths */
+#ownersTable th:nth-child(1),#ownersTable td:nth-child(1){min-width:175px;width:175px}
+#ownersTable th:nth-child(2),#ownersTable td:nth-child(2){min-width:175px;width:175px}
+#ownersTable th:nth-child(3),#ownersTable td:nth-child(3){min-width:85px;width:85px;text-align:center}
+#ownersTable th:nth-child(4),#ownersTable td:nth-child(4){min-width:260px;width:260px}
+#ownersTable th:nth-child(5),#ownersTable td:nth-child(5){min-width:115px;width:115px}
+#ownersTable th:nth-child(6),#ownersTable td:nth-child(6){min-width:145px;width:145px}
+#ownersTable th:nth-child(7),#ownersTable td:nth-child(7){min-width:350px;width:350px}
+#ownersTable th:nth-child(8),#ownersTable td:nth-child(8){min-width:135px;width:135px}
+#ownersTable th:nth-child(9),#ownersTable td:nth-child(9){min-width:150px;width:150px}
+
+#ownersTable td:nth-child(1),
+#ownersTable td:nth-child(2),
+#ownersTable td:nth-child(4){
+  word-break:normal!important;
+  overflow-wrap:anywhere!important;
+}
+
+.latestRemarkRead,
+.leadNotesRead,
+.remarksInput,
+.leadNotesBox{
+  font-size:12.5px!important;
+  line-height:1.45!important;
+  min-height:52px!important;
+  max-height:76px!important;
+  white-space:normal!important;
+  overflow:auto!important;
+  display:block!important;
+}
+
+/* Lead table readable */
+.leadsTable{
+  table-layout:auto!important;
+  min-width:1260px!important;
+}
+.leadsTable th{font-size:12px!important;padding:12px 10px!important}
+.leadsTable td{font-size:13px!important;padding:10px!important;white-space:normal!important}
+.leadCellInput,.cellBox,.miniInput{
+  font-size:12.5px!important;
+}
+
+/* Modal close button always visible */
+.u6CloseButton{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  padding:0!important;
+  background:#151c27;
+  border:1px solid #334052;
+  color:#fff;
+  font-size:22px!important;
+  z-index:40;
+}
+.u6CloseButton:hover{background:#202a38}
+
+/* Full details layout: information left, timeline right */
+.u6DetailShell{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(380px,.65fr);
+  min-height:76vh;
+  max-height:90vh;
+  overflow:hidden;
+  background:var(--u6-panel);
+}
+.u6DetailLeft,.u6DetailRight{
+  overflow:auto;
+  padding:24px;
+}
+.u6DetailRight{
+  border-left:1px solid var(--u6-line);
+  background:#080c13;
+}
+.u6DetailHeader{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+  padding-right:46px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--u6-line);
+}
+.u6DetailTitle{
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:-.4px;
+}
+.u6DetailSubtitle{
+  margin-top:5px;
+  color:var(--u6-muted);
+  font-size:13px;
+}
+.u6HeaderActions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.u6StageBar{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin:16px 0;
+}
+.u6Stage{
+  padding:7px 11px;
+  border-radius:999px;
+  background:#171e29;
+  border:1px solid #2c3747;
+  color:#aeb8c6;
+  font-size:11px;
+  font-weight:700;
+}
+.u6Stage.active{
+  background:rgba(46,200,183,.16);
+  border-color:rgba(46,200,183,.5);
+  color:#aff7ee;
+}
+.u6DetailGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0 34px;
+  margin-top:4px;
+}
+.u6Field{
+  display:grid;
+  grid-template-columns:145px minmax(0,1fr);
+  gap:14px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(148,163,184,.09);
+}
+.u6Field label{
+  color:var(--u6-muted);
+  font-size:12px;
+}
+.u6Field div{
+  color:var(--u6-text);
+  font-size:13.5px;
+  word-break:break-word;
+}
+.u6NotesBox{
+  margin-top:18px;
+  border:1px solid var(--u6-line);
+  border-radius:12px;
+  background:#0a0f18;
+  padding:15px;
+}
+.u6NotesBox h3{
+  margin:0 0 9px;
+  font-size:14px;
+}
+.u6NotesText{
+  white-space:pre-wrap;
+  color:#dce4ee;
+  font-size:13.5px;
+  line-height:1.55;
+}
+.u6TimelineTitle{
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:12px;
+}
+.u6Composer{
+  border:1px solid var(--u6-line);
+  border-radius:12px;
+  padding:13px;
+  background:#0d131d;
+  margin-bottom:16px;
+}
+.u6ComposerGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.u6Composer textarea{margin-top:8px}
+.u6Composer button{margin-top:8px}
+.u6Timeline{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.u6TimelineItem{
+  position:relative;
+  padding:0 0 18px 24px;
+  border-left:2px solid #2f3b4c;
+  margin-left:7px;
+}
+.u6TimelineItem::before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  top:2px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--u6-accent);
+  box-shadow:0 0 0 4px #0a0f17;
+}
+.u6TimelineTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
+.u6TimelineType{
+  font-size:13px;
+  font-weight:700;
+}
+.u6TimelineTime{
+  color:var(--u6-muted);
+  font-size:11px;
+  white-space:nowrap;
+}
+.u6TimelineText{
+  margin-top:5px;
+  color:#ccd5e1;
+  font-size:12.5px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+/* Modal sizing */
+#profileModal .profileModal,
+#leadDetailModal .modal{
+  width:min(1380px,97vw)!important;
+  max-height:94vh!important;
+  padding:0!important;
+  overflow:hidden!important;
+  position:relative;
+}
+
+/* Notification modal */
+.notificationModal{
+  position:relative;
+}
+
+/* Mobile: full-screen detail and better fonts */
+@media(max-width:800px){
+  body{font-size:14px!important}
+  .crmAppLauncher{
+    grid-template-columns:repeat(2,minmax(128px,1fr))!important;
+    gap:30px 18px!important;
+    padding:50px 18px!important;
+  }
+  .crmAppIcon{
+    width:108px!important;
+    height:108px!important;
+  }
+  .crmAppTile{font-size:14px!important}
+
+  .ownerCard,.leadCard{
+    padding:14px!important;
+  }
+  .ownerName{font-size:16px!important}
+  .infoLine{font-size:13.5px!important}
+
+  #profileModal .profileModal,
+  #leadDetailModal .modal{
+    width:100vw!important;
+    height:100vh!important;
+    max-height:100vh!important;
+    border-radius:0!important;
+  }
+  .u6DetailShell{
+    grid-template-columns:1fr;
+    max-height:none;
+    min-height:100vh;
+    overflow:auto;
+  }
+  .u6DetailLeft,.u6DetailRight{
+    overflow:visible;
+    padding:18px 14px;
+  }
+  .u6DetailRight{
+    border-left:0;
+    border-top:1px solid var(--u6-line);
+  }
+  .u6DetailHeader{
+    flex-direction:column;
+    padding-right:44px;
+  }
+  .u6DetailTitle{font-size:23px}
+  .u6DetailGrid{grid-template-columns:1fr}
+  .u6Field{grid-template-columns:120px 1fr}
+  .u6ComposerGrid{grid-template-columns:1fr}
+  .u6HeaderActions{width:100%}
+  .u6HeaderActions button,.u6HeaderActions a{flex:1}
+}
+
 </style>
 </head>
 
@@ -3750,6 +4129,335 @@ ${agent}`;}
     // A normal website cannot press Send silently; an installed extension or WhatsApp Business API is required.
     window.USAMA_CRM_WHATSAPP_MODE = "open_prefilled_whatsapp_web_chats";
 
-  </script>
+  
+/* =========================================================
+   USAMA CRM V6 — behavior corrections
+   ========================================================= */
+const U6_OWNER_ACTIVITIES = "owner_activities";
+let u6ActiveOwnerRow = null;
+
+function u6Value(value){
+  return (value===null || value===undefined || value==="" || value==="EMPTY") ? "-" : String(value);
+}
+function u6Field(label,value){
+  return `<div class="u6Field"><label>${escapeHtml(label)}</label><div>${escapeHtml(u6Value(value))}</div></div>`;
+}
+function u6TimelineItem(type,details,date){
+  const d=date ? new Date(date) : new Date();
+  return `<div class="u6TimelineItem">
+    <div class="u6TimelineTop">
+      <div class="u6TimelineType">${escapeHtml(type||"Activity")}</div>
+      <div class="u6TimelineTime">${Number.isNaN(d.getTime()) ? "" : d.toLocaleString()}</div>
+    </div>
+    <div class="u6TimelineText">${escapeHtml(details||"")}</div>
+  </div>`;
+}
+
+/* Always-visible close button for notification popup */
+const u6OriginalOpenTodayNotifications = typeof openTodayNotifications==="function" ? openTodayNotifications : null;
+if(u6OriginalOpenTodayNotifications){
+  openTodayNotifications = async function(){
+    await u6OriginalOpenTodayNotifications();
+    const modal=document.querySelector("#todayNotificationsModal .modal");
+    if(modal && !modal.querySelector(".u6CloseButton")){
+      modal.insertAdjacentHTML("afterbegin",`<button class="u6CloseButton" onclick="closeTodayNotifications()" aria-label="Close">×</button>`);
+    }
+  };
+}
+
+/* Log owner WhatsApp click and update latest remark */
+async function u6LogOwnerWhatsApp(ownerId,message){
+  try{
+    await db.from(U6_OWNER_ACTIVITIES).insert([{
+      owner_id:String(ownerId),
+      activity_type:"WhatsApp",
+      details:message||"WhatsApp message initiated",
+      created_by:currentUserEmail||null
+    }]);
+    const remarkColumn=isAdmin?"admin_remarks":"agent_remarks";
+    await db.from(TABLE_NAME).update({
+      [remarkColumn]:message||"WhatsApp message initiated",
+      last_contacted:today()
+    }).eq("id",ownerId);
+  }catch(e){console.warn(e);}
+}
+
+/* Override owner WhatsApp button so activity is logged automatically */
+whatsappButton = function(row){
+  const phone=get(row,["phone1","phone2","phone","mobile","contact"]);
+  const formatted=formatPhone(phone);
+  if(!formatted)return "-";
+  const msg=buildOwnerMessage(row);
+  return `<a class="waBtn" target="_blank"
+    onclick="u6LogOwnerWhatsApp('${row.id}','WhatsApp message initiated')"
+    href="https://web.whatsapp.com/send?phone=${formatted}&text=${encodeURIComponent(msg)}">WhatsApp</a>`;
+};
+
+/* OWNER DETAIL — all information left, timeline right */
+openOwnerProfile = async function(row){
+  u6ActiveOwnerRow=row;
+  const related=getRelatedRows(row).sort((a,b)=>
+    String(a.unit_sort||a.unit).localeCompare(String(b.unit_sort||b.unit),undefined,{numeric:true})
+  );
+
+  const {data:activities,error}=await db.from(U6_OWNER_ACTIVITIES)
+    .select("*").eq("owner_id",String(row.id))
+    .order("created_at",{ascending:false});
+
+  const acts=activities||[];
+  const createdDate=row.created_at||row.created_on||row.date_added||null;
+  const timeline=[
+    ...acts,
+    ...(createdDate ? [{
+      activity_type:"Owner record created",
+      details:`Owner record added for ${u6Value(row.community)} · ${u6Value(row.cluster)} · Unit ${u6Value(row.unit)}`,
+      created_at:createdDate
+    }] : [])
+  ].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+
+  const statuses=getOwnerStatuses ? getOwnerStatuses() :
+    ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
+
+  const relatedHtml=related.length>1
+    ? `<div class="u6NotesBox"><h3>Related Units</h3>
+        ${related.map(r=>`<div class="u6Field"><label>Unit ${escapeHtml(u6Value(r.unit))}</label><div>${escapeHtml(u6Value(r.community))} · ${escapeHtml(u6Value(r.cluster))} · ${escapeHtml(u6Value(r.status))}</div></div>`).join("")}
+      </div>`
+    : "";
+
+  el("profileContent").innerHTML=`
+    <button class="u6CloseButton" onclick="closeOwnerProfile()" aria-label="Close">×</button>
+    <div class="u6DetailShell">
+      <section class="u6DetailLeft">
+        <div class="u6DetailHeader">
+          <div>
+            <div class="u6DetailTitle">${escapeHtml(u6Value(row.owner))}</div>
+            <div class="u6DetailSubtitle">${escapeHtml(u6Value(row.community))} · ${escapeHtml(u6Value(row.cluster))} · Unit ${escapeHtml(u6Value(row.unit))}</div>
+          </div>
+          <div class="u6HeaderActions">
+            ${whatsappButton(row)}
+            ${callButton(row)}
+            <button class="darkBtn" onclick="openRemarkModal(${row.id},'${escapeHtml(String(ownerRemarkValue(row)||"")).replaceAll("'","&#039;")}')">Edit Remark</button>
+          </div>
+        </div>
+
+        <div class="u6StageBar">
+          ${statuses.map(s=>`<span class="u6Stage ${s===(row.status||"New")?"active":""}">${escapeHtml(s)}</span>`).join("")}
+        </div>
+
+        <div class="u6DetailGrid">
+          ${u6Field("Owner name",row.owner)}
+          ${u6Field("Phone 1",row.phone1)}
+          ${u6Field("Phone 2",row.phone2)}
+          ${u6Field("Community",row.community)}
+          ${u6Field("Cluster",row.cluster)}
+          ${u6Field("Unit",row.unit)}
+          ${u6Field("Status",row.status||"New")}
+          ${u6Field("Source",row.data_source)}
+          ${u6Field("Last contacted",row.last_contacted)}
+        </div>
+
+        <div class="u6NotesBox">
+          <h3>Latest Remark</h3>
+          <div class="u6NotesText">${escapeHtml(ownerRemarkValue(row)||"No remark yet")}</div>
+        </div>
+        ${relatedHtml}
+      </section>
+
+      <aside class="u6DetailRight">
+        <div class="u6TimelineTitle">Activity Timeline</div>
+        <div class="u6Composer">
+          <div class="u6ComposerGrid">
+            <select id="u6OwnerActivityType">
+              <option>Call</option>
+              <option>WhatsApp</option>
+              <option>Meeting</option>
+              <option>Follow-up</option>
+              <option>Broadcast</option>
+              <option>Note</option>
+            </select>
+            <input id="u6OwnerActivityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}">
+          </div>
+          <textarea id="u6OwnerActivityDetails" rows="4" placeholder="What was discussed?"></textarea>
+          <button class="primaryBtn" onclick="u6AddOwnerActivity('${row.id}')">Add Activity</button>
+        </div>
+        <div class="u6Timeline">
+          ${timeline.length ? timeline.map(a=>u6TimelineItem(a.activity_type,a.details,a.created_at)).join("") : `<div class="empty">No activity yet</div>`}
+        </div>
+      </aside>
+    </div>`;
+  el("profileModal").classList.add("show");
+};
+
+async function u6AddOwnerActivity(ownerId){
+  const type=el("u6OwnerActivityType").value;
+  const details=el("u6OwnerActivityDetails").value.trim();
+  const when=el("u6OwnerActivityWhen").value;
+  if(!details){alert("Write the activity first.");return;}
+
+  const payload={
+    owner_id:String(ownerId),
+    activity_type:type,
+    details,
+    created_by:currentUserEmail||null
+  };
+  if(when)payload.created_at=new Date(when).toISOString();
+
+  const {error}=await db.from(U6_OWNER_ACTIVITIES).insert([payload]);
+  if(error){alert(error.message);return;}
+
+  const remarkColumn=isAdmin?"admin_remarks":"agent_remarks";
+  const {error:updateError}=await db.from(TABLE_NAME).update({
+    [remarkColumn]:details,
+    last_contacted:today()
+  }).eq("id",ownerId);
+  if(updateError){alert(updateError.message);return;}
+
+  u6ActiveOwnerRow={
+    ...u6ActiveOwnerRow,
+    [remarkColumn]:details,
+    last_contacted:today()
+  };
+  await openOwnerProfile(u6ActiveOwnerRow);
+  loadData();
+}
+
+/* LEAD DETAIL — all information left, timeline right */
+renderLeadDetail = function(lead,acts){
+  const stages=getPipelineStages ? getPipelineStages() :
+    ["New","Contacted","Call Back","Interested","Viewing","Negotiation","Lost"];
+
+  const createdDate=lead.created_at||lead.lead_receive_date||null;
+  const timeline=[
+    ...(acts||[]),
+    ...(createdDate ? [{
+      activity_type:"Lead created",
+      details:`Lead created for ${u6Value(lead.project_inquired)}`,
+      created_at:createdDate
+    }] : [])
+  ].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+
+  const formattedPhone=formatPhone(lead.phone);
+  const waMessage=`Hello ${lead.name||""},\n\nThis is ${getWhatsappAgentName ? getWhatsappAgentName() : "Usama"}.\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName ? getWhatsappAgentName() : "Usama"}`;
+
+  el("leadDetailContent").innerHTML=`
+    <button class="u6CloseButton" onclick="closeLeadDetail()" aria-label="Close">×</button>
+    <div class="u6DetailShell">
+      <section class="u6DetailLeft">
+        <div class="u6DetailHeader">
+          <div>
+            <div class="u6DetailTitle">${escapeHtml(u6Value(lead.name))}</div>
+            <div class="u6DetailSubtitle">${escapeHtml(u6Value(lead.project_inquired))}</div>
+          </div>
+          <div class="u6HeaderActions">
+            ${formattedPhone ? `<a class="waBtn" target="_blank" onclick="u6LogLeadWhatsApp('${lead.id}')" href="https://web.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(waMessage)}">WhatsApp</a>` : ""}
+            ${formattedPhone ? `<a class="callBtn" href="tel:+${formattedPhone}">Call</a>` : ""}
+            <button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button>
+          </div>
+        </div>
+
+        <div class="u6StageBar">
+          ${stages.map(s=>`<span class="u6Stage ${s===(lead.status||"New")?"active":""}">${escapeHtml(s)}</span>`).join("")}
+        </div>
+
+        <div class="u6DetailGrid">
+          ${u6Field("Name",lead.name)}
+          ${u6Field("Phone",lead.phone)}
+          ${u6Field("Email",lead.email)}
+          ${u6Field("Project",lead.project_inquired)}
+          ${u6Field("Budget",lead.budget)}
+          ${u6Field("Bedrooms",lead.bedroom)}
+          ${u6Field("Property type",lead.property_type)}
+          ${u6Field("Source",lead.source)}
+          ${u6Field("Status",lead.status||"New")}
+          ${u6Field("Lead received",lead.lead_receive_date)}
+          ${u6Field("Follow-up date",lead.follow_up_date)}
+          ${u6Field("Follow-up time",lead.follow_up_time)}
+          ${u6Field("Reminder type",lead.reminder_type)}
+          ${u6Field("Reminder note",lead.reminder_note)}
+          ${u6Field("Last contacted",lead.last_contacted)}
+        </div>
+
+        <div class="u6NotesBox">
+          <h3>Latest Note</h3>
+          <div class="u6NotesText">${escapeHtml(lead.notes||"No note yet")}</div>
+        </div>
+      </section>
+
+      <aside class="u6DetailRight">
+        <div class="u6TimelineTitle">Activity Timeline</div>
+        <div class="u6Composer">
+          <div class="u6ComposerGrid">
+            <select id="activityType">
+              <option>Call</option>
+              <option>WhatsApp</option>
+              <option>Meeting</option>
+              <option>Email</option>
+              <option>Follow-up</option>
+              <option>Note</option>
+            </select>
+            <input id="activityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}">
+          </div>
+          <textarea id="activityDetails" rows="4" placeholder="What was discussed?"></textarea>
+          <button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Add Activity</button>
+        </div>
+        <div class="u6Timeline">
+          ${timeline.length ? timeline.map(a=>u6TimelineItem(a.activity_type,a.details,a.created_at)).join("") : `<div class="empty">No activity yet</div>`}
+        </div>
+      </aside>
+    </div>`;
+};
+
+/* Latest timeline activity always becomes Latest Note */
+addLeadActivity = async function(id){
+  const type=el("activityType").value;
+  const details=el("activityDetails").value.trim();
+  const when=el("activityWhen").value;
+  if(!details){alert("Write the discussion first.");return;}
+
+  const payload={
+    lead_id:String(id),
+    activity_type:type,
+    details,
+    created_by:currentUserEmail||null
+  };
+  if(when)payload.created_at=new Date(when).toISOString();
+
+  const {error}=await db.from("lead_activities").insert([payload]);
+  if(error){alert(error.message);return;}
+
+  const {error:updateError}=await db.from(LEADS_TABLE).update({
+    notes:details,
+    last_contacted:today()
+  }).eq("id",id);
+  if(updateError){alert(updateError.message);return;}
+
+  await openLeadDetail(id);
+  loadLeads();
+};
+
+async function u6LogLeadWhatsApp(leadId){
+  const details="WhatsApp message initiated";
+  await db.from("lead_activities").insert([{
+    lead_id:String(leadId),
+    activity_type:"WhatsApp",
+    details,
+    created_by:currentUserEmail||null
+  }]);
+  await db.from(LEADS_TABLE).update({
+    notes:details,
+    last_contacted:today()
+  }).eq("id",leadId);
+}
+
+/* Ensure every modal overlay can close with its visible X and Escape */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  ["todayNotificationsModal","profileModal","leadDetailModal","broadcastModal","leadModal","columnsModal","projectModal","ownerStatusModal","whatsappModal","propertiesModal"].forEach(id=>{
+    const node=el(id);
+    if(node?.classList.contains("show"))node.classList.remove("show");
+  });
+});
+
+</script>
 </body>
 </html>
