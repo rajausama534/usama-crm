@@ -3,10 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BFG Professional CRM</title>
+  <title>Usama CRM</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    /* ===== USAMA CRM V4 OVERRIDES ===== */
+    const OWNER_ACTIVITIES_TABLE = "owner_activities";
+    let activeOwnerDetailId = null;
+    let activeOwnerRow = null;
+    let broadcastLoadTimerV4 = null;
+    let broadcastRowsV4 = [];
+    let broadcastSelectedV4 = new Set();
+    let broadcastPreviewIndexV4 = 0;
+
+    showOnly = function(viewId){
+      ["loginView","choiceView","appView","leadsView","calendarView"].forEach(id=>el(id)?.classList.add("hidden"));
+      el(viewId)?.classList.remove("hidden");
+    };
+
+    showChoiceView = function(){
+      if(!isAdmin){ showOwnersView(); return; }
+      applyRoleUI(); showOnly("choiceView"); refreshLauncher();
+    };
+
+    async function refreshLauncher(){
+      const displayName = currentAccess?.full_name || currentAccess?.name || currentUserEmail.split("@")[0] || "Agent";
+      safeText("loggedInAgentName", displayName);
+      const count = await getTodayItemsCount();
+      safeText("todayNotificationCount", count);
+    }
+
+    async function getTodayItemsCount(){
+      if(!isAdmin) return 0;
+      const d=today();
+      const {count}=await db.from(LEADS_TABLE).select("*",{count:"exact",head:true}).eq("follow_up_date",d);
+      return count||0;
+    }
+
+    async function openTodayPanel(){
+      el("todayPanel").classList.add("show");
+      const d=today();
+      const {data,error}=await db.from(LEADS_TABLE).select("id,name,phone,project_inquired,follow_up_time,reminder_type,reminder_note,status").eq("follow_up_date",d).order("follow_up_time",{ascending:true});
+      if(error){el("todayPanelContent").innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;return;}
+      el("todayPanelContent").innerHTML=(data||[]).map(x=>`<div class="activityEntry" onclick="closeTodayPanel();showLeadsView().then(()=>openLeadDetail('${x.id}'))" style="cursor:pointer">
+        <div class="activityTop"><span class="activityType">${escapeHtml(x.reminder_type||"Follow-up")} · ${escapeHtml(x.name||"Lead")}</span><span class="activityTime">${escapeHtml(x.follow_up_time||"")}</span></div>
+        <div class="activityText">${escapeHtml(x.project_inquired||"")} ${x.reminder_note?`— ${escapeHtml(x.reminder_note)}`:""}</div>
+      </div>`).join("")||`<div class="empty">Nothing scheduled today</div>`;
+    }
+    function closeTodayPanel(){el("todayPanel").classList.remove("show");}
+
+    async function showCalendarView(){
+      if(!isAdmin){showOwnersView();return;}
+      showOnly("calendarView");
+      if(!el("calendarDate").value)el("calendarDate").value=today();
+      await loadCalendarView();
+    }
+    async function loadCalendarView(){
+      const d=el("calendarDate").value||today();
+      const {data,error}=await db.from(LEADS_TABLE).select("id,name,phone,project_inquired,follow_up_time,reminder_type,reminder_note,status").eq("follow_up_date",d).order("follow_up_time",{ascending:true});
+      if(error){el("calendarContent").innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;return;}
+      el("calendarContent").innerHTML=`<div class="calendarDay"><h3>${new Date(d+"T00:00:00").toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</h3>
+        ${(data||[]).map(x=>`<div class="calendarItem" onclick="showLeadsView().then(()=>openLeadDetail('${x.id}'))" style="cursor:pointer"><b>${escapeHtml(x.follow_up_time||"Any time")}</b><span>${escapeHtml(x.name||"Lead")} · ${escapeHtml(x.project_inquired||"")}</span><span>${escapeHtml(x.reminder_type||"Follow-up")}</span></div>`).join("")||`<div class="empty">No meetings or follow-ups</div>`}
+      </div>`;
+    }
+
+    function openBroadcastFromHome(){
+      showOwnersView().then(()=>setTimeout(openBroadcastModalV4,50));
+    }
+
+    // Fixed compact owner table: no checkbox column and no resizable widths.
+    renderOwnerHead = function(){
+      const cols=visibleOwnerColumns();
+      el("ownersTableHead").innerHTML=`<tr>${cols.map(c=>`<th class="owner-col-${c.key}">${escapeHtml(c.label)}</th>`).join("")}</tr>`;
+      const table=el("ownersTable"); if(table)table.style.minWidth="1160px";
+    };
+
+    // Owner profile with details on left and activity timeline on right.
+    openOwnerProfile = async function(row){
+      activeOwnerRow=row; activeOwnerDetailId=row.id;
+      const {data:acts,error}=await db.from(OWNER_ACTIVITIES_TABLE).select("*").eq("owner_id",String(row.id)).order("created_at",{ascending:false});
+      if(error && !String(error.message).includes("does not exist")) console.warn(error.message);
+      renderOwnerDetailV4(row,acts||[]);
+      el("ownerDetailModal").classList.add("show");
+    };
+    function closeOwnerDetail(){el("ownerDetailModal").classList.remove("show");}
+    function ownerDetailField(label,value){return `<div class="detailField"><label>${label}</label><div>${escapeHtml(clean(value))}</div></div>`;}
+    function renderOwnerDetailV4(row,acts){
+      const statuses=getOwnerStatuses();
+      el("ownerDetailContent").innerHTML=`<div class="detailPage">
+        <section class="detailMain">
+          <div class="detailHeader"><div><div class="detailName">${escapeHtml(clean(row.owner))}</div><div class="sectionCaption">${escapeHtml(clean(row.community))} · ${escapeHtml(clean(row.cluster))} · Unit ${escapeHtml(clean(row.unit))}</div></div><div class="compactActions"><button class="darkBtn" onclick="openRemarkModal(${row.id},'${escapeHtml(String(ownerRemarkValue(row)||"")).replaceAll("'","&#039;")}')">Edit Remark</button><button class="darkBtn" onclick="closeOwnerDetail()">Close</button></div></div>
+          <div class="detailStage">${statuses.map(s=>`<span class="${s===(row.status||"New")?"active":""}">${escapeHtml(s)}</span>`).join("")}</div>
+          <div class="detailFields">
+            ${ownerDetailField("Owner",row.owner)}${ownerDetailField("Phone 1",row.phone1)}${ownerDetailField("Phone 2",row.phone2)}
+            ${ownerDetailField("Community",row.community)}${ownerDetailField("Cluster",row.cluster)}${ownerDetailField("Unit",row.unit)}
+            ${ownerDetailField("Status",row.status||"New")}${ownerDetailField("Last contacted",row.last_contacted)}
+          </div>
+          <div class="detailTabs"><button class="active">Notes</button><button>Properties</button></div>
+          <div class="detailNotes">${escapeHtml(ownerRemarkValue(row)||"No remark yet")}</div>
+        </section>
+        <aside class="detailTimeline">
+          <div class="activityComposerV4"><div class="panelLabel"><b>Add activity</b></div>
+            <select id="ownerActivityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Follow-up</option><option>Note</option></select>
+            <textarea id="ownerActivityDetails" rows="3" placeholder="What happened?"></textarea>
+            <button class="primaryBtn" style="margin-top:7px" onclick="addOwnerActivityV4()">Log Activity</button>
+          </div>
+          <div class="panelLabel"><b>Activity</b></div>
+          <div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div>
+        </aside>
+      </div>`;
+    }
+    async function addOwnerActivityV4(){
+      const details=el("ownerActivityDetails").value.trim(); if(!details){alert("Write the activity first.");return;}
+      const type=el("ownerActivityType").value;
+      const {error}=await db.from(OWNER_ACTIVITIES_TABLE).insert([{owner_id:String(activeOwnerDetailId),activity_type:type,details,created_by:currentUserEmail||null}]);
+      if(error){alert(error.message);return;}
+      const remarkColumn=isAdmin?"admin_remarks":"agent_remarks";
+      await db.from(TABLE_NAME).update({[remarkColumn]:details,last_contacted:today()}).eq("id",activeOwnerDetailId);
+      activeOwnerRow={...activeOwnerRow,[remarkColumn]:details,last_contacted:today()};
+      await openOwnerProfile(activeOwnerRow); loadData();
+    }
+
+    // Broadcast V4: recipients only inside broadcast; community/cluster/range/manual selection.
+    openBroadcastModal = openBroadcastModalV4;
+    async function openBroadcastModalV4(){
+      const t=getSavedWhatsappTemplate();
+      el("broadcastGreeting").value=t.greeting||"Hello";
+      el("broadcastAgentName").value=t.agentName||currentAccess?.full_name||"Usama";
+      el("broadcastCompany").value=t.company||"";
+      el("broadcastMessage").value=t.message||DEFAULT_WHATSAPP_MESSAGE;
+      broadcastSelectedV4.clear();broadcastRowsV4=[];broadcastPreviewIndexV4=0;
+      el("broadcastOwnerSearch").value="";el("broadcastUnitFrom").value="";el("broadcastUnitTo").value="";
+      el("broadcastProgressBar").style.width="0%";el("broadcastQueue").innerHTML="";
+      await loadBroadcastCommunities();
+      el("broadcastModal").classList.add("show");
+      await loadBroadcastRecipients();
+      updateBroadcastPreviewV4();
+    }
+    async function loadBroadcastCommunities(){
+      let q=db.from(TABLE_NAME).select("community").not("community","is",null).limit(10000);q=applyAccessFilter(q);
+      const {data}=await q;const vals=[...new Set((data||[]).map(x=>x.community).filter(Boolean))].sort();
+      el("broadcastCommunity").innerHTML=`<option value="">Select Community</option>${vals.map(v=>`<option>${escapeHtml(v)}</option>`).join("")}`;
+    }
+    async function loadBroadcastClusters(){
+      const community=el("broadcastCommunity").value;
+      let q=db.from(TABLE_NAME).select("cluster").not("cluster","is",null).limit(10000);q=applyAccessFilter(q);if(community)q=q.eq("community",community);
+      const {data}=await q;const vals=[...new Set((data||[]).map(x=>x.cluster).filter(Boolean))].sort();
+      el("broadcastCluster").innerHTML=`<option value="">All Clusters</option>${vals.map(v=>`<option>${escapeHtml(v)}</option>`).join("")}`;
+    }
+    function loadBroadcastRecipientsDebounced(){clearTimeout(broadcastLoadTimerV4);broadcastLoadTimerV4=setTimeout(loadBroadcastRecipients,280);}
+    async function loadBroadcastRecipients(){
+      let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,unit,unit_sort,cluster,community,status").limit(1000);q=applyAccessFilter(q);
+      const community=el("broadcastCommunity").value,cluster=el("broadcastCluster").value,term=el("broadcastOwnerSearch").value.trim();
+      const from=Number(el("broadcastUnitFrom").value),to=Number(el("broadcastUnitTo").value);
+      if(community)q=q.eq("community",community);if(cluster)q=q.eq("cluster",cluster);
+      if(from)q=q.gte("unit_sort",from);if(to)q=q.lte("unit_sort",to);
+      if(term)q=q.or(`owner.ilike.%${term}%,unit.ilike.%${term}%,phone1.ilike.%${term}%,phone2.ilike.%${term}%`);
+      const {data,error}=await q.order("unit_sort",{ascending:true});if(error){alert(error.message);return;}
+      broadcastRowsV4=data||[];
+      el("broadcastPicker").innerHTML=broadcastRowsV4.map(r=>`<div class="broadcastPickRow"><label><input type="checkbox" ${broadcastSelectedV4.has(String(r.id))?"checked":""} onchange="toggleBroadcastV4('${r.id}',this.checked)"><span><strong>${escapeHtml(clean(r.owner))}</strong><br><span class="sub">${escapeHtml(clean(r.community))} · ${escapeHtml(clean(r.cluster))} · Unit ${escapeHtml(clean(r.unit))}</span></span></label></div>`).join("")||`<div class="empty">No owners found</div>`;
+      updateBroadcastSelectedCount();updateBroadcastPreviewV4();
+    }
+    function toggleBroadcastV4(id,checked){checked?broadcastSelectedV4.add(String(id)):broadcastSelectedV4.delete(String(id));updateBroadcastSelectedCount();updateBroadcastPreviewV4();}
+    function toggleAllBroadcastRecipients(on){broadcastSelectedV4.clear();if(on)broadcastRowsV4.forEach(r=>broadcastSelectedV4.add(String(r.id)));loadBroadcastRecipients();}
+    function selectedBroadcastRowsV4(){return broadcastRowsV4.filter(r=>broadcastSelectedV4.has(String(r.id)));}
+    function updateBroadcastSelectedCount(){safeText("broadcastSelectedCount",`${broadcastSelectedV4.size} selected`);}
+    function updateBroadcastPreviewV4(){
+      const rows=selectedBroadcastRowsV4();broadcastPreviewIndexV4=Math.min(broadcastPreviewIndexV4,Math.max(0,rows.length-1));
+      const row=rows[broadcastPreviewIndexV4]||{owner:"Owner Name",community:"The Valley",cluster:"Farm Gardens",unit:"101"};
+      safeText("broadcastPreviewCounter",rows.length?`${broadcastPreviewIndexV4+1}/${rows.length}`:"Sample");
+      el("broadcastPreview").textContent=buildBroadcastMessage(row);updateBroadcastSelectedCount();
+    }
+    changeBroadcastPreview=function(dir){const rows=selectedBroadcastRowsV4();if(!rows.length)return;broadcastPreviewIndexV4=(broadcastPreviewIndexV4+dir+rows.length)%rows.length;updateBroadcastPreviewV4();}
+    document.addEventListener("input",e=>{if(["broadcastGreeting","broadcastAgentName","broadcastCompany","broadcastMessage"].includes(e.target.id))updateBroadcastPreviewV4();});
+
+    async function startBroadcastV4(){
+      const rows=selectedBroadcastRowsV4();if(!rows.length){alert("Select at least one recipient.");return;}
+      const unique=[],seen=new Set();for(const r of rows){const p=formatPhone(get(r,["phone1","phone2"]));if(p&&!seen.has(p)){seen.add(p);unique.push({...r,_phone:p});}}
+      if(!unique.length){alert("Selected owners do not have valid phone numbers.");return;}
+      el("broadcastQueue").innerHTML=unique.map(r=>`<div class="broadcastQueueRow" id="bqv4_${r.id}"><span>${escapeHtml(r.owner||"Owner")} · Unit ${escapeHtml(r.unit||"")}</span><span class="badgeWait">Waiting</span></div>`).join("");
+      for(let i=0;i<unique.length;i++){
+        const r=unique[i],msg=buildBroadcastMessage(r);
+        const win=window.open(`https://web.whatsapp.com/send?phone=${r._phone}&text=${encodeURIComponent(msg)}`,"_blank");
+        const state=win?"Opened in WhatsApp Web":"Popup blocked";
+        const node=el(`bqv4_${r.id}`)?.lastElementChild;if(node){node.textContent=state;node.className=win?"badgeOk":"badgeSkip";}
+        await db.from("whatsapp_broadcast_log").insert([{owner_id:String(r.id),phone:r._phone,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);
+        if(win){
+          await db.from(OWNER_ACTIVITIES_TABLE).insert([{owner_id:String(r.id),activity_type:"WhatsApp Broadcast",details:`WhatsApp broadcast opened on ${new Date().toLocaleString()}\n\n${msg}`,created_by:currentUserEmail||null}]);
+          const remarkColumn=isAdmin?"admin_remarks":"agent_remarks";
+          await db.from(TABLE_NAME).update({[remarkColumn]:"WhatsApp broadcast opened",last_contacted:today()}).eq("id",r.id);
+        }
+        el("broadcastProgressBar").style.width=Math.round((i+1)/unique.length*100)+"%";
+        safeText("broadcastProgressText",`Opened ${i+1} of ${unique.length} chats. Click Send inside WhatsApp Web.`);
+        if(i<unique.length-1)await new Promise(res=>setTimeout(res,900));
+      }
+    }
+
+    // Make lead details use the same split-page style.
+    renderLeadDetail = function(lead,acts){
+      const stages=getPipelineStages();
+      el("leadDetailContent").innerHTML=`<div class="detailPage">
+        <section class="detailMain">
+          <div class="detailHeader"><div><div class="detailName">${escapeHtml(clean(lead.name))}</div><div class="sectionCaption">${escapeHtml(clean(lead.project_inquired))}</div></div><div class="compactActions"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div>
+          <div class="detailStage">${stages.map(s=>`<span class="${s===(lead.status||"New")?"active":""}">${escapeHtml(s)}</span>`).join("")}</div>
+          <div class="detailFields">
+            ${ownerDetailField("Name",lead.name)}${ownerDetailField("Phone",lead.phone)}${ownerDetailField("Email",lead.email)}
+            ${ownerDetailField("Project",lead.project_inquired)}${ownerDetailField("Budget",lead.budget)}${ownerDetailField("Property type",lead.property_type)}
+            ${ownerDetailField("Bedroom",lead.bedroom)}${ownerDetailField("Source",lead.source)}${ownerDetailField("Follow-up",`${lead.follow_up_date||"-"} ${lead.follow_up_time||""}`)}
+          </div>
+          <div class="detailTabs"><button class="active">Notes</button><button>Contact</button></div>
+          <div class="detailNotes">${escapeHtml(lead.notes||"No notes yet")}</div>
+        </section>
+        <aside class="detailTimeline">
+          <div class="activityComposerV4"><div class="panelLabel"><b>Add activity</b></div>
+            <select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select>
+            <textarea id="activityDetails" rows="3" placeholder="What was discussed?"></textarea>
+            <button class="primaryBtn" style="margin-top:7px" onclick="addLeadActivity('${lead.id}')">Log Activity</button>
+          </div>
+          <div class="panelLabel"><b>Activity</b></div>
+          <div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div>
+        </aside>
+      </div>`;
+    };
+
+    // Ensure launcher details update after session.
+    const originalCheckSessionV4 = checkSession;
+
+  </script>
 
   <style>
     * { box-sizing: border-box; }
@@ -1081,57 +1304,149 @@
     @media(max-width:1100px){.owner-col-remarks{min-width:300px!important}.owner-col-owner{width:240px!important}}
     @media(max-width:800px){body{padding:10px}.mainHeader{position:relative;margin:0 0 14px}.card{padding:12px}.mobileCards{display:block}.tablebox{display:none}}
 
-  </style>
+  
+  /* ===== USAMA CRM V4 ===== */
+  :root{
+    --v4bg:#070910;--v4panel:#0b0f19;--v4panel2:#0f1420;--v4line:#242a38;
+    --v4text:#e9edf5;--v4muted:#8f99aa;--v4accent:#22c7b8;--v4purple:#6f315f;
+  }
+  body{font-size:13px;background:linear-gradient(135deg,#081522 0%,#050710 48%,#050608 100%);padding:14px;color:var(--v4text)}
+  h1{font-size:22px;letter-spacing:-.25px} h2{font-size:17px}
+  button,input,select,textarea{font-size:12px}
+  input,select,textarea{border-radius:6px;padding:9px 10px;background:#090d15;border-color:var(--v4line)}
+  button{border-radius:6px}.primaryBtn,.darkBtn,.dangerBtn{padding:8px 11px;font-size:12px}
+  .card,.modal,.loginBox{border-radius:8px;background:var(--v4panel);border-color:var(--v4line);box-shadow:none}
+  .compactHeader{min-height:44px;margin-bottom:8px;align-items:center}
+  .compactHeader .headerBtns{gap:6px}
+  .dashboardCards{display:none}
+  .sub,.sectionCaption{font-size:12px;color:var(--v4muted);line-height:1.45}
+  .launcherView{min-height:calc(100vh - 28px);border-radius:9px;overflow:hidden;background:radial-gradient(circle at 18% 4%,rgba(9,91,116,.22),transparent 34%),#03050a;border:1px solid #151b27}
+  .launcherTopbar{height:54px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #151b27}
+  .brandMark{width:30px;height:30px;display:grid;place-items:center;border-radius:7px;background:linear-gradient(145deg,#22c7b8,#7a315f);font-weight:800}
+  .launcherBrand{font-weight:700;margin-left:10px}
+  .launcherUser{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:12px}
+  .notificationButton{position:relative;width:34px;height:34px;background:transparent;border:1px solid #222938}
+  .notificationButton b{position:absolute;right:-5px;top:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:20px;background:#be2c2c;font-size:10px;display:grid;place-items:center}
+  .smallGhostBtn,.iconClose,.miniNav{background:transparent;border:1px solid #252c3a;padding:6px 8px}
+  .launcherGrid{display:grid;grid-template-columns:repeat(4,150px);gap:34px;justify-content:center;padding:90px 24px}
+  .launcherTile{background:transparent;border:none;color:var(--v4text);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:14px;font-weight:500}
+  .launcherTile:hover{transform:translateY(-2px)}
+  .launcherIcon{width:86px;height:86px;display:grid;place-items:center;border-radius:9px;background:#0b1724;border:1px solid #253343;font-size:28px;font-weight:800;color:#21c8b7}
+  .sectionTopbar{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid var(--v4line);margin-bottom:12px}
+  .compactActions{display:flex;gap:6px}.calendarToolbar{display:flex;gap:7px;margin-bottom:10px}.calendarToolbar input{width:180px}
+  .calendarList{border:1px solid var(--v4line);border-radius:7px;background:var(--v4panel)}
+  .calendarDay{padding:14px;border-bottom:1px solid var(--v4line)}.calendarDay:last-child{border-bottom:none}
+  .calendarDay h3{font-size:13px;margin:0 0 8px}.calendarItem{display:grid;grid-template-columns:90px 1fr auto;gap:12px;padding:9px;border-top:1px solid rgba(255,255,255,.045)}
+  .compactModal{width:min(620px,100%)}.modalTitleRow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .modalTitleRow h2{margin:0}.iconClose{width:30px;height:30px;font-size:18px;padding:0}
+  .filters{gap:7px;margin-bottom:8px}.quickFilters{gap:5px;margin-bottom:8px}.quickFilters button{padding:5px 8px;font-size:11px}
+  .actionsRow{gap:6px;margin:4px 0 10px}.sortControls{gap:6px}
+  .tablebox{border-radius:7px;max-height:72vh;border-color:var(--v4line)}
+  table{table-layout:fixed!important;min-width:1160px!important}
+  th{font-size:11px;padding:10px 9px;background:#070a11;letter-spacing:.035em}
+  td{font-size:12px;padding:8px 9px;height:48px;white-space:nowrap}
+  .resize-handle{display:none!important}
+  .owner-col-community{width:150px!important}.owner-col-cluster{width:150px!important}.owner-col-unit{width:70px!important;text-align:center}
+  .owner-col-owner{width:230px!important}.owner-col-whatsapp{width:105px!important}.owner-col-status{width:135px!important}
+  .owner-col-remarks{width:auto!important;min-width:280px!important}.owner-col-last_contacted{width:110px!important}.owner-col-actions{width:125px!important}
+  .waBtn,.callBtn,.copyBtn{height:30px;padding:0 9px;font-size:11px;border-radius:6px}
+  .statusSelect,.leadDropdown{height:31px;padding:5px 8px;font-size:11px;border-radius:6px}
+  .profileBtn,.moreUnitBtn{font-size:9px;padding:4px 6px;margin-left:5px}
+  .latestRemarkRead{min-height:auto!important;max-height:34px!important;padding:5px 7px!important;font-size:11px!important;line-height:1.35!important;border-radius:5px!important}
+  .leadNotesRead{font-size:11px!important;line-height:1.35!important;-webkit-line-clamp:2!important;min-height:32px!important}
+  .broadcastModalV4{width:min(1180px,96vw);max-height:92vh}
+  .broadcastFilterGrid{display:grid;grid-template-columns:1.2fr 1.2fr .65fr .65fr;gap:8px}
+  .broadcastWorkspace{display:grid;grid-template-columns:.95fr 1.05fr;gap:12px;margin-top:10px}
+  .compactPicker{height:470px;max-height:52vh;border:1px solid var(--v4line);border-radius:6px;padding:5px;overflow:auto;background:#070a11}
+  .broadcastPickRow{padding:8px;border-radius:5px;background:#0b1019}.broadcastPickRow strong{font-size:11px}
+  .broadcastPickRow .sub{font-size:10px}.panelLabel{display:flex;justify-content:space-between;margin:0 0 6px;color:var(--v4muted);font-size:11px}
+  .compactForm{gap:7px}.previewLabel{margin-top:9px}.miniNav{padding:2px 7px;margin:0 5px}
+  .broadcastPreviewCard{min-height:210px;padding:13px;font-size:12px;line-height:1.65;border-radius:6px}
+  .fullDetailModal{width:min(1320px,97vw);max-height:94vh;padding:0;overflow:hidden}
+  .detailPage{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,.75fr);height:min(820px,90vh)}
+  .detailMain,.detailTimeline{overflow:auto;padding:18px}.detailTimeline{border-left:1px solid var(--v4line);background:#06080e}
+  .detailHeader{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--v4line);padding-bottom:12px;margin-bottom:14px}
+  .detailName{font-size:23px}.detailStage{display:flex;gap:0;margin-bottom:16px;overflow:auto}
+  .detailStage span{padding:7px 13px;background:#171c28;border-right:1px solid #2b3241;font-size:11px;white-space:nowrap}
+  .detailStage span.active{background:#0c504d;color:#bffcf5}
+  .detailFields{display:grid;grid-template-columns:1fr 1fr;gap:0 34px}.detailField{display:grid;grid-template-columns:125px 1fr;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.045)}
+  .detailField label{color:var(--v4muted);font-size:11px}.detailField div{font-size:12px}
+  .detailTabs{display:flex;border-bottom:1px solid var(--v4line);margin-top:16px}.detailTabs button{background:transparent;padding:9px 14px;border-radius:0;border-bottom:2px solid transparent}
+  .detailTabs button.active{border-color:#b8529e;color:#efb4df}.detailNotes{min-height:150px;padding:13px;color:#cbd3df}
+  .activityComposerV4{border-bottom:1px solid var(--v4line);padding-bottom:14px;margin-bottom:12px}.activityComposerV4 textarea{margin-top:7px}
+  .activityEntry{font-size:11px;padding-bottom:12px}.activityText{font-size:11px}.activityType{font-size:12px}
+  @media(max-width:900px){.launcherGrid{grid-template-columns:repeat(2,140px);padding-top:55px}.broadcastWorkspace,.detailPage{grid-template-columns:1fr}.detailTimeline{border-left:none;border-top:1px solid var(--v4line)}.broadcastFilterGrid{grid-template-columns:1fr 1fr}.detailFields{grid-template-columns:1fr}}
+
+</style>
 </head>
 
 <body>
   <div id="loginView" class="loginBox">
-    <h1>Property Owner Database</h1>
-    <div class="sub">Login to access your database.</div>
+    <h1>Usama CRM</h1>
+    <div class="sub">Sign in to continue.</div>
     <input id="loginEmail" type="email" placeholder="Email" />
     <input id="loginPassword" type="password" placeholder="Password" />
     <button class="primaryBtn" onclick="login()">Login</button>
     <div id="loginError" class="loginError"></div>
   </div>
 
-  <div id="choiceView" class="choiceBox hidden">
-    <h1>Property Owner Database</h1>
-    <div class="sub">Choose your workspace.</div>
 
-    <div class="dashboardCards adminOnly" id="homeKpis">
-      <div class="kpiCard"><div class="kpiLabel">Owners</div><div class="kpiValue" id="homeOwners">-</div><div class="kpiHint">Database records</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Sale</div><div class="kpiValue" id="homeSale">-</div><div class="kpiHint">Seller opportunities</div></div>
-      <div class="kpiCard"><div class="kpiLabel">For Rent</div><div class="kpiValue" id="homeRent">-</div><div class="kpiHint">Rental opportunities</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Call Back</div><div class="kpiValue" id="homeCallBack">-</div><div class="kpiHint">Need action</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Leads</div><div class="kpiValue" id="homeLeads">-</div><div class="kpiHint">CRM records</div></div>
-      <div class="kpiCard"><div class="kpiLabel">Hot Leads</div><div class="kpiValue" id="homeHotLeads">-</div><div class="kpiHint">Interested + viewing</div></div>
-    </div>
-
-    <div class="choiceGrid">
-      <div class="choiceCard" id="ownersChoiceCard" onclick="showOwnersView()">
-        <h2>Owner Database</h2>
-        <p>Search owners, units, status, remarks, quick actions and WhatsApp outreach.</p>
-        <button class="primaryBtn">Open Database</button>
-      </div>
-
-      <div class="choiceCard adminOnly" id="leadsChoiceCard" onclick="showLeadsView()">
-        <h2>Leads CRM</h2>
-        <p>Manage leads, requirements, follow-ups, status, notes and WhatsApp outreach.</p>
-        <button class="primaryBtn">Open Leads</button>
+  <div id="choiceView" class="launcherView hidden">
+    <div class="launcherTopbar">
+      <div class="brandMark">U</div>
+      <div class="launcherBrand">Usama CRM</div>
+      <div class="launcherUser">
+        <button class="notificationButton" onclick="openTodayPanel()" title="Today">
+          <span>⌁</span><b id="todayNotificationCount">0</b>
+        </button>
+        <span id="loggedInAgentName">Agent</span>
+        <button class="smallGhostBtn" onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <div class="modalActions">
-      <button class="darkBtn adminOnly" onclick="refreshHomeKpis()">Refresh Stats</button>
-      <button class="darkBtn" onclick="logout()">Logout</button>
+    <div class="launcherGrid">
+      <button class="launcherTile adminOnly" onclick="showLeadsView()">
+        <span class="launcherIcon">L</span><span>Leads</span>
+      </button>
+      <button class="launcherTile" onclick="showOwnersView()">
+        <span class="launcherIcon">O</span><span>Owner Database</span>
+      </button>
+      <button class="launcherTile" onclick="showCalendarView()">
+        <span class="launcherIcon">31</span><span>Calendar</span>
+      </button>
+      <button class="launcherTile" onclick="openBroadcastFromHome()">
+        <span class="launcherIcon">W</span><span>WhatsApp Broadcast</span>
+      </button>
     </div>
   </div>
 
+  <div id="todayPanel" class="modalOverlay">
+    <div class="modal compactModal">
+      <div class="modalTitleRow"><h2>Today</h2><button class="iconClose" onclick="closeTodayPanel()">×</button></div>
+      <div id="todayPanelContent" class="activityList"><div class="empty">Loading...</div></div>
+    </div>
+  </div>
+
+  <div id="calendarView" class="wrap hidden">
+    <div class="sectionTopbar">
+      <div><h1>Calendar</h1><div class="sectionCaption">Meetings and follow-ups</div></div>
+      <div class="compactActions">
+        <button class="darkBtn" onclick="showChoiceView()">Home</button>
+        <button class="darkBtn" onclick="showLeadsView()">Leads</button>
+        <button class="darkBtn" onclick="showOwnersView()">Owners</button>
+      </div>
+    </div>
+    <div class="calendarToolbar">
+      <input id="calendarDate" type="date" onchange="loadCalendarView()">
+      <button class="darkBtn" onclick="calendarDate.value=today();loadCalendarView()">Today</button>
+    </div>
+    <div id="calendarContent" class="calendarList"><div class="empty">Loading...</div></div>
+  </div>
+
   <div id="appView" class="wrap hidden">
-    <div class="mainHeader">
+    <div class="mainHeader compactHeader">
       <div>
-        <h1>Owner Database</h1>
-        <div class="sub">Owner intelligence with filters, profile view, remarks, status and WhatsApp outreach.</div>
+        <h1>Owners</h1>
       </div>
 
       <div class="headerBtns">
@@ -1228,10 +1543,9 @@
     </div>
   </div>
     <div id="leadsView" class="wrap hidden">
-    <div class="mainHeader">
+    <div class="mainHeader compactHeader">
       <div>
-        <h1>Leads CRM</h1>
-        <div class="sub">Manage lead details, follow-ups, notes and WhatsApp outreach.</div>
+        <h1>Leads</h1>
       </div>
 
       <div class="headerBtns">
@@ -1458,28 +1772,62 @@
 
   <div id="leadDetailModal" class="modalOverlay"><div class="modal profileModal"><div id="leadDetailContent"></div></div></div>
 
-  <div id="broadcastModal" class="modalOverlay"><div class="modal profileModal">
-    <h2>WhatsApp Broadcast</h2>
-    <div class="sub">Use owners selected in the table, all owners matching the current filters, or choose contacts directly inside this window.</div>
-    <div class="formGrid">
-      <div><label>Recipients</label><select id="broadcastScope" onchange="broadcastScopeChanged()"><option value="selected">Selected from owner table</option><option value="filtered">All owners matching current filters</option><option value="inside">Choose contacts inside broadcast</option></select></div>
-      <div><label>Delay between opening chats</label><select id="broadcastDelay"><option value="3000">3 seconds</option><option value="5000" selected>5 seconds</option><option value="8000">8 seconds</option></select></div>
-    </div>
-    <div id="broadcastInsidePicker" class="hidden" style="margin-top:14px">
-      <div class="broadcastSearchRow"><input id="broadcastOwnerSearch" placeholder="Search owner, phone, unit, community or cluster..."><button class="darkBtn" onclick="searchBroadcastOwners()">Search</button></div>
-      <div id="broadcastPicker" class="broadcastPicker"></div>
-    </div>
-    <div class="formGrid" style="margin-top:14px">
-      <div><label>Greeting</label><input id="broadcastGreeting"></div>
-      <div><label>Agent Name</label><input id="broadcastAgentName"></div>
-      <div class="formFull"><label>Company Optional</label><input id="broadcastCompany"></div>
-      <div class="formFull"><label>Your Message</label><textarea id="broadcastMessage" rows="5"></textarea></div>
-    </div>
-    <div class="timelineBox"><h2>Personalized Preview</h2><div class="broadcastPreviewNav"><button class="darkBtn" onclick="changeBroadcastPreview(-1)">Previous</button><span id="broadcastPreviewCounter">No recipient loaded</span><button class="darkBtn" onclick="changeBroadcastPreview(1)">Next</button></div><div id="broadcastPreview" class="broadcastPreviewCard">Choose recipients to preview the personalized message.</div></div>
-    <div class="broadcastProgress"><div id="broadcastProgressBar"></div></div><div id="broadcastProgressText" class="sub" style="margin:0 0 10px">Ready.</div><div id="broadcastQueue" class="broadcastQueue"></div>
-    <div class="modalActions"><button class="dangerBtn" onclick="stopBroadcast()">Stop</button><button class="darkBtn" onclick="closeBroadcastModal()">Close</button><button class="primaryBtn" onclick="startBroadcast()">Start Broadcast</button></div>
-  </div></div>
 
+  <div id="broadcastModal" class="modalOverlay">
+    <div class="modal broadcastModalV4">
+      <div class="modalTitleRow">
+        <div><h2>WhatsApp Broadcast</h2><div class="sectionCaption">Choose recipients, review the personalized message, then open each chat in WhatsApp Web.</div></div>
+        <button class="iconClose" onclick="closeBroadcastModal()">×</button>
+      </div>
+
+      <div class="broadcastFilterGrid">
+        <div><label>Community</label><select id="broadcastCommunity" onchange="loadBroadcastClusters();loadBroadcastRecipients()"><option value="">Select Community</option></select></div>
+        <div><label>Cluster</label><select id="broadcastCluster" onchange="loadBroadcastRecipients()"><option value="">All Clusters</option></select></div>
+        <div><label>Units from</label><input id="broadcastUnitFrom" inputmode="numeric" placeholder="1" oninput="loadBroadcastRecipientsDebounced()"></div>
+        <div><label>Units to</label><input id="broadcastUnitTo" inputmode="numeric" placeholder="30" oninput="loadBroadcastRecipientsDebounced()"></div>
+      </div>
+
+      <div class="broadcastSearchRow">
+        <input id="broadcastOwnerSearch" placeholder="Search owner, phone or unit..." oninput="loadBroadcastRecipientsDebounced()">
+        <button class="darkBtn" onclick="toggleAllBroadcastRecipients(true)">Select All</button>
+        <button class="darkBtn" onclick="toggleAllBroadcastRecipients(false)">Clear</button>
+      </div>
+
+      <div class="broadcastWorkspace">
+        <div>
+          <div class="panelLabel"><span>Recipients</span><b id="broadcastSelectedCount">0 selected</b></div>
+          <div id="broadcastPicker" class="broadcastPicker compactPicker"></div>
+        </div>
+        <div>
+          <div class="formGrid compactForm">
+            <div><label>Greeting</label><input id="broadcastGreeting"></div>
+            <div><label>Agent Name</label><input id="broadcastAgentName"></div>
+            <div class="formFull"><label>Company (optional)</label><input id="broadcastCompany"></div>
+            <div class="formFull"><label>Message</label><textarea id="broadcastMessage" rows="5"></textarea></div>
+          </div>
+          <div class="panelLabel previewLabel">
+            <span>Preview</span>
+            <span><button class="miniNav" onclick="changeBroadcastPreview(-1)">‹</button><span id="broadcastPreviewCounter">Sample</span><button class="miniNav" onclick="changeBroadcastPreview(1)">›</button></span>
+          </div>
+          <div id="broadcastPreview" class="broadcastPreviewCard"></div>
+        </div>
+      </div>
+
+      <div class="broadcastProgress"><div id="broadcastProgressBar"></div></div>
+      <div id="broadcastProgressText" class="sectionCaption">Ready.</div>
+      <div id="broadcastQueue" class="broadcastQueue"></div>
+
+      <div class="modalActions">
+        <button class="darkBtn" onclick="closeBroadcastModal()">Close</button>
+        <button class="primaryBtn" onclick="startBroadcastV4()">Open Chats in WhatsApp Web</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="ownerDetailModal" class="modalOverlay">
+    <div class="modal fullDetailModal"><div id="ownerDetailContent"></div></div>
+  </div>
   <div id="projectModal" class="modalOverlay"><div class="modal"><h2>Manage Projects</h2><div class="sub">Add projects once, then use the same clean project list when adding, editing and filtering leads.</div><div class="projectManagerRow"><input id="newProjectName" placeholder="Project name, e.g. Farm Gardens"><button class="primaryBtn" onclick="addProject()">Add Project</button></div><div id="projectList" class="projectList"></div><div class="modalActions"><button class="darkBtn" onclick="closeProjectModal()">Close</button></div></div></div>
 
   <div id="whatsappModal" class="modalOverlay">
@@ -1500,7 +1848,7 @@
 
         <div class="formFull">
           <label>Company Optional</label>
-          <input id="wa_company" placeholder="BFG Properties" />
+          <input id="wa_company" placeholder="Company name" />
         </div>
 
         <div class="formFull">
@@ -1545,7 +1893,7 @@
     const DEFAULT_WHATSAPP_TEMPLATE = {
       greeting: "Hello",
       agentName: "Usama",
-      company: "BFG Properties",
+      company: "",
       message: "Would you consider selling if you receive a strong offer?"
     };
 
@@ -2593,7 +2941,7 @@ ${agentName}`;
 
       const msg = `Hello ${row.name || ""},
 
-This is Usama from BFG Properties.
+This is Usama.
 
 You inquired about ${row.project_inquired || "a property"}. When is a good time to discuss your requirement?
 
