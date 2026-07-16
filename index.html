@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Database</title>
+  <title>BFG Professional CRM</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1036,6 +1036,51 @@
     .leadReadonlyTable td{vertical-align:top}
     @media(max-width:800px){.sortControls{width:100%}.sortControls select{width:100%}.projectManagerRow,.broadcastSearchRow{flex-direction:column;align-items:stretch}}
 
+
+
+    /* ===== PROFESSIONAL CRM V3 VISUAL SYSTEM ===== */
+    :root{
+      --bg:#05070b;--panel:#0a0f18;--panel2:#0d1420;--card:#0b111b;
+      --line:rgba(148,163,184,.16);--lineStrong:rgba(148,163,184,.25);
+      --text:#f8fafc;--muted:#8f9db2;--blue:#3b82f6;--green:#14b884;
+      --shadow:0 24px 80px rgba(0,0,0,.38);--radius:18px;
+    }
+    body{background:linear-gradient(180deg,#05070b 0%,#070b12 100%);padding:18px 22px 28px;letter-spacing:-.01em}
+    .wrap{max-width:1920px}
+    h1{font-size:28px;letter-spacing:-.8px}.sub{color:var(--muted)}
+    .mainHeader{position:sticky;top:0;z-index:30;padding:14px 16px;margin:-4px -4px 18px;background:rgba(5,7,11,.88);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(18px);box-shadow:0 10px 36px rgba(0,0,0,.2)}
+    .headerBtns button{height:42px;padding:0 15px}
+    .card,.choiceBox,.loginBox{background:linear-gradient(180deg,rgba(13,20,32,.95),rgba(8,13,22,.95));border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px}
+    .dashboardCards{gap:14px}.kpiCard{background:linear-gradient(145deg,#0d1522,#090e17);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 8px 26px rgba(0,0,0,.18)}
+    .kpiValue{font-size:27px}.kpiLabel{font-weight:600;color:#a8b4c6}
+    input,select,textarea{background:#080d15;border-color:rgba(148,163,184,.18);border-radius:12px;min-height:43px}
+    input:hover,select:hover,textarea:hover{border-color:rgba(148,163,184,.32)}
+    input:focus,select:focus,textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.13)}
+    .primaryBtn,.reset{background:linear-gradient(135deg,#2563eb,#0e9f79);box-shadow:0 8px 22px rgba(37,99,235,.18)}
+    .darkBtn{background:#0b111b;border:1px solid var(--lineStrong)}
+    .actionsRow{padding:10px 0 4px}.quickFilters button{background:#0a111c;border-color:var(--line);padding:8px 13px}
+    .tablebox{background:#070b12;border:1px solid var(--line);border-radius:17px;max-height:72vh;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+    table{table-layout:fixed}th{background:#0c1320;padding:14px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.045em;color:#bcc7d7;border-bottom:1px solid var(--lineStrong)}
+    td{padding:13px 14px;font-size:13px;height:66px;border-top:1px solid rgba(148,163,184,.075);vertical-align:middle}
+    tr:hover td{background:rgba(59,130,246,.045)}
+    .selectOwnerHead,td:first-child{width:48px!important;min-width:48px!important;max-width:48px!important;text-align:center;padding-left:10px!important;padding-right:8px!important}
+    .owner-col-community{width:180px!important}.owner-col-cluster{width:190px!important}.owner-col-unit{width:92px!important;text-align:center}.owner-col-owner{width:290px!important}.owner-col-whatsapp{width:138px!important}.owner-col-status{width:165px!important}.owner-col-remarks{width:auto!important;min-width:360px!important}.owner-col-last_contacted{width:135px!important}.owner-col-actions{width:145px!important}
+    .unitNumberCell{display:block;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+    .owner-col-owner{white-space:normal;line-height:1.35}.owner-col-remarks{white-space:normal;overflow:visible}
+    .latestRemarkView,.remarksInput,.leadNotesBox{line-height:1.45}
+    .latestRemarkView{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;color:#dbe4f0;min-height:56px;cursor:pointer}
+    .remarksInput,.leadNotesBox{height:64px!important;white-space:normal!important;overflow-y:auto!important;resize:none}
+    .waBtn,.callBtn,.copyBtn{height:40px;border-radius:11px}.statusSelect{height:40px}
+    .modalOverlay{background:rgba(0,0,0,.76);backdrop-filter:blur(7px)}
+    .modal{background:linear-gradient(180deg,#0c121d,#080d15);border:1px solid var(--lineStrong);border-radius:22px;box-shadow:0 32px 110px rgba(0,0,0,.6)}
+    .broadcastPreviewCard{background:#070c14;border:1px solid var(--lineStrong);min-height:250px;padding:22px;font-size:14px;line-height:1.75;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+    .broadcastPickRow,.projectItem{background:#0b121d}.broadcastPicker{padding-right:5px}
+    .kanbanBoard{gap:14px}.kanbanCol{background:#090f18;border:1px solid var(--line);border-radius:17px}.kanbanCard{background:#0d1521;border:1px solid var(--line);box-shadow:0 10px 25px rgba(0,0,0,.18)}
+    .profileBox,.timelineBox,.activityComposer,.followupComposer,.reminderPanel{background:#0a111b;border-color:var(--line)}
+    .pager button{background:#0b121d}.pager{padding-bottom:4px}
+    @media(max-width:1100px){.owner-col-remarks{min-width:300px!important}.owner-col-owner{width:240px!important}}
+    @media(max-width:800px){body{padding:10px}.mainHeader{position:relative;margin:0 0 14px}.card{padding:12px}.mobileCards{display:block}.tablebox{display:none}}
+
   </style>
 </head>
 
@@ -1517,15 +1562,15 @@
     const LEAD_COLUMN_KEY = "usama_lead_columns_v3";
 
     const defaultOwnerColumns = [
-      { key:"community", label:"Community", visible:true, width:150 },
-      { key:"cluster", label:"Cluster", visible:true, width:150 },
+      { key:"community", label:"Community", visible:true, width:180 },
+      { key:"cluster", label:"Cluster", visible:true, width:180 },
       { key:"unit", label:"Unit", visible:true, width:90 },
-      { key:"owner", label:"Owner Name", visible:true, width:240 },
+      { key:"owner", label:"Owner Name", visible:true, width:280 },
       { key:"whatsapp", label:"WhatsApp", visible:true, width:130 },
       { key:"status", label:"Status", visible:true, width:150 },
-      { key:"remarks", label:"Remarks", visible:true, width:280 },
+      { key:"remarks", label:"Latest Remark", visible:true, width:460 },
       { key:"last_contacted", label:"Last Contacted", visible:true, width:135 },
-      { key:"actions", label:"Actions", visible:true, width:170 }
+      { key:"actions", label:"Actions", visible:true, width:145 }
     ];
 
     const defaultLeadColumns = [
@@ -2152,7 +2197,7 @@ ${agentName}`;
 
     function renderOwnerHead() {
       el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c =>
-        `<th class="resizable-th" data-table="owner" data-key="${c.key}" style="width:${c.width}px">
+        `<th class="resizable-th owner-col-${c.key}" data-table="owner" data-key="${c.key}" style="width:${c.width}px">
           ${escapeHtml(c.label)}
           <span class="resize-handle" onmousedown="startColumnResize(event, 'owner', '${c.key}')"></span>
         </th>`
@@ -2167,7 +2212,7 @@ ${agentName}`;
     function ownerCell(row, col) {
       if (col.key === "community") return escapeHtml(clean(row.community));
       if (col.key === "cluster") return escapeHtml(clean(row.cluster));
-      if (col.key === "unit") return escapeHtml(clean(row.unit));
+      if (col.key === "unit") return `<span class="unitNumberCell">${escapeHtml(clean(row.unit))}</span>`;
       if (col.key === "owner") return `${escapeHtml(clean(row.owner))}${profileButton(row)}${moreUnitButton(row)}`;
       if (col.key === "whatsapp") return whatsappButton(row);
       if (col.key === "status") return statusDropdown(row);
@@ -2189,7 +2234,7 @@ ${agentName}`;
       }
 
       el("tableBody").innerHTML = rows.map(row =>
-        `<tr>${cols.map(col => `<td style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`
+        `<tr>${cols.map(col => `<td class="owner-col-${col.key}" style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`
       ).join("");
 
       el("mobileCards").innerHTML = rows.map(row => {
@@ -3172,8 +3217,8 @@ Usama Bin Nusrat.`;
     function closeBroadcastModal(){ el("broadcastModal").classList.remove("show"); }
     function stopBroadcast(){ broadcastStopRequested=true;el("broadcastProgressText").textContent="Stopping after current recipient..."; }
     function applyBroadcastTemplate(text,row){const owner=get(row,["owner"]);const first=owner?String(owner).trim().split(/\s+/)[0]:"Owner";return String(text||"").replaceAll("{first_name}",first).replaceAll("{owner}",owner||"").replaceAll("{unit}",get(row,["unit"])||"").replaceAll("{cluster}",get(row,["cluster"])||"").replaceAll("{community}",get(row,["community"])||"");}
-    async function fetchFilteredOwnersForBroadcast(){let all=[];let from=0;const batch=1000;while(true){let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").range(from,from+batch-1);q=applyAccessFilter(q);q=applyFilters(q);const {data,error}=await q;if(error){alert(error.message);return [];}all=all.concat(data||[]);if(!data||data.length<batch)break;from+=batch;}return all;}
-    async function startBroadcast(){broadcastStopRequested=false;const scope=el("broadcastScope").value;let rows;if(scope==="filtered")rows=await fetchFilteredOwnersForBroadcast();else{const ids=[...selectedOwnerIds];if(!ids.length){alert("Select at least one owner first.");return;}const {data,error}=await db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").in("id",ids);if(error){alert(error.message);return;}rows=data||[];} const seen=new Set();rows=rows.filter(r=>{const p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"]));if(!p||seen.has(p))return false;seen.add(p);return true;});const base=el("broadcastMessage").value.trim();const delay=Number(el("broadcastDelay").value||5000);el("broadcastQueue").innerHTML=rows.map(r=>`<div class="broadcastQueueRow" id="bq_${r.id}"><span>${escapeHtml(clean(r.owner))} · ${escapeHtml(clean(r.unit))}</span><span class="badgeWait">Waiting</span></div>`).join("");for(let i=0;i<rows.length;i++){if(broadcastStopRequested)break;const r=rows[i];const p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"]));const msg=applyBroadcastTemplate(base,r);const win=window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,"_blank");const statusNode=el(`bq_${r.id}`)?.lastElementChild;if(statusNode){statusNode.textContent=win?"Opened":"Popup blocked";statusNode.className=win?"badgeOk":"badgeSkip";}await db.from("whatsapp_broadcast_log").insert([{owner_id:r.id,phone:p,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);await db.from(TABLE_NAME).update({last_contacted:today()}).eq("id",r.id);const pct=Math.round(((i+1)/rows.length)*100);el("broadcastProgressBar").style.width=pct+"%";el("broadcastProgressText").textContent=`Processed ${i+1} of ${rows.length}.`;if(i<rows.length-1)await new Promise(res=>setTimeout(res,delay));} }
+    async function fetchFilteredOwnersForBroadcast(){let all=[];let from=0;const batch=1000;while(true){let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,unit,cluster,community,status").range(from,from+batch-1);q=applyAccessFilter(q);q=applyFilters(q);const {data,error}=await q;if(error){alert(error.message);return [];}all=all.concat(data||[]);if(!data||data.length<batch)break;from+=batch;}return all;}
+    async function startBroadcast(){broadcastStopRequested=false;const scope=el("broadcastScope").value;let rows;if(scope==="filtered")rows=await fetchFilteredOwnersForBroadcast();else{const ids=[...selectedOwnerIds];if(!ids.length){alert("Select at least one owner first.");return;}const {data,error}=await db.from(TABLE_NAME).select("id,owner,phone1,phone2,unit,cluster,community,status").in("id",ids);if(error){alert(error.message);return;}rows=data||[];} const seen=new Set();rows=rows.filter(r=>{const p=formatPhone(get(r,["phone1","phone2"]));if(!p||seen.has(p))return false;seen.add(p);return true;});const base=el("broadcastMessage").value.trim();const delay=Number(el("broadcastDelay").value||5000);el("broadcastQueue").innerHTML=rows.map(r=>`<div class="broadcastQueueRow" id="bq_${r.id}"><span>${escapeHtml(clean(r.owner))} · ${escapeHtml(clean(r.unit))}</span><span class="badgeWait">Waiting</span></div>`).join("");for(let i=0;i<rows.length;i++){if(broadcastStopRequested)break;const r=rows[i];const p=formatPhone(get(r,["phone1","phone2"]));const msg=applyBroadcastTemplate(base,r);const win=window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,"_blank");const statusNode=el(`bq_${r.id}`)?.lastElementChild;if(statusNode){statusNode.textContent=win?"Opened":"Popup blocked";statusNode.className=win?"badgeOk":"badgeSkip";}await db.from("whatsapp_broadcast_log").insert([{owner_id:r.id,phone:p,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);await db.from(TABLE_NAME).update({last_contacted:today()}).eq("id",r.id);const pct=Math.round(((i+1)/rows.length)*100);el("broadcastProgressBar").style.width=pct+"%";el("broadcastProgressText").textContent=`Processed ${i+1} of ${rows.length}.`;if(i<rows.length-1)await new Promise(res=>setTimeout(res,delay));} }
 
 
     // ===== FINAL CRM V2 CORRECTIONS =====
@@ -3277,14 +3322,14 @@ Regards,
 ${agent}`;}
     openBroadcastModal = async function(){const t=getSavedWhatsappTemplate();el("broadcastGreeting").value=t.greeting||"Hello";el("broadcastAgentName").value=t.agentName||"Usama";el("broadcastCompany").value=t.company||"";el("broadcastMessage").value=t.message||DEFAULT_WHATSAPP_MESSAGE;el("broadcastProgressBar").style.width="0%";el("broadcastQueue").innerHTML="";broadcastInsideSelectedIds.clear();broadcastPreviewRows=[];broadcastPreviewIndex=0;el("broadcastScope").value=selectedOwnerIds.size?"selected":"inside";broadcastScopeChanged();el("broadcastModal").classList.add("show");await refreshBroadcastPreviewRows();};
     function broadcastScopeChanged(){const inside=el("broadcastScope").value==="inside";el("broadcastInsidePicker").classList.toggle("hidden",!inside);if(inside)searchBroadcastOwners();refreshBroadcastPreviewRows();}
-    async function searchBroadcastOwners(){const term=el("broadcastOwnerSearch").value.trim();let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").limit(100);q=applyAccessFilter(q);if(term)q=q.or(`owner.ilike.%${term}%,unit.ilike.%${term}%,phone1.ilike.%${term}%,phone2.ilike.%${term}%,community.ilike.%${term}%,cluster.ilike.%${term}%`);const {data,error}=await q.order("owner",{ascending:true});if(error){alert(error.message);return;}el("broadcastPicker").innerHTML=(data||[]).map(r=>`<div class="broadcastPickRow"><label><input type="checkbox" ${broadcastInsideSelectedIds.has(String(r.id))?'checked':''} onchange="toggleBroadcastInside('${r.id}',this.checked)"><span><strong>${escapeHtml(clean(r.owner))}</strong><br><span class="sub" style="margin:0">${escapeHtml(clean(r.community))} · ${escapeHtml(clean(r.cluster))} · Unit ${escapeHtml(clean(r.unit))}</span></span></label></div>`).join('')||`<div class="empty">No owners found</div>`;}
+    async function searchBroadcastOwners(){const term=el("broadcastOwnerSearch").value.trim();let q=db.from(TABLE_NAME).select("id,owner,phone1,phone2,unit,cluster,community,status").limit(100);q=applyAccessFilter(q);if(term)q=q.or(`owner.ilike.%${term}%,unit.ilike.%${term}%,phone1.ilike.%${term}%,phone2.ilike.%${term}%,community.ilike.%${term}%,cluster.ilike.%${term}%`);const {data,error}=await q.order("owner",{ascending:true});if(error){alert(error.message);return;}el("broadcastPicker").innerHTML=(data||[]).map(r=>`<div class="broadcastPickRow"><label><input type="checkbox" ${broadcastInsideSelectedIds.has(String(r.id))?'checked':''} onchange="toggleBroadcastInside('${r.id}',this.checked)"><span><strong>${escapeHtml(clean(r.owner))}</strong><br><span class="sub" style="margin:0">${escapeHtml(clean(r.community))} · ${escapeHtml(clean(r.cluster))} · Unit ${escapeHtml(clean(r.unit))}</span></span></label></div>`).join('')||`<div class="empty">No owners found</div>`;}
     function toggleBroadcastInside(id,checked){checked?broadcastInsideSelectedIds.add(String(id)):broadcastInsideSelectedIds.delete(String(id));refreshBroadcastPreviewRows();}
-    async function getBroadcastRecipientRows(){const scope=el("broadcastScope").value;if(scope==="filtered")return await fetchFilteredOwnersForBroadcast();const ids=scope==="inside"?[...broadcastInsideSelectedIds]:[...selectedOwnerIds];if(!ids.length)return[];const {data,error}=await db.from(TABLE_NAME).select("id,owner,phone1,phone2,phone,mobile,contact,unit,cluster,community,status").in("id",ids);if(error){alert(error.message);return[];}return data||[];}
+    async function getBroadcastRecipientRows(){const scope=el("broadcastScope").value;if(scope==="filtered")return await fetchFilteredOwnersForBroadcast();const ids=scope==="inside"?[...broadcastInsideSelectedIds]:[...selectedOwnerIds];if(!ids.length)return[];const {data,error}=await db.from(TABLE_NAME).select("id,owner,phone1,phone2,unit,cluster,community,status").in("id",ids);if(error){alert(error.message);return[];}return data||[];}
     async function refreshBroadcastPreviewRows(){broadcastPreviewRows=await getBroadcastRecipientRows();broadcastPreviewIndex=Math.min(broadcastPreviewIndex,Math.max(0,broadcastPreviewRows.length-1));updateBroadcastPreview();}
-    function updateBroadcastPreview(){const row=broadcastPreviewRows[broadcastPreviewIndex];el("broadcastPreviewCounter").textContent=row?`${broadcastPreviewIndex+1} of ${broadcastPreviewRows.length} — ${row.owner||'Owner'}`:`0 recipients`;el("broadcastPreview").textContent=row?buildBroadcastMessage(row):"Choose recipients to preview the personalized message.";el("broadcastProgressText").textContent=`${broadcastPreviewRows.length} recipient${broadcastPreviewRows.length===1?'':'s'} ready.`;}
+    function updateBroadcastPreview(){const row=broadcastPreviewRows[broadcastPreviewIndex]||{owner:"Owner Name",community:"The Valley",cluster:"Farm Gardens",unit:"101"};const hasReal=broadcastPreviewRows.length>0;el("broadcastPreviewCounter").textContent=hasReal?`${broadcastPreviewIndex+1} of ${broadcastPreviewRows.length} — ${row.owner||'Owner'}`:"Sample preview — select recipients to personalize";el("broadcastPreview").textContent=buildBroadcastMessage(row);el("broadcastProgressText").textContent=hasReal?`${broadcastPreviewRows.length} recipient${broadcastPreviewRows.length===1?'':'s'} ready.`:"No recipients selected yet. The sample preview updates live.";}
     function changeBroadcastPreview(dir){if(!broadcastPreviewRows.length)return;broadcastPreviewIndex=(broadcastPreviewIndex+dir+broadcastPreviewRows.length)%broadcastPreviewRows.length;updateBroadcastPreview();}
     document.addEventListener("input",e=>{if(["broadcastGreeting","broadcastAgentName","broadcastCompany","broadcastMessage"].includes(e.target.id))updateBroadcastPreview();});
-    startBroadcast = async function(){broadcastStopRequested=false;let rows=await getBroadcastRecipientRows();const seen=new Set();rows=rows.filter(r=>{const p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"]));if(!p||seen.has(p))return false;seen.add(p);return true;});if(!rows.length){alert("Choose at least one valid recipient.");return;}const delay=Number(el("broadcastDelay").value||5000);el("broadcastQueue").innerHTML=rows.map(r=>`<div class="broadcastQueueRow" id="bq_${r.id}"><span>${escapeHtml(clean(r.owner))} · ${escapeHtml(clean(r.unit))}</span><span class="badgeWait">Waiting</span></div>`).join('');for(let i=0;i<rows.length;i++){if(broadcastStopRequested)break;const r=rows[i],p=formatPhone(get(r,["phone1","phone2","phone","mobile","contact"])),msg=buildBroadcastMessage(r),win=window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,"_blank"),statusNode=el(`bq_${r.id}`)?.lastElementChild;if(statusNode){statusNode.textContent=win?"Opened":"Popup blocked";statusNode.className=win?"badgeOk":"badgeSkip";}await db.from("whatsapp_broadcast_log").insert([{owner_id:String(r.id),phone:p,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);await db.from(TABLE_NAME).update({last_contacted:today()}).eq("id",r.id);el("broadcastProgressBar").style.width=Math.round(((i+1)/rows.length)*100)+"%";el("broadcastProgressText").textContent=`Processed ${i+1} of ${rows.length}.`;if(i<rows.length-1)await new Promise(res=>setTimeout(res,delay));}};
+    startBroadcast = async function(){broadcastStopRequested=false;let rows=await getBroadcastRecipientRows();const seen=new Set();rows=rows.filter(r=>{const p=formatPhone(get(r,["phone1","phone2"]));if(!p||seen.has(p))return false;seen.add(p);return true;});if(!rows.length){alert("Choose at least one valid recipient.");return;}const delay=Number(el("broadcastDelay").value||5000);el("broadcastQueue").innerHTML=rows.map(r=>`<div class="broadcastQueueRow" id="bq_${r.id}"><span>${escapeHtml(clean(r.owner))} · ${escapeHtml(clean(r.unit))}</span><span class="badgeWait">Waiting</span></div>`).join('');for(let i=0;i<rows.length;i++){if(broadcastStopRequested)break;const r=rows[i],p=formatPhone(get(r,["phone1","phone2"])),msg=buildBroadcastMessage(r),win=window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,"_blank"),statusNode=el(`bq_${r.id}`)?.lastElementChild;if(statusNode){statusNode.textContent=win?"Opened":"Popup blocked";statusNode.className=win?"badgeOk":"badgeSkip";}await db.from("whatsapp_broadcast_log").insert([{owner_id:String(r.id),phone:p,message:msg,status:win?"opened":"popup_blocked",sent_by:currentUserEmail||null}]);await db.from(TABLE_NAME).update({last_contacted:today()}).eq("id",r.id);el("broadcastProgressBar").style.width=Math.round(((i+1)/rows.length)*100)+"%";el("broadcastProgressText").textContent=`Processed ${i+1} of ${rows.length}.`;if(i<rows.length-1)await new Promise(res=>setTimeout(res,delay));}};
 
     // Keep project list current when opening lead modal and after view loads.
     const _v2OpenLeadModal = openLeadModal;
