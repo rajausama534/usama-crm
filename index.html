@@ -6027,6 +6027,121 @@ setTimeout(()=>{
   }, 0);
 })();
 
+/* Owner editor: contact details + additional properties */
+let u12PropertyRowCount = 0;
+
+function u12SwitchOwnerTab(tab) {
+  document.querySelectorAll("#u10OwnerEditor .u12OwnerTab").forEach(button => {
+    button.classList.toggle("active", button.dataset.tab === tab);
+  });
+  document.querySelectorAll("#u10OwnerEditor .u12OwnerPanel").forEach(panel => {
+    panel.classList.toggle("active", panel.dataset.panel === tab);
+  });
+}
+
+function u12AddPropertyRow(property = {}) {
+  const list = document.getElementById("u12PropertyList");
+  if (!list) return;
+  const index = ++u12PropertyRowCount;
+  const row = document.createElement("div");
+  row.className = "u12PropertyCard";
+  row.dataset.propertyRow = String(index);
+  row.innerHTML = `
+    <div class="u12PropertyHeading"><strong>Additional property ${index}</strong><button type="button" class="u12RemoveProperty" onclick="this.closest('.u12PropertyCard').remove()">Remove</button></div>
+    <div class="formGrid">
+      <div><label>Community</label><input data-field="community" value="${escapeHtml(property.community || "")}" placeholder="Community"></div>
+      <div><label>Cluster</label><input data-field="cluster" value="${escapeHtml(property.cluster || "")}" placeholder="Cluster / Tower"></div>
+      <div><label>Unit</label><input data-field="unit" value="${escapeHtml(property.unit || "")}" placeholder="Unit number"></div>
+      <div><label>Status</label><select data-field="status">${getOwnerStatuses().map(s => `<option ${s === (property.status || "New") ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}</select></div>
+      <div class="formFull"><label>Source</label><input data-field="data_source" value="${escapeHtml(property.data_source || "")}" placeholder="Source"></div>
+    </div>`;
+  list.appendChild(row);
+}
+
+u10OpenOwnerEditor = function (row) {
+  document.getElementById("u10OwnerEditor")?.remove();
+  u12PropertyRowCount = 0;
+  const wrap = document.createElement("div");
+  wrap.id = "u10OwnerEditor";
+  wrap.className = "modalOverlay show";
+  wrap.innerHTML = `<div class="modal u12OwnerEditorModal">
+    <button class="u6CloseButton" onclick="document.getElementById('u10OwnerEditor').remove()">×</button>
+    <h2>Edit Owner</h2>
+    <div class="u12OwnerTabs">
+      <button type="button" class="u12OwnerTab active" data-tab="details" onclick="u12SwitchOwnerTab('details')">Owner Details</button>
+      <button type="button" class="u12OwnerTab" data-tab="properties" onclick="u12SwitchOwnerTab('properties')">More Properties <span id="u12PropertyCount"></span></button>
+    </div>
+    <div class="u12OwnerPanel active" data-panel="details">
+      <div class="formGrid">
+        <div><label>Owner name</label><input id="u10eo_owner" value="${escapeHtml(row.owner || "")}"></div>
+        <div><label>Email</label><input id="u10eo_email" type="email" value="${escapeHtml(row.email || "")}" placeholder="owner@example.com"></div>
+        <div><label>Phone 1</label><input id="u10eo_phone1" value="${escapeHtml(row.phone1 || "")}"></div>
+        <div><label>Phone 2</label><input id="u10eo_phone2" value="${escapeHtml(row.phone2 || "")}"></div>
+        <div><label>Community</label><input id="u10eo_community" value="${escapeHtml(row.community || "")}"></div>
+        <div><label>Cluster</label><input id="u10eo_cluster" value="${escapeHtml(row.cluster || "")}"></div>
+        <div><label>Unit</label><input id="u10eo_unit" value="${escapeHtml(row.unit || "")}"></div>
+        <div><label>Status</label><select id="u10eo_status">${getOwnerStatuses().map(s => `<option ${s === (row.status || "New") ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}</select></div>
+        <div class="formFull"><label>Source</label><input id="u10eo_source" value="${escapeHtml(row.data_source || "")}"></div>
+      </div>
+    </div>
+    <div class="u12OwnerPanel" data-panel="properties">
+      <div class="u12PropertyIntro"><div><strong>Add another property</strong><span>Create another unit under the same owner and contact details.</span></div><button type="button" class="primaryBtn" onclick="u12AddPropertyRow()">+ Add Property</button></div>
+      <div id="u12PropertyList"></div>
+      <div id="u12EmptyProperties" class="empty">No additional properties added yet.</div>
+    </div>
+    <div class="modalActions"><button class="darkBtn" onclick="document.getElementById('u10OwnerEditor').remove()">Cancel</button><button id="u12SaveOwnerButton" class="primaryBtn" onclick="u10SaveOwner('${row.id}')">Save Owner</button></div>
+  </div>`;
+  document.body.appendChild(wrap);
+  const observer = new MutationObserver(() => {
+    const count = wrap.querySelectorAll(".u12PropertyCard").length;
+    const countNode = document.getElementById("u12PropertyCount");
+    if (countNode) countNode.textContent = count ? `(${count})` : "";
+    document.getElementById("u12EmptyProperties")?.classList.toggle("hidden", count > 0);
+  });
+  observer.observe(document.getElementById("u12PropertyList"), { childList:true });
+};
+
+u10SaveOwner = async function (id) {
+  const saveButton = document.getElementById("u12SaveOwnerButton");
+  if (saveButton) { saveButton.disabled = true; saveButton.textContent = "Saving…"; }
+  const payload = {
+    owner:el("u10eo_owner").value.trim(), email:el("u10eo_email").value.trim() || null,
+    phone1:el("u10eo_phone1").value.trim(), phone2:el("u10eo_phone2").value.trim(),
+    community:el("u10eo_community").value.trim(), cluster:el("u10eo_cluster").value.trim(),
+    unit:el("u10eo_unit").value.trim(), status:el("u10eo_status").value,
+    data_source:el("u10eo_source").value.trim()
+  };
+  const additionalProperties = [...document.querySelectorAll("#u12PropertyList .u12PropertyCard")].map(card => {
+    const value = field => card.querySelector(`[data-field="${field}"]`)?.value.trim() || null;
+    return {
+      owner:payload.owner, email:payload.email, phone1:payload.phone1, phone2:payload.phone2,
+      community:value("community"), cluster:value("cluster"), unit:value("unit"),
+      status:value("status") || "New", data_source:value("data_source") || payload.data_source
+    };
+  }).filter(property => property.community || property.cluster || property.unit);
+
+  const {data,error} = await db.from(TABLE_NAME).update(payload).eq("id",id).select().single();
+  if (error) {
+    alert(`Could not save owner: ${error.message}`);
+    if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Save Owner"; }
+    return;
+  }
+  if (additionalProperties.length) {
+    const {error:insertError} = await db.from(TABLE_NAME).insert(additionalProperties);
+    if (insertError) {
+      alert(`Owner details were saved, but the additional properties could not be added: ${insertError.message}`);
+      if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Save Owner"; }
+      return;
+    }
+  }
+  await db.from(U6_OWNER_ACTIVITIES).insert([{owner_id:String(id),activity_type:"Owner details updated",details:additionalProperties.length ? `Owner details updated and ${additionalProperties.length} additional ${additionalProperties.length === 1 ? "property" : "properties"} added` : "Owner details updated",created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
+  document.getElementById("u10OwnerEditor")?.remove();
+  u6ActiveOwnerRow=data;
+  await loadOwnerMiniRows();
+  await openOwnerProfile(data);
+  loadData();
+};
+
 </script>
 
 <style>
@@ -6117,6 +6232,17 @@ body.ownerColumnResizing *{
   cursor:col-resize!important;
   user-select:none!important;
 }
+.u12OwnerEditorModal{width:min(840px,96vw)!important;position:relative;max-height:90vh;overflow:auto}
+.u12OwnerTabs{display:flex;gap:8px;margin:18px 0 22px;border-bottom:1px solid #243246}
+.u12OwnerTab{border:0;background:transparent;color:#91a0b5;padding:12px 16px;border-bottom:2px solid transparent;font-weight:700;cursor:pointer}
+.u12OwnerTab.active{color:#fff;border-bottom-color:#22b8cf}
+.u12OwnerPanel{display:none}.u12OwnerPanel.active{display:block}
+.u12PropertyIntro{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.u12PropertyIntro span{display:block;color:#91a0b5;font-size:12px;margin-top:4px}
+.u12PropertyCard{border:1px solid #243246;border-radius:12px;padding:16px;margin:0 0 14px;background:#080e17}
+.u12PropertyHeading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.u12RemoveProperty{border:0;background:transparent;color:#ff6b6b;font-weight:700;cursor:pointer}
+@media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
 </body>
