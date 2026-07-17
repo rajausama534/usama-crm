@@ -2184,6 +2184,176 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
   }
 }
 
+
+
+/* =========================================================
+   USAMA CRM V10 — premium compact layout and workflow fixes
+   ========================================================= */
+:root{
+  --v10-divider:rgba(148,163,184,.12);
+  --v10-divider-head:rgba(148,163,184,.22);
+}
+
+/* Header user hierarchy */
+.v7ProfileText{display:flex!important;flex-direction:column!important;align-items:flex-start!important;line-height:1.15!important}
+.v7ProfileName{display:block!important}
+.v7ProfileRole{display:block!important;margin-top:3px!important;color:#94a3b8!important}
+
+/* Premium close button */
+.u6CloseButton,.iconCloseV5{
+  background:#260f15!important;
+  border:1px solid rgba(239,68,68,.40)!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(127,29,29,.22)!important;
+}
+.u6CloseButton:hover,.iconCloseV5:hover{
+  background:#3b121a!important;
+  border-color:rgba(248,113,113,.68)!important;
+  transform:scale(1.05)!important;
+}
+
+/* Dashboard launcher */
+.crmAppIcon{
+  background:linear-gradient(155deg,#111b28,#09111b)!important;
+  border:1px solid #304155!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 14px 40px rgba(0,0,0,.24)!important;
+}
+.crmAppTile:hover .crmAppIcon{
+  transform:translateY(-3px) scale(1.025);
+  border-color:rgba(46,200,183,.65)!important;
+  box-shadow:0 14px 38px rgba(13,169,159,.15)!important;
+}
+.crmAppTile:last-child:hover .crmAppIcon{
+  border-color:rgba(37,211,102,.65)!important;
+  box-shadow:0 14px 38px rgba(37,211,102,.16)!important;
+}
+
+/* Owners table: exact compact order and subtle separators */
+#ownersTable{
+  width:max-content!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+#ownersTable th,#ownersTable td{
+  border-right:1px solid var(--v10-divider)!important;
+  text-align:left!important;
+  font-size:13px!important;
+}
+#ownersTable th{
+  border-right-color:var(--v10-divider-head)!important;
+}
+#ownersTable th:last-child,#ownersTable td:last-child{border-right:0!important}
+#ownersTable .owner-col-unit{text-align:center!important}
+#ownersTable .owner-col-community{width:145px;min-width:90px}
+#ownersTable .owner-col-cluster{width:145px;min-width:90px}
+#ownersTable .owner-col-unit{width:66px;min-width:54px}
+#ownersTable .owner-col-owner{width:215px;min-width:145px}
+#ownersTable .owner-col-whatsapp{width:108px;min-width:90px}
+#ownersTable .owner-col-status{width:164px;min-width:130px}
+#ownersTable .owner-col-remarks{width:390px;min-width:220px}
+#ownersTable .resize-handle{
+  display:block!important;
+  position:absolute!important;
+  right:-5px!important;
+  top:0!important;
+  width:10px!important;
+  height:100%!important;
+  z-index:20!important;
+  cursor:col-resize!important;
+  touch-action:none!important;
+}
+#ownersTable .resize-handle:hover{background:rgba(59,130,246,.4)!important}
+#ownersTable .statusSelect{
+  max-width:150px!important;
+  height:32px!important;
+  min-height:32px!important;
+  border-radius:999px!important;
+  font-size:12px!important;
+}
+#ownersTable .waBtn{height:31px!important;font-size:11px!important}
+#ownersTable .latestRemarkRead,#ownersTable .remarksInput{
+  font-size:13px!important;
+  line-height:1.38!important;
+}
+.ownerIdentityName{font-size:13px!important}
+.ownerIdentityActions{margin-top:2px}
+
+/* Data text +1px and left alignment */
+.u6Field div,.u6NotesText,.u6TimelineText,.calendarItemV5,
+.profileBox div,.infoLine,.leadLatestNote,.latestRemarkRead{
+  font-size:13px!important;
+}
+.u6Field,.u6Field label,.u6Field div,
+.owner-col-community,.owner-col-cluster,.owner-col-owner,.owner-col-remarks{
+  text-align:left!important;
+}
+
+/* Timeline actions */
+.u10TimelineActions{display:flex;gap:5px;margin-top:7px}
+.u10MiniAction{
+  min-height:25px!important;height:25px!important;padding:2px 8px!important;
+  border-radius:7px!important;font-size:10px!important;
+  background:#111a26!important;border:1px solid #2b394b!important;color:#dbe6f2!important;
+}
+.u10MiniAction.delete{background:#250f15!important;border-color:rgba(239,68,68,.35)!important;color:#fecaca!important}
+.u10ComposerButtons{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.u10ScheduleBtn{background:linear-gradient(135deg,#6d4aff,#8b5cf6)!important}
+.u10ScheduledTag{
+  display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;
+  background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.4);
+  color:#ddd6fe;font-size:10px;font-weight:700;margin-left:7px;
+}
+
+/* Lead status colours */
+.leadCard .unitBadge{border:1px solid transparent}
+.leadCard .status-New{background:rgba(59,130,246,.14)!important;color:#bfdbfe!important;border-color:rgba(59,130,246,.4)!important}
+.leadCard .status-Contacted{background:rgba(6,182,212,.14)!important;color:#a5f3fc!important;border-color:rgba(6,182,212,.4)!important}
+.leadCard .status-CallBack{background:rgba(245,158,11,.14)!important;color:#fde68a!important;border-color:rgba(245,158,11,.4)!important}
+.leadCard .status-Interested{background:rgba(16,185,129,.14)!important;color:#a7f3d0!important;border-color:rgba(16,185,129,.4)!important}
+.leadCard .status-Viewing{background:rgba(139,92,246,.14)!important;color:#ddd6fe!important;border-color:rgba(139,92,246,.4)!important}
+.leadCard .status-Negotiation{background:rgba(37,99,235,.16)!important;color:#bfdbfe!important;border-color:rgba(37,99,235,.45)!important}
+.leadCard .status-Lost{background:rgba(239,68,68,.14)!important;color:#fecaca!important;border-color:rgba(239,68,68,.4)!important}
+
+/* Calendar popup */
+.u10Picker{
+  position:fixed;z-index:5000;width:min(360px,calc(100vw - 24px));
+  background:#0b121c;border:1px solid #334155;border-radius:16px;
+  padding:14px;box-shadow:0 26px 80px rgba(0,0,0,.55);
+}
+.u10PickerGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.u10PickerActions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.u10DateButton{
+  width:100%;min-height:43px;display:flex;align-items:center;justify-content:space-between;
+  background:#080d15;border:1px solid #26364a;color:#edf4fc;padding:9px 12px;border-radius:9px;
+}
+
+/* Mobile refinements */
+@media(max-width:800px){
+  html,body{max-width:100%!important;overflow-x:hidden!important}
+  #leadDetailModal,#leadDetailModal .modal,#leadDetailContent,
+  #profileModal,#profileModal .modal,#profileContent,
+  .u6DetailShell,.u6DetailLeft,.u6DetailRight{
+    width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;
+  }
+  #leadDetailModal,#profileModal{padding:0!important;overflow:hidden!important}
+  #leadDetailModal .modal,#profileModal .modal{
+    height:100dvh!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;
+  }
+  .u6DetailShell{display:block!important;overflow-x:hidden!important}
+  .u6DetailLeft,.u6DetailRight{padding:13px!important;overflow:visible!important}
+  .u6DetailGrid{display:block!important}
+  .u6Field{grid-template-columns:105px minmax(0,1fr)!important}
+  .u6Field div,.u6NotesText,.u6TimelineText{overflow-wrap:anywhere!important;word-break:break-word!important}
+  .u6StageBar{overflow-x:auto!important;flex-wrap:nowrap!important;max-width:100%!important}
+  .crmAppIcon{width:96px!important;height:96px!important;border-radius:18px!important}
+  .crmAppIcon svg{width:50px!important;height:50px!important}
+  .crmAppLauncher{gap:25px 14px!important;padding:42px 14px!important}
+  .crmAppTile{font-size:13px!important}
+  .leadCard .mobileActionGrid{grid-template-columns:1fr 1fr 1fr!important}
+  .leadCard .mobileActionGrid a,.leadCard .mobileActionGrid button{min-width:0!important;width:100%!important}
+  .v7ProfileText{display:none!important}
+}
+
 </style>
 </head>
 
@@ -5314,6 +5484,373 @@ setTimeout(()=>{
     if(typeof currentOwnerPageRows!=='undefined' && currentOwnerPageRows?.length) renderData(currentOwnerPageRows);
   }catch(e){console.warn(e);}
 },250);
+
+
+
+/* =========================================================
+   USAMA CRM V10 — functional refinements
+   ========================================================= */
+const U10_SYSTEM_TYPES = [
+  "WhatsApp","Status changed","Status Change","Owner details updated","Lead created",
+  "Owner record created","Follow-up Set","Broadcast","Scheduled"
+];
+function u10IsManualActivity(a){
+  const t=String(a?.activity_type||"");
+  const d=String(a?.details||"").toLowerCase();
+  if(t.startsWith("Scheduled:")) return false;
+  if(U10_SYSTEM_TYPES.some(x=>t.toLowerCase()===x.toLowerCase())) return false;
+  if(d.includes("whatsapp message initiated")) return false;
+  if(d.startsWith("status changed")) return false;
+  return true;
+}
+function u10LatestManualText(activities,fallback="-"){
+  const x=(activities||[]).find(u10IsManualActivity);
+  return x?.details?.trim() || fallback;
+}
+function u10ActivityStatusClass(status){
+  return `status-${String(status||"New").replace(/\s+/g,"")}`;
+}
+function u10IsFuture(value){ return new Date(value).getTime()>Date.now()+30000; }
+function u10SqlDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toISOString().slice(0,10);}
+
+/* Correct owner column order and compact defaults */
+(function(){
+  const desired=[
+    {key:"community",label:"Community",visible:true,width:145},
+    {key:"cluster",label:"Cluster",visible:true,width:145},
+    {key:"unit",label:"Unit",visible:true,width:66},
+    {key:"owner",label:"Owner Name",visible:true,width:215},
+    {key:"whatsapp",label:"WhatsApp",visible:true,width:108},
+    {key:"status",label:"Status",visible:true,width:164},
+    {key:"remarks",label:"Latest Remark",visible:true,width:390}
+  ];
+  ownerColumns.splice(0,ownerColumns.length,...desired);
+  saveOwnerColumnsState();
+})();
+
+/* True pointer-based resizing */
+startColumnResize=function(e,table,key){
+  e.preventDefault();e.stopPropagation();
+  const cols=table==="owner"?ownerColumns:leadColumns;
+  const col=cols.find(c=>c.key===key);if(!col)return;
+  const startX=e.clientX??e.touches?.[0]?.clientX;
+  const startWidth=Number(col.width||120);
+  document.body.style.userSelect="none";
+  document.body.style.cursor="col-resize";
+  const move=ev=>{
+    const x=ev.clientX??ev.touches?.[0]?.clientX;
+    const max=key==="remarks"?700:420;
+    col.width=Math.min(max,Math.max(key==="unit"?54:80,startWidth+(x-startX)));
+    const nodes=document.querySelectorAll(`#ownersTable .owner-col-${key}`);
+    nodes.forEach(n=>{n.style.width=`${col.width}px`;n.style.minWidth=`${col.width}px`;});
+  };
+  const up=()=>{
+    document.removeEventListener("mousemove",move);document.removeEventListener("mouseup",up);
+    document.removeEventListener("touchmove",move);document.removeEventListener("touchend",up);
+    document.body.style.userSelect="";document.body.style.cursor="";
+    if(table==="owner")saveOwnerColumnsState();else saveLeadColumnsState();
+  };
+  document.addEventListener("mousemove",move);document.addEventListener("mouseup",up);
+  document.addEventListener("touchmove",move,{passive:false});document.addEventListener("touchend",up);
+};
+
+/* Clean latest remark in the outside table only */
+const u10OriginalLoadData=loadData;
+loadData=async function(){
+  await u10OriginalLoadData();
+  try{
+    const ids=(currentOwnerPageRows||[]).map(x=>String(x.id));
+    if(!ids.length)return;
+    const {data}=await db.from(U6_OWNER_ACTIVITIES).select("*").in("owner_id",ids).order("created_at",{ascending:false});
+    const by={};(data||[]).forEach(a=>{if(!by[a.owner_id])by[a.owner_id]=[];by[a.owner_id].push(a)});
+    currentOwnerPageRows.forEach(r=>r.__u10_latest=u10LatestManualText(by[String(r.id)]||[],"-"));
+    renderData(currentOwnerPageRows);
+  }catch(e){console.warn("Manual remark load failed",e);}
+};
+const u10OwnerCellBase=ownerCell;
+ownerCell=function(row,col){
+  if(col.key==="remarks"){
+    return `<div class="latestRemarkRead" title="${escapeHtml(row.__u10_latest||"-")}">${escapeHtml(row.__u10_latest||"-")}</div>`;
+  }
+  return u10OwnerCellBase(row,col);
+};
+
+/* Activity timeline item with edit/delete for manual records */
+function u10TimelineItem(a,entity){
+  const d=a?.created_at?new Date(a.created_at):new Date();
+  const manual=u10IsManualActivity(a);
+  const scheduled=String(a?.activity_type||"").startsWith("Scheduled:");
+  return `<div class="u6TimelineItem">
+    <div class="u6TimelineTop">
+      <div class="u6TimelineType">${escapeHtml(a?.activity_type||"Activity")}${scheduled?'<span class="u10ScheduledTag">Scheduled</span>':""}</div>
+      <div class="u6TimelineTime">${Number.isNaN(d.getTime())?"":formatCRMDateTime(d)}</div>
+    </div>
+    <div class="u6TimelineText">${escapeHtml(a?.details||"")}</div>
+    ${manual?`<div class="u10TimelineActions">
+      <button class="u10MiniAction" onclick="u10EditActivity('${entity}','${a.id}')">Edit</button>
+      <button class="u10MiniAction delete" onclick="u10DeleteActivity('${entity}','${a.id}')">Delete</button>
+    </div>`:""}
+  </div>`;
+}
+async function u10EditActivity(entity,id){
+  const table=entity==="owner"?U6_OWNER_ACTIVITIES:"lead_activities";
+  const {data,error}=await db.from(table).select("*").eq("id",id).single();
+  if(error){alert(error.message);return;}
+  const details=prompt("Edit activity:",data.details||"");
+  if(details===null)return;
+  const type=prompt("Activity type:",data.activity_type||"Note");
+  if(type===null)return;
+  const {error:e}=await db.from(table).update({details:details.trim(),activity_type:type.trim()||"Note"}).eq("id",id);
+  if(e){alert(e.message);return;}
+  if(entity==="owner")await openOwnerProfile(u6ActiveOwnerRow);else await openLeadDetail(activeLeadDetailId);
+  loadData();loadLeads();
+}
+async function u10DeleteActivity(entity,id){
+  if(!confirm("Delete this activity?"))return;
+  const table=entity==="owner"?U6_OWNER_ACTIVITIES:"lead_activities";
+  const {error}=await db.from(table).delete().eq("id",id);
+  if(error){alert(error.message);return;}
+  if(entity==="owner")await openOwnerProfile(u6ActiveOwnerRow);else await openLeadDetail(activeLeadDetailId);
+  loadData();loadLeads();
+}
+
+/* Small premium date/time picker */
+function u10OpenPicker(inputId,anchor){
+  document.getElementById("u10Picker")?.remove();
+  const input=el(inputId);const current=input.value||localDateTimeValue();
+  const d=new Date(current);
+  const pop=document.createElement("div");pop.id="u10Picker";pop.className="u10Picker";
+  pop.innerHTML=`<div class="u10PickerGrid">
+    <div><label>Date</label><input id="u10PickDate" type="date" value="${u10SqlDate(d)}"></div>
+    <div><label>Time</label><input id="u10PickTime" type="time" value="${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}"></div>
+  </div>
+  <div class="u10PickerActions">
+    <button class="darkBtn" onclick="document.getElementById('u10Picker').remove()">Cancel</button>
+    <button class="primaryBtn" onclick="u10ConfirmPicker('${inputId}')">Confirm</button>
+  </div>`;
+  document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect();
+  pop.style.left=Math.min(window.innerWidth-pop.offsetWidth-12,Math.max(12,r.left))+"px";
+  pop.style.top=Math.min(window.innerHeight-pop.offsetHeight-12,r.bottom+8)+"px";
+}
+function u10ConfirmPicker(inputId){
+  const date=el("u10PickDate").value,time=el("u10PickTime").value;
+  if(!date||!time)return;
+  el(inputId).value=`${date}T${time}`;
+  const label=el(inputId+"Label");if(label)label.textContent=formatCRMDateTime(new Date(`${date}T${time}`));
+  el("u10Picker").remove();
+}
+function u10DateControl(id,value){
+  const v=value||localDateTimeValue();
+  return `<input id="${id}" type="hidden" value="${v}">
+    <button type="button" class="u10DateButton" onclick="u10OpenPicker('${id}',this)">
+      <span id="${id}Label">${formatCRMDateTime(new Date(v))}</span><span>▣</span>
+    </button>`;
+}
+
+/* Edit owner modal */
+function u10OpenOwnerEditor(row){
+  document.getElementById("u10OwnerEditor")?.remove();
+  const wrap=document.createElement("div");wrap.id="u10OwnerEditor";wrap.className="modalOverlay show";
+  wrap.innerHTML=`<div class="modal" style="width:min(760px,96vw);position:relative">
+    <button class="u6CloseButton" onclick="document.getElementById('u10OwnerEditor').remove()">×</button>
+    <h2>Edit Owner</h2>
+    <div class="formGrid">
+      <div><label>Owner name</label><input id="u10eo_owner" value="${escapeHtml(row.owner||"")}"></div>
+      <div><label>Phone 1</label><input id="u10eo_phone1" value="${escapeHtml(row.phone1||"")}"></div>
+      <div><label>Phone 2</label><input id="u10eo_phone2" value="${escapeHtml(row.phone2||"")}"></div>
+      <div><label>Community</label><input id="u10eo_community" value="${escapeHtml(row.community||"")}"></div>
+      <div><label>Cluster</label><input id="u10eo_cluster" value="${escapeHtml(row.cluster||"")}"></div>
+      <div><label>Unit</label><input id="u10eo_unit" value="${escapeHtml(row.unit||"")}"></div>
+      <div><label>Status</label><select id="u10eo_status">${getOwnerStatuses().map(s=>`<option ${s===(row.status||"New")?"selected":""}>${escapeHtml(s)}</option>`).join("")}</select></div>
+      <div><label>Source</label><input id="u10eo_source" value="${escapeHtml(row.data_source||"")}"></div>
+    </div>
+    <div class="modalActions"><button class="primaryBtn" onclick="u10SaveOwner('${row.id}')">Save Owner</button></div>
+  </div>`;
+  document.body.appendChild(wrap);
+}
+async function u10SaveOwner(id){
+  const payload={
+    owner:el("u10eo_owner").value.trim(),phone1:el("u10eo_phone1").value.trim(),
+    phone2:el("u10eo_phone2").value.trim(),community:el("u10eo_community").value.trim(),
+    cluster:el("u10eo_cluster").value.trim(),unit:el("u10eo_unit").value.trim(),
+    status:el("u10eo_status").value,data_source:el("u10eo_source").value.trim()
+  };
+  const {data,error}=await db.from(TABLE_NAME).update(payload).eq("id",id).select().single();
+  if(error){alert(error.message);return;}
+  await db.from(U6_OWNER_ACTIVITIES).insert([{owner_id:String(id),activity_type:"Owner details updated",details:"Owner details updated",created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
+  document.getElementById("u10OwnerEditor").remove();
+  u6ActiveOwnerRow=data;await openOwnerProfile(data);loadData();
+}
+
+/* Owner profile */
+openOwnerProfile=async function(row){
+  u6ActiveOwnerRow=row;
+  const related=getRelatedRows(row).sort((a,b)=>String(a.unit_sort||a.unit).localeCompare(String(b.unit_sort||b.unit),undefined,{numeric:true}));
+  const {data:activities}=await db.from(U6_OWNER_ACTIVITIES).select("*").eq("owner_id",String(row.id)).order("created_at",{ascending:false});
+  const acts=activities||[];
+  const latest=u10LatestManualText(acts,"-");
+  const statuses=getOwnerStatuses();
+  el("profileContent").innerHTML=`
+    <button class="u6CloseButton" onclick="closeOwnerProfile()">×</button>
+    <div class="u6DetailShell">
+      <section class="u6DetailLeft">
+        <button class="u9MobileBack" onclick="closeOwnerProfile()">← Owners</button>
+        <div class="u6DetailHeader">
+          <div><div class="u6DetailTitle">${escapeHtml(u6Value(row.owner))}</div><div class="u6DetailSubtitle">${escapeHtml(u6Value(row.community))} · ${escapeHtml(u6Value(row.cluster))} · Unit ${escapeHtml(u6Value(row.unit))}</div></div>
+          <div class="u6HeaderActions">${whatsappButton(row)}${callButton(row)}<button class="darkBtn" onclick='u10OpenOwnerEditor(${JSON.stringify(row).replaceAll("'","&#039;")})'>Edit Owner</button></div>
+        </div>
+        <div class="u6StageBar">${statuses.map(s=>`<button class="u6Stage ${s===(row.status||"New")?"active":""}" onclick="u9ChangeOwnerStatus('${row.id}','${escapeHtml(s).replaceAll("'","&#039;")}')">${escapeHtml(s)}</button>`).join("")}</div>
+        <div class="u6DetailGrid">
+          ${u6Field("Owner name",row.owner)}${u6Field("Phone 1",row.phone1)}${u6Field("Phone 2",row.phone2)}
+          ${u6Field("Community",row.community)}${u6Field("Cluster",row.cluster)}${u6Field("Unit",row.unit)}
+          ${u6Field("Status",row.status||"New")}${u6Field("Source",row.data_source)}${u6Field("Last contacted",formatCRMDate(row.last_contacted))}
+        </div>
+        <div class="u6NotesBox"><h3>Latest Remark</h3><div class="u6NotesText">${escapeHtml(latest)}</div></div>
+        ${related.length>1?`<div class="u6NotesBox"><h3>Related Units</h3>${related.map(r=>`<div class="u6Field u6RelatedUnitCard"><label>Unit ${escapeHtml(u6Value(r.unit))}</label><div>${escapeHtml(u6Value(r.community))} · ${escapeHtml(u6Value(r.cluster))} · ${escapeHtml(u6Value(r.status))}</div></div>`).join("")}</div>`:""}
+      </section>
+      <aside class="u6DetailRight">
+        <div class="u6TimelineTitle">Activity Timeline</div>
+        <div class="u6Composer">
+          <div class="u6ComposerGrid"><select id="u6OwnerActivityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Follow-up</option><option>Note</option></select>${u10DateControl("u6OwnerActivityWhen",localDateTimeValue())}</div>
+          <textarea id="u6OwnerActivityDetails" rows="4" placeholder="What was discussed?"></textarea>
+          <div class="u10ComposerButtons"><button class="primaryBtn" onclick="u10AddOwnerActivity('${row.id}',false)">Add Activity</button><button class="primaryBtn u10ScheduleBtn" onclick="u10AddOwnerActivity('${row.id}',true)">Schedule</button></div>
+        </div>
+        <div class="u6Timeline">${acts.length?acts.map(a=>u10TimelineItem(a,"owner")).join(""):`<div class="empty">No activity yet</div>`}</div>
+      </aside>
+    </div>`;
+  el("profileModal").classList.add("show");
+};
+async function u10AddOwnerActivity(id,schedule){
+  const type=el("u6OwnerActivityType").value,details=el("u6OwnerActivityDetails").value.trim(),when=el("u6OwnerActivityWhen").value;
+  if(!details){alert("Write the activity first.");return;}
+  if(schedule&&!u10IsFuture(when)){alert("Choose a future date and time to schedule this activity.");return;}
+  if(!schedule&&u10IsFuture(when)){alert("This date is in the future. Use Schedule instead.");return;}
+  const payload={owner_id:String(id),activity_type:schedule?`Scheduled: ${type}`:type,details,created_at:new Date(when).toISOString(),created_by:currentUserEmail||null};
+  const {error}=await db.from(U6_OWNER_ACTIVITIES).insert([payload]);if(error){alert(error.message);return;}
+  if(!schedule){
+    const remarkColumn=isAdmin?"admin_remarks":"agent_remarks";
+    await db.from(TABLE_NAME).update({[remarkColumn]:details,last_contacted:today()}).eq("id",id);
+    u6ActiveOwnerRow={...u6ActiveOwnerRow,[remarkColumn]:details,last_contacted:today()};
+  }
+  await openOwnerProfile(u6ActiveOwnerRow);loadData();u10RefreshNotifications();
+}
+
+/* Lead detail */
+renderLeadDetail=function(lead,acts){
+  const stages=getPipelineStages();
+  const latest=u10LatestManualText(acts,lead.notes||"-");
+  const formattedPhone=formatPhone(lead.phone);
+  const waMessage=`Hello ${lead.name||""},\n\nThis is ${getWhatsappAgentName()}.\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName()}`;
+  el("leadDetailContent").innerHTML=`
+    <button class="u6CloseButton" onclick="closeLeadDetail()">×</button>
+    <div class="u6DetailShell">
+      <section class="u6DetailLeft">
+        <button class="u9MobileBack" onclick="closeLeadDetail()">← Leads</button>
+        <div class="u6DetailHeader">
+          <div><div class="u6DetailTitle">${escapeHtml(u6Value(lead.name))}</div><div class="u6DetailSubtitle">${escapeHtml(u6Value(lead.project_inquired))}</div></div>
+          <div class="u6HeaderActions">
+            ${formattedPhone?`<a class="waBtn" target="_blank" onclick="u6LogLeadWhatsApp('${lead.id}')" href="https://wa.me/${formattedPhone}?text=${encodeURIComponent(waMessage)}">WhatsApp</a><a class="callBtn" href="tel:+${formattedPhone}">Call</a>`:""}
+            <button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button>
+          </div>
+        </div>
+        <div class="u6StageBar">${stages.map(s=>`<button class="u6Stage ${s===(lead.status||"New")?"active":""}" onclick="changeLeadStage('${lead.id}','${escapeHtml(s).replaceAll("'","&#039;")}','${escapeHtml(lead.status||"New").replaceAll("'","&#039;")}')">${escapeHtml(s)}</button>`).join("")}</div>
+        <div class="u6DetailGrid">
+          ${u6Field("Name",lead.name)}${u6Field("Phone",lead.phone)}${u6Field("Email",lead.email)}${u6Field("Project",lead.project_inquired)}
+          ${u6Field("Budget",lead.budget)}${u6Field("Bedrooms",lead.bedroom)}${u6Field("Property type",lead.property_type)}${u6Field("Source",lead.source)}
+          ${u6Field("Status",lead.status||"New")}${u6Field("Lead received",formatCRMDate(lead.lead_receive_date))}
+          ${u6Field("Follow-up date",formatCRMDate(lead.follow_up_date))}${u6Field("Follow-up time",lead.follow_up_time)}
+          ${u6Field("Reminder type",lead.reminder_type)}${u6Field("Reminder note",lead.reminder_note)}${u6Field("Last contacted",formatCRMDate(lead.last_contacted))}
+        </div>
+        <div class="u6NotesBox"><h3>Latest Note</h3><div class="u6NotesText">${escapeHtml(latest)}</div></div>
+      </section>
+      <aside class="u6DetailRight">
+        <div class="u6TimelineTitle">Activity Timeline</div>
+        <div class="u6Composer">
+          <div class="u6ComposerGrid"><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Follow-up</option><option>Note</option></select>${u10DateControl("activityWhen",localDateTimeValue())}</div>
+          <textarea id="activityDetails" rows="4" placeholder="What was discussed?"></textarea>
+          <div class="u10ComposerButtons"><button class="primaryBtn" onclick="u10AddLeadActivity('${lead.id}',false)">Add Activity</button><button class="primaryBtn u10ScheduleBtn" onclick="u10AddLeadActivity('${lead.id}',true)">Schedule</button></div>
+        </div>
+        <div class="u6Timeline">${(acts||[]).length?acts.map(a=>u10TimelineItem(a,"lead")).join(""):`<div class="empty">No activity yet</div>`}</div>
+      </aside>
+    </div>`;
+};
+async function u10AddLeadActivity(id,schedule){
+  const type=el("activityType").value,details=el("activityDetails").value.trim(),when=el("activityWhen").value;
+  if(!details){alert("Write the activity first.");return;}
+  if(schedule&&!u10IsFuture(when)){alert("Choose a future date and time to schedule this activity.");return;}
+  if(!schedule&&u10IsFuture(when)){alert("This date is in the future. Use Schedule instead.");return;}
+  const payload={lead_id:String(id),activity_type:schedule?`Scheduled: ${type}`:type,details,created_at:new Date(when).toISOString(),created_by:currentUserEmail||null};
+  const {error}=await db.from("lead_activities").insert([payload]);if(error){alert(error.message);return;}
+  if(!schedule)await db.from(LEADS_TABLE).update({notes:details,last_contacted:today()}).eq("id",id);
+  await openLeadDetail(id);loadLeads();u10RefreshNotifications();
+}
+
+/* Calendar combines scheduled owner and lead activities */
+loadCalendarModule=async function(){
+  const d=el("calendarModuleDate").value||today();
+  const start=new Date(`${d}T00:00:00`).toISOString(),end=new Date(`${d}T23:59:59`).toISOString();
+  const [{data:owners},{data:leads}]=await Promise.all([
+    db.from(U6_OWNER_ACTIVITIES).select("*").gte("created_at",start).lte("created_at",end).like("activity_type","Scheduled:%").order("created_at"),
+    db.from("lead_activities").select("*").gte("created_at",start).lte("created_at",end).like("activity_type","Scheduled:%").order("created_at")
+  ]);
+  const ownerIds=[...new Set((owners||[]).map(x=>x.owner_id))],leadIds=[...new Set((leads||[]).map(x=>x.lead_id))];
+  const [{data:ownerRows},{data:leadRows}]=await Promise.all([
+    ownerIds.length?db.from(TABLE_NAME).select("id,owner,community,cluster,unit").in("id",ownerIds):Promise.resolve({data:[]}),
+    leadIds.length?db.from(LEADS_TABLE).select("id,name,project_inquired").in("id",leadIds):Promise.resolve({data:[]})
+  ]);
+  const om=Object.fromEntries((ownerRows||[]).map(x=>[String(x.id),x])),lm=Object.fromEntries((leadRows||[]).map(x=>[String(x.id),x]));
+  const items=[
+    ...(owners||[]).map(a=>({when:a.created_at,type:a.activity_type.replace("Scheduled: ",""),name:om[a.owner_id]?.owner||"Owner",sub:`Owner · ${om[a.owner_id]?.community||""} ${om[a.owner_id]?.cluster||""}`,details:a.details,click:`showOwnersView().then(()=>openOwnerProfile(${JSON.stringify(om[a.owner_id]||{}).replaceAll("'","&#039;")}))`})),
+    ...(leads||[]).map(a=>({when:a.created_at,type:a.activity_type.replace("Scheduled: ",""),name:lm[a.lead_id]?.name||"Lead",sub:`Lead · ${lm[a.lead_id]?.project_inquired||""}`,details:a.details,click:`showLeadsView().then(()=>openLeadDetail('${a.lead_id}'))`}))
+  ].sort((a,b)=>new Date(a.when)-new Date(b.when));
+  const title=formatCRMDate(new Date(`${d}T00:00:00`));
+  el("calendarModuleContent").innerHTML=`<div class="calendarDateTitle">${title}</div>${items.length?items.map(i=>`<div class="calendarItemV5" onclick="${i.click}"><b>${new Date(i.when).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",hour12:true})}</b><span><b>${escapeHtml(i.name)}</b><br><small>${escapeHtml(i.sub)} — ${escapeHtml(i.details)}</small></span><span>${escapeHtml(i.type)}</span></div>`).join(""):`<div class="empty">No scheduled calls or meetings</div>`}`;
+};
+async function u10RefreshNotifications(){
+  try{
+    const now=new Date(),end=new Date(now.getTime()+24*60*60*1000);
+    const [{data:o},{data:l}]=await Promise.all([
+      db.from(U6_OWNER_ACTIVITIES).select("*").gte("created_at",now.toISOString()).lte("created_at",end.toISOString()).like("activity_type","Scheduled:%"),
+      db.from("lead_activities").select("*").gte("created_at",now.toISOString()).lte("created_at",end.toISOString()).like("activity_type","Scheduled:%")
+    ]);
+    const count=(o||[]).length+(l||[]).length;
+    const badge=document.getElementById("v7NotificationBadge");if(badge){badge.textContent=count;badge.style.display=count?"grid":"none";}
+  }catch(e){console.warn(e)}
+}
+setTimeout(u10RefreshNotifications,1200);
+
+/* Mobile lead cards: Call button + coloured status */
+const u10OriginalRenderLeads=renderLeads;
+renderLeads=function(rows){
+  u10OriginalRenderLeads(rows);
+  if(!rows?.length)return;
+  el("leadMobileCards").innerHTML=rows.map(row=>{
+    const phone=formatPhone(row.phone);
+    return `<div class="leadCard">
+      <div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.name))}</div><div class="unitBadge ${u10ActivityStatusClass(row.status)}">${escapeHtml(clean(row.status||"New"))}</div></div>
+      <div class="infoLine"><span>Phone</span>${escapeHtml(clean(row.phone))}</div>
+      <div class="infoLine"><span>Project</span>${escapeHtml(clean(row.project_inquired))}</div>
+      <div class="infoLine"><span>Latest Note</span><div class="leadLatestNote" onclick="openLeadDetail('${row.id}')">${escapeHtml(row.notes||"No notes yet")}</div></div>
+      <div class="mobileActionGrid"><button class="primaryBtn" onclick="openLeadDetail('${row.id}')">Open Lead</button>${leadWhatsappButton(row)}${phone?`<a class="callBtn" href="tel:+${phone}">Call</a>`:"<span></span>"}</div>
+    </div>`;
+  }).join("");
+};
+
+/* Replace dashboard icons with one coherent premium family */
+(function(){
+  const icons=document.querySelectorAll(".crmAppIcon");
+  if(icons[0])icons[0].innerHTML=`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="18" cy="17" r="6"/><circle cx="33" cy="19" r="5"/><path d="M7 38c1-8 5-12 11-12s10 4 11 12M28 30c6 0 10 3 12 8"/></svg>`;
+  if(icons[1])icons[1].innerHTML=`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M8 41V12h20v29M28 20h12v21M14 18h4m4 0h1m-9 7h4m4 0h1m-9 7h4m4 0h1m11-5h2m-2 7h2"/></svg>`;
+  if(icons[2])icons[2].innerHTML=`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="7" y="10" width="34" height="31" rx="6"/><path d="M15 6v9m18-9v9M7 20h34M15 27h5m5 0h5m-15 7h5m5 0h5"/></svg>`;
+  if(icons[3]){icons[3].style.color="#25D366";icons[3].innerHTML=`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 7a17 17 0 0 0-14.7 25.5L7 41l8.8-2.3A17 17 0 1 0 24 7Z"/><path d="M17 15c1 7 8 14 15 16l3-4-5-2-2 2c-4-2-7-5-9-9l2-2-2-5Z"/></svg>`;}
+})();
+
+/* Ensure profile text is separated */
+setTimeout(()=>{
+  const p=getV7Profile();const n=el("v7TopName"),r=el("v7TopRole");
+  if(n)n.textContent=p.name||"Usama";if(r)r.textContent=p.role||"Admin";
+},300);
 
 </script>
 </body>
