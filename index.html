@@ -5563,7 +5563,7 @@ loadData=async function(){
     if(!ids.length)return;
     const {data}=await db.from(U6_OWNER_ACTIVITIES).select("*").in("owner_id",ids).order("created_at",{ascending:false});
     const by={};(data||[]).forEach(a=>{if(!by[a.owner_id])by[a.owner_id]=[];by[a.owner_id].push(a)});
-    currentOwnerPageRows.forEach(r=>r.__u10_latest=u10LatestManualText(by[String(r.id)]||[],"-"));
+    currentOwnerPageRows.forEach(r=>r.__u10_latest=u10LatestManualText(by[String(r.id)]||[],ownerRemarkValue(r)||"-"));
     renderData(currentOwnerPageRows);
   }catch(e){console.warn("Manual remark load failed",e);}
 };
@@ -5578,7 +5578,7 @@ ownerCell=function(row,col){
 /* Activity timeline item with edit/delete for manual records */
 function u10TimelineItem(a,entity){
   const d=a?.created_at?new Date(a.created_at):new Date();
-  const manual=u10IsManualActivity(a);
+  const manual=!a?.legacy && u10IsManualActivity(a);
   const scheduled=String(a?.activity_type||"").startsWith("Scheduled:");
   return `<div class="u6TimelineItem">
     <div class="u6TimelineTop">
@@ -5689,7 +5689,20 @@ openOwnerProfile=async function(row){
   const related=getRelatedRows(row).sort((a,b)=>String(a.unit_sort||a.unit).localeCompare(String(b.unit_sort||b.unit),undefined,{numeric:true}));
   const {data:activities}=await db.from(U6_OWNER_ACTIVITIES).select("*").eq("owner_id",String(row.id)).order("created_at",{ascending:false});
   const acts=activities||[];
-  const latest=u10LatestManualText(acts,"-");
+  const previousRemark=ownerRemarkValue(row)||"-";
+  const latest=u10LatestManualText(acts,previousRemark);
+  const timelineActivities=[...acts];
+  const hasSameLegacyRemark=acts.some(a=>String(a?.details||"").trim()===String(previousRemark).trim());
+  if(previousRemark!=="-"&&!hasSameLegacyRemark){
+    timelineActivities.push({
+      id:`legacy-${row.id}`,
+      activity_type:"Previous Remark",
+      details:previousRemark,
+      created_at:row.last_contacted||row.updated_at||row.created_at||null,
+      legacy:true
+    });
+    timelineActivities.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  }
   const statuses=getOwnerStatuses();
   el("profileContent").innerHTML=`
     <button class="u6CloseButton" onclick="closeOwnerProfile()">×</button>
@@ -5716,7 +5729,7 @@ openOwnerProfile=async function(row){
           <textarea id="u6OwnerActivityDetails" rows="4" placeholder="What was discussed?"></textarea>
           <div class="u10ComposerButtons"><button class="primaryBtn" onclick="u10AddOwnerActivity('${row.id}',false)">Add Activity</button><button class="primaryBtn u10ScheduleBtn" onclick="u10AddOwnerActivity('${row.id}',true)">Schedule</button></div>
         </div>
-        <div class="u6Timeline">${acts.length?acts.map(a=>u10TimelineItem(a,"owner")).join(""):`<div class="empty">No activity yet</div>`}</div>
+        <div class="u6Timeline">${timelineActivities.length?timelineActivities.map(a=>u10TimelineItem(a,"owner")).join(""):`<div class="empty">No activity yet</div>`}</div>
       </aside>
     </div>`;
   el("profileModal").classList.add("show");
