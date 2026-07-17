@@ -5865,6 +5865,247 @@ setTimeout(()=>{
   if(n)n.textContent=p.name||"Usama";if(r)r.textContent=p.role||"Admin";
 },300);
 
+
+
+/* =========================================================
+   USAMA CRM V11 — compact Notes table + Excel-style columns
+   ========================================================= */
+(function () {
+  const compactOwnerColumns = [
+    { key:"community", label:"Community", visible:true, width:145 },
+    { key:"cluster", label:"Cluster", visible:true, width:145 },
+    { key:"unit", label:"Unit", visible:true, width:58 },
+    { key:"owner", label:"Owner Name", visible:true, width:220 },
+    { key:"whatsapp", label:"WhatsApp", visible:true, width:96 },
+    { key:"status", label:"Status", visible:true, width:155 },
+    { key:"remarks", label:"Notes", visible:true, width:320 }
+  ];
+
+  ownerColumns.splice(0, ownerColumns.length, ...compactOwnerColumns.map(c => ({...c})));
+  saveOwnerColumnsState();
+
+  const minimums = {
+    community: 80,
+    cluster: 80,
+    unit: 48,
+    owner: 135,
+    whatsapp: 88,
+    status: 125,
+    remarks: 180
+  };
+
+  const maximums = {
+    community: 320,
+    cluster: 320,
+    unit: 110,
+    owner: 420,
+    whatsapp: 150,
+    status: 220,
+    remarks: 700
+  };
+
+  function setOwnerColumnWidth(key, width, persist = false) {
+    const col = ownerColumns.find(c => c.key === key);
+    if (!col) return;
+
+    const min = minimums[key] || 70;
+    const max = maximums[key] || 700;
+    col.width = Math.round(Math.min(max, Math.max(min, Number(width) || min)));
+
+    document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
+      node.style.setProperty("width", `${col.width}px`, "important");
+      node.style.setProperty("min-width", `${col.width}px`, "important");
+      node.style.setProperty("max-width", `${col.width}px`, "important");
+    });
+
+    if (persist) saveOwnerColumnsState();
+  }
+
+  window.u11ApplyOwnerWidths = function () {
+    ownerColumns.forEach(col => setOwnerColumnWidth(col.key, col.width, false));
+    const table = document.getElementById("ownersTable");
+    if (table) {
+      const total = ownerColumns.filter(c => c.visible).reduce((sum, c) => sum + Number(c.width || 100), 0);
+      table.style.setProperty("width", `${total}px`, "important");
+      table.style.setProperty("min-width", `${total}px`, "important");
+    }
+  };
+
+  renderOwnerHead = function () {
+    el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c =>
+      `<th class="resizable-th owner-col-${c.key}" data-table="owner" data-key="${c.key}">
+        <span class="ownerHeaderLabel">${escapeHtml(c.label)}</span>
+        <span class="resize-handle" title="Drag to resize. Double-click to auto-fit."
+          onmousedown="startColumnResize(event, 'owner', '${c.key}')"></span>
+      </th>`
+    ).join("")}</tr>`;
+    requestAnimationFrame(window.u11ApplyOwnerWidths);
+  };
+
+  const previousRenderDataV11 = renderData;
+  renderData = function (rows) {
+    previousRenderDataV11(rows);
+    requestAnimationFrame(window.u11ApplyOwnerWidths);
+  };
+
+  startColumnResize = function (event, table, key) {
+    if (table !== "owner") return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const col = ownerColumns.find(c => c.key === key);
+    if (!col) return;
+
+    const startX = event.clientX;
+    const startWidth = Number(col.width || 120);
+    document.body.classList.add("ownerColumnResizing");
+
+    const move = e => setOwnerColumnWidth(key, startWidth + (e.clientX - startX), false);
+    const finish = () => {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", finish);
+      document.body.classList.remove("ownerColumnResizing");
+      saveOwnerColumnsState();
+      window.u11ApplyOwnerWidths();
+    };
+
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", finish, { once:true });
+  };
+
+  function autoFitOwnerColumn(key) {
+    const col = ownerColumns.find(c => c.key === key);
+    if (!col) return;
+
+    const nodes = [...document.querySelectorAll(`#ownersTable .owner-col-${key}`)];
+    let needed = minimums[key] || 70;
+
+    nodes.forEach(node => {
+      const clone = node.cloneNode(true);
+      clone.querySelectorAll(".resize-handle").forEach(x => x.remove());
+      Object.assign(clone.style, {
+        position: "fixed",
+        left: "-10000px",
+        top: "0",
+        width: "max-content",
+        minWidth: "0",
+        maxWidth: "none",
+        whiteSpace: key === "remarks" ? "normal" : "nowrap",
+        visibility: "hidden"
+      });
+      document.body.appendChild(clone);
+      needed = Math.max(needed, Math.ceil(clone.getBoundingClientRect().width) + 18);
+      clone.remove();
+    });
+
+    setOwnerColumnWidth(key, needed, true);
+    window.u11ApplyOwnerWidths();
+  }
+
+  document.addEventListener("dblclick", function (event) {
+    const handle = event.target.closest("#ownersTable .resize-handle");
+    if (!handle) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const th = handle.closest("th");
+    if (th?.dataset?.key) autoFitOwnerColumn(th.dataset.key);
+  }, true);
+
+  setTimeout(() => {
+    renderOwnerHead();
+    window.u11ApplyOwnerWidths();
+  }, 0);
+})();
+
 </script>
+
+<style>
+/* V11 final table rules */
+#ownersTable{
+  table-layout:fixed!important;
+  width:max-content!important;
+  min-width:0!important;
+}
+#ownersTable th,
+#ownersTable td{
+  box-sizing:border-box!important;
+  padding:7px 8px!important;
+  height:48px!important;
+}
+#ownersTable th{
+  position:sticky!important;
+  overflow:visible!important;
+}
+#ownersTable .ownerHeaderLabel{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding-right:5px;
+}
+#ownersTable .owner-col-unit{
+  text-align:center!important;
+  padding-left:4px!important;
+  padding-right:4px!important;
+}
+#ownersTable .unitNumberCell{
+  text-align:center!important;
+  width:100%;
+}
+#ownersTable .owner-col-whatsapp{
+  text-align:center!important;
+  padding-left:4px!important;
+  padding-right:4px!important;
+}
+#ownersTable .owner-col-whatsapp .waBtn{
+  min-width:0!important;
+  width:auto!important;
+  max-width:100%!important;
+  padding:0 9px!important;
+  margin:0 auto!important;
+}
+#ownersTable .owner-col-status{
+  padding-left:6px!important;
+  padding-right:6px!important;
+}
+#ownersTable .owner-col-status .statusSelect{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+#ownersTable .owner-col-remarks{
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+#ownersTable .owner-col-remarks .latestRemarkRead,
+#ownersTable .owner-col-remarks .remarksInput{
+  width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#ownersTable .resize-handle{
+  display:block!important;
+  position:absolute!important;
+  top:0!important;
+  right:-5px!important;
+  width:10px!important;
+  height:100%!important;
+  z-index:50!important;
+  cursor:col-resize!important;
+  background:transparent!important;
+  border-right:1px solid transparent;
+}
+#ownersTable .resize-handle:hover{
+  background:rgba(59,130,246,.20)!important;
+  border-right-color:#60a5fa!important;
+}
+body.ownerColumnResizing,
+body.ownerColumnResizing *{
+  cursor:col-resize!important;
+  user-select:none!important;
+}
+</style>
+
 </body>
 </html>
