@@ -1784,7 +1784,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 .v7ExportBtn{height:40px;display:flex;align-items:center;gap:9px;padding:0 14px;background:#070d15;border:1px solid #263548;border-radius:8px;color:#fff;font-size:12px;font-weight:700}.v7Divider{width:1px;height:32px;background:#263548}.v7TopActions{gap:10px}.v7TopIcon{position:relative}.v7Bell b{position:absolute;right:-6px;top:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:10px;background:#e43d3d;color:#fff;font-size:9px;display:grid;place-items:center}.v7Chevron{width:15px!important;height:15px!important;color:#9eacbc;margin-left:2px}
 .followupAlert{display:none!important}
 .quickFilters button{display:inline-flex;align-items:center;gap:8px!important}.quickFilters button::before{content:"";width:8px;height:8px;border-radius:50%;background:#64748b;flex:none}.quickFilters button[data-status="New"]::before{background:#1688ff}.quickFilters button[data-status="For Sale"]::before{background:#13b86f}.quickFilters button[data-status="For Rent"]::before{background:#9847f5}.quickFilters button[data-status="Sold"]::before{background:#ffc21a}.quickFilters button[data-status="Call Back"]::before{background:#ff7a14}.quickFilters button[data-status="No Response"]::before{background:#71301c}.quickFilters button[data-status="Not Interested"]::before{background:#ff4545}.quickFilters button[data-status="Invalid Number"]::before,.quickFilters button[data-status="Invalid"]::before{background:#718096}
-#ownersTable{min-width:1080px!important}#ownersTable th,#ownersTable td{padding:10px 12px!important}#ownersTable th:nth-child(1),#ownersTable td:nth-child(1){width:13%!important;min-width:130px!important}#ownersTable th:nth-child(2),#ownersTable td:nth-child(2){width:14%!important;min-width:135px!important}#ownersTable th:nth-child(3),#ownersTable td:nth-child(3){width:7%!important;min-width:65px!important}#ownersTable th:nth-child(4),#ownersTable td:nth-child(4){width:20%!important;min-width:190px!important}#ownersTable th:nth-child(5),#ownersTable td:nth-child(5){width:13%!important;min-width:115px!important}#ownersTable th:nth-child(6),#ownersTable td:nth-child(6){width:20%!important;min-width:215px!important}#ownersTable th:nth-child(7),#ownersTable td:nth-child(7){width:26%!important;min-width:260px!important}#ownersTable th:nth-child(n+8),#ownersTable td:nth-child(n+8){display:none!important}
+#ownersTable{min-width:1080px!important}#ownersTable th,#ownersTable td{padding:10px 12px!important}#ownersTable th:nth-child(1),#ownersTable td:nth-child(1){width:13%!important;min-width:130px!important}#ownersTable th:nth-child(2),#ownersTable td:nth-child(2){width:14%!important;min-width:135px!important}#ownersTable th:nth-child(3),#ownersTable td:nth-child(3){width:7%!important;min-width:65px!important}#ownersTable th:nth-child(4),#ownersTable td:nth-child(4){width:20%!important;min-width:190px!important}#ownersTable th:nth-child(5),#ownersTable td:nth-child(5){width:13%!important;min-width:115px!important}#ownersTable th:nth-child(6),#ownersTable td:nth-child(6){width:20%!important;min-width:215px!important}#ownersTable th:nth-child(7),#ownersTable td:nth-child(7){width:26%!important;min-width:260px!important}
 .u6DetailHeader{align-items:center!important;min-height:112px!important;padding-top:8px!important;padding-bottom:18px!important}.u6HeaderActions{align-items:center!important;justify-content:flex-end!important}.u6HeaderActions .waBtn,.u6HeaderActions .callBtn,.u6HeaderActions button{height:44px!important;display:inline-flex;align-items:center;justify-content:center;padding:0 16px!important}.u6Stage{cursor:pointer;font-family:Poppins,sans-serif}.u6Stage:hover{transform:none;border-color:#3e536a;color:#fff}
 .broadcastFilterGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.broadcastFilterGrid label{display:block;font-size:11px;color:#93a3b7;margin-bottom:5px}
 @media(max-width:1100px){.v7ExportBtn span{display:none}.v7Brand{min-width:auto}.v7Nav button{padding:0 12px!important}.v7TopActions{gap:7px}}
@@ -5881,7 +5881,17 @@ setTimeout(()=>{
     { key:"remarks", label:"Notes", visible:true, width:320 }
   ];
 
-  ownerColumns.splice(0, ownerColumns.length, ...compactOwnerColumns.map(c => ({...c})));
+  // Keep widths the user already adjusted, while enforcing the current
+  // compact column set and ensuring Notes can never be hidden by stale state.
+  const savedOwnerColumns = new Map(ownerColumns.map(c => [c.key, c]));
+  ownerColumns.splice(0, ownerColumns.length, ...compactOwnerColumns.map(c => {
+    const saved = savedOwnerColumns.get(c.key);
+    return {
+      ...c,
+      visible: true,
+      width: Number(saved?.width) > 0 ? Number(saved.width) : c.width
+    };
+  }));
   saveOwnerColumnsState();
 
   const minimums = {
@@ -6028,6 +6038,8 @@ setTimeout(()=>{
 }
 #ownersTable th,
 #ownersTable td{
+  display:table-cell!important;
+  visibility:visible!important;
   box-sizing:border-box!important;
   padding:7px 8px!important;
   height:48px!important;
