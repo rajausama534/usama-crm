@@ -1685,10 +1685,120 @@ button,input,select,textarea{font-size:13px!important}
   .u6HeaderActions button,.u6HeaderActions a{flex:1}
 }
 
+
+
+/* =========================================================
+   USAMA CRM V7 — generated design match
+   ========================================================= */
+:root{
+  --v7-bg:#05080d;
+  --v7-panel:#081019;
+  --v7-panel2:#0b131e;
+  --v7-line:#223041;
+  --v7-text:#f2f6fb;
+  --v7-muted:#93a3b7;
+  --v7-blue:#1177df;
+  --v7-teal:#0da99f;
+  --v7-green:#0aa56f;
+}
+body{padding:76px 20px 20px!important;background:linear-gradient(180deg,#05080d,#071019)!important;color:var(--v7-text)}
+.wrap{max-width:none!important;width:100%!important}
+#loginView{margin-top:40px}
+
+.v7Topbar{position:fixed;inset:0 0 auto 0;height:66px;z-index:1000;display:flex;align-items:center;gap:20px;padding:0 20px;background:rgba(4,8,13,.97);border-bottom:1px solid var(--v7-line);backdrop-filter:blur(18px)}
+.v7Topbar.hidden{display:none!important}
+.v7Brand{display:flex;align-items:center;gap:10px;min-width:196px;font-size:20px;font-weight:800;white-space:nowrap}
+.v7MenuIcon{font-size:24px;color:#cbd5e1}
+.v7Brand strong{color:#fff}.v7Brand span{color:#2f8eea}
+.v7Nav{display:flex;align-self:stretch;gap:2px;overflow-x:auto}
+.v7Nav button{height:100%;padding:0 18px;background:transparent;border-radius:0;color:#e8edf4;font-size:14px;font-weight:600;border-bottom:3px solid transparent;white-space:nowrap}
+.v7Nav button:hover{transform:none;background:#0a1520}
+.v7Nav button.active{background:linear-gradient(180deg,rgba(20,111,165,.22),rgba(12,77,119,.18));color:#48c9ff;border-bottom-color:#1687df}
+.v7TopActions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.v7TopIcon{width:38px;height:38px;border-radius:9px;background:#08111b;border:1px solid var(--v7-line);display:grid;place-items:center;color:#d9e4ef;padding:0}
+.v7Profile{display:flex;align-items:center;gap:10px;padding:4px 8px;background:transparent;border:0;text-align:left}
+.v7Profile:hover{transform:none;background:#0a111b}
+.v7Avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:linear-gradient(145deg,#1e6b78,#834c7f);border:2px solid #243346;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;overflow:hidden}
+.v7Avatar img{width:100%;height:100%;object-fit:cover}
+.v7ProfileText{line-height:1.15}.v7ProfileName{font-size:14px;font-weight:700;color:#fff}.v7ProfileRole{font-size:11px;color:#9aa8b8;margin-top:4px}
+
+/* Hide duplicate legacy page headers while keeping actions available in the new shell */
+.mainHeader{position:relative!important;top:auto!important;min-height:66px!important;margin:0 0 12px!important;padding:14px 16px!important;border-radius:12px!important;background:#060b12!important;border:1px solid #172536!important;box-shadow:none!important}
+.mainHeader h1{font-size:24px!important}
+.mainHeader .headerBtns{gap:8px}
+.compactPageHeader{margin-bottom:12px!important}
+
+.card{background:#060b12!important;border:1px solid #172536!important;border-radius:12px!important;box-shadow:none!important;padding:14px!important}
+.filters{gap:8px!important}.actionsRow{gap:8px!important}.quickFilters{gap:6px!important}
+input,select,textarea{background:#060b12!important;border-color:#1d2b3c!important;border-radius:8px!important}
+.darkBtn{background:#060b12!important;border-color:#253447!important}.primaryBtn,.reset{background:linear-gradient(135deg,#126fd9,#0ca89a)!important}
+
+.tablebox{background:#05090f!important;border-color:#172536!important;border-radius:10px!important;max-height:72vh!important}
+#ownersTable{width:100%!important;min-width:1160px!important;table-layout:fixed!important}
+#ownersTable th,#ownersTable td{padding-left:9px!important;padding-right:9px!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#ownersTable th{height:58px!important;font-size:11.5px!important;background:#060a10!important;color:#b8c6d8!important}
+#ownersTable td{height:58px!important;font-size:12.5px!important;background:#05090f!important;border-top-color:rgba(148,163,184,.08)!important}
+#ownersTable tr:hover td{background:#07101a!important}
+/* compact balanced widths matching the generated mock-up */
+#ownersTable th:nth-child(1),#ownersTable td:nth-child(1){width:12%!important;min-width:120px!important}
+#ownersTable th:nth-child(2),#ownersTable td:nth-child(2){width:13%!important;min-width:130px!important}
+#ownersTable th:nth-child(3),#ownersTable td:nth-child(3){width:6%!important;min-width:66px!important;text-align:center!important}
+#ownersTable th:nth-child(4),#ownersTable td:nth-child(4){width:18%!important;min-width:185px!important}
+#ownersTable th:nth-child(5),#ownersTable td:nth-child(5){width:11%!important;min-width:110px!important}
+#ownersTable th:nth-child(6),#ownersTable td:nth-child(6){width:20%!important;min-width:210px!important}
+#ownersTable th:nth-child(7),#ownersTable td:nth-child(7){width:20%!important;min-width:240px!important}
+#ownersTable th:nth-child(n+8),#ownersTable td:nth-child(n+8){width:120px!important;min-width:120px!important}
+.statusSelect{border-radius:8px!important;height:40px!important;font-size:11.5px!important}
+.waBtn{height:36px!important;border-radius:7px!important;background:#079b69!important}
+.profileBtn{border-radius:5px!important;margin-left:5px!important}
+.moreUnitBtn{border-radius:5px!important}
+.latestRemarkRead,.remarksRead,.latestRemarkView{max-height:48px!important;min-height:38px!important;font-size:11.5px!important;padding:5px 7px!important;background:transparent!important;border:0!important}
+
+/* status colors from the generated design */
+.status-New{background:rgba(37,99,235,.13)!important;border-color:#2563eb!important;color:#bfdbfe!important}
+.status-ForSale,.status-Contacted{background:rgba(5,150,105,.12)!important;border-color:#087f5b!important;color:#9ff0cf!important}
+.status-ForRent,.status-Interested{background:rgba(139,92,246,.13)!important;border-color:#7c3aed!important;color:#ded0ff!important}
+.status-Sold{background:rgba(245,158,11,.13)!important;border-color:#c58110!important;color:#fde3a4!important}
+.status-CallBack{background:rgba(249,115,22,.13)!important;border-color:#c65b16!important;color:#ffd0aa!important}
+.status-NoResponse{background:rgba(71,85,105,.18)!important;border-color:#46566a!important;color:#e1e8f0!important}
+.status-NotInterested,.status-Lost{background:rgba(190,24,93,.15)!important;border-color:#a7164f!important;color:#ffc1d7!important}
+.status-InvalidNumber{background:rgba(71,85,105,.14)!important;border-color:#4b5563!important;color:#d5dde6!important}
+.status-Viewing{background:rgba(6,182,212,.14)!important;border-color:#0e91a8!important;color:#b9f5ff!important}
+.status-Negotiation{background:rgba(234,179,8,.13)!important;border-color:#a97908!important;color:#fff1aa!important}
+
+.v7ProfileModal{width:min(560px,94vw)!important;position:relative}
+.v7ProfilePreview{display:flex;align-items:center;gap:16px;margin:12px 0 18px;padding:14px;background:#0a111b;border:1px solid #223041;border-radius:12px}
+.v7ProfilePreview .v7Avatar{width:72px;height:72px}
+.v7ProfileFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.v7ProfileFields .full{grid-column:1/-1}.v7ProfileFields label{display:block;font-size:11px;color:#93a3b7;margin-bottom:5px}
+.v7UploadBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border-radius:8px;background:#0b1520;border:1px solid #2b3b4e;color:#fff;font-weight:700;cursor:pointer}
+
+@media(max-width:900px){
+  body{padding:66px 0 0!important}.v7Topbar{padding:0 10px;gap:8px}.v7Brand{min-width:auto}.v7Brand strong{display:none}.v7Nav button{padding:0 11px;font-size:12px}.v7ProfileText{display:none}.v7TopIcon{display:none}.mainHeader{border-radius:0!important;border-left:0!important;border-right:0!important}.card{border-radius:0!important;border-left:0!important;border-right:0!important}.v7ProfileFields{grid-template-columns:1fr}.v7ProfileFields .full{grid-column:auto}
+}
+
 </style>
 </head>
 
 <body>
+
+  <header id="v7Topbar" class="v7Topbar hidden">
+    <div class="v7Brand"><span class="v7MenuIcon">☰</span><strong>Usama</strong><span>CRM</span></div>
+    <nav class="v7Nav">
+      <button id="v7NavOwners" onclick="showOwnersView()">♟ Owners</button>
+      <button id="v7NavLeads" class="adminOnly" onclick="showLeadsView()">♙ Leads</button>
+      <button id="v7NavCalendar" class="adminOnly" onclick="showCalendarModule()">▣ Calendar</button>
+      <button id="v7NavBroadcast" class="adminOnly" onclick="openBroadcastModule()">◉ WhatsApp Broadcast</button>
+    </nav>
+    <div class="v7TopActions">
+      <button class="v7TopIcon" onclick="openTodayNotifications()" title="Notifications">♧</button>
+      <button class="v7Profile" onclick="openV7ProfileSettings()" title="Profile settings">
+        <span id="v7TopAvatar" class="v7Avatar">U</span>
+        <span class="v7ProfileText"><span id="v7TopName" class="v7ProfileName">Usama</span><span id="v7TopRole" class="v7ProfileRole">Admin</span></span>
+      </button>
+    </div>
+  </header>
+
   <div id="loginView" class="loginBox">
     <h1>Usama CRM</h1>
     <div class="sub">Sign in to continue.</div>
@@ -2179,6 +2289,25 @@ button,input,select,textarea{font-size:13px!important}
         <button class="darkBtn" onclick="resetWhatsappMessageForm()">Reset</button>
         <button class="primaryBtn" onclick="saveWhatsappSettings()">Save Template</button>
       </div>
+    </div>
+  </div>
+
+  
+  <div id="v7ProfileModal" class="modalOverlay">
+    <div class="modal v7ProfileModal">
+      <button class="u6CloseButton" onclick="closeV7ProfileSettings()">×</button>
+      <h2>Admin Profile</h2>
+      <div class="sub">Change the name, role and profile image shown in the CRM header.</div>
+      <div class="v7ProfilePreview">
+        <span id="v7ProfilePreviewAvatar" class="v7Avatar">U</span>
+        <div><div id="v7ProfilePreviewName" style="font-size:17px;font-weight:700">Usama</div><div id="v7ProfilePreviewRole" class="sub" style="margin:3px 0 0">Admin</div></div>
+      </div>
+      <div class="v7ProfileFields">
+        <div><label>Name</label><input id="v7ProfileNameInput" placeholder="Usama"></div>
+        <div><label>Role</label><input id="v7ProfileRoleInput" placeholder="Admin"></div>
+        <div class="full"><label>Profile image</label><label class="v7UploadBtn" for="v7ProfileImageInput">Choose Image</label><input id="v7ProfileImageInput" type="file" accept="image/*" class="hidden" onchange="previewV7ProfileImage(event)"></div>
+      </div>
+      <div class="modalActions"><button class="darkBtn" onclick="closeV7ProfileSettings()">Cancel</button><button class="primaryBtn" onclick="saveV7ProfileSettings()">Save Profile</button></div>
     </div>
   </div>
 
@@ -4457,6 +4586,63 @@ document.addEventListener("keydown",e=>{
     if(node?.classList.contains("show"))node.classList.remove("show");
   });
 });
+
+
+/* ===== USAMA CRM V7 TOP NAVIGATION + ADMIN PROFILE ===== */
+let v7PendingAvatar = null;
+function getV7Profile(){
+  const saved=JSON.parse(localStorage.getItem('usama_crm_profile')||'{}');
+  const fallbackName=(typeof currentAccess!=='undefined' && (currentAccess?.full_name||currentAccess?.name)) || (typeof currentUserEmail!=='undefined' && currentUserEmail?.split('@')[0]) || 'Usama';
+  return {name:saved.name||fallbackName,role:saved.role||'Admin',avatar:saved.avatar||''};
+}
+function renderV7Avatar(node,profile){
+  if(!node)return;
+  node.innerHTML=profile.avatar?`<img src="${profile.avatar}" alt="Profile">`:escapeHtml((profile.name||'U').trim().charAt(0).toUpperCase()||'U');
+}
+function refreshV7Profile(){
+  const p=getV7Profile();
+  safeText('v7TopName',p.name); safeText('v7TopRole',p.role);
+  safeText('v7ProfilePreviewName',p.name); safeText('v7ProfilePreviewRole',p.role);
+  renderV7Avatar(el('v7TopAvatar'),p); renderV7Avatar(el('v7ProfilePreviewAvatar'),p);
+  const legacy=el('homeAgentName'); if(legacy)legacy.textContent=p.name;
+}
+function openV7ProfileSettings(){
+  if(!isAdmin)return;
+  const p=getV7Profile(); v7PendingAvatar=p.avatar||null;
+  el('v7ProfileNameInput').value=p.name; el('v7ProfileRoleInput').value=p.role;
+  refreshV7Profile(); el('v7ProfileModal').classList.add('show');
+}
+function closeV7ProfileSettings(){el('v7ProfileModal').classList.remove('show');v7PendingAvatar=null;}
+function previewV7ProfileImage(event){
+  const file=event.target.files?.[0]; if(!file)return;
+  if(file.size>2*1024*1024){alert('Please choose an image smaller than 2 MB.');event.target.value='';return;}
+  const reader=new FileReader(); reader.onload=()=>{v7PendingAvatar=reader.result;renderV7Avatar(el('v7ProfilePreviewAvatar'),{name:el('v7ProfileNameInput').value||'U',avatar:v7PendingAvatar});}; reader.readAsDataURL(file);
+}
+function saveV7ProfileSettings(){
+  const name=el('v7ProfileNameInput').value.trim()||'Usama';
+  const role=el('v7ProfileRoleInput').value.trim()||'Admin';
+  localStorage.setItem('usama_crm_profile',JSON.stringify({name,role,avatar:v7PendingAvatar||''}));
+  closeV7ProfileSettings();refreshV7Profile();
+}
+function setV7Active(viewId){
+  const map={appView:'v7NavOwners',leadsView:'v7NavLeads',calendarModuleView:'v7NavCalendar'};
+  ['v7NavOwners','v7NavLeads','v7NavCalendar','v7NavBroadcast'].forEach(id=>el(id)?.classList.remove('active'));
+  if(map[viewId])el(map[viewId])?.classList.add('active');
+}
+const _v7ShowOnly=showOnly;
+showOnly=function(viewId){
+  _v7ShowOnly(viewId);
+  const top=el('v7Topbar');
+  if(top)top.classList.toggle('hidden',viewId==='loginView');
+  setV7Active(viewId);refreshV7Profile();applyRoleUI();
+};
+const _v7OpenBroadcastModule=openBroadcastModule;
+openBroadcastModule=async function(){
+  el('v7NavBroadcast')?.classList.add('active');
+  ['v7NavOwners','v7NavLeads','v7NavCalendar'].forEach(id=>el(id)?.classList.remove('active'));
+  return await _v7OpenBroadcastModule();
+};
+document.addEventListener('DOMContentLoaded',refreshV7Profile);
 
 </script>
 </body>
