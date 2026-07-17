@@ -4341,7 +4341,7 @@ whatsappButton = function(row){
   const msg=buildOwnerMessage(row);
   return `<a class="waBtn" target="_blank"
     onclick="u6LogOwnerWhatsApp('${row.id}','WhatsApp message initiated')"
-    href="https://web.whatsapp.com/send?phone=${formatted}&text=${encodeURIComponent(msg)}">WhatsApp</a>`;
+    href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
 };
 
 /* OWNER DETAIL — all information left, timeline right */
@@ -4500,7 +4500,7 @@ renderLeadDetail = function(lead,acts){
             <div class="u6DetailSubtitle">${escapeHtml(u6Value(lead.project_inquired))}</div>
           </div>
           <div class="u6HeaderActions">
-            ${formattedPhone ? `<a class="waBtn" target="_blank" onclick="u6LogLeadWhatsApp('${lead.id}')" href="https://web.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(waMessage)}">WhatsApp</a>` : ""}
+            ${formattedPhone ? `<a class="waBtn" target="_blank" onclick="u6LogLeadWhatsApp('${lead.id}')" href="https://wa.me/${formattedPhone}?text=${encodeURIComponent(waMessage)}">WhatsApp</a>` : ""}
             ${formattedPhone ? `<a class="callBtn" href="tel:+${formattedPhone}">Call</a>` : ""}
             <button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button>
           </div>
