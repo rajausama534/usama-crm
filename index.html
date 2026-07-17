@@ -1777,24 +1777,41 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
   body{padding:66px 0 0!important}.v7Topbar{padding:0 10px;gap:8px}.v7Brand{min-width:auto}.v7Brand strong{display:none}.v7Nav button{padding:0 11px;font-size:12px}.v7ProfileText{display:none}.v7TopIcon{display:none}.mainHeader{border-radius:0!important;border-left:0!important;border-right:0!important}.card{border-radius:0!important;border-left:0!important;border-right:0!important}.v7ProfileFields{grid-template-columns:1fr}.v7ProfileFields .full{grid-column:auto}
 }
 
+
+/* ===== USAMA CRM V8 FINAL CORRECTIONS ===== */
+.v7Brand{min-width:220px;gap:7px}.v7MenuIcon{display:none!important}
+.v7Nav button{display:flex;align-items:center;gap:9px;padding:0 19px!important}.v7Nav button svg,.v7TopIcon svg,.v7ExportBtn svg,.v7Chevron{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.v7ExportBtn{height:40px;display:flex;align-items:center;gap:9px;padding:0 14px;background:#070d15;border:1px solid #263548;border-radius:8px;color:#fff;font-size:12px;font-weight:700}.v7Divider{width:1px;height:32px;background:#263548}.v7TopActions{gap:10px}.v7TopIcon{position:relative}.v7Bell b{position:absolute;right:-6px;top:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:10px;background:#e43d3d;color:#fff;font-size:9px;display:grid;place-items:center}.v7Chevron{width:15px!important;height:15px!important;color:#9eacbc;margin-left:2px}
+.followupAlert{display:none!important}
+.quickFilters button{display:inline-flex;align-items:center;gap:8px!important}.quickFilters button::before{content:"";width:8px;height:8px;border-radius:50%;background:#64748b;flex:none}.quickFilters button[data-status="New"]::before{background:#1688ff}.quickFilters button[data-status="For Sale"]::before{background:#13b86f}.quickFilters button[data-status="For Rent"]::before{background:#9847f5}.quickFilters button[data-status="Sold"]::before{background:#ffc21a}.quickFilters button[data-status="Call Back"]::before{background:#ff7a14}.quickFilters button[data-status="No Response"]::before{background:#71301c}.quickFilters button[data-status="Not Interested"]::before{background:#ff4545}.quickFilters button[data-status="Invalid Number"]::before,.quickFilters button[data-status="Invalid"]::before{background:#718096}
+#ownersTable{min-width:1080px!important}#ownersTable th,#ownersTable td{padding:10px 12px!important}#ownersTable th:nth-child(1),#ownersTable td:nth-child(1){width:13%!important;min-width:130px!important}#ownersTable th:nth-child(2),#ownersTable td:nth-child(2){width:14%!important;min-width:135px!important}#ownersTable th:nth-child(3),#ownersTable td:nth-child(3){width:7%!important;min-width:65px!important}#ownersTable th:nth-child(4),#ownersTable td:nth-child(4){width:20%!important;min-width:190px!important}#ownersTable th:nth-child(5),#ownersTable td:nth-child(5){width:13%!important;min-width:115px!important}#ownersTable th:nth-child(6),#ownersTable td:nth-child(6){width:20%!important;min-width:215px!important}#ownersTable th:nth-child(7),#ownersTable td:nth-child(7){width:26%!important;min-width:260px!important}#ownersTable th:nth-child(n+8),#ownersTable td:nth-child(n+8){display:none!important}
+.u6DetailHeader{align-items:center!important;min-height:112px!important;padding-top:8px!important;padding-bottom:18px!important}.u6HeaderActions{align-items:center!important;justify-content:flex-end!important}.u6HeaderActions .waBtn,.u6HeaderActions .callBtn,.u6HeaderActions button{height:44px!important;display:inline-flex;align-items:center;justify-content:center;padding:0 16px!important}.u6Stage{cursor:pointer;font-family:Poppins,sans-serif}.u6Stage:hover{transform:none;border-color:#3e536a;color:#fff}
+.broadcastFilterGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.broadcastFilterGrid label{display:block;font-size:11px;color:#93a3b7;margin-bottom:5px}
+@media(max-width:1100px){.v7ExportBtn span{display:none}.v7Brand{min-width:auto}.v7Nav button{padding:0 12px!important}.v7TopActions{gap:7px}}
+@media(max-width:800px){.broadcastFilterGrid{grid-template-columns:1fr}.v7ExportBtn,.v7Divider{display:none!important}}
+
 </style>
 </head>
 
 <body>
 
   <header id="v7Topbar" class="v7Topbar hidden">
-    <div class="v7Brand"><span class="v7MenuIcon">☰</span><strong>Usama</strong><span>CRM</span></div>
+    <div class="v7Brand"><strong>Usama</strong><span>CRM</span></div>
     <nav class="v7Nav">
-      <button id="v7NavOwners" onclick="showOwnersView()">♟ Owners</button>
-      <button id="v7NavLeads" class="adminOnly" onclick="showLeadsView()">♙ Leads</button>
-      <button id="v7NavCalendar" class="adminOnly" onclick="showCalendarModule()">▣ Calendar</button>
-      <button id="v7NavBroadcast" class="adminOnly" onclick="openBroadcastModule()">◉ WhatsApp Broadcast</button>
+      <button id="v7NavOwners" onclick="showOwnersView()"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Owners</button>
+      <button id="v7NavLeads" class="adminOnly" onclick="showLeadsView()"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10"/></svg>Leads</button>
+      <button id="v7NavCalendar" class="adminOnly" onclick="showCalendarModule()"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</button>
+      <button id="v7NavBroadcast" class="adminOnly" onclick="openBroadcastModule()"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.6 9.6 0 0 1-4-.9L3 21l1.9-4.8A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c.7 3.2 2.5 5 5.7 5.7l1.3-1.3 2 .7c-.3 2-1.8 3.1-3.9 2.8-4.2-.7-7.3-3.8-8-8-.3-2.1.8-3.6 2.8-3.9l.7 2Z"/></svg>WhatsApp Broadcast</button>
     </nav>
     <div class="v7TopActions">
-      <button class="v7TopIcon" onclick="openTodayNotifications()" title="Notifications">♧</button>
+      <button class="v7ExportBtn adminOnly" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2"/></svg>Export CSV</button>
+      <span class="v7Divider"></span>
+      <button class="v7TopIcon" onclick="toggleV8Theme()" title="Appearance"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+      <button class="v7TopIcon v7Bell" onclick="openTodayNotifications()" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><b id="v7NotificationBadge">0</b></button>
       <button class="v7Profile" onclick="openV7ProfileSettings()" title="Profile settings">
         <span id="v7TopAvatar" class="v7Avatar">U</span>
         <span class="v7ProfileText"><span id="v7TopName" class="v7ProfileName">Usama</span><span id="v7TopRole" class="v7ProfileRole">Admin</span></span>
+        <svg class="v7Chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
       </button>
     </div>
   </header>
@@ -2236,7 +2253,12 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
       <div><label>Delay between opening chats</label><select id="broadcastDelay"><option value="3000">3 seconds</option><option value="5000" selected>5 seconds</option><option value="8000">8 seconds</option></select></div>
     </div>
     <div id="broadcastInsidePicker" class="hidden" style="margin-top:14px">
-      <div class="broadcastSearchRow"><input id="broadcastOwnerSearch" placeholder="Search owner, phone, unit, community or cluster..."><button class="darkBtn" onclick="searchBroadcastOwners()">Search</button></div>
+      <div class="broadcastFilterGrid">
+        <div><label>Community</label><select id="broadcastCommunity" onchange="loadBroadcastClusters()"><option value="">Choose community</option></select></div>
+        <div><label>Cluster</label><select id="broadcastCluster" onchange="loadBroadcastRangeOptions()"><option value="">Choose cluster</option></select></div>
+        <div><label>Range</label><select id="broadcastRange" onchange="loadBroadcastRangeContacts()"><option value="">Choose range</option></select></div>
+      </div>
+      <div id="broadcastRangeInfo" class="sub" style="margin:10px 0 0">Choose a community and cluster.</div>
       <div id="broadcastPicker" class="broadcastPicker"></div>
     </div>
     <div class="formGrid" style="margin-top:14px">
@@ -3976,7 +3998,7 @@ Usama Bin Nusrat.`;
     async function logLeadActivity(leadId,type,details){ const {error}=await db.from("lead_activities").insert([{lead_id:leadId,activity_type:type,details,created_by:currentUserEmail||null}]); if(error) console.warn("Activity log failed",error.message); }
     async function openLeadDetail(id){ activeLeadDetailId=id; const [{data:lead,error},{data:acts}]=await Promise.all([db.from(LEADS_TABLE).select("*").eq("id",id).single(),db.from("lead_activities").select("*").eq("lead_id",id).order("created_at",{ascending:false})]); if(error){alert(error.message);return;} renderLeadDetail(lead,acts||[]); el("leadDetailModal").classList.add("show"); }
     function closeLeadDetail(){ el("leadDetailModal").classList.remove("show"); activeLeadDetailId=null; }
-    function renderLeadDetail(lead,acts){ el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Follow-up</label><div>${escapeHtml(clean(lead.follow_up_date))} ${escapeHtml(lead.follow_up_time||"")}</div></div><div class="profileBox"><label>Reminder</label><div>${escapeHtml(lead.reminder_type||"Call")} — ${escapeHtml(lead.reminder_note||"")}</div></div></div><div class="modalActions"><button class="primaryBtn" onclick="markFollowupDone('${lead.id}')">Mark Follow-up Done</button></div></div></div>`; }
+    function renderLeadDetail(lead,acts){ el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${localDateTimeValue()}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Follow-up</label><div>${escapeHtml(clean(lead.follow_up_date))} ${escapeHtml(lead.follow_up_time||"")}</div></div><div class="profileBox"><label>Reminder</label><div>${escapeHtml(lead.reminder_type||"Call")} — ${escapeHtml(lead.reminder_note||"")}</div></div></div><div class="modalActions"><button class="primaryBtn" onclick="markFollowupDone('${lead.id}')">Mark Follow-up Done</button></div></div></div>`; }
     async function addLeadActivity(id){ const type=el("activityType").value; const details=el("activityDetails").value.trim(); const when=el("activityWhen").value; if(!details){alert("Write the discussion first.");return;} const payload={lead_id:id,activity_type:type,details,created_by:currentUserEmail||null}; if(when)payload.created_at=new Date(when).toISOString(); const {error}=await db.from("lead_activities").insert([payload]); if(error){alert(error.message);return;} await db.from(LEADS_TABLE).update({last_contacted:today()}).eq("id",id); openLeadDetail(id); }
     async function markFollowupDone(id){ await logLeadActivity(id,"Follow-up Completed","Follow-up marked as completed."); const {error}=await db.from(LEADS_TABLE).update({follow_up_date:null,follow_up_time:null,reminder_note:null}).eq("id",id); if(error){alert(error.message);return;} closeLeadDetail();loadFollowupDashboard();if(leadViewMode==="kanban")loadKanban();else loadLeads(); }
 
@@ -4094,7 +4116,7 @@ Usama Bin Nusrat.`;
 
     // Full lead detail now includes a real Set / Update Follow-up composer.
     renderLeadDetail = function(lead,acts){
-      el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||'')}</div></div>`).join(''):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Latest Note</label><div>${escapeHtml(clean(lead.notes))}</div></div></div><div class="followupComposer"><h2>Set / Update Follow-up</h2><div class="formGrid"><div><label>Date</label><input id="detailFollowupDate" type="date" value="${escapeHtml(lead.follow_up_date||'')}"></div><div><label>Time</label><input id="detailFollowupTime" type="time" value="${escapeHtml(lead.follow_up_time||'')}"></div><div><label>Type</label><select id="detailReminderType">${['Call','WhatsApp','Meeting','General Follow-up'].map(x=>`<option ${x===(lead.reminder_type||'Call')?'selected':''}>${x}</option>`).join('')}</select></div><div><label>Reminder Note</label><input id="detailReminderNote" value="${escapeHtml(lead.reminder_note||'')}" placeholder="What do you need to do?"></div></div><div class="modalActions"><button class="darkBtn" onclick="markFollowupDone('${lead.id}')">Mark Done</button><button class="primaryBtn" onclick="saveLeadFollowup('${lead.id}')">Save Follow-up</button></div></div></div></div>`;
+      el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${localDateTimeValue()}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||'')}</div></div>`).join(''):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Latest Note</label><div>${escapeHtml(clean(lead.notes))}</div></div></div><div class="followupComposer"><h2>Set / Update Follow-up</h2><div class="formGrid"><div><label>Date</label><input id="detailFollowupDate" type="date" value="${escapeHtml(lead.follow_up_date||'')}"></div><div><label>Time</label><input id="detailFollowupTime" type="time" value="${escapeHtml(lead.follow_up_time||'')}"></div><div><label>Type</label><select id="detailReminderType">${['Call','WhatsApp','Meeting','General Follow-up'].map(x=>`<option ${x===(lead.reminder_type||'Call')?'selected':''}>${x}</option>`).join('')}</select></div><div><label>Reminder Note</label><input id="detailReminderNote" value="${escapeHtml(lead.reminder_note||'')}" placeholder="What do you need to do?"></div></div><div class="modalActions"><button class="darkBtn" onclick="markFollowupDone('${lead.id}')">Mark Done</button><button class="primaryBtn" onclick="saveLeadFollowup('${lead.id}')">Save Follow-up</button></div></div></div></div>`;
     };
     async function saveLeadFollowup(id){const follow_up_date=el("detailFollowupDate").value||null,follow_up_time=el("detailFollowupTime").value||null,reminder_type=el("detailReminderType").value||"Call",reminder_note=el("detailReminderNote").value.trim()||null;if(!follow_up_date){alert("Choose a follow-up date.");return;}const {error}=await db.from(LEADS_TABLE).update({follow_up_date,follow_up_time,reminder_type,reminder_note}).eq("id",id);if(error){alert(error.message);return;}await logLeadActivity(id,"Follow-up Set",`${reminder_type} follow-up set for ${follow_up_date}${follow_up_time?' at '+follow_up_time:''}${reminder_note?' — '+reminder_note:''}`);showLeadSaved();await openLeadDetail(id);loadFollowupDashboard();if(leadViewMode==='kanban')loadKanban();else loadLeads();}
 
@@ -4276,7 +4298,7 @@ function u6TimelineItem(type,details,date){
   return `<div class="u6TimelineItem">
     <div class="u6TimelineTop">
       <div class="u6TimelineType">${escapeHtml(type||"Activity")}</div>
-      <div class="u6TimelineTime">${Number.isNaN(d.getTime()) ? "" : d.toLocaleString()}</div>
+      <div class="u6TimelineTime">${Number.isNaN(d.getTime()) ? "" : formatCRMDateTime(d)}</div>
     </div>
     <div class="u6TimelineText">${escapeHtml(details||"")}</div>
   </div>`;
@@ -4404,7 +4426,7 @@ openOwnerProfile = async function(row){
               <option>Broadcast</option>
               <option>Note</option>
             </select>
-            <input id="u6OwnerActivityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}">
+            <input id="u6OwnerActivityWhen" type="datetime-local" value="${localDateTimeValue()}">
           </div>
           <textarea id="u6OwnerActivityDetails" rows="4" placeholder="What was discussed?"></textarea>
           <button class="primaryBtn" onclick="u6AddOwnerActivity('${row.id}')">Add Activity</button>
@@ -4485,7 +4507,7 @@ renderLeadDetail = function(lead,acts){
         </div>
 
         <div class="u6StageBar">
-          ${stages.map(s=>`<span class="u6Stage ${s===(lead.status||"New")?"active":""}">${escapeHtml(s)}</span>`).join("")}
+          ${stages.map(s=>`<button class="u6Stage ${s===(lead.status||"New")?"active":""}" onclick="changeLeadStage('${lead.id}','${escapeHtml(s).replaceAll("'","&#039;")}','${escapeHtml(lead.status||"New").replaceAll("'","&#039;")}')">${escapeHtml(s)}</button>`).join("")}
         </div>
 
         <div class="u6DetailGrid">
@@ -4524,7 +4546,7 @@ renderLeadDetail = function(lead,acts){
               <option>Follow-up</option>
               <option>Note</option>
             </select>
-            <input id="activityWhen" type="datetime-local" value="${new Date().toISOString().slice(0,16)}">
+            <input id="activityWhen" type="datetime-local" value="${localDateTimeValue()}">
           </div>
           <textarea id="activityDetails" rows="4" placeholder="What was discussed?"></textarea>
           <button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Add Activity</button>
@@ -4643,6 +4665,97 @@ openBroadcastModule=async function(){
   return await _v7OpenBroadcastModule();
 };
 document.addEventListener('DOMContentLoaded',refreshV7Profile);
+
+
+/* ===== USAMA CRM V8 BEHAVIOR CORRECTIONS ===== */
+function localDateTimeValue(date=new Date()){
+  const pad=n=>String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function formatCRMDate(value){
+  if(!value || value==='-' || value==='EMPTY') return '-';
+  const d=value instanceof Date?value:new Date(String(value).length===10?`${value}T00:00:00`:value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return `${String(d.getDate()).padStart(2,'0')}/${d.toLocaleString('en-GB',{month:'long'})}/${d.getFullYear()}`;
+}
+function formatCRMDateTime(value){
+  const d=value instanceof Date?value:new Date(value);
+  if(Number.isNaN(d.getTime())) return '';
+  return `${formatCRMDate(d)}, ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
+}
+const _v8U6Field=u6Field;
+u6Field=function(label,value){
+  const dateLabels=['Lead received','Follow-up date','Last contacted','Created','Date'];
+  return _v8U6Field(label,dateLabels.includes(label)?formatCRMDate(value):value);
+};
+showFollowupAlert=function(){};
+function decorateStatusChips(){
+  document.querySelectorAll('.quickFilters button').forEach(b=>b.dataset.status=b.textContent.trim());
+}
+const _v8RenderOwnerStatusQuickFilters=window.renderOwnerStatusQuickFilters;
+if(_v8RenderOwnerStatusQuickFilters) window.renderOwnerStatusQuickFilters=function(){const r=_v8RenderOwnerStatusQuickFilters.apply(this,arguments);setTimeout(decorateStatusChips,0);return r;};
+setTimeout(decorateStatusChips,100);
+
+async function changeLeadStage(leadId,newStatus,oldStatus){
+  if(newStatus===oldStatus)return;
+  document.querySelectorAll('.u6Stage').forEach(b=>b.classList.toggle('active',b.textContent.trim()===newStatus));
+  const {error}=await db.from(LEADS_TABLE).update({status:newStatus,last_contacted:today()}).eq('id',leadId);
+  if(error){alert(error.message);await openLeadDetail(leadId);return;}
+  await db.from('lead_activities').insert([{lead_id:String(leadId),activity_type:'Status changed',details:`Status changed from ${oldStatus} to ${newStatus}`,created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
+  await openLeadDetail(leadId);loadLeads();
+}
+function toggleV8Theme(){document.body.classList.toggle('v8Softer');}
+
+const _v8UpdateHomeNotificationBadge=window.updateHomeNotificationBadge;
+if(_v8UpdateHomeNotificationBadge) window.updateHomeNotificationBadge=async function(){const r=await _v8UpdateHomeNotificationBadge.apply(this,arguments);const a=el('homeNotificationBadge'),b=el('v7NotificationBadge');if(a&&b)b.textContent=a.textContent||'0';return r;};
+
+let v8BroadcastRows=[];
+async function initBroadcastFilters(){
+  const q=applyAccessFilter(db.from(TABLE_NAME).select('community').not('community','is',null));
+  const {data,error}=await q;
+  if(error)return;
+  const communities=[...new Set((data||[]).map(r=>clean(r.community)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  el('broadcastCommunity').innerHTML='<option value="">Choose community</option>'+communities.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
+  el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>';
+  el('broadcastRange').innerHTML='<option value="">Choose range</option>';
+  el('broadcastPicker').innerHTML='';
+}
+async function loadBroadcastClusters(){
+  const community=el('broadcastCommunity').value;
+  el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>';
+  el('broadcastRange').innerHTML='<option value="">Choose range</option>';
+  el('broadcastPicker').innerHTML='';
+  if(!community)return;
+  let q=applyAccessFilter(db.from(TABLE_NAME).select('cluster').eq('community',community).not('cluster','is',null));
+  const {data,error}=await q;if(error){alert(error.message);return;}
+  const clusters=[...new Set((data||[]).map(r=>clean(r.cluster)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>'+clusters.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
+}
+async function loadBroadcastRangeOptions(){
+  const community=el('broadcastCommunity').value,cluster=el('broadcastCluster').value;
+  el('broadcastRange').innerHTML='<option value="">Choose range</option>';el('broadcastPicker').innerHTML='';
+  if(!community||!cluster)return;
+  let q=applyAccessFilter(db.from(TABLE_NAME).select('id,owner,phone1,phone2,unit,cluster,community,status').eq('community',community).eq('cluster',cluster));
+  const {data,error}=await q;if(error){alert(error.message);return;}
+  const seen=new Set();
+  v8BroadcastRows=(data||[]).filter(r=>{const p=formatPhone(get(r,['phone1','phone2']));if(!p||seen.has(p))return false;seen.add(p);return true;}).sort((a,b)=>{const na=parseFloat(a.unit),nb=parseFloat(b.unit);if(!Number.isNaN(na)&&!Number.isNaN(nb)&&na!==nb)return na-nb;return clean(a.owner).localeCompare(clean(b.owner));});
+  const opts=[];for(let i=0;i<v8BroadcastRows.length;i+=50)opts.push(`<option value="${i}:${Math.min(i+50,v8BroadcastRows.length)}">${i+1}–${Math.min(i+50,v8BroadcastRows.length)}</option>`);
+  el('broadcastRange').innerHTML='<option value="">Choose range</option>'+opts.join('');
+  el('broadcastRangeInfo').textContent=`${community} > ${cluster} > ${v8BroadcastRows.length} valid contacts`;
+}
+function loadBroadcastRangeContacts(){
+  const value=el('broadcastRange').value;if(!value)return;
+  const [start,end]=value.split(':').map(Number);const rows=v8BroadcastRows.slice(start,end);broadcastInsideSelectedIds.clear();rows.forEach(r=>broadcastInsideSelectedIds.add(String(r.id)));
+  el('broadcastPicker').innerHTML=rows.map(r=>`<div class="broadcastPickRow"><label><input type="checkbox" checked onchange="toggleBroadcastInside('${r.id}',this.checked)"><span><strong>${escapeHtml(clean(r.owner))}</strong><br><span class="sub" style="margin:0">${escapeHtml(clean(r.community))} · ${escapeHtml(clean(r.cluster))} · Unit ${escapeHtml(clean(r.unit))}</span></span></label></div>`).join('')||'<div class="empty">No valid contacts</div>';
+  el('broadcastRangeInfo').textContent=`${el('broadcastCommunity').value} > ${el('broadcastCluster').value} > ${v8BroadcastRows.length} valid contacts > Showing ${start+1}–${end}`;
+  refreshBroadcastPreviewRows();
+}
+const _v8BroadcastScopeChanged=broadcastScopeChanged;
+broadcastScopeChanged=function(){const inside=el('broadcastScope').value==='inside';el('broadcastInsidePicker').classList.toggle('hidden',!inside);if(inside)initBroadcastFilters();refreshBroadcastPreviewRows();};
+searchBroadcastOwners=function(){return loadBroadcastRangeContacts();};
+
+// keep bell badge synchronized
+setInterval(()=>{const a=el('homeNotificationBadge'),b=el('v7NotificationBadge');if(a&&b)b.textContent=a.textContent||'0';},1500);
 
 </script>
 </body>
