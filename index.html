@@ -1790,6 +1790,400 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 @media(max-width:1100px){.v7ExportBtn span{display:none}.v7Brand{min-width:auto}.v7Nav button{padding:0 12px!important}.v7TopActions{gap:7px}}
 @media(max-width:800px){.broadcastFilterGrid{grid-template-columns:1fr}.v7ExportBtn,.v7Divider{display:none!important}}
 
+
+
+/* =========================================================
+   USAMA CRM V9 — compact desktop table + corrected mobile UI
+   ========================================================= */
+
+/* Owners table: content-sized instead of stretching across the screen */
+#ownersTable{
+  width:max-content!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+#ownersTable th,
+#ownersTable td{
+  padding:7px 7px!important;
+  height:48px!important;
+  min-height:48px!important;
+  white-space:normal!important;
+  vertical-align:middle!important;
+}
+#ownersTable th{
+  height:44px!important;
+  font-size:11px!important;
+}
+#ownersTable td{
+  font-size:12px!important;
+}
+#ownersTable .resize-handle{
+  display:block!important;
+  width:8px!important;
+  right:-4px!important;
+  background:transparent;
+}
+#ownersTable .resize-handle:hover{
+  background:rgba(59,130,246,.45)!important;
+}
+
+/* The selection checkbox inserted by JS */
+#ownersTable .selectOwnerHead,
+#ownersTable th:first-child:has(.ownerSelect),
+#ownersTable td:first-child:has(.ownerSelect){
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  padding:0 6px!important;
+}
+
+/* Compact fixed defaults. Inline widths still remain draggable/adjustable. */
+#ownersTable .owner-col-community{width:140px!important;min-width:100px!important}
+#ownersTable .owner-col-cluster{width:140px!important;min-width:100px!important}
+#ownersTable .owner-col-unit{width:64px!important;min-width:54px!important;text-align:center!important}
+#ownersTable .owner-col-owner{width:205px!important;min-width:155px!important}
+#ownersTable .owner-col-whatsapp{width:104px!important;min-width:92px!important}
+#ownersTable .owner-col-status{width:158px!important;min-width:132px!important}
+#ownersTable .owner-col-remarks{width:330px!important;min-width:230px!important}
+#ownersTable .owner-col-last_contacted{width:128px!important;min-width:110px!important}
+#ownersTable .owner-col-actions{width:112px!important;min-width:90px!important}
+
+/* Clean owner cell */
+.ownerIdentityCell{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+  min-width:0;
+}
+.ownerIdentityName{
+  width:100%;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.3;
+  overflow-wrap:anywhere;
+}
+.ownerIdentityActions{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+}
+.profileBtn,.moreUnitBtn{
+  margin:0!important;
+  min-height:24px!important;
+  height:24px!important;
+  padding:2px 7px!important;
+  border-radius:999px!important;
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:700!important;
+}
+
+/* Smaller premium controls */
+#ownersTable .waBtn{
+  width:auto!important;
+  min-width:82px!important;
+  height:31px!important;
+  padding:0 10px!important;
+  border-radius:9px!important;
+  font-size:10.5px!important;
+}
+#ownersTable .statusSelect{
+  width:100%!important;
+  max-width:150px!important;
+  min-width:125px!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding:4px 28px 4px 12px!important;
+  border-radius:999px!important;
+  font-size:10.5px!important;
+  font-weight:700!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+#ownersTable .statusSelect:hover{
+  border-color:rgba(96,165,250,.55)!important;
+  box-shadow:0 0 0 2px rgba(59,130,246,.08)!important;
+}
+#ownersTable .latestRemarkRead,
+#ownersTable .remarksInput{
+  min-height:38px!important;
+  max-height:54px!important;
+  height:42px!important;
+  padding:6px 8px!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+}
+.tablebox{
+  overflow:auto!important;
+}
+
+/* Detail screen close/back controls */
+.u9MobileBack{
+  display:none;
+}
+.u6CloseButton{
+  position:fixed!important;
+  top:78px!important;
+  right:18px!important;
+  z-index:3000!important;
+}
+
+/* Compact profile/detail layout */
+.u6DetailHeader{
+  gap:12px!important;
+}
+.u6HeaderActions{
+  align-items:center!important;
+}
+.u6HeaderActions .waBtn,
+.u6HeaderActions .callBtn,
+.u6HeaderActions .darkBtn{
+  min-height:40px!important;
+  height:40px!important;
+  padding:0 16px!important;
+}
+.u6StageBar{
+  gap:7px!important;
+}
+.u6Stage{
+  min-height:32px!important;
+  padding:6px 12px!important;
+  border-radius:999px!important;
+}
+.u6NotesBox{
+  padding:13px!important;
+  margin-top:14px!important;
+}
+.u6Field{
+  padding:10px 0!important;
+}
+
+/* Mobile */
+@media(max-width:800px){
+  body{
+    padding:58px 0 0!important;
+  }
+  .v7Topbar{
+    height:58px!important;
+    padding:0 7px!important;
+    gap:4px!important;
+    overflow:hidden!important;
+  }
+  .v7Brand{
+    min-width:56px!important;
+    gap:0!important;
+    font-size:18px!important;
+  }
+  .v7Brand span{
+    font-size:18px!important;
+  }
+  .v7Nav{
+    flex:1!important;
+    min-width:0!important;
+    overflow-x:auto!important;
+    scrollbar-width:none;
+  }
+  .v7Nav::-webkit-scrollbar{display:none}
+  .v7Nav button{
+    flex:0 0 auto!important;
+    min-width:76px!important;
+    height:58px!important;
+    padding:0 8px!important;
+    font-size:11px!important;
+    gap:4px!important;
+  }
+  .v7Nav button svg{
+    width:20px!important;
+    height:20px!important;
+  }
+  .v7Profile{
+    padding:2px!important;
+  }
+  .v7Avatar{
+    width:35px!important;
+    height:35px!important;
+  }
+
+  /* Mobile owner cards */
+  .ownerCard{
+    margin:10px!important;
+    padding:13px!important;
+    border-radius:12px!important;
+  }
+  .ownerTop{
+    margin-bottom:10px!important;
+  }
+  .ownerName{
+    font-size:15px!important;
+  }
+  .mobileLocation{
+    padding:9px!important;
+    margin-bottom:10px!important;
+  }
+  .infoLine{
+    margin:8px 0!important;
+  }
+  .mobileActionGrid{
+    gap:7px!important;
+    margin-top:10px!important;
+  }
+  .mobileActionGrid .waBtn,
+  .mobileActionGrid .callBtn,
+  .mobileActionGrid .copyBtn{
+    height:40px!important;
+  }
+  .ownerCard .statusSelect{
+    height:34px!important;
+    min-height:34px!important;
+    width:auto!important;
+    min-width:145px!important;
+    max-width:100%!important;
+    border-radius:999px!important;
+  }
+
+  /* Full-screen owner and lead details */
+  #profileModal,
+  #leadDetailModal{
+    z-index:2000!important;
+    align-items:stretch!important;
+    padding:0!important;
+  }
+  #profileModal .profileModal,
+  #leadDetailModal .modal{
+    width:100vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+  .u6CloseButton{
+    position:fixed!important;
+    top:66px!important;
+    right:10px!important;
+    width:34px!important;
+    height:34px!important;
+    font-size:19px!important;
+  }
+  .u9MobileBack{
+    display:inline-flex!important;
+    align-items:center;
+    gap:6px;
+    min-height:34px;
+    padding:6px 10px;
+    margin-bottom:10px;
+    border-radius:9px;
+    background:#111a26;
+    border:1px solid #2b394b;
+    color:#e7edf5;
+    font-size:12px;
+    font-weight:700;
+  }
+  .u6DetailShell{
+    display:block!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    overflow:auto!important;
+  }
+  .u6DetailLeft,
+  .u6DetailRight{
+    padding:14px!important;
+  }
+  .u6DetailHeader{
+    flex-direction:column!important;
+    padding:0 40px 12px 0!important;
+    gap:10px!important;
+  }
+  .u6DetailTitle{
+    font-size:20px!important;
+    line-height:1.25!important;
+  }
+  .u6DetailSubtitle{
+    font-size:12px!important;
+    line-height:1.4!important;
+  }
+  .u6HeaderActions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1fr!important;
+    width:100%!important;
+    gap:7px!important;
+  }
+  .u6HeaderActions .waBtn,
+  .u6HeaderActions .callBtn,
+  .u6HeaderActions .darkBtn{
+    width:100%!important;
+    min-width:0!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:0 7px!important;
+    font-size:12px!important;
+    text-align:center!important;
+  }
+  .u6StageBar{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    gap:7px!important;
+    padding:2px 0 8px!important;
+    margin:12px 0!important;
+    scrollbar-width:none;
+  }
+  .u6StageBar::-webkit-scrollbar{display:none}
+  .u6Stage{
+    flex:0 0 auto!important;
+    min-height:34px!important;
+    padding:6px 12px!important;
+    font-size:11px!important;
+  }
+  .u6DetailGrid{
+    display:block!important;
+  }
+  .u6Field{
+    grid-template-columns:105px minmax(0,1fr)!important;
+    gap:10px!important;
+    padding:9px 0!important;
+  }
+  .u6Field label{
+    font-size:11.5px!important;
+  }
+  .u6Field div{
+    font-size:13.5px!important;
+  }
+  .u6NotesBox{
+    margin-top:12px!important;
+    padding:12px!important;
+  }
+  .u6NotesBox h3{
+    font-size:14px!important;
+    margin-bottom:7px!important;
+  }
+  .u6NotesText{
+    font-size:13px!important;
+  }
+  .u6RelatedUnitCard{
+    padding:10px!important;
+    border-top:1px solid rgba(148,163,184,.12);
+  }
+  .u6RelatedUnitCard:first-of-type{
+    border-top:0;
+  }
+}
+
+/* Very narrow phones */
+@media(max-width:430px){
+  .v7Nav button{
+    min-width:69px!important;
+    padding:0 6px!important;
+    font-size:10px!important;
+  }
+  .u6HeaderActions{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .u6HeaderActions .darkBtn{
+    grid-column:1/-1;
+  }
+}
+
 </style>
 </head>
 
@@ -4756,6 +5150,170 @@ searchBroadcastOwners=function(){return loadBroadcastRangeContacts();};
 
 // keep bell badge synchronized
 setInterval(()=>{const a=el('homeNotificationBadge'),b=el('v7NotificationBadge');if(a&&b)b.textContent=a.textContent||'0';},1500);
+
+
+
+/* =========================================================
+   USAMA CRM V9 — behavior fixes
+   ========================================================= */
+
+// Required display format: 17 July 2026
+formatCRMDate = function(value){
+  if(!value || value==='-' || value==='EMPTY') return '-';
+  const raw=String(value);
+  const d=value instanceof Date ? value : new Date(raw.length===10 ? `${raw}T00:00:00` : raw);
+  if(Number.isNaN(d.getTime())) return raw;
+  return `${d.getDate()} ${d.toLocaleString('en-GB',{month:'long'})} ${d.getFullYear()}`;
+};
+formatCRMDateTime = function(value){
+  const d=value instanceof Date ? value : new Date(value);
+  if(Number.isNaN(d.getTime())) return '';
+  return `${formatCRMDate(d)}, ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
+};
+
+// Compact widths, while preserving drag-to-resize and local storage.
+(function migrateV9OwnerWidths(){
+  const migrationKey='usama_crm_v9_compact_columns_done';
+  if(localStorage.getItem(migrationKey)) return;
+  const widths={
+    community:140, cluster:140, unit:64, owner:205,
+    whatsapp:104, status:158, remarks:330,
+    last_contacted:128, actions:112
+  };
+  if(Array.isArray(ownerColumns)){
+    ownerColumns.forEach(c=>{if(widths[c.key]) c.width=widths[c.key];});
+    if(typeof saveOwnerColumnsState==='function') saveOwnerColumnsState();
+  }
+  localStorage.setItem(migrationKey,'1');
+})();
+
+// Owner cell: name on first line, small actions on second line.
+moreUnitButton = function(row){
+  const related=getRelatedRows(row);
+  if(related.length<=1) return '';
+  return `<button class="moreUnitBtn" onclick='openProperties(${JSON.stringify(row).replaceAll("'","&#039;")})'>${related.length} Units</button>`;
+};
+profileButton = function(row){
+  return `<button class="profileBtn" onclick='openOwnerProfile(${JSON.stringify(row).replaceAll("'","&#039;")})'>Profile</button>`;
+};
+const _u9OwnerCell=ownerCell;
+ownerCell=function(row,col){
+  if(col.key==='owner'){
+    return `<div class="ownerIdentityCell">
+      <div class="ownerIdentityName">${escapeHtml(clean(row.owner))}</div>
+      <div class="ownerIdentityActions">${profileButton(row)}${moreUnitButton(row)}</div>
+    </div>`;
+  }
+  if(col.key==='last_contacted'){
+    return `<span data-last-contacted="${row.id}">${escapeHtml(formatCRMDate(row.last_contacted))}</span>`;
+  }
+  return _u9OwnerCell(row,col);
+};
+
+// Double-click a column divider to auto-fit that column.
+document.addEventListener('dblclick',function(e){
+  const handle=e.target.closest('.resize-handle');
+  if(!handle) return;
+  const th=handle.closest('th');
+  if(!th || th.dataset.table!=='owner') return;
+  const key=th.dataset.key;
+  const cells=[th,...document.querySelectorAll(`#ownersTable .owner-col-${key}`)];
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d');
+  let best=80;
+  cells.forEach(cell=>{
+    const style=getComputedStyle(cell);
+    ctx.font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    const text=(cell.innerText||'').replace(/\s+/g,' ').trim();
+    best=Math.max(best,Math.ceil(ctx.measureText(text).width)+30);
+  });
+  const limits={community:230,cluster:230,unit:100,owner:300,whatsapp:135,status:185,remarks:520,last_contacted:180,actions:170};
+  const col=ownerColumns.find(c=>c.key===key);
+  if(col){
+    col.width=Math.min(limits[key]||400,Math.max(64,best));
+    saveOwnerColumnsState();
+    renderOwnerHead();
+    loadData();
+  }
+});
+
+// Mobile back button in every owner/lead detail screen.
+function u9InjectMobileBack(containerId,closeFunction,label){
+  const root=document.getElementById(containerId);
+  const left=root?.querySelector('.u6DetailLeft');
+  if(left && !left.querySelector('.u9MobileBack')){
+    left.insertAdjacentHTML('afterbegin',
+      `<button class="u9MobileBack" onclick="${closeFunction}()">← ${label}</button>`);
+  }
+}
+
+const _u9OpenOwnerProfile=openOwnerProfile;
+openOwnerProfile=async function(row){
+  await _u9OpenOwnerProfile(row);
+  u9InjectMobileBack('profileContent','closeOwnerProfile','Owners');
+  const relatedBox=[...document.querySelectorAll('#profileContent .u6NotesBox')]
+    .find(x=>x.querySelector('h3')?.textContent.trim()==='Related Units');
+  if(relatedBox){
+    relatedBox.querySelectorAll('.u6Field').forEach(x=>x.classList.add('u6RelatedUnitCard'));
+  }
+};
+
+const _u9RenderLeadDetail=renderLeadDetail;
+renderLeadDetail=function(lead,acts){
+  _u9RenderLeadDetail(lead,acts);
+  u9InjectMobileBack('leadDetailContent','closeLeadDetail','Leads');
+};
+
+// Make owner status pills in the profile functional.
+async function u9ChangeOwnerStatus(ownerId,newStatus){
+  const {error}=await db.from(TABLE_NAME).update({
+    status:newStatus,
+    last_contacted:today()
+  }).eq('id',ownerId);
+  if(error){alert(error.message);return;}
+  try{
+    await db.from(U6_OWNER_ACTIVITIES).insert([{
+      owner_id:String(ownerId),
+      activity_type:'Status changed',
+      details:`Status changed to ${newStatus}`,
+      created_at:new Date().toISOString(),
+      created_by:currentUserEmail||null
+    }]);
+  }catch(e){console.warn(e);}
+  if(u6ActiveOwnerRow){
+    u6ActiveOwnerRow={...u6ActiveOwnerRow,status:newStatus,last_contacted:today()};
+    await openOwnerProfile(u6ActiveOwnerRow);
+  }
+  loadData();
+}
+
+// Replace static owner status spans with functional buttons after profile opens.
+const _u9OpenOwnerProfileInteractive=openOwnerProfile;
+openOwnerProfile=async function(row){
+  await _u9OpenOwnerProfileInteractive(row);
+  document.querySelectorAll('#profileContent .u6Stage').forEach(stage=>{
+    const status=stage.textContent.trim();
+    stage.outerHTML=`<button class="${stage.className}" onclick="u9ChangeOwnerStatus('${row.id}','${status.replaceAll("'","&#039;")}')">${escapeHtml(status)}</button>`;
+  });
+};
+
+// Keep WhatsApp links app-friendly rather than forcing WhatsApp Web.
+whatsappButton=function(row){
+  const phone=get(row,['phone1','phone2','phone','mobile','contact']);
+  const formatted=formatPhone(phone);
+  if(!formatted) return '-';
+  const msg=buildOwnerMessage(row);
+  return `<a class="waBtn" target="_blank"
+    onclick="u6LogOwnerWhatsApp('${row.id}','WhatsApp message initiated')"
+    href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
+};
+
+// Re-render once after all V9 overrides are ready.
+setTimeout(()=>{
+  try{
+    if(typeof currentOwnerPageRows!=='undefined' && currentOwnerPageRows?.length) renderData(currentOwnerPageRows);
+  }catch(e){console.warn(e);}
+},250);
 
 </script>
 </body>
