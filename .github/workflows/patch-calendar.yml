@@ -1,0 +1,179 @@
+name: Install Monthly CRM Calendar
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-calendar.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_html = '''  <div id="calendarModuleView" class="wrap hidden">
+    <div class="compactPageHeader">
+      <div>
+        <h1>Calendar</h1>
+        <div class="sub">Meetings and follow-ups</div>
+      </div>
+      <div class="headerBtns">
+        <button class="darkBtn" onclick="showChoiceView()">Home</button>
+        <button class="darkBtn" onclick="showLeadsView()">Leads</button>
+      </div>
+    </div>
+    <div class="calendarModuleToolbar">
+      <input id="calendarModuleDate" type="date" onchange="loadCalendarModule()">
+      <button class="darkBtn" onclick="setCalendarToday()">Today</button>
+    </div>
+    <div id="calendarModuleContent" class="calendarModuleContent"></div>
+  </div>'''
+
+          new_html = '''  <div id="calendarModuleView" class="wrap hidden">
+    <div class="u13CalendarHeader">
+      <div>
+        <h1>Calendar</h1>
+        <div class="sub">Meetings, calls, viewings and follow-ups</div>
+      </div>
+      <div class="u13CalendarActions">
+        <button class="darkBtn" onclick="u13CalendarToday()">Today</button>
+        <button class="darkBtn" onclick="u13CalendarMove(-1)" aria-label="Previous month">←</button>
+        <button class="darkBtn" onclick="u13CalendarMove(1)" aria-label="Next month">→</button>
+      </div>
+    </div>
+    <div class="u13CalendarLayout">
+      <section class="u13CalendarPanel">
+        <div class="u13MonthBar">
+          <strong id="u13CalendarMonthTitle">Calendar</strong>
+          <button class="darkBtn" onclick="loadCalendarModule()">Refresh</button>
+        </div>
+        <div class="u13Weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+        <div id="calendarModuleContent" class="u13CalendarGrid"><div class="empty">Loading calendar…</div></div>
+      </section>
+      <aside class="u13UpcomingPanel">
+        <div class="u13UpcomingTitle">Upcoming Events</div>
+        <div id="u13UpcomingList"><div class="empty">Loading…</div></div>
+      </aside>
+    </div>
+  </div>'''
+
+          if old_html not in text:
+              raise SystemExit('Calendar HTML block not found')
+          text = text.replace(old_html, new_html, 1)
+
+          css = r'''
+
+/* ===== U13 MONTHLY CALENDAR ===== */
+.u13CalendarHeader{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 2px 14px;border-bottom:1px solid #172536;margin-bottom:12px}
+.u13CalendarHeader h1{margin:0}.u13CalendarHeader .sub{margin:5px 0 0}
+.u13CalendarActions{display:flex;gap:8px;align-items:center}
+.u13CalendarLayout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}
+.u13CalendarPanel,.u13UpcomingPanel{background:#050a11;border:1px solid #172536;border-radius:12px;overflow:hidden}
+.u13MonthBar{min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #172536}
+.u13MonthBar strong{font-size:18px}
+.u13Weekdays,.u13CalendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.u13Weekdays span{padding:11px 6px;text-align:center;color:#91a0b5;font-size:11px;font-weight:700;border-right:1px solid rgba(148,163,184,.1)}
+.u13CalendarDay{min-height:128px;padding:8px;border-top:1px solid rgba(148,163,184,.1);border-right:1px solid rgba(148,163,184,.1);background:#05090f;overflow:hidden}
+.u13CalendarDay.other{opacity:.38}.u13CalendarDay.today{box-shadow:inset 0 0 0 2px #1687df;background:#07111d}
+.u13DayNumber{font-size:12px;font-weight:700;margin-bottom:6px}
+.u13Event{width:100%;display:block;text-align:left;margin:4px 0;padding:5px 7px;border-radius:6px;background:rgba(37,99,235,.17);border-left:3px solid #3b82f6;color:#eaf2ff;font-size:10.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.u13Event.owner{background:rgba(16,185,129,.14);border-left-color:#10b981}.u13Event.followup{background:rgba(139,92,246,.16);border-left-color:#8b5cf6}
+.u13More{font-size:10.5px;color:#93c5fd;margin-top:5px}
+.u13UpcomingTitle{height:58px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid #172536;font-weight:700}
+#u13UpcomingList{max-height:760px;overflow:auto}.u13UpcomingItem{padding:12px 14px;border-bottom:1px solid rgba(148,163,184,.1);cursor:pointer}.u13UpcomingItem:hover{background:#07111b}
+.u13UpcomingDate{font-size:10.5px;color:#60a5fa;font-weight:700}.u13UpcomingName{font-size:12.5px;font-weight:700;margin-top:4px}.u13UpcomingMeta{font-size:11px;color:#91a0b5;line-height:1.45;margin-top:3px}
+@media(max-width:980px){.u13CalendarLayout{grid-template-columns:1fr}.u13UpcomingPanel{margin-bottom:14px}}
+@media(max-width:700px){.u13CalendarHeader{align-items:flex-start;flex-direction:column;padding:12px}.u13CalendarActions{width:100%}.u13CalendarActions button:first-child{flex:1}.u13Weekdays span{font-size:9px;padding:8px 1px}.u13CalendarDay{min-height:92px;padding:5px}.u13DayNumber{font-size:10px}.u13Event{font-size:9px;padding:4px 5px}.u13MonthBar{padding:0 10px}.u13MonthBar strong{font-size:15px}}
+'''
+          style_pos = text.rfind('</style>')
+          if style_pos == -1:
+              raise SystemExit('Closing style tag not found')
+          text = text[:style_pos] + css + text[style_pos:]
+
+          js = r'''
+
+/* ===== U13 MONTHLY CALENDAR LOGIC ===== */
+let u13CalendarCursor=new Date();u13CalendarCursor.setDate(1);
+function u13Pad(n){return String(n).padStart(2,'0')}
+function u13DateKey(d){return `${d.getFullYear()}-${u13Pad(d.getMonth()+1)}-${u13Pad(d.getDate())}`}
+function u13GridStart(d){const x=new Date(d.getFullYear(),d.getMonth(),1);x.setDate(x.getDate()-((x.getDay()+6)%7));x.setHours(0,0,0,0);return x}
+function u13GridEnd(d){const x=u13GridStart(d);x.setDate(x.getDate()+41);x.setHours(23,59,59,999);return x}
+function u13CalendarToday(){u13CalendarCursor=new Date();u13CalendarCursor.setDate(1);loadCalendarModule()}
+function u13CalendarMove(step){u13CalendarCursor.setMonth(u13CalendarCursor.getMonth()+step);loadCalendarModule()}
+function u13EventTime(value){return new Date(value).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:true})}
+function u13EventDate(value){return new Date(value).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}
+function u13OpenCalendarEvent(event){
+  if(event.kind==='owner'&&event.row){showOwnersView().then(()=>openOwnerProfile(event.row));return}
+  if(event.leadId){showLeadsView().then(()=>openLeadDetail(String(event.leadId)))}
+}
+async function showCalendarModule(){
+  if(!isAdmin){showOwnersView();return}
+  showOnly('calendarModuleView');
+  await loadCalendarModule();
+}
+function setCalendarToday(){u13CalendarToday()}
+async function loadCalendarModule(){
+  const grid=el('calendarModuleContent'),upcoming=el('u13UpcomingList'),title=el('u13CalendarMonthTitle');
+  if(!grid)return;
+  title.textContent=u13CalendarCursor.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  grid.innerHTML='<div class="empty">Loading calendar…</div>';if(upcoming)upcoming.innerHTML='<div class="empty">Loading…</div>';
+  const start=u13GridStart(u13CalendarCursor),end=u13GridEnd(u13CalendarCursor);
+  const startIso=start.toISOString(),endIso=end.toISOString(),startDate=u13DateKey(start),endDate=u13DateKey(end);
+  const [ownerResult,leadActivityResult,followupResult]=await Promise.all([
+    db.from(U6_OWNER_ACTIVITIES).select('*').gte('created_at',startIso).lte('created_at',endIso).like('activity_type','Scheduled:%').order('created_at'),
+    db.from('lead_activities').select('*').gte('created_at',startIso).lte('created_at',endIso).like('activity_type','Scheduled:%').order('created_at'),
+    db.from(LEADS_TABLE).select('id,name,project_inquired,follow_up_date,follow_up_time,reminder_type,reminder_note,status').gte('follow_up_date',startDate).lte('follow_up_date',endDate).order('follow_up_date').order('follow_up_time')
+  ]);
+  const firstError=ownerResult.error||leadActivityResult.error||followupResult.error;
+  if(firstError){grid.innerHTML=`<div class="empty">${escapeHtml(firstError.message)}</div>`;return}
+  const ownerActs=ownerResult.data||[],leadActs=leadActivityResult.data||[],followups=followupResult.data||[];
+  const ownerIds=[...new Set(ownerActs.map(x=>String(x.owner_id)).filter(Boolean))],leadIds=[...new Set(leadActs.map(x=>String(x.lead_id)).filter(Boolean))];
+  const [ownerRowsResult,leadRowsResult]=await Promise.all([
+    ownerIds.length?db.from(TABLE_NAME).select('*').in('id',ownerIds):Promise.resolve({data:[]}),
+    leadIds.length?db.from(LEADS_TABLE).select('id,name,project_inquired').in('id',leadIds):Promise.resolve({data:[]})
+  ]);
+  const ownerMap=Object.fromEntries((ownerRowsResult.data||[]).map(x=>[String(x.id),x]));
+  const leadMap=Object.fromEntries((leadRowsResult.data||[]).map(x=>[String(x.id),x]));
+  const events=[];
+  ownerActs.forEach(a=>{const row=ownerMap[String(a.owner_id)]||null;events.push({when:a.created_at,kind:'owner',row,leadId:null,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:row?.owner||'Owner',meta:`${row?.community||''} ${row?.cluster||''}${row?.unit?` · Unit ${row.unit}`:''}`.trim(),details:a.details||''})});
+  leadActs.forEach(a=>{const row=leadMap[String(a.lead_id)]||{};events.push({when:a.created_at,kind:'lead',row:null,leadId:a.lead_id,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:row.name||'Lead',meta:row.project_inquired||'',details:a.details||''})});
+  followups.forEach(f=>{const time=f.follow_up_time||'09:00';const when=`${f.follow_up_date}T${time}:00`;events.push({when,kind:'followup',row:null,leadId:f.id,type:f.reminder_type||'Follow-up',name:f.name||'Lead',meta:f.project_inquired||'',details:f.reminder_note||''})});
+  const dedup=new Map();events.forEach(e=>{const k=[e.kind,e.leadId||e.row?.id||'',new Date(e.when).getTime(),e.type,e.details].join('|');if(!dedup.has(k))dedup.set(k,e)});
+  const items=[...dedup.values()].sort((a,b)=>new Date(a.when)-new Date(b.when));
+  window.u13CalendarEvents=items;
+  const byDay={};items.forEach((e,index)=>{e.index=index;const k=u13DateKey(new Date(e.when));(byDay[k]||(byDay[k]=[])).push(e)});
+  const todayKey=u13DateKey(new Date());let html='';const cursor=new Date(start);
+  for(let i=0;i<42;i++){
+    const k=u13DateKey(cursor),dayItems=byDay[k]||[],other=cursor.getMonth()!==u13CalendarCursor.getMonth();
+    html+=`<div class="u13CalendarDay ${other?'other':''} ${k===todayKey?'today':''}"><div class="u13DayNumber">${cursor.getDate()}</div>${dayItems.slice(0,4).map(e=>`<button class="u13Event ${e.kind}" onclick="u13OpenCalendarEvent(window.u13CalendarEvents[${e.index}])" title="${escapeHtml(`${e.type} — ${e.name} — ${e.details}`)}"><b>${escapeHtml(u13EventTime(e.when))}</b> ${escapeHtml(e.type)} · ${escapeHtml(e.name)}</button>`).join('')}${dayItems.length>4?`<div class="u13More">+${dayItems.length-4} more</div>`:''}</div>`;
+    cursor.setDate(cursor.getDate()+1);
+  }
+  grid.innerHTML=html;
+  const future=items.filter(e=>new Date(e.when).getTime()>=Date.now()).slice(0,40);
+  if(upcoming)upcoming.innerHTML=future.length?future.map(e=>`<div class="u13UpcomingItem" onclick="u13OpenCalendarEvent(window.u13CalendarEvents[${e.index}])"><div class="u13UpcomingDate">${escapeHtml(u13EventDate(e.when))} · ${escapeHtml(u13EventTime(e.when))}</div><div class="u13UpcomingName">${escapeHtml(e.type)} — ${escapeHtml(e.name)}</div><div class="u13UpcomingMeta">${escapeHtml(e.meta)}${e.details?`<br>${escapeHtml(e.details)}`:''}</div></div>`).join(''):'<div class="empty">No upcoming events</div>';
+}
+'''
+          script_pos = text.rfind('</script>')
+          if script_pos == -1:
+              raise SystemExit('Closing script tag not found')
+          text = text[:script_pos] + js + text[script_pos:]
+          path.write_text(text, encoding='utf-8')
+      - name: Commit calendar fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Replace daily agenda with monthly calendar"
+          git push
