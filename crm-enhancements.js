@@ -1,15 +1,15 @@
 (()=>{
-  const VERSION='20260722-6';
+  const VERSION='20260722-7';
   const textOf=e=>(e?.textContent||'').trim().toLowerCase();
   const normalizeStatus=t=>String(t||'').trim().toLowerCase().replace(/\s+/g,' ');
   const pipelineOrder=['new','contacted','call back','interested','viewing','visit done','negotiation','won','lost'];
   let uiRefreshQueued=false;
   let badgeLoading=false;
-  let taskQueueLoading=false;
+  let reminderLoading=false;
 
-  function calendarUrl(){return `calendar.html?v=${VERSION}&t=${Date.now()}`}
-  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-  function fmtDateTime(v){return new Date(v).toLocaleString('en-AE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:true})}
+  function calendarUrl(range=''){const q=range?`&range=${encodeURIComponent(range)}`:'';return `calendar.html?v=${VERSION}&t=${Date.now()}${q}`}
+  function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+  function dayEnd(d){const x=new Date(d);x.setHours(23,59,59,999);return x}
 
   document.addEventListener('click',e=>{
     const target=e.target.closest('a,button');
@@ -31,8 +31,7 @@
     if(badgeLoading||typeof db==='undefined')return;
     badgeLoading=true;
     try{
-      const now=new Date(),start=new Date(now),end=new Date(now);
-      start.setHours(0,0,0,0);end.setHours(23,59,59,999);
+      const now=new Date(),start=dayStart(now),end=dayEnd(now);
       const [l,o]=await Promise.all([
         db.from('lead_activities').select('id',{count:'exact',head:true}).gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%'),
         db.from('owner_activities').select('id',{count:'exact',head:true}).gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%')
@@ -69,79 +68,54 @@
   }
 
   function findReminderRoot(){
-    const heading=[...document.querySelectorAll('h1,h2,h3,h4,div')].find(x=>['follow-up reminders','follow-up tasks'].includes(textOf(x)));
+    const heading=[...document.querySelectorAll('h1,h2,h3,h4,div')].find(x=>['follow-up reminders','follow-up tasks','calendar tasks'].includes(textOf(x)));
     if(!heading)return null;
     let node=heading;
     for(let i=0;i<7&&node;i++,node=node.parentElement){
       const t=(node.innerText||'').toLowerCase();
-      if((t.includes('overdue')&&t.includes('next 7 days'))||node.dataset.crmTaskQueue)return node;
+      if((t.includes('today')&&t.includes('next 7 days'))||node.dataset.crmReminderSummary)return node;
     }
     return heading.parentElement;
   }
 
   function manualEvents(){try{return JSON.parse(localStorage.getItem('usama_crm_manual_events')||'[]')}catch{return[]}}
-  function saveManualEvents(rows){localStorage.setItem('usama_crm_manual_events',JSON.stringify(rows))}
 
-  window.crmCompleteCalendarTask=async(table,id,type)=>{
-    if(!confirm('Mark this overdue item as done?'))return;
-    if(table==='manual'){
-      saveManualEvents(manualEvents().filter(x=>String(x.id)!==String(id)));
-    }else{
-      const cleanType=String(type||'Event').replace(/^Scheduled:\s*/,'');
-      const {error}=await db.from(table).update({activity_type:`Completed: ${cleanType}`}).eq('id',id);
-      if(error){alert(error.message);return}
-    }
-    await loadFollowupQueue();updateCalendarBadge();
-  };
-
-  function taskRow(e,overdue){
-    return `<div class="crmSimpleTask ${overdue?'overdue':'coming'}"><div class="crmSimpleWhen"><strong>${esc(fmtDateTime(e.when))}</strong><span>${overdue?'Overdue':'Coming up'}</span></div><div class="crmSimpleMain"><strong>${esc(e.type)} — ${esc(e.name)}</strong><span>${esc(e.detail||'')}</span></div><div class="crmSimpleActions"><a href="${calendarUrl()}">Open</a>${overdue?`<button class="done" onclick="window.crmCompleteCalendarTask('${esc(e.table)}','${esc(e.id)}','${esc(e.type)}')">Done</button>`:''}</div></div>`;
+  async function countScheduled(start,end){
+    const [l,o]=await Promise.all([
+      db.from('lead_activities').select('id',{count:'exact',head:true}).gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%'),
+      db.from('owner_activities').select('id',{count:'exact',head:true}).gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%')
+    ]);
+    if(l.error||o.error)throw(l.error||o.error);
+    const manual=manualEvents().filter(e=>{const d=new Date(e.when);return d>=start&&d<=end}).length;
+    return (l.count||0)+(o.count||0)+manual;
   }
 
-  async function loadFollowupQueue(){
-    if(taskQueueLoading||typeof db==='undefined')return;
+  async function loadReminderSummary(){
+    if(reminderLoading||typeof db==='undefined')return;
     const root=findReminderRoot();if(!root)return;
-    taskQueueLoading=true;root.dataset.crmTaskQueue='1';
-    root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>Overdue items and upcoming events.</p></div><button id="crmSimpleRefresh">Refresh</button></div><div class="crmTaskLoading">Loading calendar tasks…</div>`;
-    root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
+    reminderLoading=true;root.dataset.crmReminderSummary='1';
+    root.innerHTML='<div class="crmReminderLoading">Loading reminders…</div>';
     try{
       const now=new Date();
-      const start=new Date(now);start.setMonth(start.getMonth()-3);
-      const end=new Date(now);end.setMonth(end.getMonth()+6);
-      const [la,oa]=await Promise.all([
-        db.from('lead_activities').select('*').gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%').order('created_at'),
-        db.from('owner_activities').select('*').gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%').order('created_at')
+      const todayStart=dayStart(now),todayEnd=dayEnd(now);
+      const nextStart=new Date(todayEnd.getTime()+1);
+      const nextEnd=dayEnd(new Date(now.getFullYear(),now.getMonth(),now.getDate()+7));
+      const [todayCount,nextCount]=await Promise.all([
+        countScheduled(todayStart,todayEnd),
+        countScheduled(nextStart,nextEnd)
       ]);
-      if(la.error||oa.error)throw(la.error||oa.error);
-      const leadActs=la.data||[],ownerActs=oa.data||[];
-      const leadIds=[...new Set(leadActs.map(x=>x.lead_id).filter(Boolean))];
-      const ownerIds=[...new Set(ownerActs.map(x=>x.owner_id).filter(Boolean))];
-      const [lm,om]=await Promise.all([
-        leadIds.length?db.from('leads').select('id,name,project_inquired').in('id',leadIds):Promise.resolve({data:[]}),
-        ownerIds.length?db.from('owners').select('id,owner,community,cluster,unit').in('id',ownerIds):Promise.resolve({data:[]})
-      ]);
-      const leadMap=Object.fromEntries((lm.data||[]).map(x=>[String(x.id),x]));
-      const ownerMap=Object.fromEntries((om.data||[]).map(x=>[String(x.id),x]));
-      const events=[
-        ...leadActs.map(a=>{const p=leadMap[String(a.lead_id)]||{};return{id:a.id,table:'lead_activities',when:a.created_at,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:p.name||'Lead',detail:[p.project_inquired,a.details].filter(Boolean).join(' · ')}}),
-        ...ownerActs.map(a=>{const p=ownerMap[String(a.owner_id)]||{};return{id:a.id,table:'owner_activities',when:a.created_at,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:p.owner||'Owner',detail:[p.community,p.cluster,p.unit?`Unit ${p.unit}`:'',a.details].filter(Boolean).join(' · ')}}),
-        ...manualEvents().map(a=>({id:a.id,table:'manual',when:a.when,type:a.type||'Event',name:a.name||'Manual',detail:[a.title,a.details||a.location].filter(Boolean).join(' · ')}))
-      ].sort((a,b)=>new Date(a.when)-new Date(b.when));
-      const overdue=events.filter(e=>new Date(e.when)<now);
-      const coming=events.filter(e=>new Date(e.when)>=now);
-      root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>${overdue.length} overdue · ${coming.length} coming up</p></div><button id="crmSimpleRefresh">Refresh</button></div><div class="crmSimpleColumns"><section><div class="crmSimpleTitle overdueTitle"><span>Overdue</span><b>${overdue.length}</b></div><div class="crmSimpleList">${overdue.length?overdue.slice(0,8).map(e=>taskRow(e,true)).join(''):'<div class="crmTaskEmpty">No overdue items.</div>'}</div></section><section><div class="crmSimpleTitle comingTitle"><span>Coming Up</span><b>${coming.length}</b></div><div class="crmSimpleList">${coming.length?coming.slice(0,8).map(e=>taskRow(e,false)).join(''):'<div class="crmTaskEmpty">No upcoming events.</div>'}</div></section></div>`;
-      root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
+      root.innerHTML=`<div class="crmReminderHeader"><div><h2>Follow-up Reminders</h2><p>Quick view of your scheduled calendar activity.</p></div></div><div class="crmReminderCards"><article class="crmReminderCard today"><div><span>Today</span><strong>${todayCount}</strong></div><a href="${calendarUrl('today')}">View →</a></article><article class="crmReminderCard upcoming"><div><span>Next 7 Days</span><strong>${nextCount}</strong></div><a href="${calendarUrl('7days')}">View →</a></article></div>`;
     }catch(error){
-      root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>Could not load calendar events.</p></div><button id="crmSimpleRefresh">Retry</button></div><div class="crmTaskError">${esc(error.message||error)}</div>`;
-      root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
-    }finally{taskQueueLoading=false}
+      root.innerHTML=`<div class="crmReminderHeader"><div><h2>Follow-up Reminders</h2><p>Could not load calendar counts.</p></div><button id="crmReminderRetry">Retry</button></div>`;
+      root.querySelector('#crmReminderRetry').onclick=loadReminderSummary;
+    }finally{reminderLoading=false}
   }
 
   function queueUiRefresh(){
     if(uiRefreshQueued)return;uiRefreshQueued=true;
-    requestAnimationFrame(()=>{uiRefreshQueued=false;addScheduleEditLinks();styleAndOrderPipeline();const root=findReminderRoot();if(root&&!root.dataset.crmTaskQueue)loadFollowupQueue()});
+    requestAnimationFrame(()=>{uiRefreshQueued=false;addScheduleEditLinks();styleAndOrderPipeline();const root=findReminderRoot();if(root&&!root.dataset.crmReminderSummary)loadReminderSummary()});
   }
 
   const observer=new MutationObserver(queueUiRefresh);observer.observe(document.documentElement,{subtree:true,childList:true});
-  queueUiRefresh();setTimeout(updateCalendarBadge,1500);setTimeout(loadFollowupQueue,1800);setInterval(updateCalendarBadge,60000);setInterval(loadFollowupQueue,120000);
+  queueUiRefresh();setTimeout(updateCalendarBadge,1500);setTimeout(loadReminderSummary,1800);setInterval(updateCalendarBadge,60000);setInterval(loadReminderSummary,120000);
 })();
