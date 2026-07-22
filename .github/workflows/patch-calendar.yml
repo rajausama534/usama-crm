@@ -1,4 +1,4 @@
-name: Install Monthly CRM Calendar
+name: Install CRM Enhancements
 
 on:
   workflow_dispatch:
@@ -15,38 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Connect Calendar tab to monthly calendar
+      - name: Inject enhancement files into CRM
+        shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          python3 -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); css='<link rel=\"stylesheet\" href=\"crm-cleanup.css?v=2\">'; js='<script src=\"crm-enhancements.js?v=2\"></script>'; s=s if css in s else s.replace('</head>',css+'\\n</head>'); s=s if js in s else s.replace('</body>',js+'\\n</body>'); p.write_text(s)"
 
-          path = Path('index.html')
-          text = path.read_text(encoding='utf-8')
-          marker = '</script>'
-          patch = '''
-
-          /* Calendar tab fix: open the full monthly calendar page. */
-          showCalendarModule = async function(){
-            window.location.href = "calendar.html";
-          };
-          '''
-
-          if 'Calendar tab fix: open the full monthly calendar page.' not in text:
-              position = text.rfind(marker)
-              if position < 0:
-                  raise SystemExit('Closing script tag not found')
-              text = text[:position] + patch + text[position:]
-              path.write_text(text, encoding='utf-8')
-          PY
-
-      - name: Commit calendar fix
+      - name: Commit patched index
+        shell: bash
         run: |
-          if git diff --quiet; then
-            echo "Calendar fix already installed"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Connect CRM Calendar tab to monthly calendar"
+          git diff --cached --quiet || git commit -m "Connect premium calendar and clean lead layout"
           git push
