@@ -1,15 +1,26 @@
-/* Usama CRM clean layout patch */
-#leadsTable,#ownersTable{border-collapse:separate!important;border-spacing:0!important;width:100%!important}
+/* Usama CRM unified clean layout */
+#leadsTable,#ownersTable{border-collapse:separate!important;border-spacing:0!important;width:100%!important;table-layout:fixed!important}
 #leadsTable th,#leadsTable td,#ownersTable th,#ownersTable td{text-align:left!important;vertical-align:middle!important;border:0!important;border-bottom:1px solid rgba(148,163,184,.08)!important;padding:8px 10px!important;white-space:normal!important}
 #leadsTable th,#ownersTable th{height:44px!important;color:#91a0b5!important;font-size:11px!important;font-weight:700!important;letter-spacing:.25px!important;background:#07101a!important;position:sticky!important;top:0!important;z-index:2!important}
 #leadsTable td,#ownersTable td{height:52px!important;font-size:13px!important;color:#edf3fa!important;background:#050a11!important}
 #leadsTable tr:hover td,#ownersTable tr:hover td{background:#08121d!important}
 #leadsTable td:first-child,#leadsTable th:first-child,#ownersTable td:first-child,#ownersTable th:first-child{padding-left:14px!important}
+#leadsTable td,#leadsTable th{text-align:left!important}
+#leadsTable td:nth-child(1),#leadsTable th:nth-child(1){width:14%!important}
+#leadsTable td:nth-child(2),#leadsTable th:nth-child(2){width:13%!important}
+#leadsTable td:nth-child(3),#leadsTable th:nth-child(3){width:16%!important}
+#leadsTable td:nth-child(4),#leadsTable th:nth-child(4){width:9%!important}
+#leadsTable td:nth-child(5),#leadsTable th:nth-child(5){width:8%!important}
+#leadsTable td:nth-child(6),#leadsTable th:nth-child(6){width:12%!important}
+#leadsTable td:nth-child(7),#leadsTable th:nth-child(7){width:20%!important}
+#leadsTable td:nth-child(8),#leadsTable th:nth-child(8){width:8%!important}
 #leadsTable .profileBtn,#leadsTable .callBtn,#leadsTable .copyBtn,#leadsTable .waBtn,#leadsTable button,#ownersTable .profileBtn,#ownersTable .callBtn,#ownersTable .copyBtn,#ownersTable .waBtn{margin:2px 4px 2px 0!important;vertical-align:middle!important}
+#leadsTable td:last-child>div,#ownersTable td:last-child>div{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;flex-wrap:wrap!important}
 #leadsTable .remarksInput,#ownersTable .remarksInput{min-height:34px!important;max-height:74px!important;width:100%!important;text-align:left!important;padding:8px 9px!important;border-radius:8px!important}
 #leadsTable .remarkBox,#ownersTable .remarkBox{display:flex!important;align-items:flex-start!important;gap:6px!important;min-width:220px!important}
 #leadsTable .saveRemarkBtn,#ownersTable .saveRemarkBtn{position:static!important;flex:0 0 auto!important;margin:0!important;height:34px!important}
 #leadDetailModal .activityItem,#ownerProfileModal .activityItem,.activityTimeline>div{position:relative!important;padding-right:120px!important}
 .crmEditScheduleBtn{display:inline-flex;align-items:center;justify-content:center;margin-top:9px;padding:7px 10px;border-radius:8px;border:1px solid #31506e;background:#0b1724;color:#d9edff;font:600 11px Poppins,sans-serif;cursor:pointer}
 .crmEditScheduleBtn:hover{background:#10243a;border-color:#1687df}
-@media(max-width:760px){#leadsTable th,#leadsTable td,#ownersTable th,#ownersTable td{padding:7px 8px!important}.crmEditScheduleBtn{width:100%}}
+.crmCalendarBadge{position:absolute!important;top:7px!important;right:7px!important;min-width:19px!important;height:19px!important;padding:0 5px!important;border-radius:999px!important;background:#ef4444!important;color:#fff!important;font:700 10px Poppins,sans-serif!important;align-items:center!important;justify-content:center!important;line-height:1!important;box-shadow:0 0 0 2px #050a11!important;z-index:20!important}
+@media(max-width:760px){#leadsTable th,#leadsTable td,#ownersTable th,#ownersTable td{padding:7px 8px!important}.crmEditScheduleBtn{width:100%}#leadsTable{min-width:1100px!important}.crmCalendarBadge{top:4px!important;right:4px!important}}
