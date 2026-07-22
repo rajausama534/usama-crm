@@ -23,4 +23,15 @@
 .crmEditScheduleBtn{display:inline-flex;align-items:center;justify-content:center;margin-top:9px;padding:7px 10px;border-radius:8px;border:1px solid #31506e;background:#0b1724;color:#d9edff;font:600 11px Poppins,sans-serif;cursor:pointer}
 .crmEditScheduleBtn:hover{background:#10243a;border-color:#1687df}
 .crmCalendarBadge{position:absolute!important;top:7px!important;right:7px!important;min-width:19px!important;height:19px!important;padding:0 5px!important;border-radius:999px!important;background:#ef4444!important;color:#fff!important;font:700 10px Poppins,sans-serif!important;align-items:center!important;justify-content:center!important;line-height:1!important;box-shadow:0 0 0 2px #050a11!important;z-index:20!important}
-@media(max-width:760px){#leadsTable th,#leadsTable td,#ownersTable th,#ownersTable td{padding:7px 8px!important}.crmEditScheduleBtn{width:100%}#leadsTable{min-width:1100px!important}.crmCalendarBadge{top:4px!important;right:4px!important}}
+.crmPipelineOrdered{display:flex!important;align-items:center!important;gap:12px!important;flex-wrap:wrap!important}
+[data-crm-status]{transition:.16s!important}
+[data-crm-status="new"]{background:#111827!important;border-color:#374151!important;color:#d1d5db!important}
+[data-crm-status="contacted"]{background:#12263d!important;border-color:#4ea7ff!important;color:#bfe1ff!important}
+[data-crm-status="call-back"]{background:#3a2208!important;border-color:#f59e0b!important;color:#ffd48a!important}
+[data-crm-status="interested"]{background:#0f3523!important;border-color:#22c55e!important;color:#b8f7cb!important}
+[data-crm-status="viewing"]{background:#0c2f3b!important;border-color:#22d3ee!important;color:#bdf7ff!important}
+[data-crm-status="visit-done"]{background:#173d18!important;border-color:#7ed957!important;color:#d6ffc6!important}
+[data-crm-status="negotiation"]{background:#2f1b46!important;border-color:#a855f7!important;color:#e8c8ff!important}
+[data-crm-status="won"]{background:#0c382b!important;border-color:#10b981!important;color:#b7f7df!important}
+[data-crm-status="lost"]{background:#3a1519!important;border-color:#ef4444!important;color:#ffc5ca!important}
+@media(max-width:760px){#leadsTable th,#leadsTable td,#ownersTable th,#ownersTable td{padding:7px 8px!important}.crmEditScheduleBtn{width:100%}#leadsTable{min-width:1100px!important}.crmCalendarBadge{top:4px!important;right:4px!important}.crmPipelineOrdered{gap:8px!important}}
