@@ -1,5 +1,5 @@
 (()=>{
-  const VERSION='20260722-7';
+  const VERSION='20260722-8';
   const textOf=e=>(e?.textContent||'').trim().toLowerCase();
   const normalizeStatus=t=>String(t||'').trim().toLowerCase().replace(/\s+/g,' ');
   const pipelineOrder=['new','contacted','call back','interested','viewing','visit done','negotiation','won','lost'];
@@ -71,11 +71,35 @@
     const heading=[...document.querySelectorAll('h1,h2,h3,h4,div')].find(x=>['follow-up reminders','follow-up tasks','calendar tasks'].includes(textOf(x)));
     if(!heading)return null;
     let node=heading;
-    for(let i=0;i<7&&node;i++,node=node.parentElement){
+    for(let i=0;i<9&&node;i++,node=node.parentElement){
       const t=(node.innerText||'').toLowerCase();
-      if((t.includes('today')&&t.includes('next 7 days'))||node.dataset.crmReminderSummary)return node;
+      if(node.dataset.crmReminderSummary)return node;
+      if(t.includes('follow-up reminders')&&t.includes('overdue')&&t.includes('next 7 days'))return node;
     }
     return heading.parentElement;
+  }
+
+  function hideLegacyReminderUi(root){
+    const legacyPattern=/^(overdue|today|next\s*7\s*days)\s*:\s*\d+/i;
+    [...document.querySelectorAll('div,section,article')].forEach(node=>{
+      if(root&&root.contains(node))return;
+      const own=(node.childNodes.length===1?node.textContent:(node.firstChild?.textContent||'')).trim();
+      if(!legacyPattern.test(own))return;
+      let card=node;
+      for(let i=0;i<4&&card.parentElement;i++){
+        const txt=(card.innerText||'').trim();
+        if(txt.length<160&&/(nothing due|overdue|today|next 7 days)/i.test(txt))card=card.parentElement;
+        else break;
+      }
+      card.style.display='none';
+      card.dataset.crmLegacyReminderHidden='1';
+    });
+    [...document.querySelectorAll('button')].forEach(btn=>{
+      if(root&&root.contains(btn))return;
+      if(textOf(btn)!=='refresh')return;
+      const area=btn.closest('section,article,div');
+      if(area&&/follow-up reminders|overdue|next 7 days/i.test(area.innerText||''))btn.style.display='none';
+    });
   }
 
   function manualEvents(){try{return JSON.parse(localStorage.getItem('usama_crm_manual_events')||'[]')}catch{return[]}}
@@ -105,15 +129,17 @@
         countScheduled(nextStart,nextEnd)
       ]);
       root.innerHTML=`<div class="crmReminderHeader"><div><h2>Follow-up Reminders</h2><p>Quick view of your scheduled calendar activity.</p></div></div><div class="crmReminderCards"><article class="crmReminderCard today"><div><span>Today</span><strong>${todayCount}</strong></div><a href="${calendarUrl('today')}">View →</a></article><article class="crmReminderCard upcoming"><div><span>Next 7 Days</span><strong>${nextCount}</strong></div><a href="${calendarUrl('7days')}">View →</a></article></div>`;
+      hideLegacyReminderUi(root);
     }catch(error){
       root.innerHTML=`<div class="crmReminderHeader"><div><h2>Follow-up Reminders</h2><p>Could not load calendar counts.</p></div><button id="crmReminderRetry">Retry</button></div>`;
       root.querySelector('#crmReminderRetry').onclick=loadReminderSummary;
+      hideLegacyReminderUi(root);
     }finally{reminderLoading=false}
   }
 
   function queueUiRefresh(){
     if(uiRefreshQueued)return;uiRefreshQueued=true;
-    requestAnimationFrame(()=>{uiRefreshQueued=false;addScheduleEditLinks();styleAndOrderPipeline();const root=findReminderRoot();if(root&&!root.dataset.crmReminderSummary)loadReminderSummary()});
+    requestAnimationFrame(()=>{uiRefreshQueued=false;addScheduleEditLinks();styleAndOrderPipeline();const root=findReminderRoot();if(root&&!root.dataset.crmReminderSummary)loadReminderSummary();else hideLegacyReminderUi(root)});
   }
 
   const observer=new MutationObserver(queueUiRefresh);observer.observe(document.documentElement,{subtree:true,childList:true});
