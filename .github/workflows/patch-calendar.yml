@@ -20,23 +20,31 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
+
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          css='<link rel="stylesheet" href="crm-cleanup.css?v=3">'
-          js='<script src="crm-enhancements.js?v=3"></script>'
-          import re
+          css='<link rel="stylesheet" href="crm-cleanup.css?v=4">'
+          js='<script src="crm-enhancements.js?v=4"></script>'
           s=re.sub(r'<link rel="stylesheet" href="crm-cleanup\.css\?v=\d+">',css,s)
           s=re.sub(r'<script src="crm-enhancements\.js\?v=\d+"></script>',js,s)
           if css not in s:s=s.replace('</head>',css+'\n</head>')
           if js not in s:s=s.replace('</body>',js+'\n</body>')
           p.write_text(s,encoding='utf-8')
+
+          c=Path('calendar.html')
+          cs=c.read_text(encoding='utf-8')
+          hotfix='<script src="calendar-save-hotfix.js?v=1"></script>'
+          cs=re.sub(r'<script src="calendar-save-hotfix\.js\?v=\d+"></script>','',cs)
+          cs=cs.replace('</body>',hotfix+'\n</body>')
+          c.write_text(cs,encoding='utf-8')
           PY
 
-      - name: Commit patched index
+      - name: Commit patched files
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git diff --cached --quiet || git commit -m "Deploy CRM calendar and lead layout refinements"
+          git add index.html calendar.html
+          git diff --cached --quiet || git commit -m "Deploy calendar save hotfix"
           git push
