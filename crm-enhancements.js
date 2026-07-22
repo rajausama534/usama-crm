@@ -1,5 +1,5 @@
 (()=>{
-  const VERSION='20260722-5';
+  const VERSION='20260722-6';
   const textOf=e=>(e?.textContent||'').trim().toLowerCase();
   const normalizeStatus=t=>String(t||'').trim().toLowerCase().replace(/\s+/g,' ');
   const pipelineOrder=['new','contacted','call back','interested','viewing','visit done','negotiation','won','lost'];
@@ -9,18 +9,14 @@
 
   function calendarUrl(){return `calendar.html?v=${VERSION}&t=${Date.now()}`}
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-  function digits(v){return String(v||'').replace(/\D/g,'')}
-  function formatTime(v){if(!v)return'';const [h,m]=String(v).split(':');const d=new Date();d.setHours(Number(h)||0,Number(m)||0,0,0);return d.toLocaleTimeString('en-AE',{hour:'2-digit',minute:'2-digit',hour12:true})}
-  function isoDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  function fmtDateTime(v){return new Date(v).toLocaleString('en-AE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:true})}
 
   document.addEventListener('click',e=>{
     const target=e.target.closest('a,button');
     if(!target)return;
     const label=textOf(target).replace(/\d+/g,'').trim();
     if(label==='calendar'||target.getAttribute('data-module')==='calendar'){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      location.href=calendarUrl();
+      e.preventDefault();e.stopImmediatePropagation();location.href=calendarUrl();
     }
   },true);
 
@@ -45,9 +41,7 @@
       calendarTargets().forEach(target=>{
         let badge=target.querySelector(':scope > .crmCalendarBadge');
         if(!badge){badge=document.createElement('span');badge.className='crmCalendarBadge';target.style.position='relative';target.appendChild(badge)}
-        const next=count>99?'99+':String(count);
-        if(badge.textContent!==next)badge.textContent=next;
-        badge.style.display=count?'inline-flex':'none';
+        badge.textContent=count>99?'99+':String(count);badge.style.display=count?'inline-flex':'none';
       });
     }catch(error){console.warn('Calendar badge:',error)}finally{badgeLoading=false}
   }
@@ -75,82 +69,72 @@
   }
 
   function findReminderRoot(){
-    const heading=[...document.querySelectorAll('h1,h2,h3,h4,div')].find(x=>textOf(x)==='follow-up reminders');
+    const heading=[...document.querySelectorAll('h1,h2,h3,h4,div')].find(x=>['follow-up reminders','follow-up tasks'].includes(textOf(x)));
     if(!heading)return null;
     let node=heading;
-    for(let i=0;i<6&&node;i++,node=node.parentElement){
+    for(let i=0;i<7&&node;i++,node=node.parentElement){
       const t=(node.innerText||'').toLowerCase();
-      if(t.includes('overdue')&&t.includes('next 7 days'))return node;
+      if((t.includes('overdue')&&t.includes('next 7 days'))||node.dataset.crmTaskQueue)return node;
     }
     return heading.parentElement;
   }
 
-  function ensureRescheduleModal(){
-    if(document.getElementById('crmRescheduleBack'))return;
-    const wrap=document.createElement('div');wrap.id='crmRescheduleBack';wrap.className='crmRescheduleBack';
-    wrap.innerHTML=`<div class="crmRescheduleModal"><div class="crmRescheduleHead"><strong>Reschedule Follow-up</strong><button type="button" onclick="window.crmCloseReschedule()">×</button></div><div class="crmRescheduleBody"><input id="crmRescheduleLeadId" type="hidden"><label>Date<input id="crmRescheduleDate" type="date"></label><label>Time<input id="crmRescheduleTime" type="time"></label><label>Reminder type<select id="crmRescheduleType"><option>Call</option><option>Meeting</option><option>Viewing</option><option>Follow-up</option><option>Task</option></select></label><label>Note<input id="crmRescheduleNote" placeholder="What needs to be done?"></label><div class="crmRescheduleActions"><button type="button" onclick="window.crmCloseReschedule()">Cancel</button><button class="primary" type="button" onclick="window.crmSaveReschedule()">Save</button></div></div></div>`;
-    document.body.appendChild(wrap);
-  }
+  function manualEvents(){try{return JSON.parse(localStorage.getItem('usama_crm_manual_events')||'[]')}catch{return[]}}
+  function saveManualEvents(rows){localStorage.setItem('usama_crm_manual_events',JSON.stringify(rows))}
 
-  window.crmCloseReschedule=()=>document.getElementById('crmRescheduleBack')?.classList.remove('show');
-  window.crmOpenReschedule=(id,date,time,type,note)=>{
-    ensureRescheduleModal();
-    document.getElementById('crmRescheduleLeadId').value=id;
-    document.getElementById('crmRescheduleDate').value=date||isoDate(new Date());
-    document.getElementById('crmRescheduleTime').value=(time||'10:00').slice(0,5);
-    document.getElementById('crmRescheduleType').value=type||'Call';
-    document.getElementById('crmRescheduleNote').value=note||'';
-    document.getElementById('crmRescheduleBack').classList.add('show');
-  };
-  window.crmSaveReschedule=async()=>{
-    const id=document.getElementById('crmRescheduleLeadId').value;
-    const payload={follow_up_date:document.getElementById('crmRescheduleDate').value,follow_up_time:document.getElementById('crmRescheduleTime').value,reminder_type:document.getElementById('crmRescheduleType').value,reminder_note:document.getElementById('crmRescheduleNote').value.trim()};
-    const {error}=await db.from('leads').update(payload).eq('id',id);
-    if(error){alert(error.message);return}
-    window.crmCloseReschedule();await loadFollowupQueue();
-  };
-  window.crmMarkFollowupDone=async id=>{
-    if(!confirm('Mark this follow-up as completed?'))return;
-    const {error}=await db.from('leads').update({follow_up_date:null,follow_up_time:null,reminder_type:null,reminder_note:null}).eq('id',id);
-    if(error){alert(error.message);return}
-    await loadFollowupQueue();
-  };
-  window.crmOpenLead=id=>{
-    try{
-      if(typeof showLeadsView==='function')Promise.resolve(showLeadsView()).then(()=>{if(typeof openLeadDetail==='function')openLeadDetail(String(id))});
-      else if(typeof openLeadDetail==='function')openLeadDetail(String(id));
-    }catch(e){console.warn(e)}
+  window.crmCompleteCalendarTask=async(table,id,type)=>{
+    if(!confirm('Mark this overdue item as done?'))return;
+    if(table==='manual'){
+      saveManualEvents(manualEvents().filter(x=>String(x.id)!==String(id)));
+    }else{
+      const cleanType=String(type||'Event').replace(/^Scheduled:\s*/,'');
+      const {error}=await db.from(table).update({activity_type:`Completed: ${cleanType}`}).eq('id',id);
+      if(error){alert(error.message);return}
+    }
+    await loadFollowupQueue();updateCalendarBadge();
   };
 
-  function taskCard(row,bucket){
-    const phone=digits(row.phone||row.mobile||row.contact||row.phone_number);
-    const wa=phone?`https://wa.me/${phone}`:'#';
-    const dateLabel=bucket==='overdue'?'Overdue':bucket==='today'?'Today':new Date(`${row.follow_up_date}T00:00:00`).toLocaleDateString('en-AE',{weekday:'short',day:'numeric',month:'short'});
-    const meta=[row.reminder_type||'Follow-up',row.project_inquired||'',row.reminder_note||''].filter(Boolean).join(' · ');
-    return `<div class="crmTaskRow ${bucket}"><div class="crmTaskTime"><strong>${esc(formatTime(row.follow_up_time)||'Any time')}</strong><span>${esc(dateLabel)}</span></div><div class="crmTaskMain"><strong>${esc(row.name||'Unnamed lead')}</strong><span>${esc(meta||'Follow-up required')}</span></div><div class="crmTaskActions">${phone?`<a href="tel:+${phone}">Call</a><a class="wa" target="_blank" href="${wa}">WhatsApp</a>`:''}<button onclick="window.crmOpenLead('${esc(row.id)}')">Open</button><button onclick="window.crmOpenReschedule('${esc(row.id)}','${esc(row.follow_up_date||'')}','${esc(row.follow_up_time||'')}','${esc(row.reminder_type||'Call')}','${esc(row.reminder_note||'')}')">Reschedule</button><button class="done" onclick="window.crmMarkFollowupDone('${esc(row.id)}')">Done</button></div></div>`;
+  function taskRow(e,overdue){
+    return `<div class="crmSimpleTask ${overdue?'overdue':'coming'}"><div class="crmSimpleWhen"><strong>${esc(fmtDateTime(e.when))}</strong><span>${overdue?'Overdue':'Coming up'}</span></div><div class="crmSimpleMain"><strong>${esc(e.type)} — ${esc(e.name)}</strong><span>${esc(e.detail||'')}</span></div><div class="crmSimpleActions"><a href="${calendarUrl()}">Open</a>${overdue?`<button class="done" onclick="window.crmCompleteCalendarTask('${esc(e.table)}','${esc(e.id)}','${esc(e.type)}')">Done</button>`:''}</div></div>`;
   }
 
   async function loadFollowupQueue(){
     if(taskQueueLoading||typeof db==='undefined')return;
     const root=findReminderRoot();if(!root)return;
-    taskQueueLoading=true;
-    root.dataset.crmTaskQueue='1';
-    root.innerHTML=`<div class="crmTaskHeader"><div><h2>Follow-up Tasks</h2><p>Calls, meetings and reminders that need action.</p></div><button id="crmTaskRefresh">Refresh</button></div><div class="crmTaskLoading">Loading follow-ups…</div>`;
-    root.querySelector('#crmTaskRefresh').onclick=loadFollowupQueue;
+    taskQueueLoading=true;root.dataset.crmTaskQueue='1';
+    root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>Overdue items and upcoming events.</p></div><button id="crmSimpleRefresh">Refresh</button></div><div class="crmTaskLoading">Loading calendar tasks…</div>`;
+    root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
     try{
-      const today=isoDate(new Date()),future=new Date();future.setDate(future.getDate()+7);const end=isoDate(future);
-      const {data,error}=await db.from('leads').select('*').not('follow_up_date','is',null).lte('follow_up_date',end).order('follow_up_date').order('follow_up_time');
-      if(error)throw error;
-      const rows=(data||[]).map(r=>({...r,bucket:r.follow_up_date<today?'overdue':r.follow_up_date===today?'today':'upcoming'}));
-      const counts={overdue:rows.filter(r=>r.bucket==='overdue').length,today:rows.filter(r=>r.bucket==='today').length,upcoming:rows.filter(r=>r.bucket==='upcoming').length};
-      root.innerHTML=`<div class="crmTaskHeader"><div><h2>Follow-up Tasks</h2><p>Calls, meetings and reminders that need action.</p></div><button id="crmTaskRefresh">Refresh</button></div><div class="crmTaskSummary"><button data-filter="all" class="active">All <b>${rows.length}</b></button><button data-filter="overdue">Overdue <b>${counts.overdue}</b></button><button data-filter="today">Today <b>${counts.today}</b></button><button data-filter="upcoming">Next 7 Days <b>${counts.upcoming}</b></button></div><div id="crmTaskList" class="crmTaskList">${rows.length?rows.map(r=>taskCard(r,r.bucket)).join(''):'<div class="crmTaskEmpty">No pending follow-ups.</div>'}</div>`;
-      root.querySelector('#crmTaskRefresh').onclick=loadFollowupQueue;
-      root.querySelectorAll('.crmTaskSummary button').forEach(btn=>btn.onclick=()=>{
-        root.querySelectorAll('.crmTaskSummary button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
-        const f=btn.dataset.filter;root.querySelectorAll('.crmTaskRow').forEach(row=>row.style.display=f==='all'||row.classList.contains(f)?'grid':'none');
-      });
-    }catch(error){root.innerHTML=`<div class="crmTaskHeader"><div><h2>Follow-up Tasks</h2><p>Could not load reminders.</p></div><button id="crmTaskRefresh">Retry</button></div><div class="crmTaskError">${esc(error.message||error)}</div>`;root.querySelector('#crmTaskRefresh').onclick=loadFollowupQueue}
-    finally{taskQueueLoading=false}
+      const now=new Date();
+      const start=new Date(now);start.setMonth(start.getMonth()-3);
+      const end=new Date(now);end.setMonth(end.getMonth()+6);
+      const [la,oa]=await Promise.all([
+        db.from('lead_activities').select('*').gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%').order('created_at'),
+        db.from('owner_activities').select('*').gte('created_at',start.toISOString()).lte('created_at',end.toISOString()).like('activity_type','Scheduled:%').order('created_at')
+      ]);
+      if(la.error||oa.error)throw(la.error||oa.error);
+      const leadActs=la.data||[],ownerActs=oa.data||[];
+      const leadIds=[...new Set(leadActs.map(x=>x.lead_id).filter(Boolean))];
+      const ownerIds=[...new Set(ownerActs.map(x=>x.owner_id).filter(Boolean))];
+      const [lm,om]=await Promise.all([
+        leadIds.length?db.from('leads').select('id,name,project_inquired').in('id',leadIds):Promise.resolve({data:[]}),
+        ownerIds.length?db.from('owners').select('id,owner,community,cluster,unit').in('id',ownerIds):Promise.resolve({data:[]})
+      ]);
+      const leadMap=Object.fromEntries((lm.data||[]).map(x=>[String(x.id),x]));
+      const ownerMap=Object.fromEntries((om.data||[]).map(x=>[String(x.id),x]));
+      const events=[
+        ...leadActs.map(a=>{const p=leadMap[String(a.lead_id)]||{};return{id:a.id,table:'lead_activities',when:a.created_at,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:p.name||'Lead',detail:[p.project_inquired,a.details].filter(Boolean).join(' · ')}}),
+        ...ownerActs.map(a=>{const p=ownerMap[String(a.owner_id)]||{};return{id:a.id,table:'owner_activities',when:a.created_at,type:String(a.activity_type||'').replace('Scheduled: ','')||'Event',name:p.owner||'Owner',detail:[p.community,p.cluster,p.unit?`Unit ${p.unit}`:'',a.details].filter(Boolean).join(' · ')}}),
+        ...manualEvents().map(a=>({id:a.id,table:'manual',when:a.when,type:a.type||'Event',name:a.name||'Manual',detail:[a.title,a.details||a.location].filter(Boolean).join(' · ')}))
+      ].sort((a,b)=>new Date(a.when)-new Date(b.when));
+      const overdue=events.filter(e=>new Date(e.when)<now);
+      const coming=events.filter(e=>new Date(e.when)>=now);
+      root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>${overdue.length} overdue · ${coming.length} coming up</p></div><button id="crmSimpleRefresh">Refresh</button></div><div class="crmSimpleColumns"><section><div class="crmSimpleTitle overdueTitle"><span>Overdue</span><b>${overdue.length}</b></div><div class="crmSimpleList">${overdue.length?overdue.slice(0,8).map(e=>taskRow(e,true)).join(''):'<div class="crmTaskEmpty">No overdue items.</div>'}</div></section><section><div class="crmSimpleTitle comingTitle"><span>Coming Up</span><b>${coming.length}</b></div><div class="crmSimpleList">${coming.length?coming.slice(0,8).map(e=>taskRow(e,false)).join(''):'<div class="crmTaskEmpty">No upcoming events.</div>'}</div></section></div>`;
+      root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
+    }catch(error){
+      root.innerHTML=`<div class="crmSimpleHeader"><div><h2>Calendar Tasks</h2><p>Could not load calendar events.</p></div><button id="crmSimpleRefresh">Retry</button></div><div class="crmTaskError">${esc(error.message||error)}</div>`;
+      root.querySelector('#crmSimpleRefresh').onclick=loadFollowupQueue;
+    }finally{taskQueueLoading=false}
   }
 
   function queueUiRefresh(){
