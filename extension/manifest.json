@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Usama CRM Unit Finder",
+  "version": "1.0.0",
+  "description": "Extract listing details from Bayut, Dubizzle and Property Finder and send them to Usama CRM.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://www.bayut.com/*",
+    "https://dubai.dubizzle.com/*",
+    "https://www.propertyfinder.ae/*",
+    "https://usama-crm.vercel.app/*"
+  ],
+  "action": {
+    "default_title": "Usama CRM Unit Finder",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bayut.com/*",
+        "https://dubai.dubizzle.com/*",
+        "https://www.propertyfinder.ae/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
