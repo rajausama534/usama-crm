@@ -62,13 +62,49 @@
     }
   }
 
-  const timer=setInterval(()=>{
+  function openUnitFinder(){ location.href='unit-finder.html'; }
+
+  function addUnitFinderEntry(){
+    if(document.querySelector('[data-unit-finder-entry]'))return true;
+
+    const launcher=document.querySelector('.crmAppLauncher');
+    if(launcher){
+      const tile=document.createElement('button');
+      tile.type='button';
+      tile.className='crmAppTile';
+      tile.dataset.unitFinderEntry='home';
+      tile.innerHTML=`<span class="crmAppIcon" style="display:grid;place-items:center;font-size:48px;color:#27c8bc">⌖</span><span>Unit Finder</span>`;
+      tile.addEventListener('click',openUnitFinder);
+      launcher.appendChild(tile);
+    }
+
+    const nav=document.querySelector('.v7Nav');
+    if(nav&&!nav.querySelector('[data-unit-finder-entry]')){
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.dataset.unitFinderEntry='nav';
+      btn.textContent='Unit Finder';
+      btn.addEventListener('click',openUnitFinder);
+      nav.appendChild(btn);
+    }
+
+    return Boolean(document.querySelector('[data-unit-finder-entry]'));
+  }
+
+  const migrationTimer=setInterval(()=>{
     if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){
-      clearInterval(timer);
+      clearInterval(migrationTimer);
       runMigration();
     }
   },1000);
-  setTimeout(()=>clearInterval(timer),120000);
+  setTimeout(()=>clearInterval(migrationTimer),120000);
 
-  console.info('Usama CRM stability patch and Farm Gardens 2 migration loaded.');
+  let attempts=0;
+  const uiTimer=setInterval(()=>{
+    attempts++;
+    const added=addUnitFinderEntry();
+    if((added&&attempts>5)||attempts>60)clearInterval(uiTimer);
+  },500);
+
+  console.info('Usama CRM stability patch, Unit Finder entry and Farm Gardens 2 migration loaded.');
 })();
