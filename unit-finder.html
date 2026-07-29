@@ -13,9 +13,9 @@
 <body>
 <header class="top"><div class="brand">Usama <span>CRM</span> · Unit Finder</div><a class="back" href="/">Back to CRM</a></header>
 <main class="wrap">
-<section class="hero"><h1>Find listing details</h1><p>Paste a Bayut property link. Confirm the unit once and the CRM will remember it for future searches.</p></section>
-<section class="search"><input id="url" placeholder="https://www.bayut.com/property/details-...html"><button id="analyse" onclick="analyse()">Analyse Listing</button></section>
-<div id="status" class="status">Bayut property-details links are supported.</div>
+<section class="hero"><h1>Find listing details</h1><p>Paste a listing link or use the Chrome extension. Confirm the unit once and the CRM will remember it for future searches.</p></section>
+<section class="search"><input id="url" placeholder="Bayut, Dubizzle or Property Finder listing link"><button id="analyse" onclick="analyse()">Analyse Listing</button></section>
+<div id="status" class="status">Bayut property-details links are supported. The extension can also read Dubizzle and Property Finder pages.</div>
 <section id="result" class="result"><div class="resultHead"><strong>Listing Result</strong><span class="badge" id="badge">EXTRACTED</span></div><div id="grid" class="grid"></div><div id="resolver" class="resolver"></div><div class="mapping"><h3>Confirm and save unit mapping</h3><p>Enter the confirmed unit details. The next time this listing ID is searched, the saved unit appears instantly.</p><div class="mappingRow"><input id="mapUnit" placeholder="Unit number"><input id="mapProperty" placeholder="Property number"><input id="mapLand" placeholder="Land number"><button class="saveBtn" onclick="saveMapping()">Save Mapping</button></div><div id="saveMsg" class="saveMsg"></div></div></section>
 </main>
 <script>
@@ -29,27 +29,27 @@ function setMappings(value){localStorage.setItem(MAP_KEY,JSON.stringify(value))}
 function savedFor(id){return id?getMappings()[String(id)]||null:null}
 function render(d){
  const saved=savedFor(d.listingId);
- if(saved){d={...d,...saved};document.getElementById('badge').textContent='SAVED MATCH'}else document.getElementById('badge').textContent='EXTRACTED';
+ if(saved){d={...d,...saved};document.getElementById('badge').textContent='SAVED MATCH'}else document.getElementById('badge').textContent=d.source==='browser-extension'?'PAGE EXTRACTED':'EXTRACTED';
  currentData=d;
  document.getElementById('grid').innerHTML=[
-  cell('Listing ID',d.listingId),cell('Permit Number',d.permitNumber),cell('Reference',d.referenceNumber),
-  cell('Project',d.project),cell('Building',d.building),cell('Area',d.area),
-  cell('Bedrooms',d.bedrooms&&Number(d.bedrooms)>0?`${d.bedrooms} BR`:'-'),cell('Bathrooms',d.bathrooms),cell('Size',d.sizeSqft?`${Number(d.sizeSqft).toLocaleString('en-US')} sq ft`:'-'),
-  cell('Price',money(d.price)),cell('Agency',d.agency),cell('Broker',d.broker),
-  cell('Unit Number',d.unitNumber),cell('Property Number',d.propertyNumber),cell('Land Number',d.landNumber)
+  cell('Platform',d.platform),cell('Listing ID',d.listingId),cell('Permit Number',d.permitNumber),
+  cell('Reference',d.referenceNumber),cell('Project',d.project),cell('Building',d.building),
+  cell('Area',d.area),cell('Bedrooms',d.bedrooms&&Number(d.bedrooms)>0?`${d.bedrooms} BR`:'-'),cell('Bathrooms',d.bathrooms),
+  cell('Size',d.sizeSqft?`${Number(d.sizeSqft).toLocaleString('en-US')} sq ft`:'-'),cell('Price',money(d.price)),cell('Agency',d.agency),
+  cell('Broker',d.broker),cell('Unit Number',d.unitNumber),cell('Property Number',d.propertyNumber),cell('Land Number',d.landNumber)
  ].join('');
  document.getElementById('mapUnit').value=d.unitNumber||'';
  document.getElementById('mapProperty').value=d.propertyNumber||'';
  document.getElementById('mapLand').value=d.landNumber||'';
- document.getElementById('resolver').textContent=saved?'Saved CRM mapping found for this listing ID.':(d.note||'Exact unit number requires confirmation or an authorised resolver.');
+ document.getElementById('resolver').textContent=saved?'Saved CRM mapping found for this listing ID.':(d.note||'Page details extracted. Confirm the exact unit once to save the mapping.');
  document.getElementById('result').classList.add('show');
 }
 async function analyse(){
  const url=document.getElementById('url').value.trim(),btn=document.getElementById('analyse'),status=document.getElementById('status'),result=document.getElementById('result');
- if(!url){status.innerHTML='<span class="error">Paste a Bayut listing link.</span>';return}
- const listingId=url.match(/details-(\d+)\.html/i)?.[1]||null;
+ if(!url){status.innerHTML='<span class="error">Paste a listing link.</span>';return}
+ const listingId=url.match(/details-(\d+)\.html/i)?.[1]||url.match(/-(\d{6,})\/?(?:\?|$)/)?.[1]||null;
  const cached=savedFor(listingId);
- if(cached){render({listingId,platform:'Bayut',...cached,note:'Saved CRM mapping found.'});status.textContent='Saved unit mapping loaded.';return}
+ if(cached){render({listingId,url,platform:url.includes('dubizzle')?'Dubizzle':url.includes('propertyfinder')?'Property Finder':'Bayut',...cached,note:'Saved CRM mapping found.'});status.textContent='Saved unit mapping loaded.';return}
  btn.disabled=true;btn.textContent='Checking…';status.textContent='Reading the listing…';result.classList.remove('show');
  try{
   const r=await fetch('/api/unit-finder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
@@ -67,7 +67,21 @@ function saveMapping(){
  all[String(currentData.listingId)]={unitNumber:unit||null,propertyNumber:property||null,landNumber:land||null,permitNumber:currentData.permitNumber||null,project:currentData.project||null,building:currentData.building||null,area:currentData.area||null,savedAt:new Date().toISOString()};
  setMappings(all);render({...currentData,...all[String(currentData.listingId)]});status.textContent='Mapping saved. Future searches for this listing will show the saved unit instantly.';
 }
+function loadExtensionPayload(){
+ const prefix='#extension=';
+ if(!location.hash.startsWith(prefix))return;
+ try{
+  const raw=decodeURIComponent(location.hash.slice(prefix.length));
+  const json=decodeURIComponent(escape(atob(raw)));
+  const data=JSON.parse(json);
+  document.getElementById('url').value=data.url||'';
+  render({...data,note:'Listing details were read directly from the open portal page by the Chrome extension.'});
+  document.getElementById('status').textContent='Listing imported from Chrome extension.';
+  history.replaceState(null,'',location.pathname);
+ }catch(error){document.getElementById('status').innerHTML=`<span class="error">Could not read extension data: ${esc(error.message)}</span>`}
+}
 document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')analyse()});
+loadExtensionPayload();
 </script>
 </body>
 </html>
