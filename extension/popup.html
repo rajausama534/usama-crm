@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Usama Unit Finder</title>
+<style>
+:root{--bg:#05080d;--panel:#0b131e;--line:#223041;--text:#f2f6fb;--muted:#93a3b7;--blue:#1177df;--teal:#0da99f;--red:#ff7f88}
+*{box-sizing:border-box}body{margin:0;width:380px;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}.head{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:18px}.head span{color:#2f8eea}.main{padding:16px}.status{color:var(--muted);font-size:12px;line-height:1.45;margin-bottom:12px}.btn{width:100%;height:44px;border:0;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--blue),var(--teal))}.btn.secondary{margin-top:9px;background:#0b111b;border:1px solid var(--line)}.grid{display:none;margin-top:14px;border:1px solid var(--line);border-radius:11px;overflow:hidden}.grid.show{display:grid;grid-template-columns:1fr 1fr}.item{padding:11px;background:var(--panel);border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:62px}.item:nth-child(2n){border-right:0}.label{color:var(--muted);font-size:10px;text-transform:uppercase;font-weight:700;margin-bottom:5px}.value{font-weight:700;word-break:break-word}.error{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="head">Usama <span>CRM</span> · Unit Finder</div>
+<div class="main">
+<div id="status" class="status">Open a Bayut, Dubizzle, or Property Finder listing, then click Extract.</div>
+<button id="extract" class="btn">Extract Current Listing</button>
+<div id="grid" class="grid"></div>
+<button id="open" class="btn secondary" disabled>Open in CRM</button>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
