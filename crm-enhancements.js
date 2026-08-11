@@ -142,32 +142,53 @@
   window.markOwnerContacted=markOwnerContacted;
 
   function openUnitFinder(){ location.href='unit-finder.html'; }
+  function openOwnerFinder(){ location.href='owner-finder.html'; }
 
-  function addUnitFinderEntry(){
-    if(document.querySelector('[data-unit-finder-entry]'))return true;
-
+  function addFinderEntries(){
     const launcher=document.querySelector('.crmAppLauncher');
     if(launcher){
-      const tile=document.createElement('button');
-      tile.type='button';
-      tile.className='crmAppTile';
-      tile.dataset.unitFinderEntry='home';
-      tile.innerHTML=`<span class="crmAppIcon" style="display:grid;place-items:center;font-size:48px;color:#27c8bc">⌖</span><span>Unit Finder</span>`;
-      tile.addEventListener('click',openUnitFinder);
-      launcher.appendChild(tile);
+      if(!launcher.querySelector('[data-unit-finder-entry]')){
+        const tile=document.createElement('button');
+        tile.type='button';
+        tile.className='crmAppTile';
+        tile.dataset.unitFinderEntry='home';
+        tile.innerHTML=`<span class="crmAppIcon" style="display:grid;place-items:center;font-size:48px;color:#27c8bc">⌖</span><span>Unit Finder</span>`;
+        tile.addEventListener('click',openUnitFinder);
+        launcher.appendChild(tile);
+      }
+
+      if(!launcher.querySelector('[data-owner-finder-entry]')){
+        const tile=document.createElement('button');
+        tile.type='button';
+        tile.className='crmAppTile';
+        tile.dataset.ownerFinderEntry='home';
+        tile.innerHTML=`<span class="crmAppIcon" style="display:grid;place-items:center;font-size:44px;color:#27c8bc">◎</span><span>Owner Finder</span>`;
+        tile.addEventListener('click',openOwnerFinder);
+        launcher.appendChild(tile);
+      }
     }
 
     const nav=document.querySelector('.v7Nav');
-    if(nav&&!nav.querySelector('[data-unit-finder-entry]')){
-      const btn=document.createElement('button');
-      btn.type='button';
-      btn.dataset.unitFinderEntry='nav';
-      btn.textContent='Unit Finder';
-      btn.addEventListener('click',openUnitFinder);
-      nav.appendChild(btn);
+    if(nav){
+      if(!nav.querySelector('[data-unit-finder-entry]')){
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.dataset.unitFinderEntry='nav';
+        btn.textContent='Unit Finder';
+        btn.addEventListener('click',openUnitFinder);
+        nav.appendChild(btn);
+      }
+      if(!nav.querySelector('[data-owner-finder-entry]')){
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.dataset.ownerFinderEntry='nav';
+        btn.textContent='Owner Finder';
+        btn.addEventListener('click',openOwnerFinder);
+        nav.appendChild(btn);
+      }
     }
 
-    return Boolean(document.querySelector('[data-unit-finder-entry]'));
+    return Boolean(document.querySelector('[data-unit-finder-entry]')&&document.querySelector('[data-owner-finder-entry]'));
   }
 
   const migrationTimer=setInterval(()=>{
@@ -181,10 +202,10 @@
   let attempts=0;
   const uiTimer=setInterval(()=>{
     attempts++;
-    const added=addUnitFinderEntry();
+    const added=addFinderEntries();
     installContactFixes();
     if((added&&attempts>20)||attempts>120)clearInterval(uiTimer);
   },500);
 
-  console.info('Usama CRM note-preservation, Contacted status, Unit Finder and FG2 repair patch loaded.');
+  console.info('Usama CRM note-preservation, Contacted status, Unit Finder, Owner Finder and FG2 repair patch loaded.');
 })();
