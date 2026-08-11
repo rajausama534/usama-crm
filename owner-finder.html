@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Finder | Usama CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    *{box-sizing:border-box} :root{--bg:#05070c;--panel:#07101d;--card:#0a1423;--line:#213149;--text:#eef4ff;--muted:#8ea0b8;--cyan:#2bc8bf;--green:#20d37a;--red:#ef5a67} body{margin:0;min-height:100vh;background:radial-gradient(circle at top left,rgba(43,200,191,.11),transparent 34%),#05070c;color:var(--text);font-family:Poppins,sans-serif;padding:28px}.wrap{max-width:1500px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.back,.ghost,.primary{border:1px solid var(--line);background:#0b1421;color:white;border-radius:12px;padding:10px 15px;font:600 13px Poppins;cursor:pointer}.primary{background:linear-gradient(135deg,#1ebfb5,#18a96b);border:none}.title h1{font-size:30px;margin:0}.title p{color:var(--muted);margin:5px 0 0;font-size:13px}.modeGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}.mode{background:linear-gradient(180deg,#0b1524,#08111d);border:1px solid var(--line);border-radius:20px;padding:23px;text-align:left;color:white;cursor:pointer}.mode.active{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(43,200,191,.25)}.modeIcon{font-size:34px;color:var(--cyan);margin-bottom:10px}.mode h2{margin:0 0 5px;font-size:20px}.mode p{margin:0;color:var(--muted);font-size:13px}.panel{background:rgba(7,16,29,.94);border:1px solid var(--line);border-radius:20px;padding:22px}.hidden{display:none!important}.searchRow{display:grid;grid-template-columns:1fr auto;gap:10px}.searchRow input{width:100%;background:#050b14;color:white;border:1px solid #26374f;border-radius:13px;padding:14px 15px;font:500 14px Poppins}.hint{color:var(--muted);font-size:12px;margin-top:9px}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.chip{background:#0c1726;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:#b8c6d9;font-size:12px}.results{display:grid;gap:12px}.result{background:#07101b;border:1px solid #1d2b40;border-radius:16px;padding:16px}.resultTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.owner{font-size:17px;font-weight:700}.source{font-size:11px;color:#75869e;text-align:right}.grid{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;margin-top:12px}.field{background:#0a1422;border:1px solid #17263a;border-radius:11px;padding:10px}.label{color:#6f849f;font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}.value{font-size:13px;white-space:pre-wrap;word-break:break-word}.raw{margin-top:10px;color:#8798ad;font-size:11px;line-height:1.6}.empty{padding:48px 12px;text-align:center;color:#71849d}.drop{border:2px dashed #2d405b;border-radius:18px;padding:48px 20px;text-align:center;background:#060d17;cursor:pointer}.drop.drag{border-color:var(--cyan);background:#071a1c}.dropIcon{font-size:42px;color:var(--cyan)}.drop h3{margin:9px 0 5px}.drop p{margin:0;color:var(--muted);font-size:13px}.fileInput{display:none}.uploadStatus{margin-top:16px;padding:12px 14px;border-radius:12px;background:#091522;border:1px solid var(--line);color:#a9bbd0;font-size:12px}.fileList{margin-top:18px;display:grid;gap:10px}.fileItem{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#091321;border:1px solid var(--line);border-radius:13px;padding:12px 14px}.fileName{font-weight:600;font-size:13px}.fileMeta{color:#8092aa;font-size:11px;margin-top:3px}.danger{background:#2a1017;border:1px solid #5f2430;color:#ff9ba7;border-radius:9px;padding:7px 10px;cursor:pointer}.footnote{margin-top:14px;color:#71839b;font-size:11px;line-height:1.6}.progress{height:7px;background:#08101b;border-radius:999px;overflow:hidden;margin-top:9px}.bar{height:100%;width:0;background:linear-gradient(90deg,#25c8bd,#20d37a);transition:.2s}.headerRight{display:flex;gap:8px}@media(max-width:850px){body{padding:15px}.modeGrid,.grid{grid-template-columns:1fr}.searchRow{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.headerRight{width:100%}.headerRight button{flex:1}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title"><h1>Owner Finder</h1><p>Search owner contact details and property records across every database you upload.</p></div>
+    <div class="headerRight"><button class="back" onclick="location.href='index.html'">← CRM Home</button><button class="ghost" id="clearAllBtn">Clear Database</button></div>
+  </div>
+
+  <div class="modeGrid">
+    <button class="mode active" id="searchMode"><div class="modeIcon">⌕</div><h2>Search by Name / Property Detail</h2><p>Search owner name, phone, email, community, building, villa, apartment or unit.</p></button>
+    <button class="mode" id="uploadMode"><div class="modeIcon">⇧</div><h2>Upload Files</h2><p>Drag and drop your Excel, CSV or text databases. No manual organization required.</p></button>
+  </div>
+
+  <section class="panel" id="searchPanel">
+    <div class="searchRow"><input id="searchInput" autocomplete="off" placeholder="Example: Ahmad Muhammed, Farm Gardens 2, Villa 120, +97150..."/><button class="primary" id="searchBtn">Search</button></div>
+    <div class="hint">Search checks every cell in every uploaded file. Minor spacing and punctuation differences are ignored.</div>
+    <div class="stats" id="stats"></div>
+    <div class="results" id="results"><div class="empty">Upload your databases first, then search here.</div></div>
+  </section>
+
+  <section class="panel hidden" id="uploadPanel">
+    <input class="fileInput" id="fileInput" type="file" multiple accept=".xlsx,.xls,.csv,.tsv,.txt"/>
+    <div class="drop" id="dropZone"><div class="dropIcon">⇧</div><h3>Drop database files here</h3><p>or click to choose files · XLSX, XLS, CSV, TSV and TXT supported</p></div>
+    <div class="uploadStatus" id="uploadStatus">Ready for upload.<div class="progress"><div class="bar" id="bar"></div></div></div>
+    <div class="fileList" id="fileList"></div>
+    <div class="footnote">Files are indexed inside this browser on this device. The original files are not modified. For a later multi-device version, this index can be moved to your Supabase backend.</div>
+  </section>
+</div>
+<script>
+const DB_NAME='usama_owner_finder_v1', DB_VERSION=1, RECORDS='records', FILES='files';
+let dbPromise;
+function openDb(){if(dbPromise)return dbPromise;dbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(RECORDS)){const s=d.createObjectStore(RECORDS,{keyPath:'id',autoIncrement:true});s.createIndex('fileId','fileId',{unique:false})}if(!d.objectStoreNames.contains(FILES))d.createObjectStore(FILES,{keyPath:'id'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});return dbPromise}
+function tx(store,mode='readonly'){return openDb().then(d=>d.transaction(store,mode).objectStore(store))}
+function reqP(req){return new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)})}
+const normalize=v=>String(v??'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9+]+/g,' ').replace(/\s+/g,' ').trim();
+const compact=v=>normalize(v).replace(/\s/g,'');
+function cleanValue(v){if(v===null||v===undefined)return '';if(typeof v==='number'&&Number.isFinite(v))return String(v);return String(v).trim()}
+function findByKeys(row,patterns){const entries=Object.entries(row);for(const p of patterns){const hit=entries.find(([k])=>p.test(normalize(k)));if(hit&&cleanValue(hit[1]))return cleanValue(hit[1])}return ''}
+function allMatching(row,patterns){const vals=[];for(const [k,v] of Object.entries(row)){if(patterns.some(p=>p.test(normalize(k)))&&cleanValue(v))vals.push(cleanValue(v))}return [...new Set(vals)].join(' · ')}
+function infer(row){
+ const name=findByKeys(row,[/^owner name$/,/^owner$/,/customer name/,/client name/,/full name/,/^name$/]);
+ const phones=allMatching(row,[/phone/,/mobile/,/contact no/,/contact number/,/whatsapp/,/^tel/]);
+ const email=allMatching(row,[/email/,/e mail/]);
+ const community=findByKeys(row,[/community/,/area/,/location/,/project/]);
+ const building=findByKeys(row,[/building/,/tower/,/cluster/,/sub community/]);
+ const unit=findByKeys(row,[/^unit$/,/unit no/,/unit number/,/villa/,/apartment/,/^apt/,/property no/]);
+ const property=[community,building,unit].filter(Boolean).join(' · ');
+ return {name,phones,email,property};
+}
+async function addFileMeta(meta){const s=await tx(FILES,'readwrite');return reqP(s.put(meta))}
+async function addRecords(records){const d=await openDb();return new Promise((resolve,reject)=>{const t=d.transaction(RECORDS,'readwrite'),s=t.objectStore(RECORDS);records.forEach(r=>s.add(r));t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}
+async function deleteFile(fileId){const d=await openDb();return new Promise((resolve,reject)=>{const t=d.transaction([FILES,RECORDS],'readwrite');t.objectStore(FILES).delete(fileId);const idx=t.objectStore(RECORDS).index('fileId');const range=IDBKeyRange.only(fileId);idx.openCursor(range).onsuccess=e=>{const c=e.target.result;if(c){c.delete();c.continue()}};t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}
+async function clearDb(){const d=await openDb();return new Promise((resolve,reject)=>{const t=d.transaction([FILES,RECORDS],'readwrite');t.objectStore(FILES).clear();t.objectStore(RECORDS).clear();t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}
+async function getAll(store){const s=await tx(store);return reqP(s.getAll())}
+function parseDelimited(text,delimiter){const wb=XLSX.read(text,{type:'string'});return workbookRows(wb)}
+function workbookRows(wb){const out=[];for(const sheetName of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{defval:'',raw:false});rows.forEach((row,i)=>out.push({sheetName,rowNo:i+2,row}))}return out}
+async function parseFile(file){const ext=file.name.split('.').pop().toLowerCase();if(['xlsx','xls'].includes(ext)){const buf=await file.arrayBuffer();return workbookRows(XLSX.read(buf,{type:'array'}))}if(['csv','tsv','txt'].includes(ext)){const text=await file.text();return parseDelimited(text,ext==='tsv'?'\t':',')}throw new Error('Unsupported file type')}
+function searchableRow(row){return normalize(Object.entries(row).map(([k,v])=>`${k} ${cleanValue(v)}`).join(' '))}
+async function importFiles(files){if(!files.length)return;const status=document.getElementById('uploadStatus'),bar=document.getElementById('bar');let done=0,totalRows=0;for(const file of files){status.firstChild.textContent=`Reading ${file.name}... `;bar.style.width=`${Math.round(done/files.length*100)}%`;try{const parsed=await parseFile(file);const fileId=`${Date.now()}_${Math.random().toString(36).slice(2)}`;const records=parsed.map(x=>{const inf=infer(x.row);return {fileId,fileName:file.name,sheetName:x.sheetName,rowNo:x.rowNo,row:x.row,searchable:searchableRow(x.row),ownerName:inf.name,phones:inf.phones,email:inf.email,property:inf.property}});await addRecords(records);await addFileMeta({id:fileId,name:file.name,size:file.size,rows:records.length,uploadedAt:new Date().toISOString()});totalRows+=records.length}catch(e){console.error(e);alert(`Could not import ${file.name}: ${e.message}`)}done++;bar.style.width=`${Math.round(done/files.length*100)}%`}status.firstChild.textContent=`Imported ${done} file(s), ${totalRows.toLocaleString()} rows. `;bar.style.width='100%';await refreshFiles();await refreshStats()}
+function scoreRecord(r,q){const n=normalize(q),c=compact(q);if(!n)return 0;let score=0;const fields=[r.ownerName,r.phones,r.email,r.property].map(normalize);if(fields.some(v=>v===n))score+=100;if(normalize(r.ownerName).includes(n))score+=65;if(normalize(r.property).includes(n))score+=55;if(compact(r.phones).includes(c))score+=60;if(r.searchable.includes(n))score+=30;const tokens=n.split(' ').filter(Boolean);score+=tokens.filter(t=>r.searchable.includes(t)).length*7;return score}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
+async function runSearch(){const q=document.getElementById('searchInput').value.trim(),box=document.getElementById('results');if(!q){box.innerHTML='<div class="empty">Type a name, phone number or property detail.</div>';return}box.innerHTML='<div class="empty">Searching...</div>';const rows=await getAll(RECORDS);const ranked=rows.map(r=>({r,score:scoreRecord(r,q)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,250);if(!ranked.length){box.innerHTML='<div class="empty">No matching owner/property records found.</div>';return}box.innerHTML=ranked.map(({r})=>{const raw=Object.entries(r.row).filter(([,v])=>cleanValue(v)).slice(0,12).map(([k,v])=>`<b>${esc(k)}:</b> ${esc(v)}`).join(' &nbsp; • &nbsp; ');return `<div class="result"><div class="resultTop"><div class="owner">${esc(r.ownerName||'Owner name not identified')}</div><div class="source">${esc(r.fileName)}<br>${esc(r.sheetName)} · Row ${r.rowNo}</div></div><div class="grid"><div class="field"><div class="label">Contact</div><div class="value">${esc(r.phones||'—')}</div></div><div class="field"><div class="label">Email</div><div class="value">${esc(r.email||'—')}</div></div><div class="field"><div class="label">Property</div><div class="value">${esc(r.property||'—')}</div></div></div><div class="raw">${raw}</div></div>`}).join('')}
+async function refreshStats(){const [files,records]=await Promise.all([getAll(FILES),getAll(RECORDS)]);document.getElementById('stats').innerHTML=`<span class="chip">${files.length.toLocaleString()} uploaded files</span><span class="chip">${records.length.toLocaleString()} indexed rows</span>`}
+async function refreshFiles(){const files=(await getAll(FILES)).sort((a,b)=>b.uploadedAt.localeCompare(a.uploadedAt)),box=document.getElementById('fileList');box.innerHTML=files.length?files.map(f=>`<div class="fileItem"><div><div class="fileName">${esc(f.name)}</div><div class="fileMeta">${f.rows.toLocaleString()} rows · ${new Date(f.uploadedAt).toLocaleString()}</div></div><button class="danger" data-delete="${f.id}">Remove</button></div>`).join(''):'<div class="empty">No files uploaded yet.</div>';box.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{if(confirm('Remove this file and all indexed rows from Owner Finder?')){await deleteFile(b.dataset.delete);await refreshFiles();await refreshStats()}})}
+function showMode(mode){const search=mode==='search';document.getElementById('searchMode').classList.toggle('active',search);document.getElementById('uploadMode').classList.toggle('active',!search);document.getElementById('searchPanel').classList.toggle('hidden',!search);document.getElementById('uploadPanel').classList.toggle('hidden',search);if(search)setTimeout(()=>document.getElementById('searchInput').focus(),50)}
+document.getElementById('searchMode').onclick=()=>showMode('search');document.getElementById('uploadMode').onclick=()=>showMode('upload');document.getElementById('searchBtn').onclick=runSearch;document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});const dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');dz.onclick=()=>fi.click();fi.onchange=()=>importFiles([...fi.files]);['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));dz.addEventListener('drop',e=>importFiles([...e.dataTransfer.files]));document.getElementById('clearAllBtn').onclick=async()=>{if(confirm('Clear every Owner Finder file and indexed record on this device?')){await clearDb();await refreshFiles();await refreshStats();document.getElementById('results').innerHTML='<div class="empty">Database cleared.</div>'}};
+refreshStats();refreshFiles();
+</script>
+</body>
+</html>
