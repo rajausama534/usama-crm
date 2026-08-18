@@ -209,3 +209,78 @@
 
   console.info('Usama CRM note-preservation, Contacted status, Unit Finder, Owner Finder and FG2 repair patch loaded.');
 })();
+
+(()=>{
+  'use strict';
+
+  const MIGRATION_KEY='rivana_notes_20260818_v1';
+  const DATA_FILES=['data/rivana-part-1.txt','data/rivana-part-2.txt','data/rivana-part-3.txt'];
+
+  const normalizeUnit=value=>{
+    const digits=String(value??'').match(/\d+/g)?.join('')||'';
+    return digits?digits.padStart(3,'0').slice(-3):'';
+  };
+
+  const buildNote=item=>`Type: ${item.beds}BR\nPlot: ${item.plot} sqft\nLast Transaction: AED ${item.price} - ${item.date}`;
+
+  function mergeNote(existing,note){
+    const cleaned=String(existing||'').trim()
+      .replace(/^Type:\s*[345]BR\s*\nPlot:\s*[\d,]+\s*sqft\s*\nLast Transaction:\s*AED\s*[\d,]+\s*-\s*[^\n]+(?:\n+)?/i,'')
+      .trim();
+    return cleaned?`${note}\n\n${cleaned}`:note;
+  }
+
+  async function loadDataFiles(){
+    const texts=await Promise.all(DATA_FILES.map(async path=>{
+      const response=await fetch(path,{cache:'no-store'});
+      if(!response.ok)throw new Error(`Unable to load ${path}`);
+      return response.text();
+    }));
+    return texts.join('\n').split(/\r?\n/).filter(Boolean).map(line=>{
+      const [unit,beds,plot,price,date]=line.split('|');
+      return {unit,beds,plot,price,date};
+    });
+  }
+
+  async function runRivanaMigration(){
+    if(localStorage.getItem(MIGRATION_KEY)==='done')return;
+    if(typeof db==='undefined'||typeof TABLE_NAME==='undefined'||typeof isAdmin==='undefined'||!isAdmin||!currentUserEmail)return;
+
+    try{
+      const source=await loadDataFiles();
+      const byUnit=new Map(source.map(item=>[item.unit,item]));
+      const {data:rows,error}=await db.from(TABLE_NAME)
+        .select('id,unit,community,cluster,admin_remarks')
+        .ilike('community','%The Valley%')
+        .ilike('cluster','%RIVANA%');
+      if(error)throw error;
+
+      let updated=0,failed=0,skipped=0;
+      for(const row of rows||[]){
+        const item=byUnit.get(normalizeUnit(row.unit));
+        if(!item){skipped++;continue;}
+        const admin_remarks=mergeNote(row.admin_remarks,buildNote(item));
+        const {error:updateError}=await db.from(TABLE_NAME).update({admin_remarks}).eq('id',row.id);
+        if(updateError){failed++;console.error(`Rivana Unit ${row.unit} failed`,updateError);}else updated++;
+      }
+
+      console.info(`Rivana CRM notes: ${updated} updated, ${failed} failed, ${skipped} without a transaction in the supplied report.`);
+      if(failed===0){
+        localStorage.setItem(MIGRATION_KEY,'done');
+        if(typeof loadData==='function')loadData();
+      }
+    }catch(error){
+      console.error('Rivana notes migration failed:',error);
+    }
+  }
+
+  const timer=setInterval(()=>{
+    if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){
+      clearInterval(timer);
+      runRivanaMigration();
+    }
+  },1000);
+  setTimeout(()=>clearInterval(timer),120000);
+
+  console.info('Rivana transaction notes migration loaded.');
+})();
