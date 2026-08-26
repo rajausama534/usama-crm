@@ -30,8 +30,17 @@
     .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
     .top h1{margin:0;font-size:30px;letter-spacing:-.5px}
     .sub{margin-top:4px;color:var(--muted);font-size:13px}
+    .topActions{display:flex;align-items:center;gap:8px}
     .homeLink{color:#cbd5e1;text-decoration:none;font-weight:600;font-size:13px;padding:8px 11px;border:1px solid #123052;border-radius:9px;white-space:nowrap}
     .homeLink:hover{border-color:var(--accent);color:#fff}
+    .primaryBtn,.secondaryBtn,.dangerBtn{border-radius:9px;padding:8px 11px;font-weight:600;font-size:12px;color:#fff}
+    .primaryBtn{border:1px solid var(--accent-dark);background:linear-gradient(135deg,#0bb38e,#07846e)}
+    .primaryBtn:hover{filter:brightness(1.08)}
+    .secondaryBtn{border:1px solid #29435f;background:#07101a;color:#d7e1ed}
+    .secondaryBtn:hover{border-color:#3c6386}
+    .dangerBtn{border:1px solid #70303b;background:#2b1118;color:#ffadb8}
+    .dangerBtn:hover{background:#3a151e}
+    .hidden{display:none!important}
 
     .toolbar{display:grid;grid-template-columns:minmax(230px,1fr) 220px 150px;gap:9px;margin:18px 0 12px}
     .control{width:100%;border:1px solid #263d59;background:#050a11;color:#eef4fb;border-radius:10px;padding:11px 12px;outline:none}
@@ -62,6 +71,8 @@
     .detailHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
     .detailHeader h2{margin:0;font-size:26px;letter-spacing:-.4px}
     .community{margin-top:4px;color:var(--accent);font-size:12px;font-weight:600}
+    .detailRight{display:grid;justify-items:end;gap:9px}
+    .detailActions{display:flex;gap:7px}
     .unitPills{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px}
     .unitPill{border:1px solid #1d4761;color:#bfe8ff;background:#081724;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:600}
 
@@ -90,6 +101,34 @@
     .usp{grid-column:1/-1;border-color:#155349;background:linear-gradient(135deg,rgba(23,201,189,.08),#07101a)}
     .optional{font-weight:400;color:#60778f;text-transform:none;letter-spacing:0}
     .error{border:1px solid #6b2732;background:#2a1118;color:#ffabb6;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+    .notice{border:1px solid #155349;background:#071b19;color:#8ce8df;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+    .modal.show{display:flex}
+    .modalCard{width:min(1180px,100%);background:#050a10;border:1px solid #173b59;border-radius:17px;box-shadow:0 25px 90px rgba(0,0,0,.65);overflow:hidden}
+    .modalHeader{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;gap:15px;padding:17px 18px;background:#07101a;border-bottom:1px solid var(--line)}
+    .modalHeader h2{margin:0;font-size:21px}
+    .closeBtn{width:34px;height:34px;border:1px solid #29435f;background:#050a11;color:#d8e3ef;border-radius:9px;font-size:21px;line-height:1}
+    .formBody{padding:18px}
+    .formGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+    .field{display:grid;gap:5px}
+    .field.full{grid-column:1/-1}
+    .field label{color:#94a7bd;font-size:11px;font-weight:600}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #263d59;background:#02060a;color:#f4f7fb;border-radius:9px;padding:10px 11px;outline:none;font-size:12px}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,201,189,.08)}
+    .field textarea{min-height:84px;resize:vertical;line-height:1.5}
+    .field input[readonly]{background:#0a1017;color:#9eb0c4}
+    .unitEditorHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0 9px}
+    .unitEditorHeader h3{margin:0;font-size:15px}
+    .unitEditor{display:grid;gap:10px}
+    .unitEditorRow{border:1px solid var(--line);background:#07101a;border-radius:13px;padding:12px}
+    .unitRowTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+    .unitRowTop strong{font-size:12px;color:#dce6f2}
+    .removeRow{border:0;background:transparent;color:#ff8999;font-size:11px;font-weight:600;padding:4px}
+    .unitFormGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+    .unitFormGrid .wide{grid-column:span 2}
+    .modalFooter{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;padding:13px 18px;background:#07101a;border-top:1px solid var(--line)}
+    .saveState{margin-right:auto;align-self:center;color:#8fa2b9;font-size:11px}
 
     @media(max-width:1000px){
       .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -99,6 +138,8 @@
       .top{align-items:center}
       .top h1{font-size:25px}
       .sub{font-size:11px;line-height:1.45}
+      .topActions{align-items:stretch}
+      .topActions .primaryBtn{font-size:11px;padding:7px 8px}
       .homeLink{font-size:11px;padding:7px 8px}
       .toolbar{grid-template-columns:1fr 1fr;margin-top:14px}
       .toolbar .control:first-child{grid-column:1/-1}
@@ -109,12 +150,21 @@
       .detail{padding:13px;min-height:390px}
       .detailHeader{display:block}
       .detailHeader h2{font-size:22px}
+      .detailRight{justify-items:start;margin-top:10px}
       .unitPills{justify-content:flex-start;margin-top:10px}
       .summaryGrid{gap:7px}
       .summaryCard{padding:10px}
       .summaryCard div{font-size:12px}
       .infoGrid{grid-template-columns:1fr}
       .usp{grid-column:auto}
+      .modal{padding:10px}
+      .modalHeader{padding:14px}
+      .formBody{padding:13px}
+      .formGrid{grid-template-columns:1fr}
+      .field.full{grid-column:auto}
+      .unitFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .unitFormGrid .wide{grid-column:1/-1}
+      .modalFooter{padding:11px 13px}
     }
   </style>
 </head>
@@ -125,7 +175,7 @@
         <h1>Cluster Guide</h1>
         <div class="sub">Unit mix, layouts, sizes, original prices and project dates.</div>
       </div>
-      <a class="homeLink" href="index.html">← CRM Home</a>
+      <div class="topActions"><button class="primaryBtn hidden" id="addClusterBtn">+ Add Cluster</button><a class="homeLink" href="index.html">← CRM Home</a></div>
     </header>
 
     <div class="toolbar">
@@ -148,9 +198,39 @@
     </main>
   </div>
 
+  <div class="modal" id="clusterModal" role="dialog" aria-modal="true" aria-labelledby="clusterModalTitle">
+    <div class="modalCard">
+      <div class="modalHeader">
+        <div><h2 id="clusterModalTitle">Add Cluster</h2><div class="sub">Add each unit type and bedroom configuration separately.</div></div>
+        <button class="closeBtn" id="closeModalBtn" type="button" aria-label="Close">×</button>
+      </div>
+      <form id="clusterForm">
+        <div class="formBody">
+          <input id="formId" type="hidden">
+          <datalist id="unitTypeOptions"><option value="Townhouse"><option value="Semi-Detached Villa"><option value="Villa"></datalist>
+          <div class="formGrid">
+            <div class="field"><label for="formName">Cluster Name *</label><input id="formName" maxlength="200" required placeholder="Farm Gardens"></div>
+            <div class="field"><label for="formCommunity">Community</label><input id="formCommunity" maxlength="200" placeholder="The Valley"></div>
+            <div class="field"><label for="formLaunch">Launch Date</label><input id="formLaunch" maxlength="100" placeholder="June 2022"></div>
+            <div class="field"><label for="formHandover">Handover Date</label><input id="formHandover" maxlength="100" placeholder="Q3 2026"></div>
+            <div class="field"><label for="formTotal">Total Units (calculated)</label><input id="formTotal" value="0" readonly></div>
+            <div class="field full"><label for="formPayment">Payment Plan</label><textarea id="formPayment" maxlength="4000" placeholder="80/20 or full milestone breakdown"></textarea></div>
+            <div class="field full"><label for="formUsp">USP <span class="optional">(Optional)</span></label><textarea id="formUsp" maxlength="6000" placeholder="Key selling points of the cluster"></textarea></div>
+          </div>
+
+          <div class="unitEditorHeader"><h3>Unit Types, Bedrooms & Layouts</h3><button class="secondaryBtn" id="addUnitRowBtn" type="button">+ Add Unit Configuration</button></div>
+          <div class="unitEditor" id="unitEditor"></div>
+        </div>
+        <div class="modalFooter"><span class="saveState" id="saveState"></span><button class="secondaryBtn" id="cancelModalBtn" type="button">Cancel</button><button class="primaryBtn" id="saveClusterBtn" type="submit">Save Cluster</button></div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL='https://vnydxkmhrcesdffpfjpc.supabase.co';
     const SUPABASE_KEY='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I';
+    const API='https://fkhboleibqrrqljmwbit.supabase.co/functions/v1/owner-finder-api';
+    const ADMIN_EMAIL='thechussar@gmail.com';
     const crm=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
     const $=id=>document.getElementById(id);
     const clean=value=>value===null||value===undefined?'':String(value).trim();
@@ -159,6 +239,9 @@
     let clusters=[];
     let filtered=[];
     let activeId='';
+    let session=null;
+    let isAdmin=false;
+    let formRows=[];
 
     function normalizeCluster(cluster,index){
       const products=Array.isArray(cluster.unit_mix)?cluster.unit_mix:[];
@@ -206,8 +289,12 @@
     }
 
     function renderFilters(){
+      const selectedType=$('typeFilter').value;
+      const selectedBeds=$('bedFilter').value;
       $('typeFilter').innerHTML='<option value="">All Unit Types</option>'+values('unit_type').map(value=>`<option>${esc(value)}</option>`).join('');
       $('bedFilter').innerHTML='<option value="">All Bedrooms</option>'+values('bedrooms').map(value=>`<option value="${esc(value)}">${esc(value)} BR</option>`).join('');
+      if([...$('typeFilter').options].some(option=>option.value===selectedType))$('typeFilter').value=selectedType;
+      if([...$('bedFilter').options].some(option=>option.value===selectedBeds))$('bedFilter').value=selectedBeds;
     }
 
     function renderStats(){
@@ -248,7 +335,10 @@
       $('detail').innerHTML=`
         <div class="detailHeader">
           <div><h2>${esc(cluster.name)}</h2><div class="community">${esc(cluster.community||'Community not specified')}</div></div>
-          <div class="unitPills">${types.map(type=>`<span class="unitPill">${esc(type)}</span>`).join('')}</div>
+          <div class="detailRight">
+            ${isAdmin?`<div class="detailActions"><button class="secondaryBtn" type="button" onclick="openClusterFormById('${esc(cluster.id)}')">Edit</button><button class="dangerBtn" type="button" onclick="deleteCluster('${esc(cluster.id)}')">Delete</button></div>`:''}
+            <div class="unitPills">${types.map(type=>`<span class="unitPill">${esc(type)}</span>`).join('')}</div>
+          </div>
         </div>
         <div class="summaryGrid">
           <div class="summaryCard"><label>Total Units</label><div>${cluster.total_units?cluster.total_units.toLocaleString():'—'}</div></div>
@@ -281,21 +371,192 @@
       renderList();
     }
 
+    async function api(action,data={}){
+      if(!session)throw new Error('Login to CRM first.');
+      const response=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},
+        body:JSON.stringify({action,...data})
+      });
+      const payload=await response.json().catch(()=>({error:'Invalid server response'}));
+      if(!response.ok)throw new Error(payload.error||'Request failed');
+      return payload;
+    }
+
+    function blankUnit(){
+      return {unit_type:'',bedrooms:'',units:0,layouts:[],layout_count:0,bua_min_sqft:0,bua_max_sqft:0,plot_min_sqft:0,plot_max_sqft:0,op_min_aed:0,op_max_aed:0};
+    }
+
+    function fieldValue(row,key){return esc(row[key]||'')}
+
+    function renderUnitEditor(){
+      $('unitEditor').innerHTML=formRows.map((row,index)=>`
+        <div class="unitEditorRow" data-index="${index}">
+          <div class="unitRowTop"><strong>Configuration ${index+1}</strong><button class="removeRow" type="button" onclick="removeUnitRow(${index})">Remove</button></div>
+          <div class="unitFormGrid">
+            <div class="field"><label>Unit Type</label><input data-field="unit_type" list="unitTypeOptions" maxlength="100" value="${fieldValue(row,'unit_type')}" placeholder="Villa"></div>
+            <div class="field"><label>Bedrooms</label><input data-field="bedrooms" maxlength="30" value="${fieldValue(row,'bedrooms')}" placeholder="4"></div>
+            <div class="field"><label>Total Units</label><input data-field="units" type="number" min="0" step="1" value="${Number(row.units)||0}"></div>
+            <div class="field"><label>No. of Layouts</label><input data-field="layout_count" type="number" min="0" step="1" value="${Number(row.layout_count)||row.layouts?.length||0}"></div>
+            <div class="field wide"><label>Layout / Style Names</label><input data-field="layouts" value="${esc((row.layouts||[]).join(', '))}" placeholder="Earth, Horizon"></div>
+            <div class="field"><label>Min BUA (sq ft)</label><input data-field="bua_min_sqft" type="number" min="0" step="1" value="${Number(row.bua_min_sqft)||0}"></div>
+            <div class="field"><label>Max BUA (sq ft)</label><input data-field="bua_max_sqft" type="number" min="0" step="1" value="${Number(row.bua_max_sqft)||0}"></div>
+            <div class="field"><label>Min Plot (sq ft)</label><input data-field="plot_min_sqft" type="number" min="0" step="1" value="${Number(row.plot_min_sqft)||0}"></div>
+            <div class="field"><label>Max Plot (sq ft)</label><input data-field="plot_max_sqft" type="number" min="0" step="1" value="${Number(row.plot_max_sqft)||0}"></div>
+            <div class="field"><label>Min OP (AED)</label><input data-field="op_min_aed" type="number" min="0" step="1000" value="${Number(row.op_min_aed)||0}"></div>
+            <div class="field"><label>Max OP (AED)</label><input data-field="op_max_aed" type="number" min="0" step="1000" value="${Number(row.op_max_aed)||0}"></div>
+          </div>
+        </div>`).join('');
+      updateFormTotal();
+    }
+
+    function syncUnitRows(){
+      formRows=[...$('unitEditor').querySelectorAll('.unitEditorRow')].map(node=>{
+        const value=key=>node.querySelector(`[data-field="${key}"]`)?.value||'';
+        const number=key=>Math.max(0,Number(value(key))||0);
+        return {
+          unit_type:clean(value('unit_type')),
+          bedrooms:clean(value('bedrooms')),
+          units:Math.floor(number('units')),
+          layouts:value('layouts').split(/[,;]+/).map(clean).filter(Boolean),
+          layout_count:Math.floor(number('layout_count')),
+          bua_min_sqft:number('bua_min_sqft'),
+          bua_max_sqft:number('bua_max_sqft'),
+          plot_min_sqft:number('plot_min_sqft'),
+          plot_max_sqft:number('plot_max_sqft'),
+          op_min_aed:number('op_min_aed'),
+          op_max_aed:number('op_max_aed')
+        };
+      });
+      return formRows;
+    }
+
+    function updateFormTotal(){
+      const inputs=[...$('unitEditor').querySelectorAll('[data-field="units"]')];
+      $('formTotal').value=inputs.reduce((sum,input)=>sum+(Math.max(0,Number(input.value))||0),0).toLocaleString('en-US');
+    }
+
+    function addUnitRow(){
+      syncUnitRows();
+      formRows.push(blankUnit());
+      renderUnitEditor();
+    }
+
+    function removeUnitRow(index){
+      syncUnitRows();
+      formRows.splice(index,1);
+      if(!formRows.length)formRows=[blankUnit()];
+      renderUnitEditor();
+    }
+
+    function openClusterForm(cluster=null){
+      if(!isAdmin)return;
+      $('clusterModalTitle').textContent=cluster?'Edit Cluster':'Add Cluster';
+      $('formId').value=cluster?.id||'';
+      $('formName').value=cluster?.name||'';
+      $('formCommunity').value=cluster?.community||'';
+      $('formLaunch').value=cluster?.launch_date||'';
+      $('formHandover').value=cluster?.handover_date||'';
+      $('formPayment').value=cluster?.payment_plan||'';
+      $('formUsp').value=cluster?.usp||'';
+      $('saveState').textContent='';
+      formRows=cluster?.unit_mix?.length?cluster.unit_mix.map(row=>({...blankUnit(),...row,layouts:[...(row.layouts||[])]})):[blankUnit()];
+      renderUnitEditor();
+      $('clusterModal').classList.add('show');
+      setTimeout(()=>$('formName').focus(),30);
+    }
+
+    function openClusterFormById(id){openClusterForm(clusters.find(cluster=>cluster.id===id)||null)}
+    function closeClusterForm(){$('clusterModal').classList.remove('show')}
+
+    async function saveCluster(event){
+      event.preventDefault();
+      const name=clean($('formName').value);
+      if(!name){$('formName').focus();return}
+      const hasData=row=>row.unit_type||row.bedrooms||row.units||row.layouts.length||row.layout_count||row.bua_min_sqft||row.bua_max_sqft||row.plot_min_sqft||row.plot_max_sqft||row.op_min_aed||row.op_max_aed;
+      const unitMix=syncUnitRows().filter(hasData).map(row=>({...row,layout_count:Math.max(row.layout_count,row.layouts.length)}));
+      const incomplete=unitMix.find(row=>!row.unit_type||!row.bedrooms);
+      if(incomplete){$('saveState').textContent='Every unit configuration needs a unit type and bedrooms.';return}
+      const invalidRange=unitMix.find(row=>(row.bua_min_sqft&&row.bua_max_sqft&&row.bua_min_sqft>row.bua_max_sqft)||(row.plot_min_sqft&&row.plot_max_sqft&&row.plot_min_sqft>row.plot_max_sqft)||(row.op_min_aed&&row.op_max_aed&&row.op_min_aed>row.op_max_aed));
+      if(invalidRange){$('saveState').textContent='A minimum value cannot be higher than its maximum.';return}
+      const cluster={
+        id:clean($('formId').value),
+        name,
+        community:clean($('formCommunity').value),
+        launch_date:clean($('formLaunch').value),
+        handover_date:clean($('formHandover').value),
+        payment_plan:clean($('formPayment').value),
+        usp:clean($('formUsp').value),
+        unit_mix:unitMix
+      };
+      $('saveClusterBtn').disabled=true;
+      $('saveState').textContent='Saving online…';
+      try{
+        const result=await api('saveCluster',{cluster});
+        activeId=result.cluster.id;
+        closeClusterForm();
+        await loadClusters();
+        $('error').innerHTML='<div class="notice">Cluster saved online.</div>';
+        setTimeout(()=>{if($('error').textContent.includes('saved online'))$('error').innerHTML=''},2500);
+      }catch(error){
+        $('saveState').textContent=error.message;
+      }finally{
+        $('saveClusterBtn').disabled=false;
+      }
+    }
+
+    async function deleteCluster(id){
+      const cluster=clusters.find(item=>item.id===id);
+      if(!isAdmin||!cluster||!confirm(`Delete ${cluster.name}? This cannot be undone.`))return;
+      try{
+        await api('deleteCluster',{id});
+        activeId='';
+        await loadClusters();
+      }catch(error){alert(error.message)}
+    }
+
+    async function loadClusters(){
+      $('stats').innerHTML='<span class="chip">Loading cluster data…</span>';
+      $('error').innerHTML='';
+      let payload;
+      try{
+        payload=await api('listClusters');
+        isAdmin=Boolean(payload.canEdit)&&isAdmin;
+      }catch(onlineError){
+        const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
+        if(!response.ok)throw onlineError;
+        payload=await response.json();
+        isAdmin=false;
+        $('error').innerHTML='<div class="error">Online database unavailable. Showing the read-only backup.</div>';
+      }
+      clusters=(Array.isArray(payload.clusters)?payload.clusters:[]).map(normalizeCluster);
+      $('addClusterBtn').classList.toggle('hidden',!isAdmin);
+      renderFilters();
+      renderStats();
+      applyFilters();
+    }
+
     async function init(){
       const isLocalPreview=['localhost','127.0.0.1'].includes(location.hostname);
-      if(!isLocalPreview){
-        const {data:{session}}=await crm.auth.getSession();
+      if(isLocalPreview){
+        isAdmin=false;
+      }else{
+        const result=await crm.auth.getSession();
+        session=result.data.session;
         if(!session){alert('Login to CRM first.');location.href='index.html';return}
+        isAdmin=clean(session.user?.email).toLowerCase()===ADMIN_EMAIL;
       }
       try{
-        const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
-        if(!response.ok)throw new Error('Unable to load cluster data.');
-        const payload=await response.json();
-        clusters=(Array.isArray(payload.clusters)?payload.clusters:[]).map(normalizeCluster);
-        filtered=[...clusters];
-        renderFilters();
-        renderStats();
-        renderList();
+        if(isLocalPreview){
+          const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
+          const payload=await response.json();
+          clusters=(payload.clusters||[]).map(normalizeCluster);
+          renderFilters();
+          renderStats();
+          applyFilters();
+        }else{
+          await loadClusters();
+        }
       }catch(error){
         $('error').innerHTML=`<div class="error">${esc(error.message)}</div>`;
         $('stats').innerHTML='<span class="chip">Cluster data unavailable</span>';
@@ -306,6 +567,17 @@
     $('search').addEventListener('input',applyFilters);
     $('typeFilter').addEventListener('change',applyFilters);
     $('bedFilter').addEventListener('change',applyFilters);
+    $('addClusterBtn').addEventListener('click',()=>openClusterForm());
+    $('addUnitRowBtn').addEventListener('click',addUnitRow);
+    $('unitEditor').addEventListener('input',event=>{if(event.target.dataset.field==='units')updateFormTotal()});
+    $('clusterForm').addEventListener('submit',saveCluster);
+    $('closeModalBtn').addEventListener('click',closeClusterForm);
+    $('cancelModalBtn').addEventListener('click',closeClusterForm);
+    $('clusterModal').addEventListener('click',event=>{if(event.target===$('clusterModal'))closeClusterForm()});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeClusterForm()});
+    window.openClusterFormById=openClusterFormById;
+    window.deleteCluster=deleteCluster;
+    window.removeUnitRow=removeUnitRow;
     init();
   </script>
 </body>
