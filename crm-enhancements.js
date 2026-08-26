@@ -143,6 +143,7 @@
 
   function openUnitFinder(){ location.href='unit-finder.html'; }
   function openOwnerFinder(){ location.href='owner-finder.html'; }
+  function openClusterGuide(){ location.href='cluster-guide.html'; }
 
   function addFinderEntries(){
     const launcher=document.querySelector('.crmAppLauncher');
@@ -166,6 +167,16 @@
         tile.addEventListener('click',openOwnerFinder);
         launcher.appendChild(tile);
       }
+
+      if(!launcher.querySelector('[data-cluster-guide-entry]')){
+        const tile=document.createElement('button');
+        tile.type='button';
+        tile.className='crmAppTile';
+        tile.dataset.clusterGuideEntry='home';
+        tile.innerHTML=`<span class="crmAppIcon" style="display:grid;place-items:center;color:#27c8bc"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:56px;height:56px"><path d="M5 40V24l9-7 9 7v16M23 40V17l10-8 10 8v23M10 40V29h8v11M29 23h8m-8 7h8m-8 7h8"/></svg></span><span>Cluster Guide</span>`;
+        tile.addEventListener('click',openClusterGuide);
+        launcher.appendChild(tile);
+      }
     }
 
     const nav=document.querySelector('.v7Nav');
@@ -186,9 +197,17 @@
         btn.addEventListener('click',openOwnerFinder);
         nav.appendChild(btn);
       }
+      if(!nav.querySelector('[data-cluster-guide-entry]')){
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.dataset.clusterGuideEntry='nav';
+        btn.textContent='Cluster Guide';
+        btn.addEventListener('click',openClusterGuide);
+        nav.appendChild(btn);
+      }
     }
 
-    return Boolean(document.querySelector('[data-unit-finder-entry]')&&document.querySelector('[data-owner-finder-entry]'));
+    return Boolean(document.querySelector('[data-unit-finder-entry]')&&document.querySelector('[data-owner-finder-entry]')&&document.querySelector('[data-cluster-guide-entry]'));
   }
 
   const migrationTimer=setInterval(()=>{
@@ -207,7 +226,7 @@
     if((added&&attempts>20)||attempts>120)clearInterval(uiTimer);
   },500);
 
-  console.info('Usama CRM note-preservation, Contacted status, Unit Finder, Owner Finder and FG2 repair patch loaded.');
+  console.info('Usama CRM note-preservation, Contacted status, Unit Finder, Owner Finder, Cluster Guide and FG2 repair patch loaded.');
 })();
 
 (()=>{

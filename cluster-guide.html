@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usama CRM Cluster Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#030609;
+      --panel:#07101a;
+      --panel-2:#0a1421;
+      --line:#17314b;
+      --line-soft:#10294a;
+      --text:#f3f6fb;
+      --muted:#8295b0;
+      --accent:#17c9bd;
+      --accent-dark:#0b9c84;
+      --blue:#47b5ff;
+    }
+
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,sans-serif;padding:18px}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .wrap{max-width:1550px;margin:0 auto}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+    .top h1{margin:0;font-size:30px;letter-spacing:-.5px}
+    .sub{margin-top:4px;color:var(--muted);font-size:13px}
+    .homeLink{color:#cbd5e1;text-decoration:none;font-weight:600;font-size:13px;padding:8px 11px;border:1px solid #123052;border-radius:9px;white-space:nowrap}
+    .homeLink:hover{border-color:var(--accent);color:#fff}
+
+    .toolbar{display:grid;grid-template-columns:minmax(230px,1fr) 220px 150px;gap:9px;margin:18px 0 12px}
+    .control{width:100%;border:1px solid #263d59;background:#050a11;color:#eef4fb;border-radius:10px;padding:11px 12px;outline:none}
+    .control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,201,189,.08)}
+    select.control{color:#c9d5e4}
+
+    .stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .chip{border:1px solid #123052;border-radius:9px;padding:7px 10px;color:#a8b7ca;font-size:12px;background:#060b12}
+    .chip strong{color:#fff}
+
+    .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
+    .panel{border:1px solid var(--line-soft);background:#050a10;border-radius:16px;overflow:hidden}
+    .panelTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 15px;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--muted)}
+    .panelTitle strong{font-size:14px;color:#edf3fa}
+    .clusterList{padding:9px;display:grid;gap:7px;max-height:calc(100vh - 220px);overflow:auto}
+    .clusterButton{width:100%;text-align:left;border:1px solid transparent;background:#07101a;color:#fff;border-radius:11px;padding:11px 12px}
+    .clusterButton:hover{border-color:#1c4661;background:#091522}
+    .clusterButton.active{border-color:var(--accent);background:linear-gradient(135deg,rgba(23,201,189,.13),rgba(7,16,26,.96))}
+    .clusterButton b{display:block;font-size:14px}
+    .clusterButton span{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
+
+    .detail{min-height:470px;padding:18px}
+    .empty{display:grid;place-items:center;text-align:center;min-height:390px;color:#7187a4;padding:30px}
+    .emptyIcon{width:64px;height:64px;color:var(--accent);opacity:.65;margin:0 auto 12px}
+    .empty h2{font-size:18px;color:#dce6f2;margin:0 0 6px}
+    .empty p{margin:0;max-width:560px;font-size:13px;line-height:1.7}
+
+    .detailHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
+    .detailHeader h2{margin:0;font-size:26px;letter-spacing:-.4px}
+    .community{margin-top:4px;color:var(--accent);font-size:12px;font-weight:600}
+    .unitPills{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px}
+    .unitPill{border:1px solid #1d4761;color:#bfe8ff;background:#081724;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:600}
+
+    .summaryGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:15px}
+    .summaryCard{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px}
+    .summaryCard label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.55px;margin-bottom:5px}
+    .summaryCard div{font-size:14px;font-weight:600;overflow-wrap:anywhere}
+
+    .section{margin-top:15px}
+    .section h3{font-size:14px;margin:0 0 8px;color:#e9f0f8}
+    .tableWrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:920px;background:#050b12}
+    th{background:#0a1421;color:#8fa2b9;font-size:10px;text-transform:uppercase;letter-spacing:.45px;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+    td{font-size:12px;padding:11px 10px;border-bottom:1px solid #102238;vertical-align:top;line-height:1.5}
+    tbody tr:last-child td{border-bottom:0}
+    tbody tr:hover{background:#071522}
+    .number{font-weight:700;color:#fff}
+    .range{white-space:nowrap}
+    .layouts{min-width:155px;color:#c7d4e4}
+    .layoutCount{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:6px;background:rgba(23,201,189,.14);color:#72e9df;font-weight:700;margin-right:5px}
+
+    .infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .infoBox{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:13px}
+    .infoBox label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.55px;margin-bottom:6px}
+    .infoBox div{font-size:12px;line-height:1.65;color:#d9e3ef;white-space:pre-line}
+    .usp{grid-column:1/-1;border-color:#155349;background:linear-gradient(135deg,rgba(23,201,189,.08),#07101a)}
+    .optional{font-weight:400;color:#60778f;text-transform:none;letter-spacing:0}
+    .error{border:1px solid #6b2732;background:#2a1118;color:#ffabb6;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+
+    @media(max-width:1000px){
+      .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:760px){
+      body{padding:13px}
+      .top{align-items:center}
+      .top h1{font-size:25px}
+      .sub{font-size:11px;line-height:1.45}
+      .homeLink{font-size:11px;padding:7px 8px}
+      .toolbar{grid-template-columns:1fr 1fr;margin-top:14px}
+      .toolbar .control:first-child{grid-column:1/-1}
+      .control{padding:10px;font-size:12px}
+      .workspace{grid-template-columns:1fr}
+      .clusterList{display:flex;overflow-x:auto;max-height:none;padding:8px}
+      .clusterButton{min-width:210px}
+      .detail{padding:13px;min-height:390px}
+      .detailHeader{display:block}
+      .detailHeader h2{font-size:22px}
+      .unitPills{justify-content:flex-start;margin-top:10px}
+      .summaryGrid{gap:7px}
+      .summaryCard{padding:10px}
+      .summaryCard div{font-size:12px}
+      .infoGrid{grid-template-columns:1fr}
+      .usp{grid-column:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Cluster Guide</h1>
+        <div class="sub">Unit mix, layouts, sizes, original prices and project dates.</div>
+      </div>
+      <a class="homeLink" href="index.html">← CRM Home</a>
+    </header>
+
+    <div class="toolbar">
+      <input class="control" id="search" type="search" placeholder="Search cluster, community or layout">
+      <select class="control" id="typeFilter"><option value="">All Unit Types</option></select>
+      <select class="control" id="bedFilter"><option value="">All Bedrooms</option></select>
+    </div>
+
+    <div class="stats" id="stats">
+      <span class="chip">Loading cluster data…</span>
+    </div>
+    <div id="error"></div>
+
+    <main class="workspace">
+      <aside class="panel">
+        <div class="panelTitle"><strong>Clusters</strong><span id="resultCount">0 results</span></div>
+        <div class="clusterList" id="clusterList"></div>
+      </aside>
+      <section class="panel detail" id="detail"></section>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL='https://vnydxkmhrcesdffpfjpc.supabase.co';
+    const SUPABASE_KEY='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I';
+    const crm=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const $=id=>document.getElementById(id);
+    const clean=value=>value===null||value===undefined?'':String(value).trim();
+    const esc=value=>clean(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const norm=value=>clean(value).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+    let clusters=[];
+    let filtered=[];
+    let activeId='';
+
+    function normalizeCluster(cluster,index){
+      const products=Array.isArray(cluster.unit_mix)?cluster.unit_mix:[];
+      return {
+        id:clean(cluster.id)||`cluster-${index+1}`,
+        name:clean(cluster.name)||'Unnamed Cluster',
+        community:clean(cluster.community),
+        total_units:Number(cluster.total_units)||products.reduce((sum,row)=>sum+(Number(row.units)||0),0),
+        launch_date:clean(cluster.launch_date),
+        handover_date:clean(cluster.handover_date),
+        payment_plan:clean(cluster.payment_plan),
+        usp:clean(cluster.usp),
+        unit_mix:products.map(row=>({
+          unit_type:clean(row.unit_type),
+          bedrooms:clean(row.bedrooms),
+          units:Number(row.units)||0,
+          layouts:Array.isArray(row.layouts)?row.layouts.map(clean).filter(Boolean):[],
+          layout_count:Number(row.layout_count)||0,
+          bua_min_sqft:Number(row.bua_min_sqft)||0,
+          bua_max_sqft:Number(row.bua_max_sqft)||0,
+          plot_min_sqft:Number(row.plot_min_sqft)||0,
+          plot_max_sqft:Number(row.plot_max_sqft)||0,
+          op_min_aed:Number(row.op_min_aed)||0,
+          op_max_aed:Number(row.op_max_aed)||0
+        }))
+      };
+    }
+
+    const fmtNumber=value=>Number(value)>0?Number(value).toLocaleString('en-US'):'—';
+    const fmtSqft=(min,max)=>{
+      if(!min&&!max)return '—';
+      if(min&&max&&min!==max)return `${fmtNumber(min)}–${fmtNumber(max)} sq ft`;
+      return `${fmtNumber(min||max)} sq ft`;
+    };
+    const fmtPrice=(min,max)=>{
+      if(!min&&!max)return '—';
+      const money=value=>`AED ${Number(value).toLocaleString('en-US')}`;
+      if(min&&max&&min!==max)return `${money(min)}–${money(max)}`;
+      return money(min||max);
+    };
+    const values=key=>[...new Set(clusters.flatMap(cluster=>cluster.unit_mix.map(row=>clean(row[key])).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+
+    function showEmpty(message='No cluster information has been added yet.'){
+      $('detail').innerHTML=`<div class="empty"><div><svg class="emptyIcon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 54V30l12-9 12 9v24M32 54V22l12-9 12 9v32M15 54V38h10v16M40 29h8m-8 8h8m-8 8h8"/></svg><h2>${esc(message)}</h2><p>The page is ready for verified cluster records. BUA, plot, original price and unit totals are stored separately for every unit type and bedroom configuration.</p></div></div>`;
+    }
+
+    function renderFilters(){
+      $('typeFilter').innerHTML='<option value="">All Unit Types</option>'+values('unit_type').map(value=>`<option>${esc(value)}</option>`).join('');
+      $('bedFilter').innerHTML='<option value="">All Bedrooms</option>'+values('bedrooms').map(value=>`<option value="${esc(value)}">${esc(value)} BR</option>`).join('');
+    }
+
+    function renderStats(){
+      const totalUnits=clusters.reduce((sum,cluster)=>sum+cluster.total_units,0);
+      const productRows=clusters.reduce((sum,cluster)=>sum+cluster.unit_mix.length,0);
+      $('stats').innerHTML=`<span class="chip"><strong>${clusters.length.toLocaleString()}</strong> clusters</span><span class="chip"><strong>${totalUnits.toLocaleString()}</strong> total units</span><span class="chip"><strong>${productRows.toLocaleString()}</strong> unit configurations</span>`;
+    }
+
+    function renderList(){
+      $('resultCount').textContent=`${filtered.length} result${filtered.length===1?'':'s'}`;
+      if(!filtered.length){
+        $('clusterList').innerHTML='<div class="empty" style="min-height:180px;padding:20px">No matching clusters</div>';
+        showEmpty(clusters.length?'No matching cluster found.':undefined);
+        return;
+      }
+      if(!filtered.some(cluster=>cluster.id===activeId))activeId=filtered[0].id;
+      $('clusterList').innerHTML=filtered.map(cluster=>{
+        const types=[...new Set(cluster.unit_mix.map(row=>row.unit_type).filter(Boolean))];
+        return `<button class="clusterButton ${cluster.id===activeId?'active':''}" data-id="${esc(cluster.id)}"><b>${esc(cluster.name)}</b><span>${esc(cluster.community||'Community not specified')}</span><span>${cluster.total_units.toLocaleString()} units${types.length?' · '+esc(types.join(', ')):''}</span></button>`;
+      }).join('');
+      $('clusterList').querySelectorAll('.clusterButton').forEach(button=>button.addEventListener('click',()=>{
+        activeId=button.dataset.id;
+        renderList();
+        renderDetail();
+      }));
+      renderDetail();
+    }
+
+    function renderDetail(){
+      const cluster=filtered.find(item=>item.id===activeId);
+      if(!cluster){showEmpty();return}
+      const types=[...new Set(cluster.unit_mix.map(row=>row.unit_type).filter(Boolean))];
+      const bedrooms=[...new Set(cluster.unit_mix.map(row=>row.bedrooms).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+      const rows=cluster.unit_mix.map(row=>{
+        const layoutCount=row.layouts.length||row.layout_count;
+        return `<tr><td><b>${esc(row.unit_type||'—')}</b></td><td><span class="number">${esc(row.bedrooms||'—')}${row.bedrooms?' BR':''}</span></td><td><span class="number">${row.units?row.units.toLocaleString():'—'}</span></td><td class="layouts">${layoutCount?`<span class="layoutCount">${layoutCount}</span>`:''}${row.layouts.length?esc(row.layouts.join(', ')):'—'}</td><td class="range">${fmtSqft(row.bua_min_sqft,row.bua_max_sqft)}</td><td class="range">${fmtSqft(row.plot_min_sqft,row.plot_max_sqft)}</td><td class="range">${fmtPrice(row.op_min_aed,row.op_max_aed)}</td></tr>`;
+      }).join('');
+      $('detail').innerHTML=`
+        <div class="detailHeader">
+          <div><h2>${esc(cluster.name)}</h2><div class="community">${esc(cluster.community||'Community not specified')}</div></div>
+          <div class="unitPills">${types.map(type=>`<span class="unitPill">${esc(type)}</span>`).join('')}</div>
+        </div>
+        <div class="summaryGrid">
+          <div class="summaryCard"><label>Total Units</label><div>${cluster.total_units?cluster.total_units.toLocaleString():'—'}</div></div>
+          <div class="summaryCard"><label>Bedrooms</label><div>${bedrooms.length?bedrooms.map(value=>esc(value)+' BR').join(', '):'—'}</div></div>
+          <div class="summaryCard"><label>Launch Date</label><div>${esc(cluster.launch_date||'—')}</div></div>
+          <div class="summaryCard"><label>Handover Date</label><div>${esc(cluster.handover_date||'—')}</div></div>
+        </div>
+        <section class="section">
+          <h3>Unit Mix & Specifications</h3>
+          <div class="tableWrap"><table><thead><tr><th>Unit Type</th><th>Bedrooms</th><th>Total Units</th><th>Layouts / Styles</th><th>BUA Range</th><th>Plot Range</th><th>Original Price</th></tr></thead><tbody>${rows||'<tr><td colspan="7">No unit configurations added.</td></tr>'}</tbody></table></div>
+        </section>
+        <section class="section infoGrid">
+          <div class="infoBox"><label>Payment Plan</label><div>${esc(cluster.payment_plan||'—')}</div></div>
+          <div class="infoBox"><label>Unit Types</label><div>${types.length?esc(types.join(', ')):'—'}</div></div>
+          ${cluster.usp?`<div class="infoBox usp"><label>USP <span class="optional">(Optional)</span></label><div>${esc(cluster.usp)}</div></div>`:''}
+        </section>`;
+    }
+
+    function applyFilters(){
+      const query=norm($('search').value);
+      const type=$('typeFilter').value;
+      const beds=$('bedFilter').value;
+      filtered=clusters.filter(cluster=>{
+        const searchable=norm([cluster.name,cluster.community,cluster.usp,...cluster.unit_mix.flatMap(row=>[row.unit_type,row.bedrooms,...row.layouts])].join(' '));
+        const matchesQuery=!query||searchable.includes(query);
+        const matchesType=!type||cluster.unit_mix.some(row=>row.unit_type===type);
+        const matchesBeds=!beds||cluster.unit_mix.some(row=>row.bedrooms===beds);
+        return matchesQuery&&matchesType&&matchesBeds;
+      });
+      renderList();
+    }
+
+    async function init(){
+      const isLocalPreview=['localhost','127.0.0.1'].includes(location.hostname);
+      if(!isLocalPreview){
+        const {data:{session}}=await crm.auth.getSession();
+        if(!session){alert('Login to CRM first.');location.href='index.html';return}
+      }
+      try{
+        const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
+        if(!response.ok)throw new Error('Unable to load cluster data.');
+        const payload=await response.json();
+        clusters=(Array.isArray(payload.clusters)?payload.clusters:[]).map(normalizeCluster);
+        filtered=[...clusters];
+        renderFilters();
+        renderStats();
+        renderList();
+      }catch(error){
+        $('error').innerHTML=`<div class="error">${esc(error.message)}</div>`;
+        $('stats').innerHTML='<span class="chip">Cluster data unavailable</span>';
+        showEmpty('Cluster data could not be loaded.');
+      }
+    }
+
+    $('search').addEventListener('input',applyFilters);
+    $('typeFilter').addEventListener('change',applyFilters);
+    $('bedFilter').addEventListener('change',applyFilters);
+    init();
+  </script>
+</body>
+</html>
