@@ -303,3 +303,83 @@
 
   console.info('Rivana transaction notes migration loaded.');
 })();
+
+(()=>{
+  'use strict';
+
+  const MIGRATION_KEY='elie_saab_transaction_activities_20260904_v1';
+  const DATA_FILE='data/elie-saab-latest-transactions.txt';
+  const ACTIVITY_TYPE='Property Transaction';
+
+  const normalizeUnit=value=>{
+    const parts=String(value??'').match(/\d+/g)||[];
+    return parts.length?String(Number(parts[parts.length-1])):'';
+  };
+
+  const buildNote=item=>`Last Transaction - ${item.type}: AED ${item.amount} - ${item.date}`;
+
+  async function loadElieSaabTransactions(){
+    const response=await fetch(DATA_FILE,{cache:'no-store'});
+    if(!response.ok)throw new Error(`Unable to load ${DATA_FILE}`);
+    return (await response.text()).split(/\r?\n/).filter(Boolean).map(line=>{
+      const [cluster,unit,type,amount,date]=line.split('|');
+      return {cluster,unit:normalizeUnit(unit),type,amount,date};
+    });
+  }
+
+  async function runElieSaabMigration(){
+    if(localStorage.getItem(MIGRATION_KEY)==='done')return;
+    if(typeof db==='undefined'||typeof TABLE_NAME==='undefined'||typeof isAdmin==='undefined'||!isAdmin||!currentUserEmail)return;
+    if(typeof U6_OWNER_ACTIVITIES==='undefined')return;
+
+    try{
+      const source=await loadElieSaabTransactions();
+      const byUnit=new Map(source.map(item=>[item.unit,item]));
+      const {data:rows,error}=await db.from(TABLE_NAME)
+        .select('id,unit,community,cluster')
+        .ilike('cluster','%Elie Saab%');
+      if(error)throw error;
+
+      const matched=(rows||[]).map(row=>({row,item:byUnit.get(normalizeUnit(row.unit))})).filter(x=>x.item);
+      const ownerIds=matched.map(x=>String(x.row.id));
+      let existing=[];
+      if(ownerIds.length){
+        const result=await db.from(U6_OWNER_ACTIVITIES)
+          .select('owner_id,details')
+          .eq('activity_type',ACTIVITY_TYPE)
+          .in('owner_id',ownerIds);
+        if(result.error)throw result.error;
+        existing=result.data||[];
+      }
+
+      const existingKeys=new Set(existing.map(a=>`${String(a.owner_id)}|${String(a.details||'').trim()}`));
+      const additions=matched.map(({row,item})=>({
+        owner_id:String(row.id),
+        activity_type:ACTIVITY_TYPE,
+        details:buildNote(item),
+        created_by:currentUserEmail||null
+      })).filter(a=>!existingKeys.has(`${a.owner_id}|${a.details}`));
+
+      if(additions.length){
+        const {error:insertError}=await db.from(U6_OWNER_ACTIVITIES).insert(additions);
+        if(insertError)throw insertError;
+      }
+
+      console.info(`Elie Saab transaction notes: ${additions.length} added, ${matched.length-additions.length} already present, ${(rows||[]).length-matched.length} CRM villas had no transaction in the supplied reports.`);
+      localStorage.setItem(MIGRATION_KEY,'done');
+      if(typeof loadData==='function')loadData();
+    }catch(error){
+      console.error('Elie Saab transaction notes migration failed:',error);
+    }
+  }
+
+  const timer=setInterval(()=>{
+    if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){
+      clearInterval(timer);
+      runElieSaabMigration();
+    }
+  },1000);
+  setTimeout(()=>clearInterval(timer),120000);
+
+  console.info('Elie Saab latest transaction activity migration loaded.');
+})();
