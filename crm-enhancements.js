@@ -307,7 +307,7 @@
 (()=>{
   'use strict';
 
-  const MIGRATION_KEY='elie_saab_transaction_activities_20260904_v1';
+  const MIGRATION_KEY='elie_saab_transaction_activities_20260906_v2';
   const DATA_FILE='data/elie-saab-latest-transactions.txt';
   const ACTIVITY_TYPE='Property Transaction';
 
@@ -337,19 +337,20 @@
       const byUnit=new Map(source.map(item=>[item.unit,item]));
       const {data:rows,error}=await db.from(TABLE_NAME)
         .select('id,unit,community,cluster')
-        .ilike('cluster','%Elie Saab%');
+        .ilike('cluster','%Saab%');
       if(error)throw error;
 
       const matched=(rows||[]).map(row=>({row,item:byUnit.get(normalizeUnit(row.unit))})).filter(x=>x.item);
+      if(!matched.length)throw new Error('No Elie Saab CRM villas matched the supplied transaction reports.');
       const ownerIds=matched.map(x=>String(x.row.id));
       let existing=[];
-      if(ownerIds.length){
+      for(let index=0;index<ownerIds.length;index+=50){
         const result=await db.from(U6_OWNER_ACTIVITIES)
           .select('owner_id,details')
           .eq('activity_type',ACTIVITY_TYPE)
-          .in('owner_id',ownerIds);
+          .in('owner_id',ownerIds.slice(index,index+50));
         if(result.error)throw result.error;
-        existing=result.data||[];
+        existing.push(...(result.data||[]));
       }
 
       const existingKeys=new Set(existing.map(a=>`${String(a.owner_id)}|${String(a.details||'').trim()}`));
@@ -360,8 +361,8 @@
         created_by:currentUserEmail||null
       })).filter(a=>!existingKeys.has(`${a.owner_id}|${a.details}`));
 
-      if(additions.length){
-        const {error:insertError}=await db.from(U6_OWNER_ACTIVITIES).insert(additions);
+      for(let index=0;index<additions.length;index+=50){
+        const {error:insertError}=await db.from(U6_OWNER_ACTIVITIES).insert(additions.slice(index,index+50));
         if(insertError)throw insertError;
       }
 
