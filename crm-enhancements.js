@@ -70,10 +70,24 @@
     }
   }
 
+  async function updateOwnerContact(ownerId){
+    const contactedAt=today();
+    const {error:lastContactError}=await db.from(TABLE_NAME)
+      .update({last_contacted:contactedAt})
+      .eq('id',ownerId);
+    if(lastContactError)throw lastContactError;
+
+    const {error:statusError}=await db.from(TABLE_NAME)
+      .update({status:'Contacted'})
+      .eq('id',ownerId)
+      .eq('status','New');
+    if(statusError)throw statusError;
+  }
+
   async function markOwnerContacted(ownerId,type){
     try{
       if(typeof db==='undefined'||typeof TABLE_NAME==='undefined')return;
-      await db.from(TABLE_NAME).update({status:'Contacted',last_contacted:today()}).eq('id',ownerId);
+      await updateOwnerContact(ownerId);
       if(typeof U6_OWNER_ACTIVITIES!=='undefined'){
         await db.from(U6_OWNER_ACTIVITIES).insert([{
           owner_id:String(ownerId),
@@ -112,10 +126,7 @@
               created_by:currentUserEmail||null
             }]);
           }
-          await db.from(TABLE_NAME).update({
-            status:'Contacted',
-            last_contacted:today()
-          }).eq('id',ownerId);
+          await updateOwnerContact(ownerId);
           if(typeof loadData==='function')loadData();
         }catch(e){console.warn(e);}
       };
