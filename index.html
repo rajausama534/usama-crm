@@ -2549,6 +2549,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
             <option value="desc">Descending / Newest</option>
           </select>
         </div>
+        <button class="primaryBtn adminOnly" onclick="u10OpenOwnerEditor()">+ Add Owner</button>
         <button class="darkBtn" onclick="openWhatsappMessageModal()">Edit WhatsApp</button>
         <button class="darkBtn" onclick="openOwnerStatusModal()">Manage Statuses</button>
         <button class="darkBtn" onclick="openOwnerColumnModal()">Manage Columns</button>
@@ -6059,15 +6060,17 @@ function u12AddPropertyRow(property = {}) {
   list.appendChild(row);
 }
 
-u10OpenOwnerEditor = function (row) {
+u10OpenOwnerEditor = function (row = {}) {
   document.getElementById("u10OwnerEditor")?.remove();
   u12PropertyRowCount = 0;
+  const existingId = row.id ?? null;
+  const isNewOwner = existingId === null;
   const wrap = document.createElement("div");
   wrap.id = "u10OwnerEditor";
   wrap.className = "modalOverlay show";
   wrap.innerHTML = `<div class="modal u12OwnerEditorModal">
     <button class="u6CloseButton" onclick="document.getElementById('u10OwnerEditor').remove()">×</button>
-    <h2>Edit Owner</h2>
+    <h2>${isNewOwner ? "Add Owner" : "Edit Owner"}</h2>
     <div class="u12OwnerTabs">
       <button type="button" class="u12OwnerTab active" data-tab="details" onclick="u12SwitchOwnerTab('details')">Owner Details</button>
       <button type="button" class="u12OwnerTab" data-tab="properties" onclick="u12SwitchOwnerTab('properties')">More Properties <span id="u12PropertyCount"></span></button>
@@ -6090,7 +6093,7 @@ u10OpenOwnerEditor = function (row) {
       <div id="u12PropertyList"></div>
       <div id="u12EmptyProperties" class="empty">No additional properties added yet.</div>
     </div>
-    <div class="modalActions"><button class="darkBtn" onclick="document.getElementById('u10OwnerEditor').remove()">Cancel</button><button id="u12SaveOwnerButton" class="primaryBtn" onclick="u10SaveOwner('${row.id}')">Save Owner</button></div>
+    <div class="modalActions"><button class="darkBtn" onclick="document.getElementById('u10OwnerEditor').remove()">Cancel</button><button id="u12SaveOwnerButton" class="primaryBtn" onclick='u10SaveOwner(${JSON.stringify(existingId)})'>${isNewOwner ? "Add Owner" : "Save Owner"}</button></div>
   </div>`;
   document.body.appendChild(wrap);
   const observer = new MutationObserver(() => {
@@ -6105,6 +6108,7 @@ u10OpenOwnerEditor = function (row) {
 u10SaveOwner = async function (id) {
   const saveButton = document.getElementById("u12SaveOwnerButton");
   if (saveButton) { saveButton.disabled = true; saveButton.textContent = "Saving…"; }
+  const isNewOwner = id === null || id === undefined || id === "";
   const payload = {
     owner:el("u10eo_owner").value.trim(), email:el("u10eo_email").value.trim() || null,
     phone1:el("u10eo_phone1").value.trim(), phone2:el("u10eo_phone2").value.trim(),
@@ -6112,6 +6116,16 @@ u10SaveOwner = async function (id) {
     unit:el("u10eo_unit").value.trim(), status:el("u10eo_status").value,
     data_source:el("u10eo_source").value.trim()
   };
+  if (!payload.owner) {
+    alert("Enter the owner name.");
+    if (saveButton) { saveButton.disabled = false; saveButton.textContent = isNewOwner ? "Add Owner" : "Save Owner"; }
+    return;
+  }
+  if (isNewOwner && !payload.unit) {
+    alert("Enter the property unit number.");
+    if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Add Owner"; }
+    return;
+  }
   const additionalProperties = [...document.querySelectorAll("#u12PropertyList .u12PropertyCard")].map(card => {
     const value = field => card.querySelector(`[data-field="${field}"]`)?.value.trim() || null;
     return {
@@ -6121,10 +6135,13 @@ u10SaveOwner = async function (id) {
     };
   }).filter(property => property.community || property.cluster || property.unit);
 
-  const {data,error} = await db.from(TABLE_NAME).update(payload).eq("id",id).select().single();
+  const saveQuery = isNewOwner
+    ? db.from(TABLE_NAME).insert([payload]).select().single()
+    : db.from(TABLE_NAME).update(payload).eq("id",id).select().single();
+  const {data,error} = await saveQuery;
   if (error) {
     alert(`Could not save owner: ${error.message}`);
-    if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Save Owner"; }
+    if (saveButton) { saveButton.disabled = false; saveButton.textContent = isNewOwner ? "Add Owner" : "Save Owner"; }
     return;
   }
   if (additionalProperties.length) {
@@ -6135,10 +6152,15 @@ u10SaveOwner = async function (id) {
       return;
     }
   }
-  await db.from(U6_OWNER_ACTIVITIES).insert([{owner_id:String(id),activity_type:"Owner details updated",details:additionalProperties.length ? `Owner details updated and ${additionalProperties.length} additional ${additionalProperties.length === 1 ? "property" : "properties"} added` : "Owner details updated",created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
+  const savedId = data.id;
+  const activityType = isNewOwner ? "Owner added" : "Owner details updated";
+  const activityDetails = additionalProperties.length
+    ? `${activityType} and ${additionalProperties.length} additional ${additionalProperties.length === 1 ? "property" : "properties"} added`
+    : activityType;
+  await db.from(U6_OWNER_ACTIVITIES).insert([{owner_id:String(savedId),activity_type:activityType,details:activityDetails,created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
   document.getElementById("u10OwnerEditor")?.remove();
   u6ActiveOwnerRow=data;
-  await loadOwnerMiniRows();
+  await loadDropdowns();
   await openOwnerProfile(data);
   loadData();
 };
