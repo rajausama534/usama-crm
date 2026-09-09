@@ -1,0 +1,181 @@
+126|Sale|Sold|7,050,000|17 Aug 2026|
+127|Sale|Sold|7,000,000|28 Jul 2026|
+147|Sale|Sold|6,950,000|21 Jul 2026|
+64|Sale|Sold|5,000,000|02 Jul 2026|
+16|Sale|Sold|6,500,000|01 Jul 2026|
+94|Sale|Sold|8,100,000|18 Jun 2026|
+198|Sale|Sold|6,600,000|12 Jun 2026|
+89|Sale|Sold|8,000,000|20 May 2026|
+63|Sale|Sold|6,700,000|11 May 2026|
+193|Sale|Sold|9,500,000|07 May 2026|
+153|Sale|Sold|8,350,000|01 Apr 2026|
+133|Sale|Sold|7,700,000|31 Mar 2026|
+164|Sale|Sold|7,350,000|10 Mar 2026|
+3|Sale|Sold|6,850,000|05 Mar 2026|
+55|Sale|Sold|7,675,000|03 Mar 2026|
+131|Sale|Sold|7,900,000|26 Feb 2026|
+50|Sale|Sold|8,000,000|25 Feb 2026|
+150|Sale|Sold|8,000,000|06 Feb 2026|
+125|Sale|Sold|7,500,000|30 Jan 2026|
+144|Sale|Sold|6,500,000|29 Jan 2026|
+57|Sale|Sold|7,850,000|22 Jan 2026|
+214|Sale|Sold|7,200,000|12 Jan 2026|
+25|Sale|Sold|7,600,000|09 Jan 2026|
+11|Sale|Sold|7,950,000|08 Jan 2026|
+122|Sale|Sold|7,650,000|30 Dec 2025|
+158|Sale|Sold|8,150,000|29 Dec 2025|
+88|Sale|Sold|7,150,000|25 Dec 2025|
+219|Sale|Sold|7,450,000|19 Dec 2025|
+163|Sale|Sold|7,000,000|11 Dec 2025|
+210|Sale|Sold|7,700,000|26 Nov 2025|
+188|Sale|Sold|10,500,000|14 Nov 2025|
+66|Sale|Sold|6,670,000|10 Nov 2025|
+83|Sale|Sold|7,400,000|05 Nov 2025|
+217|Sale|Sold|7,400,000|29 Oct 2025|
+236|Sale|Sold|7,250,000|27 Oct 2025|
+247|Sale|Sold|5,200,000|21 Oct 2025|
+155|Sale|Sold|8,000,000|14 Oct 2025|
+87|Sale|Sold|7,600,000|01 Oct 2025|
+233|Sale|Sold|7,310,000|22 Sep 2025|
+114|Sale|Sold|6,450,000|17 Sep 2025|
+199|Sale|Sold|7,450,000|29 Aug 2025|
+146|Sale|Sold|7,900,000|22 Aug 2025|
+80|Sale|Sold|7,500,000|15 Aug 2025|
+196|Sale|Sold|6,900,000|13 Aug 2025|
+157|Sale|Sold|7,775,000|13 Aug 2025|
+30|Sale|Sold|11,350,000|13 Aug 2025|
+95|Sale|Sold|7,450,000|08 Aug 2025|
+200|Sale|Sold|7,000,000|06 Aug 2025|
+60|Sale|Sold|6,000,000|05 Aug 2025|
+140|Sale|Sold|6,450,000|25 Jul 2025|
+223|Sale|Sold|7,350,000|30 Jun 2025|
+190|Sale|Sold|9,600,000|26 Jun 2025|
+9|Sale|Sold|5,700,000|04 Jun 2025|
+207|Sale|Sold|7,100,000|08 May 2025|
+98|Sale|Sold|7,210,000|29 Apr 2025|
+121|Sale|Sold|7,000,000|24 Apr 2025|
+243|Sale|Sold|2,116,444|25 Mar 2025|
+183|Sale|Sold|9,000,000|19 Mar 2025|
+175|Sale|Sold|6,900,000|13 Mar 2025|
+173|Sale|Sold|6,900,000|28 Jan 2025|
+14|Sale|Sold|6,300,000|13 Dec 2024|
+230|Sale|Sold|6,500,000|09 Dec 2024|
+160|Sale|Sold|6,800,000|26 Nov 2024|
+82|Sale|Sold|5,925,000|18 Nov 2024|
+228|Sale|Sold|6,100,000|15 Nov 2024|
+169|Sale|Sold|6,250,000|10 Oct 2024|
+84|Sale|Sold|6,500,000|07 Oct 2024|
+152|Sale|Sold|6,750,000|07 Oct 2024|
+62|Sale|Sold|5,300,000|30 Sep 2024|
+53|Sale|Sold|6,400,000|15 Aug 2024|
+26|Sale|Sold|6,000,000|17 Jul 2024|
+79|Sale|Sold|6,000,000|11 Jul 2024|
+142|Sale|Sold|4,850,000|25 Jun 2024|
+96|Sale|Sold|5,500,000|04 Jun 2024|
+238|Sale|Sold|5,500,000|03 Jun 2024|
+231|Sale|Sold|5,600,000|30 May 2024|
+245|Sale|Sold|5,600,000|29 May 2024|
+161|Sale|Sold|5,275,000|29 Mar 2024|
+45|Sale|Sold|5,300,000|14 Mar 2024|
+85|Sale|Sold|5,859,456|12 Mar 2024|
+73|Sale|Sold|4,578,311|12 Mar 2024|
+72|Sale|Sold|3,458,888|06 Mar 2024|
+20|Sale|Sold|5,300,000|04 Mar 2024|
+2|Sale|Sold|4,500,000|01 Mar 2024|
+15|Sale|Sold|5,100,000|22 Feb 2024|
+71|Sale|Sold|4,400,000|21 Feb 2024|
+107|Sale|Sold|5,950,000|05 Feb 2024|
+81|Sale|Sold|4,775,200|29 Jan 2024|
+40|Sale|Sold|6,600,000|25 Jan 2024|
+41|Sale|Sold|6,600,000|25 Jan 2024|
+42|Sale|Sold|6,600,000|25 Jan 2024|
+206|Sale|Sold|4,234,888|05 Jan 2024|
+28|Sale|Sold|5,300,000|03 Jan 2024|
+178|Sale|Sold|6,800,000|02 Jan 2024|
+11|Rental|Rented|300,000|7 Sep 2026|6 Sep 2027
+231|Rental|Rented|290,000|1 Sep 2026|31 Aug 2027
+64|Rental|Rented|320,000|19 Aug 2026|18 Aug 2027
+28|Rental|Rented|305,000|30 Jul 2026|29 Jul 2027
+167|Rental|Renewed|500,000|15 Jun 2026|14 Jun 2027
+171|Rental|Rented|300,000|6 Aug 2026|5 Aug 2027
+26|Rental|Rented|310,000|27 Jul 2026|26 Jul 2027
+106|Rental|Rented|930,000|1 Aug 2026|31 Jul 2029
+159|Rental|Rented|325,000|20 Jul 2026|19 Jul 2027
+242|Rental|Rented|290,000|16 Jul 2026|15 Jul 2027
+184|Rental|Rented|475,000|15 Jul 2026|14 Jul 2027
+243|Rental|Rented|310,000|18 Jul 2026|17 Jul 2027
+99|Rental|Rented|300,000|10 Jul 2026|9 Jul 2027
+168|Rental|Rented|290,000|10 Jul 2026|9 Jul 2027
+25|Rental|Rented|520,000|10 Aug 2026|9 Aug 2027
+6|Rental|Renewed|145,000|9 Jul 2026|8 Jan 2027
+46|Rental|Rented|1,050,000|10 Jul 2026|9 Jul 2028
+172|Rental|Rented|280,000|20 Jul 2026|19 Jul 2027
+245|Rental|Rented|265,000|5 Jul 2026|4 Jul 2027
+78|Rental|Rented|320,000|7 Jul 2026|6 Jul 2027
+179|Rental|Rented|1,100,000|1 Aug 2026|31 Jul 2028
+35|Rental|Rented|625,000|1 Jul 2026|30 Jun 2027
+129|Rental|Rented|580,000|1 Jul 2026|30 Jun 2028
+204|Rental|Rented|285,000|25 Jun 2026|24 Jun 2027
+235|Rental|Rented|280,000|1 Jul 2026|30 Jun 2027
+194|Rental|Rented|700,000|16 Jun 2026|1 Jul 2028
+120|Rental|Rented|300,000|25 Jun 2026|24 Jun 2027
+57|Rental|Rented|285,000|21 Jun 2026|20 Jun 2027
+141|Rental|Renewed|280,000|15 Jul 2026|14 Jul 2027
+214|Rental|Rented|275,000|19 Jun 2026|18 Jun 2027
+13|Rental|Rented|285,000|26 Jun 2026|25 Jun 2027
+232|Rental|Rented|550,000|10 Jun 2026|9 Jun 2028
+229|Rental|Rented|280,000|27 Jun 2026|26 Jun 2027
+42|Rental|Rented|525,000|1 Jun 2026|31 May 2027
+217|Rental|Rented|580,000|12 Jun 2026|11 Jun 2028
+170|Rental|Rented|366,666.67|1 Jul 2026|31 Oct 2027
+49|Rental|Rented|580,000|10 Jun 2026|9 Jun 2028
+151|Rental|Rented|1,200,000|1 Jun 2026|31 May 2028
+208|Rental|Rented|290,000|1 Jun 2026|31 May 2027
+112|Rental|Rented|270,000|1 Jun 2026|31 May 2027
+227|Rental|Rented|590,000|20 May 2026|19 May 2028
+101|Rental|Rented|310,000|30 May 2026|29 May 2027
+176|Rental|Rented|320,000|20 May 2026|19 May 2027
+202|Rental|Rented|285,000|16 May 2026|15 May 2027
+20|Rental|Rented|580,000|13 May 2026|12 May 2028
+65|Rental|Rented|520,000|22 May 2026|21 May 2028
+211|Rental|Rented|385,000|18 May 2026|17 May 2027
+212|Rental|Rented|285,000|22 May 2026|21 May 2027
+113|Rental|Rented|250,000|1 May 2026|30 Apr 2027
+115|Rental|Rented|275,000|1 May 2026|30 Apr 2027
+166|Rental|Rented|330,000|15 Apr 2026|14 May 2027
+135|Rental|Rented|300,000|1 May 2026|30 Apr 2027
+52|Rental|Rented|300,000|21 Apr 2026|20 Apr 2027
+107|Rental|Rented|295,000|24 Apr 2026|21 May 2027
+160|Rental|Rented|1,000,000|15 Apr 2026|14 Apr 2028
+4|Rental|Rented|275,000|15 Apr 2026|14 Apr 2027
+45|Rental|Rented|700,000|9 Mar 2026|8 Mar 2028
+43|Rental|Rented|550,000|1 Mar 2026|28 Feb 2027
+51|Rental|Rented|335,000|1 Mar 2026|2 Mar 2027
+66|Rental|Rented|285,000|20 Feb 2026|19 Feb 2027
+180|Rental|Rented|1,300,000|20 Feb 2026|19 Feb 2028
+244|Rental|Rented|430,000|3 Feb 2026|2 Feb 2027
+225|Rental|Rented|390,000|10 Feb 2026|9 Feb 2027
+102|Rental|Rented|400,000|15 Jan 2026|14 Jan 2027
+104|Rental|Rented|370,000|7 Jan 2026|6 Jan 2027
+24|Rental|Rented|460,000|15 Dec 2025|14 Dec 2026
+70|Rental|Rented|315,000|2 Jan 2026|1 Jan 2027
+140|Rental|Rented|320,000|1 Jan 2026|31 Dec 2026
+76|Rental|Rented|420,000|16 Dec 2025|15 Dec 2026
+65|Rental|Rented|300,000|5 Dec 2025|4 Dec 2026
+92|Rental|Rented|72,000|5 Dec 2025|4 Dec 2026
+137|Rental|Rented|325,000|22 Dec 2025|21 Dec 2026
+165|Rental|Rented|370,000|3 Dec 2025|2 Dec 2026
+48|Rental|Rented|650,000|1 Dec 2025|30 Nov 2026
+156|Rental|Rented|400,000|1 Dec 2025|30 Nov 2026
+110|Rental|Rented|380,000|1 Dec 2025|30 Nov 2026
+90|Rental|Rented|350,000|1 Dec 2025|30 Nov 2026
+44|Rental|Rented|840,000|28 Nov 2025|27 Nov 2027
+185|Rental|Rented|1,800,000|13 Nov 2025|31 Dec 2028
+41|Rental|Rented|700,000|28 Oct 2025|27 Oct 2026
+74|Rental|Rented|460,000|1 Oct 2025|30 Sep 2026
+27|Rental|Rented|425,000|3 Oct 2025|2 Oct 2026
+9|Rental|Rented|320,000|8 Oct 2025|7 Oct 2026
+117|Rental|Rented|465,000|26 Sep 2025|25 Sep 2026
+38|Rental|Rented|500,000|1 Oct 2025|30 Sep 2026
+224|Rental|Rented|380,000|15 Sep 2025|14 Sep 2026
+136|Rental|Rented|330,000|1 Oct 2025|30 Sep 2026
