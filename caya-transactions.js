@@ -1,7 +1,7 @@
 (()=>{
   'use strict';
 
-  const MIGRATION_KEY='caya_sale_rental_transaction_activities_20260909_v1';
+  const MIGRATION_KEY='caya_sale_rental_transaction_activities_20260911_v2';
   const DATA_FILE='data/caya-latest-transactions.txt';
   const ACTIVITY_TYPE='Property Transaction';
 
