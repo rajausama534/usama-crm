@@ -7,7 +7,8 @@
     s.onerror=()=>reject(new Error(`Unable to load ${src}`));
     document.body.appendChild(s);
   });
-  load('crm-enhancements-core.js?v=20260909')
-    .then(()=>load('caya-transactions.js?v=20260909'))
+  load('crm-enhancements-core.js?v=20260911')
+    .then(()=>load('caya-transactions.js?v=20260911'))
+    .then(()=>load('numeric-unit-sort.js?v=20260911'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
