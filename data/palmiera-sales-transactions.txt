@@ -1,139 +1,139 @@
-165|Sale|Sold|9,500,000|10 Sep 2026|
-209|Sale|Sold|11,877,199|05 Aug 2026|
-51|Sale|Sold|11,500,000|05 Aug 2026|
-177|Sale|Sold|10,700,000|04 Aug 2026|
-86|Sale|Sold|17,909,552|02 Jul 2026|
-29|Sale|Sold|9,500,000|22 Jun 2026|
-163|Sale|Sold|10,450,000|19 Jun 2026|
-31|Sale|Sold|9,550,000|18 Jun 2026|
-96|Sale|Sold|9,600,000|19 May 2026|
-138|Sale|Sold|10,750,000|04 May 2026|
-158|Sale|Sold|10,519,888|27 Apr 2026|
-112|Sale|Sold|10,000,000|21 Apr 2026|
-244|Sale|Sold|6,250,000|14 Apr 2026|
-40|Sale|Sold|6,291,299|14 Mar 2026|
-212|Sale|Sold|16,700,000|27 Feb 2026|
-18|Sale|Sold|12,600,000|27 Feb 2026|
-189|Sale|Sold|13,000,000|23 Feb 2026|
-240|Sale|Sold|11,350,000|18 Feb 2026|
-254|Sale|Sold|13,700,000|16 Feb 2026|
-222|Sale|Sold|11,600,000|16 Feb 2026|
-224|Sale|Sold|11,300,000|13 Feb 2026|
-68|Sale|Sold|11,000,000|06 Feb 2026|
-160|Sale|Sold|12,500,000|29 Jan 2026|
-139|Sale|Sold|12,950,000|22 Jan 2026|
-168|Sale|Sold|13,750,000|05 Jan 2026|
-92|Sale|Sold|16,000,000|23 Dec 2025|
-57|Sale|Sold|11,200,000|22 Dec 2025|
-24|Sale|Sold|10,450,000|17 Dec 2025|
-32|Sale|Sold|10,450,000|28 Nov 2025|
-89|Sale|Sold|15,300,000|21 Nov 2025|
-106|Sale|Sold|14,250,000|17 Nov 2025|
-231|Sale|Sold|10,500,000|04 Nov 2025|
-56|Sale|Sold|10,650,000|28 Oct 2025|
-99|Sale|Sold|9,750,000|22 Oct 2025|
-188|Sale|Sold|12,300,000|10 Oct 2025|
-190|Sale|Sold|10,600,000|02 Oct 2025|
-44|Sale|Sold|11,400,000|25 Sep 2025|
-120|Sale|Sold|11,600,000|25 Sep 2025|
-71|Sale|Sold|15,480,000|23 Sep 2025|
-35|Sale|Sold|10,200,000|22 Sep 2025|
-147|Sale|Sold|15,350,000|03 Sep 2025|
-28|Sale|Sold|11,500,000|21 Aug 2025|
-107|Sale|Sold|11,750,000|04 Aug 2025|
-51|Sale|Sold|11,700,000|25 Jul 2025|
-153|Sale|Sold|15,000,000|22 Jul 2025|
-234|Sale|Sold|10,300,000|21 Jul 2025|
-185|Sale|Sold|11,000,000|26 Jun 2025|
-113|Sale|Sold|10,750,000|16 Jun 2025|
-243|Sale|Sold|10,600,000|29 May 2025|
-250|Sale|Sold|10,800,000|29 May 2025|
-264|Sale|Sold|12,400,000|27 May 2025|
-75|Sale|Sold|15,200,000|22 Apr 2025|
-36|Sale|Sold|9,600,000|14 Apr 2025|
-254|Sale|Sold|2,562,000|08 Apr 2025|
-245|Sale|Sold|9,500,000|25 Mar 2025|
-80|Sale|Sold|13,000,000|24 Mar 2025|
-73|Sale|Sold|16,000,000|24 Mar 2025|
-25|Sale|Sold|10,550,000|18 Mar 2025|
-202|Sale|Sold|15,300,000|28 Feb 2025|
-218|Sale|Sold|10,752,888|20 Feb 2025|
-124|Sale|Sold|10,600,000|19 Feb 2025|
-244|Sale|Sold|10,250,000|18 Feb 2025|
-137|Sale|Sold|9,800,000|17 Feb 2025|
-162|Sale|Sold|9,700,000|10 Feb 2025|
-48|Sale|Sold|10,300,000|03 Feb 2025|
-171|Sale|Sold|9,700,000|24 Jan 2025|
-30|Sale|Sold|9,568,000|23 Jan 2025|
-67|Sale|Sold|10,100,000|22 Jan 2025|
-181|Sale|Sold|10,750,000|25 Dec 2024|
-161|Sale|Sold|9,726,612|20 Dec 2024|
-158|Sale|Sold|10,519,888|20 Dec 2024|
-8|Sale|Sold|10,562,888|17 Dec 2024|
-103|Sale|Sold|10,700,000|17 Dec 2024|
-139|Sale|Sold|11,100,000|12 Dec 2024|
-160|Sale|Sold|9,694,932|09 Dec 2024|
-217|Sale|Sold|9,654,850|08 Dec 2024|
-20|Sale|Sold|9,819,888|05 Dec 2024|
-219|Sale|Sold|10,698,888|05 Dec 2024|
-255|Sale|Sold|10,153,888|04 Dec 2024|
-94|Sale|Sold|14,753,888|28 Nov 2024|
-159|Sale|Sold|9,748,888|20 Nov 2024|
-246|Sale|Sold|10,040,970|13 Nov 2024|
-242|Sale|Sold|9,700,000|04 Nov 2024|
-129|Sale|Sold|11,400,000|04 Nov 2024|
-212|Sale|Sold|14,181,888|08 Oct 2024|
-252|Sale|Sold|9,750,000|10 Sep 2024|
-23|Sale|Sold|8,800,000|03 Sep 2024|
-26|Sale|Sold|9,800,000|03 Sep 2024|
-89|Sale|Sold|14,188,888|03 Sep 2024|
-61|Sale|Sold|10,000,000|26 Aug 2024|
-146|Sale|Sold|14,970,888|22 Aug 2024|
-106|Sale|Sold|11,000,000|22 Aug 2024|
-170|Sale|Sold|9,800,000|25 Jul 2024|
-87|Sale|Sold|13,196,888|24 Jul 2024|
-64|Sale|Sold|10,200,000|22 Jul 2024|
-255|Sale|Sold|10,153,888|15 Jul 2024|
-136|Sale|Sold|8,846,888|24 May 2024|
-43|Sale|Sold|9,126,630|16 May 2024|
-97|Sale|Sold|9,295,888|14 May 2024|
-93|Sale|Sold|14,639,888|14 May 2024|
-92|Sale|Sold|14,308,888|14 May 2024|
-101|Sale|Sold|8,931,888|13 May 2024|
-91|Sale|Sold|14,038,888|29 Apr 2024|
-213|Sale|Sold|12,975,888|19 Apr 2024|
-10|Sale|Sold|10,329,090|03 Apr 2024|
-215|Sale|Sold|9,513,888|01 Apr 2024|
-4|Sale|Sold|9,002,888|01 Apr 2024|
-256|Sale|Sold|9,733,888|01 Apr 2024|
-86|Sale|Sold|13,552,888|29 Mar 2024|
-257|Sale|Sold|9,781,888|28 Mar 2024|
-88|Sale|Sold|14,188,888|27 Mar 2024|
-200|Sale|Sold|9,930,888|27 Mar 2024|
-96|Sale|Sold|9,295,888|27 Mar 2024|
-199|Sale|Sold|9,576,888|27 Mar 2024|
-9|Sale|Sold|9,475,888|27 Mar 2024|
-98|Sale|Sold|8,944,888|27 Mar 2024|
-6|Sale|Sold|8,708,888|26 Mar 2024|
-90|Sale|Sold|14,038,888|26 Mar 2024|
-201|Sale|Sold|10,201,888|26 Mar 2024|
-99|Sale|Sold|8,944,888|26 Mar 2024|
-214|Sale|Sold|14,205,888|26 Mar 2024|
-5|Sale|Sold|8,708,888|26 Mar 2024|
-100|Sale|Sold|8,640,888|26 Mar 2024|
-95|Sale|Sold|9,564,888|26 Mar 2024|
-7|Sale|Sold|8,896,888|26 Mar 2024|
-52|Sale|Sold|9,149,888|07 Mar 2024|
-21|Sale|Sold|9,468,888|28 Feb 2024|
-175|Sale|Sold|8,842,888|26 Feb 2024|
-247|Sale|Sold|9,287,888|26 Feb 2024|
-234|Sale|Sold|8,808,888|21 Feb 2024|
-156|Sale|Sold|13,242,888|20 Feb 2024|
-176|Sale|Sold|9,191,888|15 Feb 2024|
-163|Sale|Sold|9,232,888|15 Feb 2024|
-66|Sale|Sold|9,554,888|12 Feb 2024|
-115|Sale|Sold|9,195,888|26 Jan 2024|
-137|Sale|Sold|9,195,888|19 Jan 2024|
-239|Sale|Sold|9,594,888|16 Jan 2024|
-188|Sale|Sold|9,963,888|10 Jan 2024|
-122|Sale|Sold|9,746,888|04 Jan 2024|
+165|Sale|Sold|9,500,000|10 Sep 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+209|Sale|Sold|11,877,199|05 Aug 2026|5BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+51|Sale|Sold|11,500,000|05 Aug 2026|4BR|10,341 sqft|3rd Transaction|Individual (2 Times)
+177|Sale|Sold|10,700,000|04 Aug 2026|4BR|8,885 sqft|2nd Transaction|Individual (1 Time)
+86|Sale|Sold|17,909,552|02 Jul 2026|5BR|8,231 sqft|2nd Transaction|Individual
+29|Sale|Sold|9,500,000|22 Jun 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+163|Sale|Sold|10,450,000|19 Jun 2026|4BR|8,573 sqft|2nd Transaction|Individual (1 Time)
+31|Sale|Sold|9,550,000|18 Jun 2026|4BR|9,006 sqft|2nd Transaction|Individual (1 Time)
+96|Sale|Sold|9,600,000|19 May 2026|4BR|8,339 sqft|2nd Transaction|Individual (1 Time)
+138|Sale|Sold|10,750,000|04 May 2026|4BR|10,108 sqft|2nd Transaction|Individual (1 Time)
+158|Sale|Sold|10,519,888|27 Apr 2026|4BR|8,820 sqft|2nd Transaction|Individual (1 Time)
+112|Sale|Sold|10,000,000|21 Apr 2026|4BR|10,366 sqft|2nd Transaction|Individual (1 Time)
+244|Sale|Sold|6,250,000|14 Apr 2026|4BR|8,267 sqft|3rd Transaction|Individual (2 Times)
+40|Sale|Sold|6,291,299|14 Mar 2026|4BR|8,726 sqft|2nd Transaction|Individual (1 Time)
+212|Sale|Sold|16,700,000|27 Feb 2026|5BR|8,380 sqft|3rd Transaction|Individual (2 Times)
+18|Sale|Sold|12,600,000|27 Feb 2026|4BR|9,396 sqft|2nd Transaction|Individual (1 Time)
+189|Sale|Sold|13,000,000|23 Feb 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+240|Sale|Sold|11,350,000|18 Feb 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+254|Sale|Sold|13,700,000|16 Feb 2026|4BR|8,558 sqft|3rd Transaction|Individual (2 Times)
+222|Sale|Sold|11,600,000|16 Feb 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+224|Sale|Sold|11,300,000|13 Feb 2026|4BR|8,269 sqft|2nd Transaction|Individual (1 Time)
+68|Sale|Sold|11,000,000|06 Feb 2026|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+160|Sale|Sold|12,500,000|29 Jan 2026|4BR|8,651 sqft|2nd Transaction|Individual (1 Time)
+139|Sale|Sold|12,950,000|22 Jan 2026|4BR|9,524 sqft|3rd Transaction|Individual (2 Times)
+168|Sale|Sold|13,750,000|05 Jan 2026|4BR|11,130 sqft|2nd Transaction|Individual (1 Time)
+92|Sale|Sold|16,000,000|23 Dec 2025|5BR|9,326 sqft|2nd Transaction|Individual (1 Time)
+57|Sale|Sold|11,200,000|22 Dec 2025|4BR|7,948 sqft|2nd Transaction|Individual (1 Time)
+24|Sale|Sold|10,450,000|17 Dec 2025|4BR|9,624 sqft|2nd Transaction|Individual (1 Time)
+32|Sale|Sold|10,450,000|28 Nov 2025|4BR|8,132 sqft|2nd Transaction|Individual (1 Time)
+89|Sale|Sold|15,300,000|21 Nov 2025|5BR|8,266 sqft|2nd Transaction|Individual (1 Time)
+106|Sale|Sold|14,250,000|17 Nov 2025|4BR|11,199 sqft|3rd Transaction|Individual (2 Times)
+231|Sale|Sold|10,500,000|04 Nov 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+56|Sale|Sold|10,650,000|28 Oct 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+99|Sale|Sold|9,750,000|22 Oct 2025|4BR|8,351 sqft|2nd Transaction|Individual (1 Time)
+188|Sale|Sold|12,300,000|10 Oct 2025|4BR|10,261 sqft|2nd Transaction|Individual (1 Time)
+190|Sale|Sold|10,600,000|02 Oct 2025|4BR|8,256 sqft|2nd Transaction|Individual (1 Time)
+44|Sale|Sold|11,400,000|25 Sep 2025|4BR|8,198 sqft|2nd Transaction|Individual (1 Time)
+120|Sale|Sold|11,600,000|25 Sep 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+71|Sale|Sold|15,480,000|23 Sep 2025|5BR|8,306 sqft|2nd Transaction|Individual (1 Time)
+35|Sale|Sold|10,200,000|22 Sep 2025|4BR|8,477 sqft|2nd Transaction|Individual (1 Time)
+147|Sale|Sold|15,350,000|03 Sep 2025|5BR|8,611 sqft|2nd Transaction|Individual (1 Time)
+28|Sale|Sold|11,500,000|21 Aug 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+107|Sale|Sold|11,750,000|04 Aug 2025|4BR|11,609 sqft|2nd Transaction|Individual (1 Time)
+51|Sale|Sold|11,700,000|25 Jul 2025|4BR|10,341 sqft|3rd Transaction|Individual (2 Times)
+153|Sale|Sold|15,000,000|22 Jul 2025|5BR|8,611 sqft|2nd Transaction|Individual (1 Time)
+234|Sale|Sold|10,300,000|21 Jul 2025|4BR|9,076 sqft|2nd Transaction|Individual (1 Time)
+185|Sale|Sold|11,000,000|26 Jun 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+113|Sale|Sold|10,750,000|16 Jun 2025|4BR|10,366 sqft|2nd Transaction|Individual (1 Time)
+243|Sale|Sold|10,600,000|29 May 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+250|Sale|Sold|10,800,000|29 May 2025|4BR|11,075 sqft|2nd Transaction|Individual (1 Time)
+264|Sale|Sold|12,400,000|27 May 2025|4BR|10,202 sqft|2nd Transaction|Individual (1 Time)
+75|Sale|Sold|15,200,000|22 Apr 2025|5BR|8,421 sqft|2nd Transaction|Individual (1 Time)
+36|Sale|Sold|9,600,000|14 Apr 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+254|Sale|Sold|2,562,000|08 Apr 2025|4BR|8,558 sqft|3rd Transaction|Individual (2 Times)
+245|Sale|Sold|9,500,000|25 Mar 2025|4BR|8,527 sqft|2nd Transaction|Individual (1 Time)
+80|Sale|Sold|13,000,000|24 Mar 2025|5BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+73|Sale|Sold|16,000,000|24 Mar 2025|5BR|8,499 sqft|2nd Transaction|Individual (1 Time)
+25|Sale|Sold|10,550,000|18 Mar 2025|4BR|9,913 sqft|2nd Transaction|Individual (1 Time)
+202|Sale|Sold|15,300,000|28 Feb 2025|5BR|8,266 sqft|2nd Transaction|Individual (1 Time)
+218|Sale|Sold|10,752,888|20 Feb 2025|4BR|8,241 sqft|1st Transaction|Developer
+124|Sale|Sold|10,600,000|19 Feb 2025|4BR|8,245 sqft|2nd Transaction|Individual (1 Time)
+244|Sale|Sold|10,250,000|18 Feb 2025|4BR|8,267 sqft|3rd Transaction|Individual (2 Times)
+137|Sale|Sold|9,800,000|17 Feb 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+162|Sale|Sold|9,700,000|10 Feb 2025|4BR|8,380 sqft|2nd Transaction|Individual (1 Time)
+48|Sale|Sold|10,300,000|03 Feb 2025|4BR|9,378 sqft|2nd Transaction|Individual (1 Time)
+171|Sale|Sold|9,700,000|24 Jan 2025|4BR|8,232 sqft|2nd Transaction|Individual (1 Time)
+30|Sale|Sold|9,568,000|23 Jan 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+67|Sale|Sold|10,100,000|22 Jan 2025|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+181|Sale|Sold|10,750,000|25 Dec 2024|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+161|Sale|Sold|9,726,612|20 Dec 2024|4BR|8,892 sqft|1st Transaction|Developer
+158|Sale|Sold|10,519,888|20 Dec 2024|4BR|8,820 sqft|1st Transaction|Developer
+8|Sale|Sold|10,562,888|17 Dec 2024|4BR|11,222 sqft|1st Transaction|Developer
+103|Sale|Sold|10,700,000|17 Dec 2024|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+139|Sale|Sold|11,100,000|12 Dec 2024|4BR|9,524 sqft|3rd Transaction|Individual (2 Times)
+160|Sale|Sold|9,694,932|09 Dec 2024|4BR|8,651 sqft|1st Transaction|Developer
+217|Sale|Sold|9,654,850|08 Dec 2024|4BR|8,267 sqft|1st Transaction|Developer
+20|Sale|Sold|9,819,888|05 Dec 2024|4BR|9,704 sqft|1st Transaction|Developer
+219|Sale|Sold|10,698,888|05 Dec 2024|4BR|8,193 sqft|1st Transaction|Developer
+255|Sale|Sold|10,153,888|04 Dec 2024|4BR|8,273 sqft|2nd Transaction|Individual (1 Time)
+94|Sale|Sold|14,753,888|28 Nov 2024|5BR|11,117 sqft|1st Transaction|Developer
+159|Sale|Sold|9,748,888|20 Nov 2024|4BR|8,651 sqft|1st Transaction|Developer
+246|Sale|Sold|10,040,970|13 Nov 2024|4BR|8,269 sqft|1st Transaction|Developer
+242|Sale|Sold|9,700,000|04 Nov 2024|4BR|8,838 sqft|2nd Transaction|Individual (1 Time)
+129|Sale|Sold|11,400,000|04 Nov 2024|4BR|11,607 sqft|2nd Transaction|Individual (1 Time)
+212|Sale|Sold|14,181,888|08 Oct 2024|5BR|8,380 sqft|3rd Transaction|Individual (2 Times)
+252|Sale|Sold|9,750,000|10 Sep 2024|4BR|8,475 sqft|2nd Transaction|Individual (1 Time)
+23|Sale|Sold|8,800,000|03 Sep 2024|4BR|8,633 sqft|2nd Transaction|Individual (1 Time)
+26|Sale|Sold|9,800,000|03 Sep 2024|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+89|Sale|Sold|14,188,888|03 Sep 2024|5BR|8,266 sqft|1st Transaction|Developer
+61|Sale|Sold|10,000,000|26 Aug 2024|4BR|8,267 sqft|2nd Transaction|Individual (1 Time)
+146|Sale|Sold|14,970,888|22 Aug 2024|5BR|10,200 sqft|1st Transaction|Developer
+106|Sale|Sold|11,000,000|22 Aug 2024|4BR|11,199 sqft|3rd Transaction|Individual (2 Times)
+170|Sale|Sold|9,800,000|25 Jul 2024|4BR|8,884 sqft|2nd Transaction|Individual (1 Time)
+87|Sale|Sold|13,196,888|24 Jul 2024|5BR|8,266 sqft|1st Transaction|Developer
+64|Sale|Sold|10,200,000|22 Jul 2024|4BR|11,900 sqft|2nd Transaction|Individual (1 Time)
+255|Sale|Sold|10,153,888|15 Jul 2024|4BR|8,273 sqft|1st Transaction|Developer
+136|Sale|Sold|8,846,888|24 May 2024|4BR|8,267 sqft|1st Transaction|Developer
+43|Sale|Sold|9,126,630|16 May 2024|4BR|8,227 sqft|1st Transaction|Developer
+97|Sale|Sold|9,295,888|14 May 2024|4BR|8,339 sqft|1st Transaction|Developer
+93|Sale|Sold|14,639,888|14 May 2024|5BR|10,669 sqft|1st Transaction|Developer
+92|Sale|Sold|14,308,888|14 May 2024|5BR|9,326 sqft|1st Transaction|Developer
+101|Sale|Sold|8,931,888|13 May 2024|4BR|8,594 sqft|1st Transaction|Developer
+91|Sale|Sold|14,038,888|29 Apr 2024|5BR|8,268 sqft|1st Transaction|Developer
+213|Sale|Sold|12,975,888|19 Apr 2024|5BR|8,565 sqft|1st Transaction|Developer
+10|Sale|Sold|10,329,090|03 Apr 2024|4BR|10,313 sqft|1st Transaction|Developer
+215|Sale|Sold|9,513,888|01 Apr 2024|4BR|8,634 sqft|1st Transaction|Developer
+4|Sale|Sold|9,002,888|01 Apr 2024|4BR|8,818 sqft|1st Transaction|Developer
+256|Sale|Sold|9,733,888|01 Apr 2024|4BR|8,269 sqft|1st Transaction|Developer
+86|Sale|Sold|13,552,888|29 Mar 2024|5BR|8,231 sqft|1st Transaction|Developer
+257|Sale|Sold|9,781,888|28 Mar 2024|4BR|8,279 sqft|1st Transaction|Developer
+88|Sale|Sold|14,188,888|27 Mar 2024|5BR|8,266 sqft|1st Transaction|Developer
+200|Sale|Sold|9,930,888|27 Mar 2024|4BR|8,267 sqft|1st Transaction|Developer
+96|Sale|Sold|9,295,888|27 Mar 2024|4BR|8,339 sqft|1st Transaction|Developer
+199|Sale|Sold|9,576,888|27 Mar 2024|4BR|8,439 sqft|1st Transaction|Developer
+9|Sale|Sold|9,475,888|27 Mar 2024|4BR|9,974 sqft|1st Transaction|Developer
+98|Sale|Sold|8,944,888|27 Mar 2024|4BR|8,352 sqft|1st Transaction|Developer
+6|Sale|Sold|8,708,888|26 Mar 2024|4BR|8,916 sqft|1st Transaction|Developer
+90|Sale|Sold|14,038,888|26 Mar 2024|5BR|8,266 sqft|1st Transaction|Developer
+201|Sale|Sold|10,201,888|26 Mar 2024|4BR|8,231 sqft|1st Transaction|Developer
+99|Sale|Sold|8,944,888|26 Mar 2024|4BR|8,351 sqft|1st Transaction|Developer
+214|Sale|Sold|14,205,888|26 Mar 2024|5BR|8,266 sqft|1st Transaction|Developer
+5|Sale|Sold|8,708,888|26 Mar 2024|4BR|8,916 sqft|1st Transaction|Developer
+100|Sale|Sold|8,640,888|26 Mar 2024|4BR|8,267 sqft|1st Transaction|Developer
+95|Sale|Sold|9,564,888|26 Mar 2024|4BR|8,267 sqft|1st Transaction|Developer
+7|Sale|Sold|8,896,888|26 Mar 2024|4BR|8,267 sqft|1st Transaction|Developer
+52|Sale|Sold|9,149,888|07 Mar 2024|4BR|8,267 sqft|1st Transaction|Developer
+21|Sale|Sold|9,468,888|28 Feb 2024|4BR|9,141 sqft|1st Transaction|Developer
+175|Sale|Sold|8,842,888|26 Feb 2024|4BR|8,267 sqft|1st Transaction|Developer
+247|Sale|Sold|9,287,888|26 Feb 2024|4BR|8,267 sqft|1st Transaction|Developer
+234|Sale|Sold|8,808,888|21 Feb 2024|4BR|9,076 sqft|1st Transaction|Developer
+156|Sale|Sold|13,242,888|20 Feb 2024|5BR|8,266 sqft|1st Transaction|Developer
+176|Sale|Sold|9,191,888|15 Feb 2024|4BR|8,267 sqft|1st Transaction|Developer
+163|Sale|Sold|9,232,888|15 Feb 2024|4BR|8,573 sqft|1st Transaction|Developer
+66|Sale|Sold|9,554,888|12 Feb 2024|4BR|8,267 sqft|1st Transaction|Developer
+115|Sale|Sold|9,195,888|26 Jan 2024|4BR|8,267 sqft|1st Transaction|Developer
+137|Sale|Sold|9,195,888|19 Jan 2024|4BR|8,267 sqft|1st Transaction|Developer
+239|Sale|Sold|9,594,888|16 Jan 2024|4BR|8,267 sqft|1st Transaction|Developer
+188|Sale|Sold|9,963,888|10 Jan 2024|4BR|10,261 sqft|1st Transaction|Developer
+122|Sale|Sold|9,746,888|04 Jan 2024|4BR|8,267 sqft|1st Transaction|Developer
