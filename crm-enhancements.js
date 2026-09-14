@@ -13,5 +13,6 @@
     .then(()=>load('numeric-unit-sort.js?v=20260914b'))
     .then(()=>load('lead-contacted-hotfix.js?v=20260914a'))
     .then(()=>load('owner-view-hotfix.js?v=20260914a'))
+    .then(()=>load('owner-latest-remark-hotfix.js?v=20260914a'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
