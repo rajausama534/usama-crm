@@ -1,6 +1,22 @@
 (()=>{
   'use strict';
 
+  function meaningfulActivityText(activities,fallback='-'){
+    for(const activity of (activities||[])){
+      const details=String(activity?.details||'').trim();
+      if(!details) continue;
+      const lower=details.toLowerCase();
+
+      // Ignore only auto-generated contact/status entries.
+      if(lower==='whatsapp message initiated') continue;
+      if(lower==='call initiated') continue;
+      if(lower.startsWith('status changed')) continue;
+
+      return details;
+    }
+    return fallback || '-';
+  }
+
   async function hydrateLatestOwnerRemarks(){
     try{
       if(typeof currentOwnerPageRows==='undefined' || !Array.isArray(currentOwnerPageRows) || !currentOwnerPageRows.length) return;
@@ -10,7 +26,7 @@
       if(!ids.length) return;
 
       const {data,error}=await db.from(U6_OWNER_ACTIVITIES)
-        .select('*')
+        .select('owner_id,activity_type,details,created_at')
         .in('owner_id',ids)
         .order('created_at',{ascending:false});
       if(error) throw error;
@@ -24,20 +40,7 @@
 
       currentOwnerPageRows.forEach(row=>{
         const fallback=(typeof ownerRemarkValue==='function' ? ownerRemarkValue(row) : '') || '-';
-        if(typeof u10LatestManualText==='function'){
-          row.__u10_latest=u10LatestManualText(grouped[String(row.id)]||[],fallback);
-        }else{
-          const activities=grouped[String(row.id)]||[];
-          const manual=activities.find(a=>{
-            const type=String(a.activity_type||'').toLowerCase();
-            const details=String(a.details||'').trim();
-            if(!details) return false;
-            if(details.toLowerCase().includes('whatsapp message initiated')) return false;
-            if(details.toLowerCase().startsWith('status changed')) return false;
-            return !['whatsapp','status change'].includes(type);
-          });
-          row.__u10_latest=manual?.details?.trim() || fallback;
-        }
+        row.__u10_latest=meaningfulActivityText(grouped[String(row.id)]||[],fallback);
       });
 
       if(typeof renderData==='function') renderData(currentOwnerPageRows);
@@ -48,21 +51,21 @@
 
   window.hydrateLatestOwnerRemarks=hydrateLatestOwnerRemarks;
 
-  // This script loads last. Wrap the final loadData implementation so numeric
-  // sorting/filtering can finish first, then refresh the latest activity text.
-  if(typeof window.loadData==='function' && !window.loadData.__latestRemarkFinalPatch){
+  // Run after every final Owners load, including numeric sorting/filtering.
+  if(typeof window.loadData==='function' && !window.loadData.__latestRemarkFinalPatchV2){
     const originalLoadData=window.loadData;
     const patched=async function(){
       const result=await originalLoadData.apply(this,arguments);
       await hydrateLatestOwnerRemarks();
       return result;
     };
-    patched.__latestRemarkFinalPatch=true;
+    patched.__latestRemarkFinalPatchV2=true;
     window.loadData=patched;
   }
 
-  // Also refresh after a profile activity is added/edited and the modal closes.
-  setTimeout(hydrateLatestOwnerRemarks,500);
+  // Refresh shortly after initial render too.
+  setTimeout(hydrateLatestOwnerRemarks,300);
+  setTimeout(hydrateLatestOwnerRemarks,1000);
 
-  console.info('Owner latest remark table hotfix loaded.');
+  console.info('Owner latest remark table hotfix V2 loaded.');
 })();
