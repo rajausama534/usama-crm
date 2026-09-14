@@ -7,13 +7,11 @@
     s.onerror=()=>reject(new Error(`Unable to load ${src}`));
     document.body.appendChild(s);
   });
+
+  // Keep the original CRM enhancement core, then load ONE final stability layer.
+  // Older stacked hotfixes are intentionally no longer loaded because they were
+  // overriding each other and causing status, notes and sorting regressions.
   load('crm-enhancements-core.js?v=20260911')
-    .then(()=>load('caya-transactions.js?v=20260911'))
-    .then(()=>load('palmiera-transactions.js?v=20260914b'))
-    .then(()=>load('numeric-unit-sort.js?v=20260914b'))
-    .then(()=>load('lead-contacted-hotfix.js?v=20260914a'))
-    .then(()=>load('owner-view-hotfix.js?v=20260914a'))
-    .then(()=>load('owner-latest-remark-hotfix.js?v=20260914b'))
-    .then(()=>load('owner-note-dom-hotfix.js?v=20260914a'))
+    .then(()=>load('crm-stability.js?v=20260914c'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
