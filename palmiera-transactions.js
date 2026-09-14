@@ -1,7 +1,7 @@
 (()=>{
   'use strict';
 
-  const MIGRATION_KEY='palmiera_sales_transaction_activities_20260914_v1';
+  const MIGRATION_KEY='palmiera_sales_transaction_activities_20260914_v2';
   const DATA_FILE='data/palmiera-sales-transactions.txt';
   const ACTIVITY_TYPE='Property Transaction';
 
@@ -10,14 +10,14 @@
     return parts.length?String(Number(parts[parts.length-1])):'';
   };
 
-  const buildNote=item=>`Last Sale Transaction: AED ${item.amount} - ${item.startDate}`;
+  const buildNote=item=>`${item.beds}\nSize: ${item.size}\nSold Price: AED ${item.amount} (${item.transactionLabel}) - ${item.startDate}`;
 
   async function loadPalmieraTransactions(){
     const response=await fetch(DATA_FILE,{cache:'no-store'});
     if(!response.ok)throw new Error(`Unable to load ${DATA_FILE}`);
     return (await response.text()).split(/\r?\n/).filter(Boolean).map(line=>{
-      const [unit,category,type,amount,startDate,endDate]=line.split('|');
-      return {unit:normalizeUnit(unit),category,type,amount,startDate,endDate};
+      const [unit,category,type,amount,startDate,beds,size,transactionLabel,soldBy]=line.split('|');
+      return {unit:normalizeUnit(unit),category,type,amount,startDate,beds,size,transactionLabel,soldBy};
     });
   }
 
@@ -56,6 +56,16 @@
         existing.push(...(result.data||[]));
       }
 
+      // Remove the old Palmiera transaction format created by v1, then replace it with enriched notes.
+      const oldIds=existing.filter(a=>
+        a.activity_type===ACTIVITY_TYPE && /^Last Sale Transaction:/i.test(String(a.details||'').trim())
+      ).map(a=>a.id).filter(Boolean);
+      for(let index=0;index<oldIds.length;index+=50){
+        const {error:deleteError}=await db.from(U6_OWNER_ACTIVITIES).delete().in('id',oldIds.slice(index,index+50));
+        if(deleteError)throw deleteError;
+      }
+
+      existing=existing.filter(a=>!oldIds.includes(a.id));
       const existingKeys=new Set(existing.map(a=>`${String(a.owner_id)}|${String(a.details||'').trim()}`));
       const additions=matched.map(({row,item})=>({
         owner_id:String(row.id),
@@ -69,7 +79,7 @@
         if(insertError)throw insertError;
       }
 
-      console.info(`Palmiera sales migration: ${additions.length} sale notes added.`);
+      console.info(`Palmiera enriched sales migration: ${oldIds.length} old notes removed, ${additions.length} enriched sale notes added.`);
       localStorage.setItem(MIGRATION_KEY,'done');
       if(typeof loadData==='function')loadData();
     }catch(error){
@@ -85,5 +95,5 @@
   },1000);
   setTimeout(()=>clearInterval(timer),120000);
 
-  console.info('Palmiera sales transaction activity migration loaded.');
+  console.info('Palmiera enriched sales transaction activity migration loaded.');
 })();
