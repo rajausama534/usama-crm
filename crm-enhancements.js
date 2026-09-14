@@ -11,5 +11,6 @@
     .then(()=>load('caya-transactions.js?v=20260911'))
     .then(()=>load('palmiera-transactions.js?v=20260914b'))
     .then(()=>load('numeric-unit-sort.js?v=20260914b'))
+    .then(()=>load('lead-contacted-hotfix.js?v=20260914a'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
