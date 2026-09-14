@@ -10,6 +10,6 @@
   load('crm-enhancements-core.js?v=20260911')
     .then(()=>load('caya-transactions.js?v=20260911'))
     .then(()=>load('palmiera-transactions.js?v=20260914'))
-    .then(()=>load('numeric-unit-sort.js?v=20260911'))
+    .then(()=>load('numeric-unit-sort.js?v=20260914b'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
