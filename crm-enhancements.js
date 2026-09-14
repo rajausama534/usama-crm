@@ -13,5 +13,6 @@
   // overriding each other and causing status, notes and sorting regressions.
   load('crm-enhancements-core.js?v=20260911')
     .then(()=>load('crm-stability.js?v=20260914c'))
+    .then(()=>load('owner-data-update-20260914.js?v=1'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
