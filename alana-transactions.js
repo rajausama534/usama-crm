@@ -1,6 +1,6 @@
 (()=>{
   'use strict';
-  const MIGRATION_KEY='alana_sales_transaction_activities_20261005_v1';
+  const MIGRATION_KEY='alana_sales_transaction_activities_20261005_v2';
   const DATA_FILE='data/alana-sales-transactions.txt';
   const ACTIVITY_TYPE='Property Transaction';
   const normalizeUnit=value=>{const parts=String(value??'').match(/\\d+/g)||[];return parts.length?String(Number(parts[parts.length-1])):'';};
@@ -21,11 +21,15 @@
       const matched=[]; for(const row of rows||[]){for(const item of byUnit.get(normalizeUnit(row.unit))||[])matched.push({row,item});}
       if(!matched.length)throw new Error('No Alana CRM villas matched the supplied sales report.');
       const ownerIds=[...new Set((rows||[]).map(x=>String(x.id)))]; let existing=[];
-      for(let i=0;i<ownerIds.length;i+=50){const r=await db.from(U6_OWNER_ACTIVITIES).select('owner_id,details').in('owner_id',ownerIds.slice(i,i+50));if(r.error)throw r.error;existing.push(...(r.data||[]));}
+      for(let i=0;i<ownerIds.length;i+=50){const r=await db.from(U6_OWNER_ACTIVITIES).select('id,owner_id,activity_type,details').in('owner_id',ownerIds.slice(i,i+50));if(r.error)throw r.error;existing.push(...(r.data||[]));}
+      // Clear previously imported Alana sale-transaction notes first so unmatched villas stay blank.
+      const oldTransactionIds=existing.filter(a=>a.activity_type===ACTIVITY_TYPE && /^Last Sale Transaction:/i.test(String(a.details||'').trim())).map(a=>a.id).filter(Boolean);
+      for(let i=0;i<oldTransactionIds.length;i+=50){const r=await db.from(U6_OWNER_ACTIVITIES).delete().in('id',oldTransactionIds.slice(i,i+50));if(r.error)throw r.error;}
+      existing=existing.filter(a=>!oldTransactionIds.includes(a.id));
       const keys=new Set(existing.map(a=>`${String(a.owner_id)}|${String(a.details||'').trim()}`));
       const additions=matched.map(({row,item})=>({owner_id:String(row.id),activity_type:ACTIVITY_TYPE,details:buildNote(item),created_by:currentUserEmail||null})).filter(a=>!keys.has(`${a.owner_id}|${a.details}`));
       for(let i=0;i<additions.length;i+=50){const r=await db.from(U6_OWNER_ACTIVITIES).insert(additions.slice(i,i+50));if(r.error)throw r.error;}
-      localStorage.setItem(MIGRATION_KEY,'done'); console.info(`Alana sales migration: ${additions.length} notes added.`); if(typeof loadData==='function')loadData();
+      localStorage.setItem(MIGRATION_KEY,'done'); console.info(`Alana sales migration: ${oldTransactionIds.length} old transaction notes removed, ${additions.length} exact-match notes added.`); if(typeof loadData==='function')loadData();
     }catch(e){console.error('Alana sales transaction migration failed:',e);}
   }
   const timer=setInterval(()=>{if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){clearInterval(timer);run();}},1000);
