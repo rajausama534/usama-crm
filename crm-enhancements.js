@@ -13,5 +13,6 @@
     .then(()=>load('crm-stability.js?v=20260914c'))
     .then(()=>load('owner-data-update-20260914.js?v=1'))
     .then(()=>load('alana-transactions.js?v=20261005'))
+    .then(()=>load('rivana-transactions.js?v=20261005'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
