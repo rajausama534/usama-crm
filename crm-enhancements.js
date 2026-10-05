@@ -9,10 +9,9 @@
   });
 
   // Keep the original CRM enhancement core, then load ONE final stability layer.
-  // Older stacked hotfixes are intentionally no longer loaded because they were
-  // overriding each other and causing status, notes and sorting regressions.
   load('crm-enhancements-core.js?v=20260911')
     .then(()=>load('crm-stability.js?v=20260914c'))
     .then(()=>load('owner-data-update-20260914.js?v=1'))
+    .then(()=>load('alana-transactions.js?v=20261005'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
