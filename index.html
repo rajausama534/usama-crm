@@ -5776,6 +5776,32 @@ async function u10SaveOwner(id){
   u6ActiveOwnerRow=data;await openOwnerProfile(data);loadData();
 }
 
+/* Delete only the selected owner contact, never every owner at the same villa. */
+async function u14DeleteOwnerContact(ownerId) {
+  if (!isAdmin) { alert("Only an administrator can delete contacts."); return; }
+  const id = Number(ownerId);
+  if (!Number.isSafeInteger(id) || id <= 0) return;
+  const {data: record,error: fetchError} = await db.from(TABLE_NAME)
+    .select("id,owner,community,cluster,unit").eq("id",id).maybeSingle();
+  if (fetchError || !record) { alert(fetchError?.message || "Contact no longer exists."); return; }
+  const description = `${record.owner} — ${record.community} / ${record.cluster} / Unit ${record.unit}`;
+  if (!confirm(`Delete this contact?\n\n${description}\n\nOnly this contact will be deleted. Other owners and units will be kept. This action cannot be undone.`)) return;
+  const typed = prompt('Type DELETE to confirm permanent deletion of this contact:');
+  if (typed !== "DELETE") return;
+  const {data: removed,error} = await db.from(TABLE_NAME).delete().eq("id",id).select("id");
+  if (error) { alert("Could not delete contact: " + error.message); return; }
+  if (!removed || removed.length !== 1) { alert("Deletion was not permitted or the record was already removed."); return; }
+  // Activity entries use a text owner_id. Remove them only after the owner deletion succeeded.
+  const {error: historyError} = await db.from(U6_OWNER_ACTIVITIES).delete().eq("owner_id",String(id));
+  closeOwnerProfile();
+  if (typeof allMiniRows !== "undefined" && Array.isArray(allMiniRows)) {
+    const index = allMiniRows.findIndex(x => String(x.id) === String(id));
+    if (index >= 0) allMiniRows.splice(index,1);
+  }
+  await loadData();
+  if (historyError) alert("Contact deleted, but activity-history cleanup needs attention: " + historyError.message);
+}
+
 /* Owner profile */
 openOwnerProfile=async function(row){
   u6ActiveOwnerRow=row;
@@ -5804,7 +5830,7 @@ openOwnerProfile=async function(row){
         <button class="u9MobileBack" onclick="closeOwnerProfile()">← Owners</button>
         <div class="u6DetailHeader">
           <div><div class="u6DetailTitle">${escapeHtml(u6Value(row.owner))}</div><div class="u6DetailSubtitle">${escapeHtml(u6Value(row.community))} · ${escapeHtml(u6Value(row.cluster))} · Unit ${escapeHtml(u6Value(row.unit))}</div></div>
-          <div class="u6HeaderActions">${whatsappButton(row)}${callButton(row)}<button class="darkBtn" onclick='u10OpenOwnerEditor(${JSON.stringify(row).replaceAll("'","&#039;")})'>Edit Owner</button></div>
+          <div class="u6HeaderActions">${whatsappButton(row)}${callButton(row)}<button class="darkBtn" onclick='u10OpenOwnerEditor(${JSON.stringify(row).replaceAll("'","&#039;")})'>Edit Owner</button>${isAdmin?\`<button class="darkBtn" style="border-color:#ad4242;color:#ff8585" onclick="u14DeleteOwnerContact('${row.id}')">Delete Contact</button>\`:""}</div>
         </div>
         <div class="u6StageBar">${statuses.map(s=>`<button class="u6Stage ${s===(row.status||"New")?"active":""}" onclick="u9ChangeOwnerStatus('${row.id}','${escapeHtml(s).replaceAll("'","&#039;")}')">${escapeHtml(s)}</button>`).join("")}</div>
         <div class="u6DetailGrid">
