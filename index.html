@@ -3807,15 +3807,16 @@ ${agentName}`;
       const catalogNames = selectedCommunity
         ? catalog.filter(x => x.community === selectedCommunity).map(x => x.cluster)
         : catalog.map(x => x.cluster);
-      const known = new Set(catalogNames.map(x => x.toLowerCase()));
-      const oldNames = rows.map(x => x.cluster).filter(Boolean).filter(x =>
-        !known.has(x.toLowerCase()) &&
-        !(selectedCommunity === "Arabian Ranches 3" && (
-          x.toUpperCase() === "BLISS II" && known.has("bliss 2") ||
-          x.toUpperCase() === "JUNE II" && known.has("june 2")
-        ))
-      );
-      fillSelect("clusterFilter", [...new Set([...catalogNames, ...oldNames])]);
+      // Prefer master-file spelling and deduplicate legacy uppercase labels.
+      const names = new Map();
+      for (const name of catalogNames) names.set(name.trim().toLocaleLowerCase(), name.trim());
+      for (const name of rows.map(x => x.cluster).filter(Boolean)) {
+        let key = name.trim().toLocaleLowerCase();
+        if (selectedCommunity === "Arabian Ranches 3" && key === "bliss ii") key = "bliss 2";
+        if (selectedCommunity === "Arabian Ranches 3" && key === "june ii") key = "june 2";
+        if (!names.has(key)) names.set(key, name.trim());
+      }
+      fillSelect("clusterFilter", [...names.values()]);
       el("clusterFilter").value = "";
     }
 
@@ -5345,10 +5346,16 @@ async function loadBroadcastClusters(){
   let q=applyAccessFilter(db.from(TABLE_NAME).select('cluster').in('community',crmCommunityStoredNames(community)).not('cluster','is',null));
   const {data,error}=await q;if(error){alert(error.message);return;}
   const catalog=isAdmin?(window.crmCommunityClusterCatalog||[]):[];
-  const clusters=[...new Set([
-    ...(data||[]).map(r=>clean(r.cluster)),
-    ...catalog.filter(r=>crmCanonicalCommunity(r.community)===community).map(r=>r.cluster)
-  ].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const names=new Map();
+  for(const name of catalog.filter(r=>crmCanonicalCommunity(r.community)===community).map(r=>r.cluster))
+    names.set(name.trim().toLocaleLowerCase(),name.trim());
+  for(const name of (data||[]).map(r=>clean(r.cluster)).filter(Boolean)) {
+    let key=name.trim().toLocaleLowerCase();
+    if(community==="Arabian Ranches 3" && key==="bliss ii") key="bliss 2";
+    if(community==="Arabian Ranches 3" && key==="june ii") key="june 2";
+    if(!names.has(key)) names.set(key,name.trim());
+  }
+  const clusters=[...names.values()].sort((a,b)=>a.localeCompare(b));
   el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>'+clusters.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
 }
 async function loadBroadcastRangeOptions(){
