@@ -5326,7 +5326,11 @@ async function initBroadcastFilters(){
   const q=applyAccessFilter(db.from(TABLE_NAME).select('community').not('community','is',null));
   const {data,error}=await q;
   if(error)return;
-  const communities=[...new Set((data||[]).map(r=>clean(r.community)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const catalog=isAdmin?(window.crmCommunityClusterCatalog||[]):[];
+  const communities=[...new Set([
+    ...(data||[]).map(r=>crmCanonicalCommunity(clean(r.community))),
+    ...catalog.map(r=>crmCanonicalCommunity(r.community))
+  ].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   el('broadcastCommunity').innerHTML='<option value="">Choose community</option>'+communities.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
   el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>';
   el('broadcastRange').innerHTML='<option value="">Choose range</option>';
@@ -5338,16 +5342,20 @@ async function loadBroadcastClusters(){
   el('broadcastRange').innerHTML='<option value="">Choose range</option>';
   el('broadcastPicker').innerHTML='';
   if(!community)return;
-  let q=applyAccessFilter(db.from(TABLE_NAME).select('cluster').eq('community',community).not('cluster','is',null));
+  let q=applyAccessFilter(db.from(TABLE_NAME).select('cluster').in('community',crmCommunityStoredNames(community)).not('cluster','is',null));
   const {data,error}=await q;if(error){alert(error.message);return;}
-  const clusters=[...new Set((data||[]).map(r=>clean(r.cluster)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const catalog=isAdmin?(window.crmCommunityClusterCatalog||[]):[];
+  const clusters=[...new Set([
+    ...(data||[]).map(r=>clean(r.cluster)),
+    ...catalog.filter(r=>crmCanonicalCommunity(r.community)===community).map(r=>r.cluster)
+  ].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>'+clusters.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
 }
 async function loadBroadcastRangeOptions(){
   const community=el('broadcastCommunity').value,cluster=el('broadcastCluster').value;
   el('broadcastRange').innerHTML='<option value="">Choose range</option>';el('broadcastPicker').innerHTML='';
   if(!community||!cluster)return;
-  let q=applyAccessFilter(db.from(TABLE_NAME).select('id,owner,phone1,phone2,unit,cluster,community,status').eq('community',community).eq('cluster',cluster));
+  let q=applyAccessFilter(db.from(TABLE_NAME).select('id,owner,phone1,phone2,unit,cluster,community,status').in('community',crmCommunityStoredNames(community)).in('cluster',crmClusterStoredNames(cluster,community)));
   const {data,error}=await q;if(error){alert(error.message);return;}
   const seen=new Set();
   v8BroadcastRows=(data||[]).filter(r=>{const p=formatPhone(get(r,['phone1','phone2']));if(!p||seen.has(p))return false;seen.add(p);return true;}).sort((a,b)=>{const na=parseFloat(a.unit),nb=parseFloat(b.unit);if(!Number.isNaN(na)&&!Number.isNaN(nb)&&na!==nb)return na-nb;return clean(a.owner).localeCompare(clean(b.owner));});
