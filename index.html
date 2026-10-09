@@ -3461,6 +3461,29 @@ ${agentName}`;
       return query.eq("id", -999999999);
     }
 
+    // Canonical display labels without touching stored owner records.
+    function crmCanonicalCommunity(name) {
+      const n = String(name || "").trim();
+      if (n.toLowerCase() === "arabian ranches-3") return "Arabian Ranches 3";
+      if (n.toLowerCase() === "the oasis") return "The Oasis";
+      return n;
+    }
+    function crmCommunityStoredNames(name) {
+      const n = crmCanonicalCommunity(name);
+      if (n === "Arabian Ranches 3") return ["Arabian Ranches 3","Arabian Ranches-3"];
+      if (n === "The Oasis") return ["The Oasis","THE OASIS"];
+      return [n];
+    }
+    function crmClusterStoredNames(name, community) {
+      const n = String(name || "").trim();
+      const aliases = [n, n.toUpperCase()];
+      if (crmCanonicalCommunity(community) === "Arabian Ranches 3") {
+        if (n === "Bliss 2") aliases.push("BLISS II");
+        if (n === "June 2") aliases.push("JUNE II");
+      }
+      return [...new Set(aliases)];
+    }
+
     function applyFilters(query) {
       const search = el("searchInput").value.trim();
       const community = el("communityFilter").value;
@@ -3473,8 +3496,8 @@ ${agentName}`;
         query = query.or(`owner.ilike.%${search}%,unit.ilike.%${search}%,phone1.ilike.%${search}%,phone2.ilike.%${search}%`);
       }
 
-      if (community) query = query.eq("community", community);
-      if (cluster) query = query.eq("cluster", cluster);
+      if (community) query = query.in("community", crmCommunityStoredNames(community));
+      if (cluster) query = query.in("cluster", crmClusterStoredNames(cluster, community));
       if (unit) query = query.eq("unit", unit);
       if (source) query = query.eq("data_source", source);
       if (status) query = query.eq("status", status);
@@ -3769,8 +3792,8 @@ ${agentName}`;
       }
       window.crmCommunityClusterCatalog = catalogRows;
       fillSelect("communityFilter", [...new Set([
-        ...allRows.map(x => x.community).filter(Boolean),
-        ...catalogRows.map(x => x.community).filter(Boolean)
+        ...allRows.map(x => crmCanonicalCommunity(x.community)).filter(Boolean),
+        ...catalogRows.map(x => crmCanonicalCommunity(x.community)).filter(Boolean)
       ])]);
       updateClusterDropdown();
       fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
@@ -3778,13 +3801,21 @@ ${agentName}`;
 
     function updateClusterDropdown() {
       const selectedCommunity = el("communityFilter").value;
-      const rows = selectedCommunity ? allMiniRows.filter(x => x.community === selectedCommunity) : allMiniRows;
+      const rows = selectedCommunity ? allMiniRows.filter(x => crmCanonicalCommunity(x.community) === selectedCommunity) : allMiniRows;
 
       const catalog = isAdmin ? (window.crmCommunityClusterCatalog || []) : [];
       const catalogNames = selectedCommunity
         ? catalog.filter(x => x.community === selectedCommunity).map(x => x.cluster)
         : catalog.map(x => x.cluster);
-      fillSelect("clusterFilter", [...new Set([...rows.map(x => x.cluster).filter(Boolean), ...catalogNames])]);
+      const known = new Set(catalogNames.map(x => x.toLowerCase()));
+      const oldNames = rows.map(x => x.cluster).filter(Boolean).filter(x =>
+        !known.has(x.toLowerCase()) &&
+        !(selectedCommunity === "Arabian Ranches 3" && (
+          x.toUpperCase() === "BLISS II" && known.has("bliss 2") ||
+          x.toUpperCase() === "JUNE II" && known.has("june 2")
+        ))
+      );
+      fillSelect("clusterFilter", [...new Set([...catalogNames, ...oldNames])]);
       el("clusterFilter").value = "";
     }
 
