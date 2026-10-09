@@ -3474,9 +3474,37 @@ ${agentName}`;
       if (n === "The Oasis") return ["The Oasis","THE OASIS"];
       return [n];
     }
-    function crmClusterStoredNames(name, community) {
+    function crmClusterDisplayName(name, community) {
       const n = String(name || "").trim();
+      const key = n.toLowerCase().replace(/\\s+/g, " ");
+      const parent = crmCanonicalCommunity(community);
+      if (parent === "The Valley") {
+        if (key === "lillia th" || key === "lillia") return "Lillia";
+        if (key === "farm grove" || key === "farm grove 1") return "Farm Grove 1";
+        if (key === "farm grove 2") return "Farm Grove 2";
+      }
+      if (parent === "The Oasis") {
+        const match = key.match(/^palmiera[-\\s]*([123])$/);
+        if (match) return "Palmiera " + match[1];
+      }
+      if (parent === "Arabian Ranches 3") {
+        if (key === "bliss ii") return "Bliss 2";
+        if (key === "june ii") return "June 2";
+      }
+      return n;
+    }
+    function crmClusterStoredNames(name, community) {
+      const n = crmClusterDisplayName(name, community);
       const aliases = [n, n.toUpperCase()];
+      if (crmCanonicalCommunity(community) === "The Valley") {
+        if (n === "Lillia") aliases.push(" LILLIA TH", "LILLIA TH");
+        if (n === "Farm Grove 1") aliases.push("Farm Grove", " FARM GROVE 1", "FARM GROVE 1");
+        if (n === "Farm Grove 2") aliases.push(" FARM GROVE 2", "FARM GROVE 2");
+      }
+      if (crmCanonicalCommunity(community) === "The Oasis") {
+        const m = n.match(/^Palmiera ([123])$/);
+        if (m) aliases.push("PALMIERA-" + m[1], "Palmiera-" + m[1]);
+      }
       if (crmCanonicalCommunity(community) === "Arabian Ranches 3") {
         if (n === "Bliss 2") aliases.push("BLISS II");
         if (n === "June 2") aliases.push("JUNE II");
@@ -3809,12 +3837,11 @@ ${agentName}`;
         : catalog.map(x => x.cluster);
       // Prefer master-file spelling and deduplicate legacy uppercase labels.
       const names = new Map();
-      for (const name of catalogNames) names.set(name.trim().toLocaleLowerCase(), name.trim());
+      for (const name of catalogNames) { const display = crmClusterDisplayName(name, selectedCommunity); names.set(display.toLowerCase(), display); }
       for (const name of rows.map(x => x.cluster).filter(Boolean)) {
-        let key = name.trim().toLocaleLowerCase();
-        if (selectedCommunity === "Arabian Ranches 3" && key === "bliss ii") key = "bliss 2";
-        if (selectedCommunity === "Arabian Ranches 3" && key === "june ii") key = "june 2";
-        if (!names.has(key)) names.set(key, name.trim());
+        const display = crmClusterDisplayName(name, selectedCommunity);
+        const key = display.toLowerCase();
+        if (!names.has(key)) names.set(key, display);
       }
       fillSelect("clusterFilter", [...names.values()]);
       el("clusterFilter").value = "";
@@ -5348,12 +5375,9 @@ async function loadBroadcastClusters(){
   const catalog=isAdmin?(window.crmCommunityClusterCatalog||[]):[];
   const names=new Map();
   for(const name of catalog.filter(r=>crmCanonicalCommunity(r.community)===community).map(r=>r.cluster))
-    names.set(name.trim().toLocaleLowerCase(),name.trim());
+    {const display=crmClusterDisplayName(name,community);names.set(display.toLowerCase(),display);}
   for(const name of (data||[]).map(r=>clean(r.cluster)).filter(Boolean)) {
-    let key=name.trim().toLocaleLowerCase();
-    if(community==="Arabian Ranches 3" && key==="bliss ii") key="bliss 2";
-    if(community==="Arabian Ranches 3" && key==="june ii") key="june 2";
-    if(!names.has(key)) names.set(key,name.trim());
+    const display=crmClusterDisplayName(name,community); const key=display.toLowerCase(); if(!names.has(key)) names.set(key,display);
   }
   const clusters=[...names.values()].sort((a,b)=>a.localeCompare(b));
   el('broadcastCluster').innerHTML='<option value="">Choose cluster</option>'+clusters.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
