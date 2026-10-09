@@ -3480,6 +3480,7 @@ ${agentName}`;
       const parent = crmCanonicalCommunity(community);
       if (parent === "The Valley") {
         if (key === "lillia th" || key === "lillia") return "Lillia";
+        if (key === "elea th" || key === "elea" || key === "ilea" || key === "ilea townhouse") return "Elea";
         if (key === "farm grove" || key === "farm grove 1") return "Farm Grove 1";
         if (key === "farm grove 2") return "Farm Grove 2";
       }
@@ -3498,6 +3499,7 @@ ${agentName}`;
       const aliases = [n, n.toUpperCase()];
       if (crmCanonicalCommunity(community) === "The Valley") {
         if (n === "Lillia") aliases.push(" LILLIA TH", "LILLIA TH");
+        if (n === "Elea") aliases.push(" ELEA TH", "ELEA TH", "Ilea", "Ilea Townhouse");
         if (n === "Farm Grove 1") aliases.push("Farm Grove", " FARM GROVE 1", "FARM GROVE 1");
         if (n === "Farm Grove 2") aliases.push(" FARM GROVE 2", "FARM GROVE 2");
       }
