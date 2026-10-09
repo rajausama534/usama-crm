@@ -5830,7 +5830,7 @@ openOwnerProfile=async function(row){
         <button class="u9MobileBack" onclick="closeOwnerProfile()">← Owners</button>
         <div class="u6DetailHeader">
           <div><div class="u6DetailTitle">${escapeHtml(u6Value(row.owner))}</div><div class="u6DetailSubtitle">${escapeHtml(u6Value(row.community))} · ${escapeHtml(u6Value(row.cluster))} · Unit ${escapeHtml(u6Value(row.unit))}</div></div>
-          <div class="u6HeaderActions">${whatsappButton(row)}${callButton(row)}<button class="darkBtn" onclick='u10OpenOwnerEditor(${JSON.stringify(row).replaceAll("'","&#039;")})'>Edit Owner</button>${isAdmin?\`<button class="darkBtn" style="border-color:#ad4242;color:#ff8585" onclick="u14DeleteOwnerContact('${row.id}')">Delete Contact</button>\`:""}</div>
+          <div class="u6HeaderActions">${whatsappButton(row)}${callButton(row)}<button class="darkBtn" onclick='u10OpenOwnerEditor(${JSON.stringify(row).replaceAll("'","&#039;")})'>Edit Owner</button>${isAdmin?`<button class="darkBtn" style="border-color:#ad4242;color:#ff8585" onclick="u14DeleteOwnerContact('${row.id}')">Delete Contact</button>`:""}</div>
         </div>
         <div class="u6StageBar">${statuses.map(s=>`<button class="u6Stage ${s===(row.status||"New")?"active":""}" onclick="u9ChangeOwnerStatus('${row.id}','${escapeHtml(s).replaceAll("'","&#039;")}')">${escapeHtml(s)}</button>`).join("")}</div>
         <div class="u6DetailGrid">
