@@ -6056,6 +6056,38 @@ function u12SwitchOwnerTab(tab) {
   });
 }
 
+// Catalog-backed input suggestions. Existing values remain valid and unchanged.
+function crmAttachPropertyCatalogInputs(root) {
+  if (!root || !isAdmin) return;
+  const catalog = window.crmCommunityClusterCatalog || [];
+  const communityInput = root.querySelector('#u10eo_community, [data-field="community"]');
+  const clusterInput = root.querySelector('#u10eo_cluster, [data-field="cluster"]');
+  if (!communityInput || !clusterInput || communityInput.dataset.catalogAttached) return;
+  communityInput.dataset.catalogAttached = "1";
+  const uniqueId = 'crmCatalog_' + Math.random().toString(36).slice(2);
+  const communityList = document.createElement('datalist');
+  communityList.id = uniqueId + '_communities';
+  const clusterList = document.createElement('datalist');
+  clusterList.id = uniqueId + '_clusters';
+  root.append(communityList,clusterList);
+  communityInput.setAttribute('list',communityList.id);
+  clusterInput.setAttribute('list',clusterList.id);
+  communityList.innerHTML = [...new Set(catalog.map(row => row.community))]
+    .sort((a,b)=>a.localeCompare(b)).map(name=>'<option value="'+escapeHtml(name)+'"></option>').join('');
+  function refreshClusters() {
+    const selected = communityInput.value.trim().toLowerCase();
+    const names = [...new Set(catalog.filter(row => row.community.toLowerCase() === selected).map(row => row.cluster))];
+    // Keep the existing cluster value; never silently assign another property.
+    if (clusterInput.value.trim() && !names.some(name=>name.toLowerCase()===clusterInput.value.trim().toLowerCase()))
+      names.push(clusterInput.value.trim());
+    clusterList.innerHTML = names.sort((a,b)=>a.localeCompare(b))
+      .map(name=>'<option value="'+escapeHtml(name)+'"></option>').join('');
+  }
+  communityInput.addEventListener('change',refreshClusters);
+  communityInput.addEventListener('input',refreshClusters);
+  refreshClusters();
+}
+
 function u12AddPropertyRow(property = {}) {
   const list = document.getElementById("u12PropertyList");
   if (!list) return;
@@ -6073,6 +6105,7 @@ function u12AddPropertyRow(property = {}) {
       <div class="formFull"><label>Source</label><input data-field="data_source" value="${escapeHtml(property.data_source || "")}" placeholder="Source"></div>
     </div>`;
   list.appendChild(row);
+  crmAttachPropertyCatalogInputs(row);
 }
 
 u10OpenOwnerEditor = function (row = {}) {
@@ -6111,6 +6144,7 @@ u10OpenOwnerEditor = function (row = {}) {
     <div class="modalActions"><button class="darkBtn" onclick="document.getElementById('u10OwnerEditor').remove()">Cancel</button><button id="u12SaveOwnerButton" class="primaryBtn" onclick='u10SaveOwner(${JSON.stringify(existingId)})'>${isNewOwner ? "Add Owner" : "Save Owner"}</button></div>
   </div>`;
   document.body.appendChild(wrap);
+  crmAttachPropertyCatalogInputs(wrap);
   const observer = new MutationObserver(() => {
     const count = wrap.querySelectorAll(".u12PropertyCard").length;
     const countNode = document.getElementById("u12PropertyCount");
