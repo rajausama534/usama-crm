@@ -3476,7 +3476,7 @@ ${agentName}`;
     }
     function crmClusterDisplayName(name, community) {
       const n = String(name || "").trim();
-      const key = n.toLowerCase().replace(/\\s+/g, " ");
+      const key = n.toLowerCase().replace(/\s+/g, " ");
       const parent = crmCanonicalCommunity(community);
       if (parent === "The Valley") {
         if (key === "lillia th" || key === "lillia") return "Lillia";
@@ -3484,7 +3484,7 @@ ${agentName}`;
         if (key === "farm grove 2") return "Farm Grove 2";
       }
       if (parent === "The Oasis") {
-        const match = key.match(/^palmiera[-\\s]*([123])$/);
+        const match = key.match(/^palmiera[-\s]*([123])$/);
         if (match) return "Palmiera " + match[1];
       }
       if (parent === "Arabian Ranches 3") {
