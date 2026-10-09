@@ -3483,6 +3483,8 @@ ${agentName}`;
         if (key === "elea th" || key === "elea" || key === "ilea" || key === "ilea townhouse") return "Elea";
         if (key === "farm grove" || key === "farm grove 1") return "Farm Grove 1";
         if (key === "farm grove 2") return "Farm Grove 2";
+        if (key === "farm gardens" || key === "farm gardens 1") return "Farm Gardens 1";
+        if (key === "farm gardens 2") return "Farm Gardens 2";
       }
       if (parent === "The Oasis") {
         const match = key.match(/^palmiera[-\s]*([123])$/);
@@ -3502,6 +3504,8 @@ ${agentName}`;
         if (n === "Elea") aliases.push(" ELEA TH", "ELEA TH", "Ilea", "Ilea Townhouse");
         if (n === "Farm Grove 1") aliases.push("Farm Grove", " FARM GROVE 1", "FARM GROVE 1");
         if (n === "Farm Grove 2") aliases.push(" FARM GROVE 2", "FARM GROVE 2");
+        if (n === "Farm Gardens 1") aliases.push(" FARM GARDENS", "FARM GARDENS", "Farm Gardens", "FARM GARDENS 1");
+        if (n === "Farm Gardens 2") aliases.push(" FARM GARDENS 2", "FARM GARDENS 2");
       }
       if (crmCanonicalCommunity(community) === "The Oasis") {
         const m = n.match(/^Palmiera ([123])$/);
