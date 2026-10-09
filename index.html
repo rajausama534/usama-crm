@@ -3760,7 +3760,18 @@ ${agentName}`;
 
       allMiniRows = allRows;
 
-      fillSelect("communityFilter", [...new Set(allRows.map(x => x.community).filter(Boolean))]);
+      // Catalog is independent of property records. Keep existing owner values for backwards compatibility.
+      let catalogRows = [];
+      if (isAdmin) {
+        const { data: catalog, error: catalogError } = await db.from("community_cluster_catalog").select("community,cluster").order("community");
+        if (!catalogError) catalogRows = catalog || [];
+        else console.warn("Community catalog unavailable:", catalogError.message);
+      }
+      window.crmCommunityClusterCatalog = catalogRows;
+      fillSelect("communityFilter", [...new Set([
+        ...allRows.map(x => x.community).filter(Boolean),
+        ...catalogRows.map(x => x.community).filter(Boolean)
+      ])]);
       updateClusterDropdown();
       fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
     }
@@ -3769,7 +3780,11 @@ ${agentName}`;
       const selectedCommunity = el("communityFilter").value;
       const rows = selectedCommunity ? allMiniRows.filter(x => x.community === selectedCommunity) : allMiniRows;
 
-      fillSelect("clusterFilter", [...new Set(rows.map(x => x.cluster).filter(Boolean))]);
+      const catalog = isAdmin ? (window.crmCommunityClusterCatalog || []) : [];
+      const catalogNames = selectedCommunity
+        ? catalog.filter(x => x.community === selectedCommunity).map(x => x.cluster)
+        : catalog.map(x => x.cluster);
+      fillSelect("clusterFilter", [...new Set([...rows.map(x => x.cluster).filter(Boolean), ...catalogNames])]);
       el("clusterFilter").value = "";
     }
 
