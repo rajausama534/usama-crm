@@ -3801,6 +3801,7 @@ ${agentName}`;
       while (true) {
         let q = db.from(TABLE_NAME)
           .select("id, community, cluster, unit, unit_sort, owner, phone1, phone2, data_source, status, last_contacted")
+          .order("id", { ascending: true })
           .range(from, from + batchSize - 1);
 
         q = applyAccessFilter(q);
