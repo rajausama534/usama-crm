@@ -3490,6 +3490,26 @@ ${agentName}`;
         const match = key.match(/^palmiera[-\s]*([123])$/);
         if (match) return "Palmiera " + match[1];
       }
+      if (parent === "Arabian Ranches 1") {
+        const names = {
+          "alma-2":"Alma 2",
+          "arabian ranches - alvorada iii":"Alvorada III",
+          "arabian ranches -la avenida i":"La Avenida I",
+          "la avenida-2":"La Avenida 2",
+          "aseel":"Aseel"
+        };
+        if (names[key]) return names[key];
+      }
+      if (parent === "Arabian Ranches 2") {
+        const cleaned = key
+          .replace(/^arabian ranches\s*-?\s*/,"")
+          .replace(/^ar ii\s*/,"")
+          .replace(/\s+community$/,"")
+          .trim();
+        const names = ["Azalea","Camelia","Camelia 2","Casa","Lila","Palma","Rasha","Reem","Rosa","Samara","Yasmin"];
+        const matched = names.find(x => x.toLowerCase() === cleaned);
+        if (matched) return matched;
+      }
       if (parent === "Arabian Ranches 3") {
         if (key === "bliss ii") return "Bliss 2";
         if (key === "june ii") return "June 2";
@@ -3514,6 +3534,14 @@ ${agentName}`;
       if (crmCanonicalCommunity(community) === "Arabian Ranches 3") {
         if (n === "Bliss 2") aliases.push("BLISS II");
         if (n === "June 2") aliases.push("JUNE II");
+      }
+      // Include actual stored labels from every fetched row, avoiding false empty results
+      // when imported owner data and the catalog use different naming conventions.
+      const targetCommunity = crmCanonicalCommunity(community);
+      const stored = typeof allMiniRows !== "undefined" && Array.isArray(allMiniRows) ? allMiniRows : [];
+      for (const row of stored) {
+        if (targetCommunity && crmCanonicalCommunity(row.community) !== targetCommunity) continue;
+        if (crmClusterDisplayName(row.cluster, row.community) === n) aliases.push(row.cluster);
       }
       return [...new Set(aliases)];
     }
