@@ -302,3 +302,12 @@ body.crmPremium #loginView,#loginView.loginBox{max-width:400px!important;margin:
   body.crmPremium .quickFilters>*{flex:none!important}
   body.crmPremium #appView :is(.actionsRow,.sortControls)>*{flex:1 1 calc(50% - 8px)!important}
 }
+
+/* Phone: page headers stack (title, then a two-column grid of actions); less nesting padding. */
+@media (max-width:640px){
+  body.crmPremium :is(#appView,#leadsView) .mainHeader{flex-direction:column!important;align-items:stretch!important;gap:var(--s-3)!important}
+  body.crmPremium :is(#appView,#leadsView) .mainHeader h1{text-align:left!important}
+  body.crmPremium :is(#appView,#leadsView) .mainHeader .headerBtns{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
+  body.crmPremium :is(#appView,#leadsView) .mainHeader .headerBtns button{width:100%!important}
+  body.crmPremium #appView>.card,body.crmPremium #leadsView .card,body.crmPremium #followupDashboard{padding:var(--s-3)!important}
+}
