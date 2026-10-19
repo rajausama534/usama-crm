@@ -4817,7 +4817,7 @@ ${agent}`;}
 
     const originalShowOnlyV5 = showOnly;
     showOnly = function(viewId){
-      ["loginView","choiceView","appView","leadsView","calendarModuleView"].forEach(id=>el(id)?.classList.add("hidden"));
+      ["loginView","choiceView","appView","leadsView","calendarModuleView","dashboardView","usersView"].forEach(id=>el(id)?.classList.add("hidden"));
       el(viewId)?.classList.remove("hidden");
     };
 

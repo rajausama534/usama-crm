@@ -92,13 +92,20 @@
         <text x="${x+bw/2}" y="${H-4}" text-anchor="middle">${i%2===0?label:''}</text></g>`;}).join('');
     return `<svg class="crmWeekChart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Leads per week">${bars}</svg>`;
   }
+  function txList(items){
+    if(!items.length)return '<div class="crmEmpty">No transactions yet.</div>';
+    return `<ul class="crmTimeline">${items.map(t=>`<li><time>${new Date(t.when+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</time><strong>${esc(t.title)} — ${money(t.amount)}</strong><span>${esc(t.sub||'')}</span></li>`).join('')}</ul>`;
+  }
   function kpi(label,value,hint,action){
     return `<button type="button" class="crmKpi" ${action?`data-action="${action}"`:'disabled'}><span class="crmKpiLabel">${esc(label)}</span><span class="crmKpiValue">${value}</span><span class="crmKpiHint">${esc(hint||'')}</span></button>`;
   }
 
+  // Notes written by import scripts, not by people; kept out of "Recent activity".
+  const SYSTEM_AUTHORS='dld-import,alana-repair';
+
   async function recentActivity(){
     const [o,l]=await Promise.all([
-      db.from('owner_activities').select('id,owner_id,activity_type,details,created_at,created_by').order('created_at',{ascending:false}).limit(8),
+      db.from('owner_activities').select('id,owner_id,activity_type,details,created_at,created_by').or(`created_by.is.null,created_by.not.in.(${SYSTEM_AUTHORS})`).order('created_at',{ascending:false}).limit(8),
       db.from('lead_activities').select('id,lead_id,activity_type,details,created_at,created_by').order('created_at',{ascending:false}).limit(8)
     ]);
     const ownerIds=[...new Set((o.data||[]).map(a=>a.owner_id).filter(id=>/^\d+$/.test(id)))];
@@ -124,10 +131,15 @@
       <div class="crmHeadActions"><button class="crmBtn" onclick="showOwnersView()">Owners</button><button class="crmBtn crmBtnPrimary" onclick="showLeadsView()">Leads</button></div></header>
       <div class="crmLoadingLine">Loading your numbers…</div>`;
     const t0=performance.now();
-    const [{data:s,error},activity]=await Promise.all([db.rpc('crm_dashboard_stats'),recentActivity().catch(()=>[])]);
+    const [{data:s,error},activity,verified,market]=await Promise.all([
+      db.rpc('crm_dashboard_stats'),recentActivity().catch(()=>[]),
+      db.from('property_transactions').select('community,cluster,unit,transaction_date,amount,area_sqft,area_type').order('transaction_date',{ascending:false}).limit(6),
+      db.from('dld_transactions').select('crm_cluster,transaction_date,amount,area_sqft,rooms,property_sub_type,procedure',{count:'exact'}).gte('transaction_date',new Date(Date.now()-90*864e5).toISOString().slice(0,10)).order('transaction_date',{ascending:false}).limit(6)
+    ]);
     if(error){v.querySelector('.crmLoadingLine').textContent='Could not load the dashboard: '+error.message;return;}
     const o=s.owners||{},L=s.leads||{},os=s.owner_status||{},ls=s.lead_status||{};
     const available=(os['For Sale']||0)+(os['For Rent']||0);
+    const worked=(o.records||0)-(os['New']||0)-(os['-']||0);
     v.querySelector('.crmLoadingLine').remove();
     v.insertAdjacentHTML('beforeend',`
       <section class="crmSectionTitle"><h2>Owners &amp; inventory</h2></section>
@@ -148,12 +160,14 @@
       </div>
       <div class="crmCardGrid">
         <article class="crmCard"><header><h3>Lead pipeline</h3><span>${fmt(L.total)} leads</span></header>${barList(orderedEntries(ls,LEAD_STAGES),L.total,true)}</article>
-        <article class="crmCard"><header><h3>Owner status</h3><span>${fmt(o.records)} records</span></header>${barList(orderedEntries(os,OWNER_ORDER),o.records,true)}</article>
+        <article class="crmCard"><header><h3>Owner status</h3><span>${fmt(worked)} worked · ${fmt((os['New']||0)+(os['-']||0))} not yet contacted</span></header>${barList(orderedEntries(Object.fromEntries(Object.entries(os).filter(([k])=>k!=='New'&&k!=='-')),OWNER_ORDER),worked,true)}</article>
         <article class="crmCard"><header><h3>New leads per week</h3><span>Last 12 weeks</span></header>${weekChart(s.leads_by_week)}</article>
         <article class="crmCard"><header><h3>Owners by community</h3><span>A–Z</span></header>${barList(Object.entries(s.owners_by_community||{}).sort((a,b)=>byName(a[0],b[0])),o.records,false)}</article>
         <article class="crmCard crmCardWide"><header><h3>Recent activity</h3><span>Owners and leads</span></header>
           ${activity.length?`<ul class="crmActivity">${activity.map(a=>`<li><span class="crmTag ${a.kind==='Lead'?'crmTagLead':''}">${a.kind}</span><div><strong>${esc(a.who)}</strong><p>${esc(a.activity_type||'')}${a.details?` — ${esc(String(a.details).slice(0,140))}`:''}</p></div><time>${new Date(a.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time></li>`).join('')}</ul>`:'<div class="crmEmpty">No activity yet.</div>'}
         </article>
+        <article class="crmCard"><header><h3>Recent verified sales</h3><span>Matched to a unit with DLD</span></header>${txList((verified.data||[]).map(t=>({when:t.transaction_date,title:`${t.cluster} ${t.unit}`,amount:t.amount,sub:t.area_sqft?`${fmt(t.area_sqft)} sq ft${t.area_type==='plot'?' plot':''}`:''})))}</article>
+        <article class="crmCard"><header><h3>Latest DLD sales</h3><span>${fmt(market.count||0)} in your clusters · last 90 days</span></header>${txList((market.data||[]).map(t=>({when:t.transaction_date,title:`${t.crm_cluster}${t.rooms?' · '+t.rooms:''}`,amount:t.amount,sub:[t.area_sqft?`${fmt(t.area_sqft)} sq ft`:'',t.procedure].filter(Boolean).join(' · ')})))}</article>
         <article class="crmCard"><header><h3>Lead sources</h3><span>Where leads come from</span></header>${barList(Object.entries(s.lead_source||{}).sort((a,b)=>b[1]-a[1]),L.total,false)}</article>
       </div>
       <p class="crmFootnote">Loaded in ${Math.round(performance.now()-t0)} ms · figures include only records you are allowed to see.</p>`);
@@ -386,7 +400,7 @@
   }
 
   // ------------------------------------------------------------------ owner profile: transactions + ownership history
-  const money=n=>{const v=Number(n);return v>=1e6?`AED ${(v/1e6).toFixed(v%1e6===0?0:2).replace(/\.?0+$/,'')}M`:`AED ${fmt(v)}`;};
+  const money=n=>{const v=Number(n);return v>=1e6?`AED ${String(Number((v/1e6).toFixed(2)))}M`:`AED ${fmt(v)}`;};
   const longDate=d=>new Date(d+(String(d).length===10?'T00:00:00':'')).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   async function enrichProfile(row){
     const left=document.querySelector('#profileContent .u6DetailLeft');

@@ -16,6 +16,6 @@
     // existing Alana sale notes and attached one wrong sale to every Alana villa.
     .then(()=>load('rivana-transactions.js?v=20261005'))
     .then(()=>load('owner-related-rows.js?v=20261019'))
-    .then(()=>load('crm-upgrade.js?v=20261019'))
+    .then(()=>load('crm-upgrade.js?v=20261019b'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
