@@ -425,3 +425,58 @@ html[data-theme="light"] body.crmPremium .modalOverlay,html[data-theme="light"] 
 html[data-theme="light"] body.crmPremium [data-crm-status]{background:var(--c-surface-2)!important;color:var(--c-text)!important;border-color:var(--c-border-strong)!important}
 html[data-theme="light"] #loginView{background:#fff!important;color:#0f172a!important}
 html[data-theme="light"] #loginView input{background:#f4f6fa!important;color:#0f172a!important}
+
+/* ---------------------------------------------------------------- Owners / Leads workspace */
+body.crmPremium .crmPageSub{margin:4px 0 0!important;color:var(--c-muted);font-size:var(--t-base)}
+body.crmPremium .crmWorkspace .mainHeader{align-items:flex-end!important}
+body.crmPremium .crmMore{position:relative}
+body.crmPremium .crmMenu{position:absolute;right:0;top:calc(100% + 6px);z-index:50;min-width:200px;padding:6px;border:1px solid var(--c-border-strong);border-radius:var(--r-md);background:var(--c-raised);box-shadow:var(--shadow)}
+body.crmPremium .crmMenu .crmMenuItem{display:flex!important;width:100%!important;height:36px!important;padding:0 var(--s-3)!important;border:0!important;border-radius:6px!important;background:transparent!important;color:var(--c-text)!important;font-size:var(--t-sm)!important;font-weight:500!important;justify-content:flex-start!important;text-align:left!important}
+body.crmPremium .crmMenu .crmMenuItem:hover{background:var(--c-surface-2)!important}
+body.crmPremium .crmWorkspace .filters{grid-template-columns:minmax(220px,2fr) repeat(3,minmax(140px,1fr)) auto auto!important;align-items:center!important}
+body.crmPremium #leadsView .filters{grid-template-columns:minmax(220px,2fr) minmax(160px,1fr) minmax(160px,1fr) auto auto!important}
+body.crmPremium .crmFilterToggle{height:40px!important;gap:6px!important}
+body.crmPremium .crmFilterToggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+body.crmPremium .crmFilterToggle b{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:99px;background:var(--c-accent);color:#fff;font-size:11px}
+body.crmPremium .crmFilterToggle.active{border-color:var(--c-accent)!important}
+body.crmPremium .crmLinkBtn{height:40px;padding:0 var(--s-2);border:0;background:none;color:var(--c-muted);font-size:var(--t-sm);font-weight:600;cursor:pointer}
+body.crmPremium .crmLinkBtn:hover{color:var(--c-text)}
+body.crmPremium .crmAdvFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--s-3);margin:0 0 var(--s-3);padding:var(--s-3);border:1px dashed var(--c-border-strong);border-radius:var(--r-md);background:var(--c-bg)}
+body.crmPremium .crmAdvFilters[hidden]{display:none}
+body.crmPremium .crmAdvField{display:flex;flex-direction:column;gap:4px;color:var(--c-muted);font-size:var(--t-xs);font-weight:600}
+body.crmPremium .crmAdvField>:is(input,select){width:100%!important}
+body.crmPremium .crmChipLabel{align-self:center;margin-right:4px;color:var(--c-faint);font-size:var(--t-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+body.crmPremium .kpiCard.is-clickable{cursor:pointer;transition:border-color .15s,transform .15s}
+body.crmPremium .kpiCard.is-clickable:hover{border-color:var(--c-border-strong)!important;transform:translateY(-1px)}
+body.crmPremium .kpiCard.is-clickable:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+body.crmPremium #ownersTable td.owner-col-owner,body.crmPremium #ownersTable td[data-col="owner"]{font-weight:600}
+body.crmPremium #ownersTable td.owner-col-unit{min-width:110px}
+body.crmPremium :is(#ownersTable,#leadsTable){border-color:var(--c-border)!important;box-shadow:none!important}
+/* stage bar */
+body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
+body.crmPremium .crmStage{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-muted);text-align:left;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
+body.crmPremium .crmStage::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--st,var(--c-border-strong))}
+body.crmPremium .crmStage span{font-size:var(--t-xs);font-weight:600}
+body.crmPremium .crmStage b{color:var(--c-text);font-size:var(--t-xl);font-weight:700;font-variant-numeric:tabular-nums}
+body.crmPremium .crmStage:hover{border-color:var(--c-border-strong)}
+body.crmPremium .crmStage.active{border-color:var(--c-accent);background:var(--c-accent-soft);color:var(--c-text)}
+body.crmPremium .crmStage-0{--st:#94a3b8}body.crmPremium .crmStage-1{--st:#f59e0b}body.crmPremium .crmStage-2{--st:#38bdf8}body.crmPremium .crmStage-3{--st:#a78bfa}
+body.crmPremium .crmStage-4{--st:#5b6cff}body.crmPremium .crmStage-5{--st:#22c55e}body.crmPremium .crmStage-6{--st:#ef4444}
+body.crmPremium .crmNext{display:block;margin-top:4px;color:var(--c-accent-text);font-size:var(--t-xs);font-weight:600}
+body.crmPremium .crmNext.none{color:var(--c-faint);font-weight:500}
+body.crmPremium .crmNext.late{color:#fca5a5}
+html[data-theme="light"] body.crmPremium .crmNext.late{color:#b91c1c}
+body.crmPremium .crmFollowStrip{padding:var(--s-3) var(--s-4)!important}
+body.crmPremium .crmFollowStrip h2,body.crmPremium .crmFollowStrip h3{font-size:var(--t-base)!important}
+body.crmPremium .crmLogout{height:36px;border:1px solid var(--c-border);border-radius:var(--r-sm);background:transparent;color:var(--c-muted);font-size:var(--t-sm);font-weight:600;cursor:pointer}
+body.crmPremium .crmLogout:hover{color:var(--c-text);background:var(--c-surface-2)}
+@media (max-width:1100px){
+  body.crmPremium .crmWorkspace .filters,body.crmPremium #leadsView .filters{grid-template-columns:repeat(2,minmax(0,1fr)) auto auto!important}
+  body.crmPremium .crmWorkspace .filters>:first-child{grid-column:1/-1!important}
+  body.crmPremium .crmStageBar{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  body.crmPremium .crmStageBar{display:flex;overflow-x:auto;padding-bottom:4px}
+  body.crmPremium .crmStage{flex:0 0 110px}
+  body.crmPremium .crmWorkspace .mainHeader .headerBtns{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}

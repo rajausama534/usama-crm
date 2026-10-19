@@ -2358,7 +2358,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
-<link rel="stylesheet" href="crm-premium.css?v=20261020a">
+<link rel="stylesheet" href="crm-premium.css?v=20261020b">
 </head>
 
 <body>
@@ -4041,7 +4041,7 @@ ${agentName}`;
     }
 
     function leadStatuses() {
-      return ["New", "Contacted", "Call Back", "Interested", "Viewing", "Negotiation", "Lost"];
+      return ["New", "Call Back", "Interested", "Viewing Done", "Negotiation", "Won", "Lost"];
     }
 
     function leadDropdownOptions(key) {
@@ -4598,7 +4598,7 @@ Usama Bin Nusrat.`;
     const OWNER_STATUS_KEY = "usama_owner_custom_statuses_v1";
     const PIPELINE_STAGE_KEY = "usama_lead_pipeline_stages_v1";
     const DEFAULT_OWNER_STATUSES = ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
-    const DEFAULT_PIPELINE_STAGES = ["New","Contacted","Call Back","Interested","Viewing","Negotiation","Won","Lost"];
+    const DEFAULT_PIPELINE_STAGES = ["New","Call Back","Interested","Viewing Done","Negotiation","Won","Lost"];
     let leadViewMode = "table";
     let selectedOwnerIds = new Set();
     let currentOwnerPageRows = [];
