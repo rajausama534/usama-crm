@@ -10,3 +10,8 @@ html body button:not([class*="day"]):not([class*="cell"]){background-color:var(-
 html body button:is(.primary,.primaryBtn,#go,[id*="save"],[id*="add"],[class*="primary"]){background-color:var(--p-accent)!important;border-color:var(--p-accent)!important;color:#fff!important}
 html body :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea){border-radius:8px!important;border:1px solid var(--p-border-strong)!important;background:var(--p-bg)!important;color:var(--p-text)!important;box-shadow:none!important}
 html body :is(input,select,textarea):focus{outline:none!important;border-color:var(--p-accent)!important;box-shadow:0 0 0 3px rgba(91,108,255,.14)!important}
+html[data-theme="light"]{--p-bg:#f4f6fa;--p-surface:#ffffff;--p-surface-2:#f0f2f7;--p-border:rgba(15,23,42,.09);--p-border-strong:rgba(15,23,42,.17);--p-text:#0f172a;--p-muted:#5b6474;--p-accent:#4f5bd5;color-scheme:light}
+html[data-theme="light"] body :is(div,section,aside,header,main,article,li,td,th,table,form,nav):not([class*="btn"]){background-color:transparent;border-color:var(--p-border)!important;color:inherit}
+html[data-theme="light"] body :is(.card,.panel,.box,[class*="card"],[class*="panel"],[class*="Card"],[class*="Panel"]){background:var(--p-surface)!important;box-shadow:0 1px 2px rgba(15,23,42,.06)!important}
+html[data-theme="light"] body :is(p,span,small,label,.sub,[class*="muted"]){color:var(--p-muted)}
+html[data-theme="light"] body :is(h1,h2,h3,h4,strong,b){color:var(--p-text)!important}

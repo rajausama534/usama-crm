@@ -17,5 +17,6 @@
     .then(()=>load('rivana-transactions.js?v=20261005'))
     .then(()=>load('owner-related-rows.js?v=20261019'))
     .then(()=>load('crm-upgrade.js?v=20261019e'))
+    .then(()=>load('crm-calendar.js?v=20261020'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
