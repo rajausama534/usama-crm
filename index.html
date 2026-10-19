@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* apply saved theme before first paint (no flash) */try{if(localStorage.getItem("crm_theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Usama CRM</title>
@@ -2356,7 +2358,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
-<link rel="stylesheet" href="crm-premium.css?v=20261019m">
+<link rel="stylesheet" href="crm-premium.css?v=20261020h">
 </head>
 
 <body>
@@ -4039,7 +4041,7 @@ ${agentName}`;
     }
 
     function leadStatuses() {
-      return ["New", "Contacted", "Call Back", "Interested", "Viewing", "Negotiation", "Lost"];
+      return ["New", "Call Back", "Interested", "Viewing Done", "Negotiation", "Won", "Lost"];
     }
 
     function leadDropdownOptions(key) {
@@ -4596,7 +4598,7 @@ Usama Bin Nusrat.`;
     const OWNER_STATUS_KEY = "usama_owner_custom_statuses_v1";
     const PIPELINE_STAGE_KEY = "usama_lead_pipeline_stages_v1";
     const DEFAULT_OWNER_STATUSES = ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
-    const DEFAULT_PIPELINE_STAGES = ["New","Contacted","Call Back","Interested","Viewing","Negotiation","Won","Lost"];
+    const DEFAULT_PIPELINE_STAGES = ["New","Call Back","Interested","Viewing Done","Negotiation","Won","Lost"];
     let leadViewMode = "table";
     let selectedOwnerIds = new Set();
     let currentOwnerPageRows = [];
@@ -5362,7 +5364,12 @@ async function changeLeadStage(leadId,newStatus,oldStatus){
   await db.from('lead_activities').insert([{lead_id:String(leadId),activity_type:'Status changed',details:`Status changed from ${oldStatus} to ${newStatus}`,created_at:new Date().toISOString(),created_by:currentUserEmail||null}]);
   await openLeadDetail(leadId);loadLeads();
 }
-function toggleV8Theme(){document.body.classList.toggle('v8Softer');}
+function toggleV8Theme(){
+  // The old version toggled a class that no stylesheet used, so the button did nothing.
+  const light=document.documentElement.dataset.theme!=='light';
+  if(light)document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;
+  try{localStorage.setItem('crm_theme',light?'light':'dark');}catch(e){}
+}
 
 const _v8UpdateHomeNotificationBadge=window.updateHomeNotificationBadge;
 if(_v8UpdateHomeNotificationBadge) window.updateHomeNotificationBadge=async function(){const r=await _v8UpdateHomeNotificationBadge.apply(this,arguments);const a=el('homeNotificationBadge'),b=el('v7NotificationBadge');if(a&&b)b.textContent=a.textContent||'0';return r;};

@@ -42,18 +42,24 @@ function cleanCluster(input: any) {
         plot_max_sqft: cleanNumber(row?.plot_max_sqft),
         op_min_aed: cleanNumber(row?.op_min_aed),
         op_max_aed: cleanNumber(row?.op_max_aed),
+        ...(row?.dld_area_min_sqft ? { dld_area_min_sqft: cleanNumber(row.dld_area_min_sqft), dld_area_max_sqft: cleanNumber(row.dld_area_max_sqft), dld_sales: Math.floor(cleanNumber(row.dld_sales)) } : {}),
+        ...(row?.dld_plot_min_sqft ? { dld_plot_min_sqft: cleanNumber(row.dld_plot_min_sqft), dld_plot_max_sqft: cleanNumber(row.dld_plot_max_sqft), dld_plot_sales: Math.floor(cleanNumber(row.dld_plot_sales)) } : {}),
       }))
     : [];
 
   return {
     name: cleanText(input?.name, 200),
     community: cleanText(input?.community, 200),
-    total_units: unitMix.reduce((sum: number, row: any) => sum + row.units, 0),
+    total_units: Math.floor(cleanNumber(input?.total_units)) || unitMix.reduce((sum: number, row: any) => sum + row.units, 0),
     launch_date: cleanText(input?.launch_date, 100),
     handover_date: cleanText(input?.handover_date, 100),
     payment_plan: cleanText(input?.payment_plan, 4000),
     usp: cleanText(input?.usp, 6000),
     unit_mix: unitMix,
+    developer: cleanText(input?.developer, 200) || null,
+    development_type: cleanText(input?.development_type, 200) || null,
+    original_price_note: cleanText(input?.original_price_note, 1000) || null,
+    open_questions: cleanText(input?.open_questions, 2000) || null,
   };
 }
 
@@ -83,7 +89,7 @@ Deno.serve(async (req) => {
 
   const action = String(body.action || "");
   // Owner Finder holds uploaded third-party owner databases: administrators only.
-  if (!["listClusters"].includes(action) && !isCrmAdmin) return json({ error: "Admin access required" }, 403);
+  if (!["listClusters", "getCluster"].includes(action) && !isCrmAdmin) return json({ error: "Admin access required" }, 403);
 
   try {
     if (action === "stats") {
@@ -191,9 +197,25 @@ Deno.serve(async (req) => {
     }
 
     if (action === "listClusters") {
-      const { data, error } = await admin.from("cluster_guides").select("*").order("name", { ascending: true });
+      // Summary only; the full guide is loaded when a cluster is opened (getCluster).
+      const { data, error } = await admin.from("cluster_guides")
+        .select("id,name,community,developer,development_type,total_units,handover_date,unit_mix,verified_on")
+        .order("community", { ascending: true }).order("name", { ascending: true });
       if (error) throw error;
-      return json({ clusters: data || [], canEdit: isCrmAdmin });
+      const clusters = (data || []).map((c: any) => ({
+        id: c.id, name: c.name, community: c.community, developer: c.developer, development_type: c.development_type,
+        total_units: c.total_units, handover_date: c.handover_date, verified_on: c.verified_on,
+        bedrooms: (c.unit_mix || []).map((m: any) => String(m.bedrooms)).filter(Boolean),
+      }));
+      return json({ clusters, canEdit: isCrmAdmin });
+    }
+
+    if (action === "getCluster") {
+      const id = cleanText(body.id, 100);
+      const { data, error } = await admin.from("cluster_guides").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      if (!data) return json({ error: "Not found" }, 404);
+      return json({ cluster: data, canEdit: isCrmAdmin });
     }
 
     if (action === "saveCluster") {

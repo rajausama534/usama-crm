@@ -59,3 +59,22 @@ Repair (needs approval): remove those 431 notes and add the correct per-unit sal
   last 21 days, maps to clusters with the same rules as the import scripts, inserts idempotently, refuses to
   run twice within 6 days. First run: 8,870 fetched, 123 in CRM clusters, 0 new (all already imported).
 - Phone checks done: dashboard, Owners (card list), owner profile, Leads (card list), Add Lead form, Users.
+
+## 20 Oct 2026 round
+- Lead stages fixed to New, Call Back, Interested, Viewing Done, Negotiation, Won, Lost. Approved mapping:
+  Visit Done/Viewing → Viewing Done (19), Contacted → Call Back (24); logged in crm_change_log.
+- Calendar: `crm_events` (lead-linked, RLS via private.can_see_event), month/week/day, overdue/today/upcoming/
+  completed lists; triggers keep the lead's follow-up fields and activity history in sync. Old "Schedule"
+  buttons now create events. Tested: create from lead and from calendar, reschedule, complete, notification
+  click opens the lead; agents only see their own events on leads they can see (rolled-back RLS test).
+- Notifications: `crm_my_notifications()` (due soon / today / overdue ≤14 days, own events only) +
+  `crm_notification_reads`.
+- Theme: the moon button toggled an unused class. Now a real light theme on html[data-theme], saved in
+  localStorage and applied before first paint; checked on Dashboard, Owners, Leads, lead/owner detail,
+  Calendar, Cluster Guide, phone cards.
+- Greeting reads user_access.name ("Usama" for the owner account; each user sees their own name).
+- Cluster Guide: own `cluster-guide-api` (list summary, load one guide), new page, 23 Valley clusters from
+  Emaar official pages + DLD-recorded areas; unpublished facts left empty and listed. Other communities
+  not yet researched.
+- Measured on preview: dashboard 0.44 s, owners 1.8 s, owner search 0.75 s, Alana filter 0.5 s,
+  leads 0.43 s, lead search 0.24 s, calendar 0.19 s.

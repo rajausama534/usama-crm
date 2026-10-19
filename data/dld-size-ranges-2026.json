@@ -1,0 +1,960 @@
+{
+ "Arabian Ranches 1|Alvorada II": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 3,
+   "min": 8405,
+   "max": 10861
+  }
+ ],
+ "Arabian Ranches 1|Arabian Ranches - Alvorada III": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 2,
+   "min": 8338,
+   "max": 9783
+  }
+ ],
+ "Arabian Ranches 2|AR II - Reem Community": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 3,
+   "min": 1946,
+   "max": 1949
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 4,
+   "min": 2841,
+   "max": 3579
+  }
+ ],
+ "Arabian Ranches 2|AR II Camelia": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 2,
+   "min": 1884,
+   "max": 1959
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 4,
+   "min": 2454,
+   "max": 3683
+  }
+ ],
+ "Arabian Ranches 2|AR II Camelia 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 5,
+   "min": 1507,
+   "max": 1665
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 2,
+   "min": 2540,
+   "max": 4386
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES - PALMA COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 8,
+   "min": 4359,
+   "max": 7110
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES - RASHA COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 4,
+   "min": 6544,
+   "max": 12027
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES - SAMARA COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Land",
+   "rooms": null,
+   "n": 5,
+   "min": 3866,
+   "max": 5563
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES - YASMIN COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 2,
+   "min": 6544,
+   "max": 9037
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES- AZALEA COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Land",
+   "rooms": null,
+   "n": 9,
+   "min": 4311,
+   "max": 5370
+  }
+ ],
+ "Arabian Ranches 2|ARABIAN RANCHES- ROSA COMMUNITY": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 1,
+   "min": 8867,
+   "max": 8867
+  }
+ ],
+ "Arabian Ranches 2|Arabian Ranches - Lila Community": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 10,
+   "min": 4359,
+   "max": 5473
+  }
+ ],
+ "Arabian Ranches 2|Arabian Ranches-Casa Community": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 9,
+   "min": 4359,
+   "max": 7152
+  }
+ ],
+ "Arabian Ranches 3|Anya": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 27,
+   "min": 1559,
+   "max": 1714
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 12,
+   "min": 2682,
+   "max": 3946
+  }
+ ],
+ "Arabian Ranches 3|Anya 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 12,
+   "min": 1559,
+   "max": 1903
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 7,
+   "min": 2682,
+   "max": 4974
+  }
+ ],
+ "Arabian Ranches 3|Bliss": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 19,
+   "min": 1270,
+   "max": 1548
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 8,
+   "min": 1538,
+   "max": 2019
+  }
+ ],
+ "Arabian Ranches 3|Bliss 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 17,
+   "min": 1270,
+   "max": 1465
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 7,
+   "min": 1560,
+   "max": 1968
+  }
+ ],
+ "Arabian Ranches 3|Caya": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 25,
+   "min": 4228,
+   "max": 6988
+  }
+ ],
+ "Arabian Ranches 3|Elie Saab": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Land",
+   "rooms": null,
+   "n": 5,
+   "min": 4831,
+   "max": 6696
+  },
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 4,
+   "min": 4822,
+   "max": 6657
+  }
+ ],
+ "Arabian Ranches 3|Elie Saab II": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 26,
+   "min": 4822,
+   "max": 6580
+  }
+ ],
+ "Arabian Ranches 3|Joy": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 19,
+   "min": 1376,
+   "max": 1522
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 5,
+   "min": 2407,
+   "max": 2417
+  }
+ ],
+ "Arabian Ranches 3|June": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 24,
+   "min": 3223,
+   "max": 4241
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "5 B/R",
+   "n": 11,
+   "min": 4496,
+   "max": 4543
+  }
+ ],
+ "Arabian Ranches 3|June 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 1,
+   "min": 3495,
+   "max": 3495
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "5 B/R",
+   "n": 2,
+   "min": 3552,
+   "max": 3552
+  }
+ ],
+ "Arabian Ranches 3|May": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 14,
+   "min": 1559,
+   "max": 1560
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 2682,
+   "max": 4071
+  }
+ ],
+ "Arabian Ranches 3|Raya": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 22,
+   "min": 1559,
+   "max": 1838
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 21,
+   "min": 2674,
+   "max": 4099
+  }
+ ],
+ "Arabian Ranches 3|Ruba": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 9,
+   "min": 1559,
+   "max": 1578
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 3,
+   "min": 2679,
+   "max": 2694
+  }
+ ],
+ "Arabian Ranches 3|Spring": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 5,
+   "min": 1445,
+   "max": 1462
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 3,
+   "min": 2529,
+   "max": 2531
+  }
+ ],
+ "Arabian Ranches 3|Sun": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 6,
+   "min": 1384,
+   "max": 1422
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 3,
+   "min": 2522,
+   "max": 2556
+  }
+ ],
+ "Mudon|Al Ranim 1": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 11,
+   "min": 1808,
+   "max": 1924
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 5,
+   "min": 2582,
+   "max": 2915
+  }
+ ],
+ "Mudon|Al Ranim 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 12,
+   "min": 1808,
+   "max": 1892
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 13,
+   "min": 2710,
+   "max": 4452
+  }
+ ],
+ "Mudon|Al Ranim 3": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 23,
+   "min": 1808,
+   "max": 1980
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 26,
+   "min": 2599,
+   "max": 5842
+  }
+ ],
+ "Mudon|Al Ranim 4": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 26,
+   "min": 1808,
+   "max": 1975
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 23,
+   "min": 2600,
+   "max": 3886
+  }
+ ],
+ "Mudon|Al Ranim 5": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 29,
+   "min": 1800,
+   "max": 1919
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 19,
+   "min": 2584,
+   "max": 5175
+  }
+ ],
+ "Mudon|Al Ranim 6": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 34,
+   "min": 1808,
+   "max": 2034
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 18,
+   "min": 2674,
+   "max": 3940
+  }
+ ],
+ "Mudon|Al Ranim 7": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 16,
+   "min": 1808,
+   "max": 2357
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 12,
+   "min": 2583,
+   "max": 3581
+  }
+ ],
+ "Mudon|Al Ranim 8": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 20,
+   "min": 1808,
+   "max": 1944
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 10,
+   "min": 2558,
+   "max": 5747
+  }
+ ],
+ "The Oasis|Lavita": [
+  {
+   "prop_type": "Land",
+   "sub_type": "General Use",
+   "rooms": null,
+   "n": 7,
+   "min": 22110,
+   "max": 40821
+  }
+ ],
+ "The Oasis|Mirage": [
+  {
+   "prop_type": "Land",
+   "sub_type": "General Use",
+   "rooms": null,
+   "n": 10,
+   "min": 10670,
+   "max": 23052
+  }
+ ],
+ "The Oasis|Palmiera 2": [
+  {
+   "prop_type": "Land",
+   "sub_type": "General Use",
+   "rooms": null,
+   "n": 3,
+   "min": 8267,
+   "max": 8267
+  }
+ ],
+ "The Oasis|Palmiera 3": [
+  {
+   "prop_type": "Land",
+   "sub_type": "General Use",
+   "rooms": null,
+   "n": 8,
+   "min": 8267,
+   "max": 8396
+  }
+ ],
+ "The Valley|Alana": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 4,
+   "min": 3237,
+   "max": 3513
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 10,
+   "min": 3715,
+   "max": 4895
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "5 B/R",
+   "n": 5,
+   "min": 4824,
+   "max": 6297
+  }
+ ],
+ "The Valley|Avena": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 3229,
+   "max": 4419
+  }
+ ],
+ "The Valley|Avena 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 3,
+   "min": 3233,
+   "max": 4402
+  }
+ ],
+ "The Valley|Eden": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 8,
+   "min": 1873,
+   "max": 1910
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 4,
+   "min": 2772,
+   "max": 2803
+  }
+ ],
+ "The Valley|Elea": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 1,
+   "min": 3621,
+   "max": 3621
+  }
+ ],
+ "The Valley|Elora": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 35,
+   "min": 1481,
+   "max": 1484
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 25,
+   "min": 2470,
+   "max": 3305
+  }
+ ],
+ "The Valley|Elva": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 5,
+   "min": 1938,
+   "max": 2241
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 3358,
+   "max": 3918
+  }
+ ],
+ "The Valley|Farm Gardens": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 23,
+   "min": 8561,
+   "max": 10009
+  }
+ ],
+ "The Valley|Farm Gardens 2": [
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 24,
+   "min": 8396,
+   "max": 9946
+  }
+ ],
+ "The Valley|Farm Grove": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 3,
+   "min": 3610,
+   "max": 5831
+  },
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 5,
+   "min": 3310,
+   "max": 6889
+  }
+ ],
+ "The Valley|Farm Grove 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 1,
+   "min": 3524,
+   "max": 3524
+  },
+  {
+   "prop_type": "Land",
+   "sub_type": "Residential",
+   "rooms": null,
+   "n": 5,
+   "min": 3310,
+   "max": 7146
+  }
+ ],
+ "The Valley|Kaia": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 2,
+   "min": 1873,
+   "max": 1873
+  }
+ ],
+ "The Valley|Lillia": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 27,
+   "min": 1483,
+   "max": 1543
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 5,
+   "min": 2515,
+   "max": 3743
+  }
+ ],
+ "The Valley|Nara": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 35,
+   "min": 1873,
+   "max": 1904
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 26,
+   "min": 2750,
+   "max": 2773
+  }
+ ],
+ "The Valley|Nima": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 26,
+   "min": 1873,
+   "max": 2135
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 2846,
+   "max": 3570
+  }
+ ],
+ "The Valley|Orania": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 55,
+   "min": 1873,
+   "max": 1904
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 20,
+   "min": 2771,
+   "max": 4199
+  }
+ ],
+ "The Valley|Rivana": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 27,
+   "min": 3229,
+   "max": 3988
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "5 B/R",
+   "n": 5,
+   "min": 4726,
+   "max": 5370
+  }
+ ],
+ "The Valley|Rivera": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 3544,
+   "max": 6173
+  }
+ ],
+ "The Valley|Talia": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 22,
+   "min": 1873,
+   "max": 1914
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 18,
+   "min": 2750,
+   "max": 2893
+  }
+ ],
+ "The Valley|Velora": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 5,
+   "min": 1938,
+   "max": 1939
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 6,
+   "min": 2971,
+   "max": 4002
+  }
+ ],
+ "The Valley|Velora 2": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 4,
+   "min": 1939,
+   "max": 1939
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 4,
+   "min": 2949,
+   "max": 3346
+  }
+ ],
+ "The Valley|Venera": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 16,
+   "min": 1937,
+   "max": 2101
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 14,
+   "min": 2934,
+   "max": 4006
+  }
+ ],
+ "The Valley|Vindera": [
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "3 B/R",
+   "n": 12,
+   "min": 1695,
+   "max": 1793
+  },
+  {
+   "prop_type": "Building",
+   "sub_type": "Villa",
+   "rooms": "4 B/R",
+   "n": 29,
+   "min": 2713,
+   "max": 3972
+  }
+ ]
+}

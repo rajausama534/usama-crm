@@ -56,7 +56,7 @@
   }
 
   // ------------------------------------------------------------------ dashboard
-  const LEAD_STAGES=['New','Contacted','Call Back','No Response','Interested','Follow-Up','Viewing','Meeting Scheduled','Visit Done','Visited','Negotiation','Negotiating','Won','Closed','Converted','Lost','Not Interested'];
+  const LEAD_STAGES=['New','Call Back','Interested','Viewing Done','Negotiation','Won','Lost'];
   const OWNER_ORDER=['For Sale','For Rent','Sold','Rented','Contacted','Call Back','No Response','Not Interested','Invalid Number','Agent','New','-'];
 
   function displayName(){
@@ -131,11 +131,12 @@
       <div class="crmHeadActions"><button class="crmBtn" onclick="showOwnersView()">Owners</button><button class="crmBtn crmBtnPrimary" onclick="showLeadsView()">Leads</button></div></header>
       <div class="crmLoadingLine">Loading your numbers…</div>`;
     const t0=performance.now();
-    const [{data:s,error},activity,verified,market,occ]=await Promise.all([
+    const [{data:s,error},activity,verified,market,occ,agenda]=await Promise.all([
       db.rpc('crm_dashboard_stats'),recentActivity().catch(()=>[]),
       db.from('property_transactions').select('community,cluster,unit,transaction_date,amount,area_sqft,area_type').order('transaction_date',{ascending:false}).limit(6),
       db.from('dld_transactions').select('crm_cluster,transaction_date,amount,area_sqft,rooms,property_sub_type,procedure',{count:'exact'}).gte('transaction_date',new Date(Date.now()-90*864e5).toISOString().slice(0,10)).order('transaction_date',{ascending:false}).limit(6),
-      db.rpc('crm_occupancy_stats')
+      db.rpc('crm_occupancy_stats'),
+      db.from('crm_events').select('id,event_type,title,starts_at,status,lead_id,leads(name)').eq('status','Scheduled').gte('starts_at',new Date(Date.now()-14*864e5).toISOString()).lt('starts_at',new Date(Date.now()+7*864e5).toISOString()).order('starts_at').limit(50)
     ]);
     const oc=occ?.data?.by_status||{},observed=occ?.data?.observed_units||0;
     if(error){v.querySelector('.crmLoadingLine').textContent='Could not load the dashboard: '+error.message;return;}
@@ -159,8 +160,16 @@
         ${kpi('New this week',fmt(L.new_7d),'Created in the last 7 days','leads')}
         ${kpi('Follow-ups today',fmt(L.followups_today),'Scheduled for today','leads')}
         ${kpi('Overdue follow-ups',fmt(L.followups_overdue),'Date has passed','leads')}
-        ${kpi('Interested',fmt((ls['Interested']||0)+(ls['Viewing']||0)+(ls['Negotiation']||0)),'Interested, viewing or negotiating','leads')}
+        ${kpi('Interested → Negotiation',fmt((ls['Interested']||0)+(ls['Viewing Done']||0)+(ls['Negotiation']||0)),'Interested, viewing done or negotiating','leads')}
       </div>
+      <section class="crmSectionTitle"><h2>Today &amp; this week</h2></section>
+      <div class="crmKpiGrid">${(()=>{const ev=agenda?.data||[],now=new Date(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+        const over=ev.filter(e=>new Date(e.starts_at)<now),today=ev.filter(e=>new Date(e.starts_at)>=now&&new Date(e.starts_at)<end),week=ev.filter(e=>new Date(e.starts_at)>=now);
+        return kpi('Follow-ups today',fmt(today.length),today[0]?`Next: ${today[0].event_type} · ${new Date(today[0].starts_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`:'Nothing else today','calendar')
+          +kpi('Overdue',fmt(over.length),over.length?'Open the calendar to clear them':'All caught up','calendar')
+          +kpi('Viewings this week',fmt(week.filter(e=>e.event_type==='Property Viewing').length),'Scheduled property viewings','calendar')
+          +kpi('Meetings this week',fmt(week.filter(e=>e.event_type==='Meeting').length),'Scheduled meetings','calendar')
+          +kpi('All follow-ups · 7 days',fmt(week.length),'Calls, follow-ups, tasks','calendar');})()}</div>
       <div class="crmCardGrid">
         <article class="crmCard"><header><h3>Lead pipeline</h3><span>${fmt(L.total)} leads</span></header>${barList(orderedEntries(ls,LEAD_STAGES),L.total,true)}</article>
         <article class="crmCard"><header><h3>Owner status</h3><span>${fmt(worked)} worked · ${fmt((os['New']||0)+(os['-']||0))} not yet contacted</span></header>${barList(orderedEntries(Object.fromEntries(Object.entries(os).filter(([k])=>k!=='New'&&k!=='-')),OWNER_ORDER),worked,true)}</article>
@@ -177,6 +186,7 @@
     v.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
       const a=b.dataset.action;
       if(a==='leads')return showLeadsView();
+      if(a==='calendar')return showCalendarModule();
       if(a.startsWith('status:'))return showOwnersView().then(()=>quickStatus(a.slice(7)));
       showOwnersView();
     });
