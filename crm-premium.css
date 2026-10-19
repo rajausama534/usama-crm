@@ -512,3 +512,10 @@ html[data-theme="light"] body.crmPremium #leadsView .leadsTable .leadLatestNote{
 html[data-theme="light"] body.crmPremium #leadsView .leadsTable tr:hover td{background:var(--c-surface-2)!important}
 html[data-theme="light"] body.crmPremium #appView #ownersTable td{background:var(--c-surface)!important;color:var(--c-text)!important}
 html[data-theme="light"] body.crmPremium #appView #ownersTable tr:hover td{background:var(--c-surface-2)!important}
+/* light mode: owner profile + lead detail internals (old layers hard-code near-white text and dark boxes) */
+html[data-theme="light"] body.crmPremium :is(#leadDetailContent,#profileContent) :is(div,span,p,small,li,dd,dt,td):not([class*="Btn"]):not([class*="btn"]):not(.u6Stage):not(.crmStatus):not(.crmTag){color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium :is(#leadDetailContent,#profileContent) :is([class*="Label"],[class*="label"],[class*="Meta"],[class*="meta"],[class*="Subtitle"],time,dt,.crmSub,.crmEmpty,.crmTimeline span,.crmTimeline time,.crmEvList span){color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium :is(.u6NotesBox,.u6Composer,.u10DateButton,.u6CloseButton,.u6TimelineItem,[class*="u6Notes"]){background:var(--c-surface-2)!important;border-color:var(--c-border)!important;color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium .u6Stage{color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium .u6Stage.active{color:#fff!important}
+html[data-theme="light"] body.crmPremium :is(#leadDetailContent,#profileContent) :is(.waBtn,.callBtn){color:#fff!important}
