@@ -43,7 +43,10 @@ body.crmPremium .v7ExportBtn{border-radius:var(--r-sm)!important}
 /* ---------------------------------------------------------------- top bar + drawer (tablet / phone) */
 @media (max-width:1099px){
   body.crmPremium:has(#v7Topbar:not(.hidden)){padding-top:60px!important}
-  body.crmPremium #v7Topbar{height:60px!important;gap:var(--s-2)!important;padding:0 var(--s-3)!important;background:var(--c-surface)!important}
+  /* backdrop-filter would make the header the containing block of the fixed drawer and clip it. */
+  body.crmPremium #v7Topbar{height:60px!important;gap:var(--s-2)!important;padding:0 var(--s-3)!important;background:var(--c-surface)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  body.crmPremium #v7Topbar .v7Brand{display:flex!important;gap:6px!important;min-width:0!important;font-size:var(--t-lg)!important}
+  body.crmPremium #v7Topbar .v7Brand strong{display:inline!important}
   body.crmPremium .crmMenuToggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-text);cursor:pointer;flex:none}
   body.crmPremium .crmMenuToggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
   body.crmPremium #v7Topbar .v7Nav{position:fixed!important;top:60px;left:0;bottom:0;width:min(300px,84vw);flex-direction:column!important;gap:2px!important;padding:var(--s-3)!important;background:var(--c-surface)!important;border-right:1px solid var(--c-border);transform:translateX(-102%);transition:transform .2s ease;overflow-y:auto!important;z-index:1002}
