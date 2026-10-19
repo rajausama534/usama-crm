@@ -34,6 +34,8 @@ body.crmPremium #v7Topbar .v7Brand strong{color:var(--c-text)!important;font-wei
 body.crmPremium #v7Topbar .v7Brand span{color:var(--c-accent)!important;font-weight:700}
 body.crmPremium #v7Topbar .v7Nav button{display:flex!important;align-items:center!important;gap:var(--s-3)!important;color:var(--c-muted)!important;font-size:var(--t-base)!important;font-weight:500!important;background:transparent!important;transition:background .15s,color .15s}
 body.crmPremium #v7Topbar .v7Nav button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* Links added by older layers have no icon: give them the same indent and a neutral marker. */
+body.crmPremium #v7Topbar .v7Nav button:not(:has(svg))::before{content:"";width:18px;height:18px;flex:none;border-radius:5px;border:1.8px solid currentColor;opacity:.55;transform:scale(.62)}
 body.crmPremium #v7Topbar .v7Nav button:hover{color:var(--c-text)!important;background:var(--c-surface-2)!important}
 body.crmPremium #v7Topbar .v7Nav button.active{color:var(--c-text)!important;background:var(--c-accent-soft)!important;box-shadow:inset 3px 0 0 var(--c-accent)}
 body.crmPremium .v7ExportBtn{border-radius:var(--r-sm)!important}
