@@ -12,7 +12,9 @@
   load('crm-enhancements-core.js?v=20260911')
     .then(()=>load('crm-stability.js?v=20260914c'))
     .then(()=>load('owner-data-update-20260914.js?v=1'))
-    .then(()=>load('alana-transactions.js?v=20261005'))
+    // alana-transactions.js is no longer loaded: its patterns were double-escaped, so it deleted
+    // existing Alana sale notes and attached one wrong sale to every Alana villa.
     .then(()=>load('rivana-transactions.js?v=20261005'))
+    .then(()=>load('owner-related-rows.js?v=20261019'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
