@@ -134,9 +134,10 @@ body.crmPremium .crmAssignee.none{color:var(--c-faint)}
 body.crmPremium .crmTableWrap{overflow-x:auto}
 body.crmPremium .crmTable{width:100%;border-collapse:collapse;font-size:var(--t-sm)}
 body.crmPremium .crmTable th{position:sticky;top:0;padding:var(--s-3);text-align:left;color:var(--c-muted);font-size:var(--t-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--c-border);background:var(--c-surface)}
-body.crmPremium .crmTable td{padding:var(--s-3);border-bottom:1px solid var(--c-border);vertical-align:top}
-body.crmPremium .crmAccessCell{max-width:340px;color:var(--c-muted)}
-body.crmPremium .crmRowActions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+body.crmPremium .crmTable td{padding:var(--s-3);border-bottom:1px solid var(--c-border);vertical-align:top;text-align:left!important;overflow-wrap:anywhere}
+body.crmPremium .crmTable th{text-align:left!important}
+body.crmPremium .crmAccessCell{max-width:260px;color:var(--c-muted)}
+body.crmPremium .crmRowActions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;min-width:150px}
 body.crmPremium #ownersTable,body.crmPremium #leadsTable{font-size:var(--t-sm)!important}
 body.crmPremium #ownersTable th,body.crmPremium #leadsTable th{background:var(--c-surface)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;letter-spacing:.05em!important}
 body.crmPremium #ownersTable td,body.crmPremium #leadsTable td{background:var(--c-bg)!important;color:var(--c-text)!important;border-bottom-color:var(--c-border)!important}
@@ -152,6 +153,8 @@ body.crmPremium .crmTimeline strong{font-size:var(--t-sm)}
 body.crmPremium .crmTimeline span{color:var(--c-muted);font-size:var(--t-xs)}
 
 /* ---------------------------------------------------------------- modals + toasts */
+/* Every existing popup (owner profile, lead detail, editors) sits above the sidebar. */
+body.crmPremium .modalOverlay,body.crmPremium #u10OwnerEditor{z-index:2000!important}
 body.crmPremium .crmModalScrim{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:var(--s-4);background:rgba(3,6,12,.7)}
 body.crmPremium .crmModal{display:flex;flex-direction:column;width:min(720px,100%);max-height:calc(100vh - 32px);border:1px solid var(--c-border-strong);border-radius:var(--r-lg);background:var(--c-surface);box-shadow:var(--shadow)}
 body.crmPremium .crmModal>header,body.crmPremium .crmModal>footer{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);padding:var(--s-4) var(--s-5)}

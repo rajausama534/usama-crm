@@ -78,7 +78,7 @@
     const max=Math.max(...entries.map(e=>e[1]),1);
     return `<div class="crmBars">${entries.map(([k,n])=>`
       <button type="button" class="crmBarRow" ${onClick?`data-key="${esc(k)}"`:'disabled'}>
-        <span class="crmBarLabel">${esc(k)}</span>
+        <span class="crmBarLabel">${esc(k==='-'?'Not set':k)}</span>
         <span class="crmBarTrack"><span class="crmBarFill" style="width:${Math.max(2,n*100/max)}%"></span></span>
         <span class="crmBarValue">${fmt(n)}<small>${pct(n,total)}%</small></span>
       </button>`).join('')}</div>`;
@@ -234,10 +234,10 @@
           <td data-label="Leads">${fmt(counts[String(u.email).toLowerCase()]||0)}</td>
           <td data-label="Status"><span class="crmStatus ${u.active?'on':'off'}">${u.active?'Active':'Deactivated'}</span>${u.has_login?'':'<span class="crmSub">No login yet</span>'}</td>
           <td data-label="Last sign-in">${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'Never'}</td>
-          <td class="crmRowActions">${String(u.email).toLowerCase()===ADMIN_EMAIL?'<span class="crmSub">Owner account</span>':`
+          <td><div class="crmRowActions">${String(u.email).toLowerCase()===ADMIN_EMAIL?'<span class="crmSub">Owner account</span>':`
             <button class="crmBtn crmBtnSm" data-edit="${esc(u.email)}">Edit</button>
             ${u.has_login?`<button class="crmBtn crmBtnSm" data-pass="${esc(u.email)}">Set password</button>`:''}
-            <button class="crmBtn crmBtnSm ${u.active?'crmBtnDanger':''}" data-toggle="${esc(u.email)}" data-active="${u.active?1:0}">${u.active?'Deactivate':'Reactivate'}</button>`}</td>
+            <button class="crmBtn crmBtnSm ${u.active?'crmBtnDanger':''}" data-toggle="${esc(u.email)}" data-active="${u.active?1:0}">${u.active?'Deactivate':'Reactivate'}</button>`}</div></td>
         </tr>`).join('')}</tbody></table></div>`:'<div class="crmEmpty">No users yet.</div>';
       const find=email=>users.find(u=>u.email===email);
       $('crmUsersList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openUserEditor(find(b.dataset.edit)));
