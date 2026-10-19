@@ -146,7 +146,8 @@ body.crmPremium #ownersTable td,body.crmPremium #leadsTable td{background:var(--
 body.crmPremium #ownersTable tr:hover td,body.crmPremium #leadsTable tr:hover td{background:var(--c-surface)!important}
 
 /* The sidebar already links Dashboard and Leads; drop the duplicate buttons from the Owners header. */
-body.crmPremium #appView .mainHeader .headerBtns button:is([onclick="showChoiceView()"],[onclick="showLeadsView()"]):not(#__){display:none!important}
+body.crmPremium :is(#appView,#leadsView) .mainHeader .headerBtns button:is([onclick="showChoiceView()"],[onclick="showLeadsView()"],[onclick="showOwnersView()"]):not(#__){display:none!important}
+body.crmPremium #leadsTable td:first-child,body.crmPremium #leadsTable th:first-child{text-align:left!important}
 
 /* ---------------------------------------------------------------- owner profile history */
 body.crmPremium .crmHistory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4);margin-top:var(--s-5)}
