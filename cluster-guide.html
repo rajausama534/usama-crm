@@ -1,587 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <script>/* apply saved theme before first paint (no flash) */try{if(localStorage.getItem("crm_theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Usama CRM Cluster Guide</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root{
-      --bg:#030609;
-      --panel:#07101a;
-      --panel-2:#0a1421;
-      --line:#17314b;
-      --line-soft:#10294a;
-      --text:#f3f6fb;
-      --muted:#8295b0;
-      --accent:#17c9bd;
-      --accent-dark:#0b9c84;
-      --blue:#47b5ff;
-    }
-
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,sans-serif;padding:18px}
-    button,input,select{font:inherit}
-    button{cursor:pointer}
-    .wrap{max-width:1550px;margin:0 auto}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-    .top h1{margin:0;font-size:30px;letter-spacing:-.5px}
-    .sub{margin-top:4px;color:var(--muted);font-size:13px}
-    .topActions{display:flex;align-items:center;gap:8px}
-    .homeLink{color:#cbd5e1;text-decoration:none;font-weight:600;font-size:13px;padding:8px 11px;border:1px solid #123052;border-radius:9px;white-space:nowrap}
-    .homeLink:hover{border-color:var(--accent);color:#fff}
-    .primaryBtn,.secondaryBtn,.dangerBtn{border-radius:9px;padding:8px 11px;font-weight:600;font-size:12px;color:#fff}
-    .primaryBtn{border:1px solid var(--accent-dark);background:linear-gradient(135deg,#0bb38e,#07846e)}
-    .primaryBtn:hover{filter:brightness(1.08)}
-    .secondaryBtn{border:1px solid #29435f;background:#07101a;color:#d7e1ed}
-    .secondaryBtn:hover{border-color:#3c6386}
-    .dangerBtn{border:1px solid #70303b;background:#2b1118;color:#ffadb8}
-    .dangerBtn:hover{background:#3a151e}
-    .hidden{display:none!important}
-
-    .toolbar{display:grid;grid-template-columns:minmax(230px,1fr) 220px 150px;gap:9px;margin:18px 0 12px}
-    .control{width:100%;border:1px solid #263d59;background:#050a11;color:#eef4fb;border-radius:10px;padding:11px 12px;outline:none}
-    .control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,201,189,.08)}
-    select.control{color:#c9d5e4}
-
-    .stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .chip{border:1px solid #123052;border-radius:9px;padding:7px 10px;color:#a8b7ca;font-size:12px;background:#060b12}
-    .chip strong{color:#fff}
-
-    .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
-    .panel{border:1px solid var(--line-soft);background:#050a10;border-radius:16px;overflow:hidden}
-    .panelTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 15px;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--muted)}
-    .panelTitle strong{font-size:14px;color:#edf3fa}
-    .clusterList{padding:9px;display:grid;gap:7px;max-height:calc(100vh - 220px);overflow:auto}
-    .clusterButton{width:100%;text-align:left;border:1px solid transparent;background:#07101a;color:#fff;border-radius:11px;padding:11px 12px}
-    .clusterButton:hover{border-color:#1c4661;background:#091522}
-    .clusterButton.active{border-color:var(--accent);background:linear-gradient(135deg,rgba(23,201,189,.13),rgba(7,16,26,.96))}
-    .clusterButton b{display:block;font-size:14px}
-    .clusterButton span{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
-
-    .detail{min-height:470px;padding:18px}
-    .empty{display:grid;place-items:center;text-align:center;min-height:390px;color:#7187a4;padding:30px}
-    .emptyIcon{width:64px;height:64px;color:var(--accent);opacity:.65;margin:0 auto 12px}
-    .empty h2{font-size:18px;color:#dce6f2;margin:0 0 6px}
-    .empty p{margin:0;max-width:560px;font-size:13px;line-height:1.7}
-
-    .detailHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
-    .detailHeader h2{margin:0;font-size:26px;letter-spacing:-.4px}
-    .community{margin-top:4px;color:var(--accent);font-size:12px;font-weight:600}
-    .detailRight{display:grid;justify-items:end;gap:9px}
-    .detailActions{display:flex;gap:7px}
-    .unitPills{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px}
-    .unitPill{border:1px solid #1d4761;color:#bfe8ff;background:#081724;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:600}
-
-    .summaryGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:15px}
-    .summaryCard{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px}
-    .summaryCard label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.55px;margin-bottom:5px}
-    .summaryCard div{font-size:14px;font-weight:600;overflow-wrap:anywhere}
-
-    .section{margin-top:15px}
-    .section h3{font-size:14px;margin:0 0 8px;color:#e9f0f8}
-    .tableWrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:920px;background:#050b12}
-    th{background:#0a1421;color:#8fa2b9;font-size:10px;text-transform:uppercase;letter-spacing:.45px;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
-    td{font-size:12px;padding:11px 10px;border-bottom:1px solid #102238;vertical-align:top;line-height:1.5}
-    tbody tr:last-child td{border-bottom:0}
-    tbody tr:hover{background:#071522}
-    .number{font-weight:700;color:#fff}
-    .range{white-space:nowrap}
-    .layouts{min-width:155px;color:#c7d4e4}
-    .layoutCount{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:6px;background:rgba(23,201,189,.14);color:#72e9df;font-weight:700;margin-right:5px}
-
-    .infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .infoBox{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:13px}
-    .infoBox label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.55px;margin-bottom:6px}
-    .infoBox div{font-size:12px;line-height:1.65;color:#d9e3ef;white-space:pre-line}
-    .usp{grid-column:1/-1;border-color:#155349;background:linear-gradient(135deg,rgba(23,201,189,.08),#07101a)}
-    .optional{font-weight:400;color:#60778f;text-transform:none;letter-spacing:0}
-    .error{border:1px solid #6b2732;background:#2a1118;color:#ffabb6;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
-    .notice{border:1px solid #155349;background:#071b19;color:#8ce8df;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
-
-    .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
-    .modal.show{display:flex}
-    .modalCard{width:min(1180px,100%);background:#050a10;border:1px solid #173b59;border-radius:17px;box-shadow:0 25px 90px rgba(0,0,0,.65);overflow:hidden}
-    .modalHeader{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;gap:15px;padding:17px 18px;background:#07101a;border-bottom:1px solid var(--line)}
-    .modalHeader h2{margin:0;font-size:21px}
-    .closeBtn{width:34px;height:34px;border:1px solid #29435f;background:#050a11;color:#d8e3ef;border-radius:9px;font-size:21px;line-height:1}
-    .formBody{padding:18px}
-    .formGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-    .field{display:grid;gap:5px}
-    .field.full{grid-column:1/-1}
-    .field label{color:#94a7bd;font-size:11px;font-weight:600}
-    .field input,.field select,.field textarea{width:100%;border:1px solid #263d59;background:#02060a;color:#f4f7fb;border-radius:9px;padding:10px 11px;outline:none;font-size:12px}
-    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,201,189,.08)}
-    .field textarea{min-height:84px;resize:vertical;line-height:1.5}
-    .field input[readonly]{background:#0a1017;color:#9eb0c4}
-    .unitEditorHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0 9px}
-    .unitEditorHeader h3{margin:0;font-size:15px}
-    .unitEditor{display:grid;gap:10px}
-    .unitEditorRow{border:1px solid var(--line);background:#07101a;border-radius:13px;padding:12px}
-    .unitRowTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
-    .unitRowTop strong{font-size:12px;color:#dce6f2}
-    .removeRow{border:0;background:transparent;color:#ff8999;font-size:11px;font-weight:600;padding:4px}
-    .unitFormGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
-    .unitFormGrid .wide{grid-column:span 2}
-    .modalFooter{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;padding:13px 18px;background:#07101a;border-top:1px solid var(--line)}
-    .saveState{margin-right:auto;align-self:center;color:#8fa2b9;font-size:11px}
-
-    @media(max-width:1000px){
-      .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-    @media(max-width:760px){
-      body{padding:13px}
-      .top{align-items:center}
-      .top h1{font-size:25px}
-      .sub{font-size:11px;line-height:1.45}
-      .topActions{align-items:stretch}
-      .topActions .primaryBtn{font-size:11px;padding:7px 8px}
-      .homeLink{font-size:11px;padding:7px 8px}
-      .toolbar{grid-template-columns:1fr 1fr;margin-top:14px}
-      .toolbar .control:first-child{grid-column:1/-1}
-      .control{padding:10px;font-size:12px}
-      .workspace{grid-template-columns:1fr}
-      .clusterList{display:flex;overflow-x:auto;max-height:none;padding:8px}
-      .clusterButton{min-width:210px}
-      .detail{padding:13px;min-height:390px}
-      .detailHeader{display:block}
-      .detailHeader h2{font-size:22px}
-      .detailRight{justify-items:start;margin-top:10px}
-      .unitPills{justify-content:flex-start;margin-top:10px}
-      .summaryGrid{gap:7px}
-      .summaryCard{padding:10px}
-      .summaryCard div{font-size:12px}
-      .infoGrid{grid-template-columns:1fr}
-      .usp{grid-column:auto}
-      .modal{padding:10px}
-      .modalHeader{padding:14px}
-      .formBody{padding:13px}
-      .formGrid{grid-template-columns:1fr}
-      .field.full{grid-column:auto}
-      .unitFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .unitFormGrid .wide{grid-column:1/-1}
-      .modalFooter{padding:11px 13px}
-    }
-  </style>
-<link rel="stylesheet" href="crm-pages.css?v=2">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cluster Guide · Usama CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0b0f17;--surface:#111723;--surface-2:#161e2d;--raised:#1b2435;--border:rgba(148,163,184,.14);--border-strong:rgba(148,163,184,.26);--text:#e8edf5;--muted:#8a96aa;--faint:#5f6b7e;--accent:#5b6cff;--accent-soft:rgba(91,108,255,.14);--accent-text:#aab4ff;--ok:#22c55e;--warn:#f59e0b;--r:12px;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.18)}
+html[data-theme="light"]{--bg:#f4f6fa;--surface:#fff;--surface-2:#f0f2f7;--raised:#fff;--border:rgba(15,23,42,.09);--border-strong:rgba(15,23,42,.17);--text:#0f172a;--muted:#5b6474;--faint:#8a93a4;--accent:#4f5bd5;--accent-soft:rgba(79,91,213,.10);--accent-text:#3c48c0;--shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border)}
+.brand{font-weight:700;font-size:16px}.brand span{color:var(--accent)}
+.top .spacer{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--raised)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+html[data-theme="light"] .btn.danger{color:#b91c1c}
+.btn.sm{height:30px;padding:0 10px;font-size:12px}
+.icon-btn{width:36px;padding:0}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;max-width:1440px;margin:0 auto;padding:24px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.list{position:sticky;top:84px;max-height:calc(100vh - 108px);display:flex;flex-direction:column;overflow:hidden}
+.list-head{padding:16px;border-bottom:1px solid var(--border);display:grid;gap:8px}
+input,select,textarea{width:100%;height:40px;padding:0 12px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px}
+textarea{height:auto;min-height:80px;padding:10px 12px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.list-body{overflow-y:auto;padding:8px}
+.group{margin:8px 0 4px;padding:0 8px;color:var(--faint);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:none;text-align:left;cursor:pointer}
+.item:hover{background:var(--surface-2)}
+.item.active{background:var(--accent-soft)}
+.item strong{font-weight:600}
+.item small{color:var(--muted);font-size:12px}
+.detail{min-height:60vh}
+.hero{padding:28px 28px 20px;border-bottom:1px solid var(--border)}
+.eyebrow{color:var(--muted);font-size:13px}
+.hero h1{margin:4px 0 6px;font-size:30px;font-weight:700;letter-spacing:-.01em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:20px 28px}
+.fact{padding:14px 16px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg)}
+.fact span{display:block;color:var(--muted);font-size:12px;font-weight:500}
+.fact b{display:block;margin-top:4px;font-size:18px;font-weight:700}
+.fact .na{color:var(--faint);font-size:14px;font-weight:500}
+.section{padding:8px 28px 24px}
+.section h2{margin:12px 0 10px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.configs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.config{padding:16px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg)}
+.config h3{margin:0 0 2px;font-size:18px}
+.config .type{color:var(--muted);font-size:12px}
+.config dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:12px 0 0}
+.config dt{color:var(--muted);font-size:12px}
+.config dd{margin:0;font-weight:600;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.src{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.src li{padding:12px 14px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg)}
+.src a{color:var(--accent-text);font-weight:600;text-decoration:none}
+.src small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.note{padding:12px 14px;border-radius:var(--r);border:1px dashed var(--border-strong);color:var(--muted);font-size:13px}
+.empty{display:grid;place-items:center;text-align:center;min-height:50vh;padding:40px;color:var(--muted)}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+.skeleton{height:14px;border-radius:6px;background:linear-gradient(90deg,var(--surface-2),var(--raised),var(--surface-2));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.err{margin:16px;padding:12px 14px;border-radius:var(--r);background:rgba(239,68,68,.12);color:#fca5a5}
+html[data-theme="light"] .err{color:#b91c1c}
+/* editor */
+.scrim{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,6,12,.65)}
+html[data-theme="light"] .scrim{background:rgba(15,23,42,.35)}
+.modal{display:flex;flex-direction:column;width:min(880px,100%);max-height:calc(100vh - 32px);border:1px solid var(--border-strong);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.modal header,.modal footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 20px}
+.modal header{border-bottom:1px solid var(--border)}.modal footer{border-top:1px solid var(--border);justify-content:flex-end}
+.modal h2{margin:0;font-size:18px}
+.modal .body{padding:20px;overflow-y:auto;display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:600}
+.mix{width:100%;border-collapse:collapse;font-size:13px}
+.mix th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:6px}
+.mix td{padding:4px}
+.mix input{height:34px;font-size:13px;padding:0 8px}
+@media (max-width:980px){.layout{grid-template-columns:1fr}.list{position:static;max-height:none}.list-body{max-height:40vh}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.layout{padding:12px;gap:12px}.top{padding:10px 12px}.hero,.facts,.section{padding-left:16px;padding-right:16px}.hero h1{font-size:24px}.grid2{grid-template-columns:1fr}.mix{display:block;overflow-x:auto}}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="top">
-      <div>
-        <h1>Cluster Guide</h1>
-        <div class="sub">Unit mix, layouts, sizes, original prices and project dates.</div>
-      </div>
-      <div class="topActions"><button class="primaryBtn hidden" id="addClusterBtn">+ Add Cluster</button><a class="homeLink" href="index.html">← CRM Home</a></div>
-    </header>
-
-    <div class="toolbar">
-      <input class="control" id="search" type="search" placeholder="Search cluster, community or layout">
-      <select class="control" id="typeFilter"><option value="">All Unit Types</option></select>
-      <select class="control" id="bedFilter"><option value="">All Bedrooms</option></select>
+<header class="top">
+  <a class="btn sm" href="index.html">← CRM</a>
+  <div class="brand">Cluster <span>Guide</span></div>
+  <div class="spacer"></div>
+  <button class="btn sm icon-btn" id="theme" title="Light / dark">◐</button>
+  <button class="btn sm primary" id="add" hidden>+ Add cluster</button>
+</header>
+<main class="layout">
+  <aside class="panel list">
+    <div class="list-head">
+      <input id="q" placeholder="Search project or community" autocomplete="off">
+      <select id="community"><option value="">All communities</option></select>
     </div>
+    <div class="list-body" id="list"><div class="skeleton" style="margin:12px"></div><div class="skeleton" style="margin:12px"></div></div>
+  </aside>
+  <section class="panel detail" id="detail"><div class="empty"><div><b>Choose a project</b>Select a cluster on the left to see its verified details.</div></div></section>
+</main>
+<script>
+const CU='https://vnydxkmhrcesdffpfjpc.supabase.co',CK='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I',API=CU+'/functions/v1/owner-finder-api';
+const db=supabase.createClient(CU,CK);
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+const range=(a,b)=>a&&b?(a===b?`${fmt(a)}`:`${fmt(a)} – ${fmt(b)}`):(a||b?fmt(a||b):'');
+const byName=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:'base'});
+let clusters=[],canEdit=false,activeId=null,cache={};
 
-    <div class="stats" id="stats">
-      <span class="chip">Loading cluster data…</span>
-    </div>
-    <div id="error"></div>
+async function api(action,data={}){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){location.href='index.html';throw new Error('Not signed in');}
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify({action,...data})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||'Request failed');
+  return j;
+}
 
-    <main class="workspace">
-      <aside class="panel">
-        <div class="panelTitle"><strong>Clusters</strong><span id="resultCount">0 results</span></div>
-        <div class="clusterList" id="clusterList"></div>
-      </aside>
-      <section class="panel detail" id="detail"></section>
-    </main>
-  </div>
+function renderList(){
+  const q=$('q').value.trim().toLowerCase(),comm=$('community').value;
+  const rows=clusters.filter(c=>(!comm||c.community===comm)&&(!q||`${c.name} ${c.community} ${c.developer||''}`.toLowerCase().includes(q)));
+  if(!rows.length){$('list').innerHTML='<p class="empty" style="min-height:0;padding:24px">No matching projects.</p>';return;}
+  const groups={};rows.forEach(c=>(groups[c.community]=groups[c.community]||[]).push(c));
+  $('list').innerHTML=Object.keys(groups).sort(byName).map(g=>`<div class="group">${esc(g)}</div>`+groups[g].sort((a,b)=>byName(a.name,b.name)).map(c=>`<button class="item ${c.id===activeId?'active':''}" data-id="${c.id}"><strong>${esc(c.name)}</strong><small>${c.bedrooms?.length?esc(c.bedrooms.join(', '))+' BR':''}</small></button>`).join('')).join('');
+  $('list').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>open(b.dataset.id));
+}
 
-  <div class="modal" id="clusterModal" role="dialog" aria-modal="true" aria-labelledby="clusterModalTitle">
-    <div class="modalCard">
-      <div class="modalHeader">
-        <div><h2 id="clusterModalTitle">Add Cluster</h2><div class="sub">Add each unit type and bedroom configuration separately.</div></div>
-        <button class="closeBtn" id="closeModalBtn" type="button" aria-label="Close">×</button>
-      </div>
-      <form id="clusterForm">
-        <div class="formBody">
-          <input id="formId" type="hidden">
-          <datalist id="unitTypeOptions"><option value="Townhouse"><option value="Semi-Detached Villa"><option value="Villa"></datalist>
-          <div class="formGrid">
-            <div class="field"><label for="formName">Cluster Name *</label><input id="formName" maxlength="200" required placeholder="Farm Gardens"></div>
-            <div class="field"><label for="formCommunity">Community</label><input id="formCommunity" maxlength="200" placeholder="The Valley"></div>
-            <div class="field"><label for="formLaunch">Launch Date</label><input id="formLaunch" maxlength="100" placeholder="June 2022"></div>
-            <div class="field"><label for="formHandover">Handover Date</label><input id="formHandover" maxlength="100" placeholder="Q3 2026"></div>
-            <div class="field"><label for="formTotal">Total Units (calculated)</label><input id="formTotal" value="0" readonly></div>
-            <div class="field full"><label for="formPayment">Payment Plan</label><textarea id="formPayment" maxlength="4000" placeholder="80/20 or full milestone breakdown"></textarea></div>
-            <div class="field full"><label for="formUsp">USP <span class="optional">(Optional)</span></label><textarea id="formUsp" maxlength="6000" placeholder="Key selling points of the cluster"></textarea></div>
-          </div>
+async function open(id){
+  activeId=id;renderList();
+  history.replaceState(null,'','#'+id);
+  const d=$('detail');
+  if(!cache[id]){d.innerHTML='<div style="padding:28px;display:grid;gap:12px"><div class="skeleton" style="width:40%;height:28px"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>';
+    try{cache[id]=(await api('getCluster',{id})).cluster;}catch(e){d.innerHTML=`<div class="err">${esc(e.message)}</div>`;return;}}
+  const c=cache[id],mix=c.unit_mix||[];
+  const beds=mix.map(m=>m.bedrooms).filter(Boolean);
+  const fact=(label,val)=>`<div class="fact"><span>${label}</span>${val?`<b>${val}</b>`:'<b class="na">Not published</b>'}</div>`;
+  const anyPlot=mix.find(m=>m.plot_min_sqft||m.dld_plot_min_sqft);
+  d.innerHTML=`<div class="hero"><div class="eyebrow">${esc(c.community)}${c.developer?` · ${esc(c.developer)}`:''}</div><h1>${esc(c.name)}</h1>
+      <div class="chips">${c.development_type?`<span class="chip">${esc(c.development_type)}</span>`:''}${beds.length?`<span class="chip">${esc(beds.join(', '))} bedrooms</span>`:''}${c.usp?`<span class="chip">${esc(c.usp)}</span>`:''}</div>
+      ${canEdit?`<div style="margin-top:14px;display:flex;gap:8px"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`:''}</div>
+    <div class="facts">${fact('Handover',esc(c.handover_date))}${fact('Total units',c.total_units?fmt(c.total_units):'')}${fact('Bedroom types',beds.length?esc(beds.join(', ')):'')}${fact('Launch',esc(c.launch_date))}</div>
+    ${c.original_price_note?`<div class="section"><h2>Price</h2><div class="note">${esc(c.original_price_note)}</div></div>`:''}
+    <div class="section"><h2>Property configurations</h2>${mix.length?`<div class="configs">${mix.map(m=>`<article class="config"><h3>${esc(m.bedrooms)} Bedrooms</h3><div class="type">${esc(m.unit_type||'')}</div><dl>
+        ${m.bua_min_sqft||m.bua_max_sqft?`<dt>BUA (developer)</dt><dd>${range(m.bua_min_sqft,m.bua_max_sqft)} sq ft</dd>`:''}
+        ${m.plot_min_sqft||m.plot_max_sqft?`<dt>Plot (developer)</dt><dd>${range(m.plot_min_sqft,m.plot_max_sqft)} sq ft</dd>`:''}
+        ${m.dld_area_min_sqft?`<dt>Area recorded by DLD</dt><dd>${range(m.dld_area_min_sqft,m.dld_area_max_sqft)} sq ft</dd><dt>DLD sales seen</dt><dd>${fmt(m.dld_sales)}</dd>`:''}
+        ${m.dld_plot_min_sqft?`<dt>Plot recorded by DLD</dt><dd>${range(m.dld_plot_min_sqft,m.dld_plot_max_sqft)} sq ft</dd><dt>DLD plot sales</dt><dd>${fmt(m.dld_plot_sales)}</dd>`:''}
+        ${m.units?`<dt>Units</dt><dd>${fmt(m.units)}</dd>`:''}
+        ${(m.layouts||[]).length?`<dt>Layouts</dt><dd>${esc(m.layouts.join(', '))}</dd>`:''}
+        ${m.op_min_aed?`<dt>Original price</dt><dd>AED ${range(m.op_min_aed,m.op_max_aed)}</dd>`:''}
+      </dl></article>`).join('')}</div>`:'<div class="note">No configurations recorded yet.</div>'}</div>
+    ${c.payment_plan?`<div class="section"><h2>Payment plan</h2><div class="note">${esc(c.payment_plan)}</div></div>`:''}
+    <div class="section"><h2>Sources</h2>${(c.sources||[]).length?`<ul class="src">${c.sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a><small>${esc((s.fields||[]).join(', '))}${s.checked?` · checked ${esc(s.checked)}`:''}</small></li>`).join('')}</ul>`:'<div class="note">No sources recorded.</div>'}
+      ${c.open_questions?`<div class="note" style="margin-top:10px">${esc(c.open_questions)}</div>`:''}</div>`;
+  if(canEdit){$('edit').onclick=()=>editor(c);$('del').onclick=()=>remove(c);}
+}
 
-          <div class="unitEditorHeader"><h3>Unit Types, Bedrooms & Layouts</h3><button class="secondaryBtn" id="addUnitRowBtn" type="button">+ Add Unit Configuration</button></div>
-          <div class="unitEditor" id="unitEditor"></div>
-        </div>
-        <div class="modalFooter"><span class="saveState" id="saveState"></span><button class="secondaryBtn" id="cancelModalBtn" type="button">Cancel</button><button class="primaryBtn" id="saveClusterBtn" type="submit">Save Cluster</button></div>
-      </form>
-    </div>
-  </div>
+async function remove(c){
+  const b=$('del');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Click again to delete';return;}
+  try{await api('deleteCluster',{id:c.id});delete cache[c.id];activeId=null;await load();$('detail').innerHTML='<div class="empty"><div><b>Deleted</b></div></div>';}catch(e){alert(e.message);}
+}
 
-  <script>
-    const SUPABASE_URL='https://vnydxkmhrcesdffpfjpc.supabase.co';
-    const SUPABASE_KEY='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I';
-    const API='https://vnydxkmhrcesdffpfjpc.supabase.co/functions/v1/owner-finder-api';
-    const ADMIN_EMAIL='thechussar@gmail.com';
-    const crm=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    const $=id=>document.getElementById(id);
-    const clean=value=>value===null||value===undefined?'':String(value).trim();
-    const esc=value=>clean(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-    const norm=value=>clean(value).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
-    let clusters=[];
-    let filtered=[];
-    let activeId='';
-    let session=null;
-    let isAdmin=false;
-    let formRows=[];
+function editor(c={}){
+  const mix=(c.unit_mix&&c.unit_mix.length?c.unit_mix:[{bedrooms:'',unit_type:''}]).map(m=>({...m}));
+  const w=document.createElement('div');w.className='scrim';
+  const row=(m,i)=>`<tr data-i="${i}"><td><input data-k="bedrooms" value="${esc(m.bedrooms||'')}" placeholder="4"></td><td><input data-k="unit_type" value="${esc(m.unit_type||'')}" placeholder="Villa"></td>
+    <td><input data-k="bua_min_sqft" type="number" value="${m.bua_min_sqft||''}"></td><td><input data-k="bua_max_sqft" type="number" value="${m.bua_max_sqft||''}"></td>
+    <td><input data-k="plot_min_sqft" type="number" value="${m.plot_min_sqft||''}"></td><td><input data-k="plot_max_sqft" type="number" value="${m.plot_max_sqft||''}"></td>
+    <td><input data-k="units" type="number" value="${m.units||''}"></td><td><input data-k="layouts" value="${esc((m.layouts||[]).join(', '))}"></td><td><button class="btn sm" data-rm>×</button></td></tr>`;
+  w.innerHTML=`<form class="modal"><header><h2>${c.id?'Edit '+esc(c.name):'Add cluster'}</h2><button type="button" class="btn sm" data-close>Close</button></header><div class="body">
+    <div class="grid2"><label>Cluster<input name="name" value="${esc(c.name||'')}" required></label><label>Community<input name="community" value="${esc(c.community||'')}"></label>
+    <label>Developer<input name="developer" value="${esc(c.developer||'')}"></label><label>Property type<input name="development_type" value="${esc(c.development_type||'')}"></label>
+    <label>Launch<input name="launch_date" value="${esc(c.launch_date||'')}"></label><label>Handover<input name="handover_date" value="${esc(c.handover_date||'')}"></label>
+    <label>Total units<input name="total_units" type="number" value="${c.total_units||''}"></label><label>Design styles<input name="usp" value="${esc(c.usp||'')}"></label></div>
+    <label>Price note<input name="original_price_note" value="${esc(c.original_price_note||'')}"></label>
+    <label>Payment plan<textarea name="payment_plan">${esc(c.payment_plan||'')}</textarea></label>
+    <div><label style="margin-bottom:6px">Configurations (developer figures)</label><table class="mix"><thead><tr><th>Beds</th><th>Type</th><th>BUA min</th><th>BUA max</th><th>Plot min</th><th>Plot max</th><th>Units</th><th>Layouts</th><th></th></tr></thead><tbody>${mix.map(row).join('')}</tbody></table>
+    <button type="button" class="btn sm" data-addrow style="margin-top:8px">+ Add configuration</button></div>
+    <label>Open questions / unverified<textarea name="open_questions">${esc(c.open_questions||'')}</textarea></label></div>
+    <footer><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save</button></footer></form>`;
+  document.body.append(w);
+  const f=w.querySelector('form'),tb=w.querySelector('tbody');
+  const sync=()=>tb.querySelectorAll('tr').forEach(tr=>{const m=mix[tr.dataset.i];tr.querySelectorAll('[data-k]').forEach(inp=>{const k=inp.dataset.k;m[k]=k==='layouts'?inp.value.split(',').map(s=>s.trim()).filter(Boolean):inp.type==='number'?Number(inp.value||0):inp.value;});});
+  const redraw=()=>{tb.innerHTML=mix.map(row).join('');tb.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{sync();mix.splice(b.closest('tr').dataset.i,1);redraw();});};
+  redraw();
+  w.querySelector('[data-addrow]').onclick=()=>{sync();mix.push({bedrooms:'',unit_type:''});redraw();};
+  w.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>w.remove());
+  f.onsubmit=async e=>{e.preventDefault();sync();
+    const fd=Object.fromEntries(new FormData(f));
+    try{const {cluster}=await api('saveCluster',{cluster:{...c,...fd,total_units:Number(fd.total_units||0),unit_mix:mix.filter(m=>m.bedrooms||m.unit_type)}});w.remove();cache[cluster.id]=cluster;await load();open(cluster.id);}
+    catch(err){alert(err.message);}};
+}
 
-    function normalizeCluster(cluster,index){
-      const products=Array.isArray(cluster.unit_mix)?cluster.unit_mix:[];
-      return {
-        id:clean(cluster.id)||`cluster-${index+1}`,
-        name:clean(cluster.name)||'Unnamed Cluster',
-        community:clean(cluster.community),
-        total_units:Number(cluster.total_units)||products.reduce((sum,row)=>sum+(Number(row.units)||0),0),
-        launch_date:clean(cluster.launch_date),
-        handover_date:clean(cluster.handover_date),
-        payment_plan:clean(cluster.payment_plan),
-        usp:clean(cluster.usp),
-        unit_mix:products.map(row=>({
-          unit_type:clean(row.unit_type),
-          bedrooms:clean(row.bedrooms),
-          units:Number(row.units)||0,
-          layouts:Array.isArray(row.layouts)?row.layouts.map(clean).filter(Boolean):[],
-          layout_count:Number(row.layout_count)||0,
-          bua_min_sqft:Number(row.bua_min_sqft)||0,
-          bua_max_sqft:Number(row.bua_max_sqft)||0,
-          plot_min_sqft:Number(row.plot_min_sqft)||0,
-          plot_max_sqft:Number(row.plot_max_sqft)||0,
-          op_min_aed:Number(row.op_min_aed)||0,
-          op_max_aed:Number(row.op_max_aed)||0
-        }))
-      };
-    }
-
-    const fmtNumber=value=>Number(value)>0?Number(value).toLocaleString('en-US'):'—';
-    const fmtSqft=(min,max)=>{
-      if(!min&&!max)return '—';
-      if(min&&max&&min!==max)return `${fmtNumber(min)}–${fmtNumber(max)} sq ft`;
-      return `${fmtNumber(min||max)} sq ft`;
-    };
-    const fmtPrice=(min,max)=>{
-      if(!min&&!max)return '—';
-      const money=value=>`AED ${Number(value).toLocaleString('en-US')}`;
-      if(min&&max&&min!==max)return `${money(min)}–${money(max)}`;
-      return money(min||max);
-    };
-    const values=key=>[...new Set(clusters.flatMap(cluster=>cluster.unit_mix.map(row=>clean(row[key])).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-
-    function showEmpty(message='No cluster information has been added yet.'){
-      $('detail').innerHTML=`<div class="empty"><div><svg class="emptyIcon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 54V30l12-9 12 9v24M32 54V22l12-9 12 9v32M15 54V38h10v16M40 29h8m-8 8h8m-8 8h8"/></svg><h2>${esc(message)}</h2><p>The page is ready for verified cluster records. BUA, plot, original price and unit totals are stored separately for every unit type and bedroom configuration.</p></div></div>`;
-    }
-
-    function renderFilters(){
-      const selectedType=$('typeFilter').value;
-      const selectedBeds=$('bedFilter').value;
-      $('typeFilter').innerHTML='<option value="">All Unit Types</option>'+values('unit_type').map(value=>`<option>${esc(value)}</option>`).join('');
-      $('bedFilter').innerHTML='<option value="">All Bedrooms</option>'+values('bedrooms').map(value=>`<option value="${esc(value)}">${esc(value)} BR</option>`).join('');
-      if([...$('typeFilter').options].some(option=>option.value===selectedType))$('typeFilter').value=selectedType;
-      if([...$('bedFilter').options].some(option=>option.value===selectedBeds))$('bedFilter').value=selectedBeds;
-    }
-
-    function renderStats(){
-      const totalUnits=clusters.reduce((sum,cluster)=>sum+cluster.total_units,0);
-      const productRows=clusters.reduce((sum,cluster)=>sum+cluster.unit_mix.length,0);
-      $('stats').innerHTML=`<span class="chip"><strong>${clusters.length.toLocaleString()}</strong> clusters</span><span class="chip"><strong>${totalUnits.toLocaleString()}</strong> total units</span><span class="chip"><strong>${productRows.toLocaleString()}</strong> unit configurations</span>`;
-    }
-
-    function renderList(){
-      $('resultCount').textContent=`${filtered.length} result${filtered.length===1?'':'s'}`;
-      if(!filtered.length){
-        $('clusterList').innerHTML='<div class="empty" style="min-height:180px;padding:20px">No matching clusters</div>';
-        showEmpty(clusters.length?'No matching cluster found.':undefined);
-        return;
-      }
-      if(!filtered.some(cluster=>cluster.id===activeId))activeId=filtered[0].id;
-      $('clusterList').innerHTML=filtered.map(cluster=>{
-        const types=[...new Set(cluster.unit_mix.map(row=>row.unit_type).filter(Boolean))];
-        return `<button class="clusterButton ${cluster.id===activeId?'active':''}" data-id="${esc(cluster.id)}"><b>${esc(cluster.name)}</b><span>${esc(cluster.community||'Community not specified')}</span><span>${cluster.total_units.toLocaleString()} units${types.length?' · '+esc(types.join(', ')):''}</span></button>`;
-      }).join('');
-      $('clusterList').querySelectorAll('.clusterButton').forEach(button=>button.addEventListener('click',()=>{
-        activeId=button.dataset.id;
-        renderList();
-        renderDetail();
-      }));
-      renderDetail();
-    }
-
-    function renderDetail(){
-      const cluster=filtered.find(item=>item.id===activeId);
-      if(!cluster){showEmpty();return}
-      const types=[...new Set(cluster.unit_mix.map(row=>row.unit_type).filter(Boolean))];
-      const bedrooms=[...new Set(cluster.unit_mix.map(row=>row.bedrooms).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-      const rows=cluster.unit_mix.map(row=>{
-        const layoutCount=row.layouts.length||row.layout_count;
-        return `<tr><td><b>${esc(row.unit_type||'—')}</b></td><td><span class="number">${esc(row.bedrooms||'—')}${row.bedrooms?' BR':''}</span></td><td><span class="number">${row.units?row.units.toLocaleString():'—'}</span></td><td class="layouts">${layoutCount?`<span class="layoutCount">${layoutCount}</span>`:''}${row.layouts.length?esc(row.layouts.join(', ')):'—'}</td><td class="range">${fmtSqft(row.bua_min_sqft,row.bua_max_sqft)}</td><td class="range">${fmtSqft(row.plot_min_sqft,row.plot_max_sqft)}</td><td class="range">${fmtPrice(row.op_min_aed,row.op_max_aed)}</td></tr>`;
-      }).join('');
-      $('detail').innerHTML=`
-        <div class="detailHeader">
-          <div><h2>${esc(cluster.name)}</h2><div class="community">${esc(cluster.community||'Community not specified')}</div></div>
-          <div class="detailRight">
-            ${isAdmin?`<div class="detailActions"><button class="secondaryBtn" type="button" onclick="openClusterFormById('${esc(cluster.id)}')">Edit</button><button class="dangerBtn" type="button" onclick="deleteCluster('${esc(cluster.id)}')">Delete</button></div>`:''}
-            <div class="unitPills">${types.map(type=>`<span class="unitPill">${esc(type)}</span>`).join('')}</div>
-          </div>
-        </div>
-        <div class="summaryGrid">
-          <div class="summaryCard"><label>Total Units</label><div>${cluster.total_units?cluster.total_units.toLocaleString():'—'}</div></div>
-          <div class="summaryCard"><label>Bedrooms</label><div>${bedrooms.length?bedrooms.map(value=>esc(value)+' BR').join(', '):'—'}</div></div>
-          <div class="summaryCard"><label>Launch Date</label><div>${esc(cluster.launch_date||'—')}</div></div>
-          <div class="summaryCard"><label>Handover Date</label><div>${esc(cluster.handover_date||'—')}</div></div>
-        </div>
-        <section class="section">
-          <h3>Unit Mix & Specifications</h3>
-          <div class="tableWrap"><table><thead><tr><th>Unit Type</th><th>Bedrooms</th><th>Total Units</th><th>Layouts / Styles</th><th>BUA Range</th><th>Plot Range</th><th>Original Price</th></tr></thead><tbody>${rows||'<tr><td colspan="7">No unit configurations added.</td></tr>'}</tbody></table></div>
-        </section>
-        <section class="section infoGrid">
-          <div class="infoBox"><label>Payment Plan</label><div>${esc(cluster.payment_plan||'—')}</div></div>
-          <div class="infoBox"><label>Unit Types</label><div>${types.length?esc(types.join(', ')):'—'}</div></div>
-          ${cluster.usp?`<div class="infoBox usp"><label>USP <span class="optional">(Optional)</span></label><div>${esc(cluster.usp)}</div></div>`:''}
-        </section>`;
-    }
-
-    function applyFilters(){
-      const query=norm($('search').value);
-      const type=$('typeFilter').value;
-      const beds=$('bedFilter').value;
-      filtered=clusters.filter(cluster=>{
-        const searchable=norm([cluster.name,cluster.community,cluster.usp,...cluster.unit_mix.flatMap(row=>[row.unit_type,row.bedrooms,...row.layouts])].join(' '));
-        const matchesQuery=!query||searchable.includes(query);
-        const matchesType=!type||cluster.unit_mix.some(row=>row.unit_type===type);
-        const matchesBeds=!beds||cluster.unit_mix.some(row=>row.bedrooms===beds);
-        return matchesQuery&&matchesType&&matchesBeds;
-      });
-      renderList();
-    }
-
-    async function api(action,data={}){
-      if(!session)throw new Error('Login to CRM first.');
-      const response=await fetch(API,{
-        method:'POST',
-        headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},
-        body:JSON.stringify({action,...data})
-      });
-      const payload=await response.json().catch(()=>({error:'Invalid server response'}));
-      if(!response.ok)throw new Error(payload.error||'Request failed');
-      return payload;
-    }
-
-    function blankUnit(){
-      return {unit_type:'',bedrooms:'',units:0,layouts:[],layout_count:0,bua_min_sqft:0,bua_max_sqft:0,plot_min_sqft:0,plot_max_sqft:0,op_min_aed:0,op_max_aed:0};
-    }
-
-    function fieldValue(row,key){return esc(row[key]||'')}
-
-    function renderUnitEditor(){
-      $('unitEditor').innerHTML=formRows.map((row,index)=>`
-        <div class="unitEditorRow" data-index="${index}">
-          <div class="unitRowTop"><strong>Configuration ${index+1}</strong><button class="removeRow" type="button" onclick="removeUnitRow(${index})">Remove</button></div>
-          <div class="unitFormGrid">
-            <div class="field"><label>Unit Type</label><input data-field="unit_type" list="unitTypeOptions" maxlength="100" value="${fieldValue(row,'unit_type')}" placeholder="Villa"></div>
-            <div class="field"><label>Bedrooms</label><input data-field="bedrooms" maxlength="30" value="${fieldValue(row,'bedrooms')}" placeholder="4"></div>
-            <div class="field"><label>Total Units</label><input data-field="units" type="number" min="0" step="1" value="${Number(row.units)||0}"></div>
-            <div class="field"><label>No. of Layouts</label><input data-field="layout_count" type="number" min="0" step="1" value="${Number(row.layout_count)||row.layouts?.length||0}"></div>
-            <div class="field wide"><label>Layout / Style Names</label><input data-field="layouts" value="${esc((row.layouts||[]).join(', '))}" placeholder="Earth, Horizon"></div>
-            <div class="field"><label>Min BUA (sq ft)</label><input data-field="bua_min_sqft" type="number" min="0" step="1" value="${Number(row.bua_min_sqft)||0}"></div>
-            <div class="field"><label>Max BUA (sq ft)</label><input data-field="bua_max_sqft" type="number" min="0" step="1" value="${Number(row.bua_max_sqft)||0}"></div>
-            <div class="field"><label>Min Plot (sq ft)</label><input data-field="plot_min_sqft" type="number" min="0" step="1" value="${Number(row.plot_min_sqft)||0}"></div>
-            <div class="field"><label>Max Plot (sq ft)</label><input data-field="plot_max_sqft" type="number" min="0" step="1" value="${Number(row.plot_max_sqft)||0}"></div>
-            <div class="field"><label>Min OP (AED)</label><input data-field="op_min_aed" type="number" min="0" step="1000" value="${Number(row.op_min_aed)||0}"></div>
-            <div class="field"><label>Max OP (AED)</label><input data-field="op_max_aed" type="number" min="0" step="1000" value="${Number(row.op_max_aed)||0}"></div>
-          </div>
-        </div>`).join('');
-      updateFormTotal();
-    }
-
-    function syncUnitRows(){
-      formRows=[...$('unitEditor').querySelectorAll('.unitEditorRow')].map(node=>{
-        const value=key=>node.querySelector(`[data-field="${key}"]`)?.value||'';
-        const number=key=>Math.max(0,Number(value(key))||0);
-        return {
-          unit_type:clean(value('unit_type')),
-          bedrooms:clean(value('bedrooms')),
-          units:Math.floor(number('units')),
-          layouts:value('layouts').split(/[,;]+/).map(clean).filter(Boolean),
-          layout_count:Math.floor(number('layout_count')),
-          bua_min_sqft:number('bua_min_sqft'),
-          bua_max_sqft:number('bua_max_sqft'),
-          plot_min_sqft:number('plot_min_sqft'),
-          plot_max_sqft:number('plot_max_sqft'),
-          op_min_aed:number('op_min_aed'),
-          op_max_aed:number('op_max_aed')
-        };
-      });
-      return formRows;
-    }
-
-    function updateFormTotal(){
-      const inputs=[...$('unitEditor').querySelectorAll('[data-field="units"]')];
-      $('formTotal').value=inputs.reduce((sum,input)=>sum+(Math.max(0,Number(input.value))||0),0).toLocaleString('en-US');
-    }
-
-    function addUnitRow(){
-      syncUnitRows();
-      formRows.push(blankUnit());
-      renderUnitEditor();
-    }
-
-    function removeUnitRow(index){
-      syncUnitRows();
-      formRows.splice(index,1);
-      if(!formRows.length)formRows=[blankUnit()];
-      renderUnitEditor();
-    }
-
-    function openClusterForm(cluster=null){
-      if(!isAdmin)return;
-      $('clusterModalTitle').textContent=cluster?'Edit Cluster':'Add Cluster';
-      $('formId').value=cluster?.id||'';
-      $('formName').value=cluster?.name||'';
-      $('formCommunity').value=cluster?.community||'';
-      $('formLaunch').value=cluster?.launch_date||'';
-      $('formHandover').value=cluster?.handover_date||'';
-      $('formPayment').value=cluster?.payment_plan||'';
-      $('formUsp').value=cluster?.usp||'';
-      $('saveState').textContent='';
-      formRows=cluster?.unit_mix?.length?cluster.unit_mix.map(row=>({...blankUnit(),...row,layouts:[...(row.layouts||[])]})):[blankUnit()];
-      renderUnitEditor();
-      $('clusterModal').classList.add('show');
-      setTimeout(()=>$('formName').focus(),30);
-    }
-
-    function openClusterFormById(id){openClusterForm(clusters.find(cluster=>cluster.id===id)||null)}
-    function closeClusterForm(){$('clusterModal').classList.remove('show')}
-
-    async function saveCluster(event){
-      event.preventDefault();
-      const name=clean($('formName').value);
-      if(!name){$('formName').focus();return}
-      const hasData=row=>row.unit_type||row.bedrooms||row.units||row.layouts.length||row.layout_count||row.bua_min_sqft||row.bua_max_sqft||row.plot_min_sqft||row.plot_max_sqft||row.op_min_aed||row.op_max_aed;
-      const unitMix=syncUnitRows().filter(hasData).map(row=>({...row,layout_count:Math.max(row.layout_count,row.layouts.length)}));
-      const incomplete=unitMix.find(row=>!row.unit_type||!row.bedrooms);
-      if(incomplete){$('saveState').textContent='Every unit configuration needs a unit type and bedrooms.';return}
-      const invalidRange=unitMix.find(row=>(row.bua_min_sqft&&row.bua_max_sqft&&row.bua_min_sqft>row.bua_max_sqft)||(row.plot_min_sqft&&row.plot_max_sqft&&row.plot_min_sqft>row.plot_max_sqft)||(row.op_min_aed&&row.op_max_aed&&row.op_min_aed>row.op_max_aed));
-      if(invalidRange){$('saveState').textContent='A minimum value cannot be higher than its maximum.';return}
-      const cluster={
-        id:clean($('formId').value),
-        name,
-        community:clean($('formCommunity').value),
-        launch_date:clean($('formLaunch').value),
-        handover_date:clean($('formHandover').value),
-        payment_plan:clean($('formPayment').value),
-        usp:clean($('formUsp').value),
-        unit_mix:unitMix
-      };
-      $('saveClusterBtn').disabled=true;
-      $('saveState').textContent='Saving online…';
-      try{
-        const result=await api('saveCluster',{cluster});
-        activeId=result.cluster.id;
-        closeClusterForm();
-        await loadClusters();
-        $('error').innerHTML='<div class="notice">Cluster saved online.</div>';
-        setTimeout(()=>{if($('error').textContent.includes('saved online'))$('error').innerHTML=''},2500);
-      }catch(error){
-        $('saveState').textContent=error.message;
-      }finally{
-        $('saveClusterBtn').disabled=false;
-      }
-    }
-
-    async function deleteCluster(id){
-      const cluster=clusters.find(item=>item.id===id);
-      if(!isAdmin||!cluster||!confirm(`Delete ${cluster.name}? This cannot be undone.`))return;
-      try{
-        await api('deleteCluster',{id});
-        activeId='';
-        await loadClusters();
-      }catch(error){alert(error.message)}
-    }
-
-    async function loadClusters(){
-      $('stats').innerHTML='<span class="chip">Loading cluster data…</span>';
-      $('error').innerHTML='';
-      let payload;
-      try{
-        payload=await api('listClusters');
-        isAdmin=Boolean(payload.canEdit)&&isAdmin;
-      }catch(onlineError){
-        const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
-        if(!response.ok)throw onlineError;
-        payload=await response.json();
-        isAdmin=false;
-        $('error').innerHTML='<div class="error">Online database unavailable. Showing the read-only backup.</div>';
-      }
-      clusters=(Array.isArray(payload.clusters)?payload.clusters:[]).map(normalizeCluster);
-      $('addClusterBtn').classList.toggle('hidden',!isAdmin);
-      renderFilters();
-      renderStats();
-      applyFilters();
-    }
-
-    async function init(){
-      const isLocalPreview=['localhost','127.0.0.1'].includes(location.hostname);
-      if(isLocalPreview){
-        isAdmin=false;
-      }else{
-        const result=await crm.auth.getSession();
-        session=result.data.session;
-        if(!session){alert('Login to CRM first.');location.href='index.html';return}
-        isAdmin=clean(session.user?.email).toLowerCase()===ADMIN_EMAIL;
-      }
-      try{
-        if(isLocalPreview){
-          const response=await fetch('data/cluster-guide.json',{cache:'no-store'});
-          const payload=await response.json();
-          clusters=(payload.clusters||[]).map(normalizeCluster);
-          renderFilters();
-          renderStats();
-          applyFilters();
-        }else{
-          await loadClusters();
-        }
-      }catch(error){
-        $('error').innerHTML=`<div class="error">${esc(error.message)}</div>`;
-        $('stats').innerHTML='<span class="chip">Cluster data unavailable</span>';
-        showEmpty('Cluster data could not be loaded.');
-      }
-    }
-
-    $('search').addEventListener('input',applyFilters);
-    $('typeFilter').addEventListener('change',applyFilters);
-    $('bedFilter').addEventListener('change',applyFilters);
-    $('addClusterBtn').addEventListener('click',()=>openClusterForm());
-    $('addUnitRowBtn').addEventListener('click',addUnitRow);
-    $('unitEditor').addEventListener('input',event=>{if(event.target.dataset.field==='units')updateFormTotal()});
-    $('clusterForm').addEventListener('submit',saveCluster);
-    $('closeModalBtn').addEventListener('click',closeClusterForm);
-    $('cancelModalBtn').addEventListener('click',closeClusterForm);
-    $('clusterModal').addEventListener('click',event=>{if(event.target===$('clusterModal'))closeClusterForm()});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeClusterForm()});
-    window.openClusterFormById=openClusterFormById;
-    window.deleteCluster=deleteCluster;
-    window.removeUnitRow=removeUnitRow;
-    init();
-  </script>
+async function load(){
+  try{const r=await api('listClusters');clusters=r.clusters||[];canEdit=!!r.canEdit;}
+  catch(e){$('list').innerHTML=`<div class="err">${esc(e.message)}</div>`;return;}
+  $('add').hidden=!canEdit;
+  const sel=$('community'),cur=sel.value;
+  sel.innerHTML='<option value="">All communities</option>'+[...new Set(clusters.map(c=>c.community))].sort(byName).map(c=>`<option ${c===cur?'selected':''}>${esc(c)}</option>`).join('');
+  renderList();
+}
+$('q').oninput=renderList;$('community').onchange=renderList;$('add').onclick=()=>editor({});
+$('theme').onclick=()=>{const light=document.documentElement.dataset.theme!=='light';if(light)document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;try{localStorage.setItem('crm_theme',light?'light':'dark')}catch(e){}};
+load().then(()=>{const id=location.hash.slice(1);if(id&&clusters.some(c=>c.id===id))open(id);else if(clusters[0])open([...clusters].sort((a,b)=>byName(a.community,b.community)||byName(a.name,b.name))[0].id);});
+</script>
 </body>
 </html>
