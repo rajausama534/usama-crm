@@ -519,3 +519,8 @@ html[data-theme="light"] body.crmPremium :is(.u6NotesBox,.u6Composer,.u10DateBut
 html[data-theme="light"] body.crmPremium .u6Stage{color:var(--c-muted)!important}
 html[data-theme="light"] body.crmPremium .u6Stage.active{color:#fff!important}
 html[data-theme="light"] body.crmPremium :is(#leadDetailContent,#profileContent) :is(.waBtn,.callBtn){color:#fff!important}
+/* light mode: phone card lists for leads and owners */
+html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is(div,span,p,small,b,strong):not([class*="Btn"]):not([class*="btn"]){color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is([class*="abel"],[class*="Label"]){color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is([class*="Note"],[class*="note"],[class*="emark"]){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important}
+html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"])>*{background:var(--c-surface)!important;border-color:var(--c-border)!important}
