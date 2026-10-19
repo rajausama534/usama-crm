@@ -210,3 +210,95 @@ body.crmPremium .crmToastError{border-color:rgba(239,68,68,.5);color:#fecaca}
   body.crmPremium .crmRowActions{justify-content:flex-start}
   body.crmPremium .crmBtn{min-height:44px}
 }
+
+/* =====================================================================================
+   Existing pages (Owners, Leads, Calendar, popups, login) on the same design system.
+   Every rule is scoped to body.crmPremium and only restyles; no markup or behaviour changes.
+   ===================================================================================== */
+body.crmPremium #appView,body.crmPremium #leadsView,body.crmPremium #calendarModuleView{max-width:1440px!important;margin:0 auto!important;padding:var(--s-6)!important;background:transparent!important}
+
+/* headers */
+body.crmPremium .mainHeader,body.crmPremium .compactPageHeader,body.crmPremium #leadsView>.mainHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:var(--s-4)!important;flex-wrap:wrap!important;margin:0 0 var(--s-5)!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important}
+body.crmPremium .mainHeader h1,body.crmPremium .compactPageHeader h1{margin:0!important;font-size:var(--t-2xl)!important;font-weight:700!important;letter-spacing:-.01em!important;color:var(--c-text)!important;text-align:left!important}
+body.crmPremium .mainHeader .sub,body.crmPremium .compactPageHeader .sub{color:var(--c-muted)!important;font-size:var(--t-base)!important}
+body.crmPremium .headerBtns{display:flex!important;gap:var(--s-2)!important;flex-wrap:wrap!important}
+
+/* buttons: one shape, two weights, no gradients or glows */
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.darkBtn,.reset,.headerBtns button,.actionsRow button,#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn,.pagination button,.calendarModuleToolbar button){display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;height:38px!important;min-height:38px!important;padding:0 var(--s-4)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-surface-2)!important;background-image:none!important;color:var(--c-text)!important;font-size:var(--t-sm)!important;font-weight:600!important;line-height:1!important;box-shadow:none!important;text-shadow:none!important;transform:none!important;white-space:nowrap!important;cursor:pointer!important;transition:background .15s,border-color .15s!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.darkBtn,.reset,.headerBtns button,.actionsRow button,#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn):hover{background:var(--c-raised)!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.reset){background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.reset):hover{background:#4c5cf0!important}
+body.crmPremium :is(#appView,#leadsView) .reset{background:transparent!important;border-color:var(--c-border-strong)!important;color:var(--c-muted)!important}
+body.crmPremium :is(#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn):disabled{opacity:.4!important;cursor:default!important}
+
+/* fields */
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){height:40px!important;min-height:40px!important;padding:0 var(--s-3)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-bg)!important;background-image:none!important;color:var(--c-text)!important;font-size:var(--t-base)!important;font-weight:400!important;box-shadow:none!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) select{padding-right:32px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a96aa' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;-webkit-appearance:none!important;appearance:none!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) textarea{height:auto!important;min-height:84px!important;padding:var(--s-3)!important;line-height:1.5!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,select,textarea):focus{outline:none!important;border-color:var(--c-accent)!important;box-shadow:0 0 0 3px var(--c-accent-soft)!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,textarea)::placeholder{color:var(--c-faint)!important}
+body.crmPremium :is(.modal,#u10OwnerEditor) label{display:block!important;margin:0 0 6px!important;color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
+
+/* filter panel = one card: search + selects grid, quick status chips, sort + actions */
+body.crmPremium #appView>.card,body.crmPremium #leadsView .card{padding:var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important}
+body.crmPremium #appView .filters{display:grid!important;grid-template-columns:2fr repeat(5,minmax(0,1fr))!important;gap:var(--s-2)!important;margin:0 0 var(--s-3)!important}
+body.crmPremium #appView .filters>*{width:100%!important;min-width:0!important;margin:0!important}
+body.crmPremium .quickFilters{display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin:0 0 var(--s-3)!important}
+body.crmPremium .quickFilters>*{height:30px!important;min-height:30px!important;padding:0 12px!important;border:1px solid var(--c-border)!important;border-radius:99px!important;background:var(--c-surface-2)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium .quickFilters>*:hover{color:var(--c-text)!important;border-color:var(--c-border-strong)!important}
+body.crmPremium #appView :is(.actionsRow,.sortControls){display:flex!important;align-items:center!important;gap:var(--s-2)!important;flex-wrap:wrap!important}
+body.crmPremium #appView .topInfo{margin:var(--s-4) 0 var(--s-2)!important;color:var(--c-muted)!important;font-size:var(--t-sm)!important}
+
+/* owner KPI tiles match the dashboard */
+body.crmPremium .dashboardCards{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:var(--s-3)!important;margin:0 0 var(--s-4)!important}
+body.crmPremium .kpiCard{padding:var(--s-4) var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;min-height:0!important}
+body.crmPremium .kpiLabel{color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
+body.crmPremium .kpiValue{color:var(--c-text)!important;font-size:var(--t-2xl)!important;font-weight:700!important;line-height:1.15!important}
+body.crmPremium .kpiHint{color:var(--c-faint)!important;font-size:var(--t-xs)!important}
+
+/* data tables */
+body.crmPremium :is(#ownersTable,#leadsTable){border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;overflow:hidden!important}
+body.crmPremium :is(#ownersTable,#leadsTable) th{height:44px!important;padding:0 var(--s-3)!important;text-transform:uppercase!important}
+body.crmPremium :is(#ownersTable,#leadsTable) td{height:auto!important;padding:var(--s-3)!important;font-size:var(--t-sm)!important;line-height:1.4!important;text-align:left!important;vertical-align:middle!important}
+body.crmPremium #ownersTable td.owner-col-unit{white-space:nowrap!important;font-weight:600!important;font-variant-numeric:tabular-nums!important}
+body.crmPremium :is(#ownersTable,#leadsTable) td:nth-child(n){font-family:inherit!important}
+body.crmPremium #ownersTable td[class*="owner"]:not(.owner-col-unit),body.crmPremium #ownersTable td{word-break:normal!important}
+/* chips inside rows: one size */
+body.crmPremium :is(#ownersTable,#leadsTable) :is(.profileBtn,.moreUnitBtn,.copyBtn,.callBtn){height:24px!important;min-height:24px!important;padding:0 10px!important;border-radius:99px!important;border:1px solid var(--c-border-strong)!important;background:var(--c-surface-2)!important;color:var(--c-text)!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .moreUnitBtn{color:var(--c-accent-text)!important;border-color:rgba(91,108,255,.35)!important;background:var(--c-accent-soft)!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .waBtn{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:var(--r-sm)!important;border:1px solid rgba(34,197,94,.35)!important;background:rgba(34,197,94,.12)!important;color:#86efac!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .waBtn:hover{background:rgba(34,197,94,.2)!important}
+body.crmPremium :is(#ownersTable,#leadsTable) select{height:32px!important;min-height:32px!important;border-radius:99px!important;font-size:var(--t-xs)!important;font-weight:600!important;padding:0 28px 0 12px!important;background-position:right 10px center!important}
+
+/* popups */
+body.crmPremium .modalOverlay{background:rgba(3,6,12,.72)!important;backdrop-filter:blur(4px)!important}
+body.crmPremium .modal{border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;color:var(--c-text)!important}
+body.crmPremium .modal h2{font-size:var(--t-xl)!important;font-weight:700!important}
+body.crmPremium #profileContent{background:var(--c-surface)!important}
+body.crmPremium .u6DetailTitle{font-size:var(--t-xl)!important;font-weight:700!important;letter-spacing:-.01em!important}
+body.crmPremium .u6DetailSubtitle{color:var(--c-muted)!important;font-size:var(--t-sm)!important}
+body.crmPremium .u6StageBar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+body.crmPremium .u6Stage{height:30px!important;padding:0 12px!important;border-radius:99px!important;border:1px solid var(--c-border)!important;background:var(--c-surface-2)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium .u6Stage.active{background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+
+/* leads extras */
+body.crmPremium #followupDashboard{padding:var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;margin-bottom:var(--s-4)!important}
+body.crmPremium #followupCards>*{border-radius:var(--r-md)!important;background:var(--c-bg)!important;box-shadow:none!important}
+
+/* login */
+body.crmPremium #loginView,#loginView.loginBox{max-width:400px!important;margin:12vh auto 0!important;padding:var(--s-6)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;font-family:Inter,system-ui,sans-serif!important}
+#loginView h1{font-size:var(--t-2xl)!important;font-weight:700!important;margin:0 0 4px!important}
+#loginView input{width:100%!important;height:44px!important;margin:var(--s-3) 0 0!important;padding:0 var(--s-3)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-bg)!important;color:var(--c-text)!important;font-size:var(--t-base)!important}
+#loginView .primaryBtn{width:100%!important;height:44px!important;margin-top:var(--s-4)!important;border:0!important;border-radius:var(--r-sm)!important;background:var(--c-accent)!important;background-image:none!important;color:#fff!important;font-weight:600!important;box-shadow:none!important}
+
+@media (max-width:1100px){
+  body.crmPremium #appView .filters{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  body.crmPremium #appView .filters>:first-child{grid-column:1/-1!important}
+}
+@media (max-width:640px){
+  body.crmPremium #appView,body.crmPremium #leadsView,body.crmPremium #calendarModuleView{padding:var(--s-4)!important}
+  body.crmPremium #appView .filters{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.crmPremium .quickFilters{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important}
+  body.crmPremium .quickFilters>*{flex:none!important}
+  body.crmPremium #appView :is(.actionsRow,.sortControls)>*{flex:1 1 calc(50% - 8px)!important}
+}
