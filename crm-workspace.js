@@ -65,7 +65,7 @@
   // Owner names are stored in capitals; show them in readable case (display only, data unchanged).
   const titleCase=s=>s.toLowerCase().replace(/(^|[\s\-'(])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
   function tidyOwnerRows(){
-    document.querySelectorAll('#tableBody td.owner-col-owner, #tableBody td[data-col="owner"]').forEach(td=>{
+    document.querySelectorAll('#tableBody td.owner-col-owner .ownerIdentityName, #tableBody td.owner-col-owner, .mobileOwnerCard h3, [class*="obileCard"] [class*="ame"]').forEach(td=>{
       const n=[...td.childNodes].find(x=>x.nodeType===3&&x.textContent.trim());
       if(n&&n.textContent===n.textContent.toUpperCase()&&/[A-Z]/.test(n.textContent)){td.title=n.textContent.trim();n.textContent=titleCase(n.textContent);}
     });

@@ -480,3 +480,14 @@ body.crmPremium .crmLogout:hover{color:var(--c-text);background:var(--c-surface-
   body.crmPremium .crmStage{flex:0 0 110px}
   body.crmPremium .crmWorkspace .mainHeader .headerBtns{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* workspace fixes */
+body.crmPremium .tablebox{border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;overflow:auto!important}
+body.crmPremium :is(#ownersTable,#leadsTable){border:0!important;border-radius:0!important}
+body.crmPremium #ownersTable{table-layout:auto!important}
+body.crmPremium #ownersTable td.owner-col-unit{width:auto!important;min-width:120px!important}
+body.crmPremium #ownersTable td.owner-col-owner{min-width:220px!important}
+body.crmPremium #ownersTable td.owner-col-remarks{min-width:220px!important;color:var(--c-muted)!important}
+body.crmPremium .crmOwnerName{display:block;font-weight:600;color:var(--c-text);line-height:1.35}
+body.crmPremium .quickFilters>.crmChipLabel{height:auto!important;min-height:0!important;padding:0 4px 0 0!important;border:0!important;background:none!important;color:var(--c-faint)!important}
+body.crmPremium .crmWorkspace .mainHeader .headerBtns>.crmBtnPrimary,body.crmPremium .crmWorkspace .mainHeader .headerBtns>button.crmBtnPrimary:not(#__){background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
