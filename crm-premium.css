@@ -137,6 +137,8 @@ body.crmPremium .crmTable th{position:sticky;top:0;padding:var(--s-3);text-align
 body.crmPremium .crmTable td{padding:var(--s-3);border-bottom:1px solid var(--c-border);vertical-align:top;text-align:left!important;overflow-wrap:anywhere}
 body.crmPremium .crmTable th{text-align:left!important}
 body.crmPremium .crmAccessCell{max-width:260px;color:var(--c-muted)}
+body.crmPremium .crmTable td:first-child{min-width:220px}
+body.crmPremium .crmTable strong,body.crmPremium .crmTable .crmSub{display:block;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important}
 body.crmPremium .crmRowActions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;min-width:150px}
 body.crmPremium #ownersTable,body.crmPremium #leadsTable{font-size:var(--t-sm)!important}
 body.crmPremium #ownersTable th,body.crmPremium #leadsTable th{background:var(--c-surface)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;letter-spacing:.05em!important}
