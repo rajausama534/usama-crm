@@ -108,9 +108,9 @@ end $$;
 -- owners: the (select ...) wrappers are evaluated once per query, not once per row.
 create policy owners_select on public.owners for select to authenticated using (
   (select private.is_admin())
-  or community = any ((select private.my_communities()))
-  or cluster = any ((select private.my_clusters()))
-  or (community || '::' || cluster) = any ((select private.my_clusters()))
+  or community = any ((select private.my_communities())::text[])
+  or cluster = any ((select private.my_clusters())::text[])
+  or (community || '::' || cluster) = any ((select private.my_clusters())::text[])
   or (assigned_to is not null and lower(assigned_to) = (select private.current_email()) and (select private.is_active()))
 );
 create policy owners_insert on public.owners for insert to authenticated with check (
@@ -119,9 +119,9 @@ create policy owners_insert on public.owners for insert to authenticated with ch
 create policy owners_update on public.owners for update to authenticated
   using (
     (select private.is_admin())
-    or community = any ((select private.my_communities()))
-    or cluster = any ((select private.my_clusters()))
-    or (community || '::' || cluster) = any ((select private.my_clusters()))
+    or community = any ((select private.my_communities())::text[])
+    or cluster = any ((select private.my_clusters())::text[])
+    or (community || '::' || cluster) = any ((select private.my_clusters())::text[])
     or (assigned_to is not null and lower(assigned_to) = (select private.current_email()) and (select private.is_active()))
   )
   with check (private.can_see_location(community, cluster, assigned_to));
