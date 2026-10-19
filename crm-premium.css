@@ -504,3 +504,11 @@ body.crmPremium #leadsTable :is(td,th):last-child{background:var(--c-surface)!im
 body.crmPremium #leadsTable thead th:last-child{background:var(--c-surface-2)!important}
 body.crmPremium #leadsTable td:last-child button{background:var(--c-surface-2)!important;border:1px solid var(--c-border-strong)!important;color:var(--c-text)!important}
 body.crmPremium .crmAssignee{color:var(--c-muted)!important}
+/* leads table in light mode (old layers paint these cells dark with id-level rules) */
+html[data-theme="light"] body.crmPremium #leadsView :is(#leadsTable,#leadsTableHead) th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium #leadsView #leadsTable td,html[data-theme="light"] body.crmPremium #leadsView #leadsTable td.actionsSticky,html[data-theme="light"] body.crmPremium #leadsView #leadsTable th.actionsSticky{background:var(--c-surface)!important;color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium #leadsView #leadsTable .leadReadValue{color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium #leadsView #leadsTable .leadLatestNote{background:var(--c-surface-2)!important;color:var(--c-muted)!important;border-color:var(--c-border)!important}
+html[data-theme="light"] body.crmPremium #leadsView #leadsTable tr:hover td{background:var(--c-surface-2)!important}
+html[data-theme="light"] body.crmPremium #appView #ownersTable td{background:var(--c-surface)!important;color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium #appView #ownersTable tr:hover td{background:var(--c-surface-2)!important}
