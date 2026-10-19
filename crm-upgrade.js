@@ -440,6 +440,9 @@
     search.addEventListener('input',e=>{e.stopImmediatePropagation();clearTimeout(timer);timer=setTimeout(()=>{currentPage=0;loadData();},300);},true);
   }
 
+  // The old launcher is replaced by the dashboard everywhere ("Dashboard" buttons, login, Home).
+  window.showChoiceView=()=>showDashboardView();
+
   buildShell();
   // This script loads after login; replace the old launcher if it is on screen.
   if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&$('choiceView')&&!$('choiceView').classList.contains('hidden'))showDashboardView();

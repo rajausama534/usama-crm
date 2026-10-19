@@ -145,6 +145,10 @@ body.crmPremium #ownersTable th,body.crmPremium #leadsTable th{background:var(--
 body.crmPremium #ownersTable td,body.crmPremium #leadsTable td{background:var(--c-bg)!important;color:var(--c-text)!important;border-bottom-color:var(--c-border)!important}
 body.crmPremium #ownersTable tr:hover td,body.crmPremium #leadsTable tr:hover td{background:var(--c-surface)!important}
 
+/* The sidebar already links Dashboard and Leads; drop the duplicate buttons from the Owners header. */
+body.crmPremium #appView .headerBtns button[onclick="showChoiceView()"],
+body.crmPremium #appView .headerBtns button[onclick="showLeadsView()"]{display:none!important}
+
 /* ---------------------------------------------------------------- owner profile history */
 body.crmPremium .crmHistory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4);margin-top:var(--s-5)}
 body.crmPremium .crmTimeline{list-style:none;margin:0;padding:0}
@@ -200,6 +204,7 @@ body.crmPremium .crmToastError{border-color:rgba(239,68,68,.5);color:#fecaca}
   body.crmPremium .crmTable tr{display:block;padding:var(--s-3) 0;border-bottom:1px solid var(--c-border)}
   body.crmPremium .crmTable td{display:flex;justify-content:space-between;gap:var(--s-3);padding:6px 0;border:0}
   body.crmPremium .crmTable td[data-label]::before{content:attr(data-label);color:var(--c-muted);font-size:var(--t-xs)}
+  body.crmPremium .crmTable td{width:auto!important;max-width:none!important;min-width:0!important}
   body.crmPremium .crmTable td:first-child{display:block}
   body.crmPremium .crmTable td:first-child::before{content:none}
   body.crmPremium .crmRowActions{justify-content:flex-start}
