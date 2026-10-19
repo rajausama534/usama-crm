@@ -69,7 +69,7 @@ for name, (beds, ptype, styles, price, slug, extra) in OFFICIAL.items():
                         "checked": "2026-10-19", "fields": ["recorded area ranges per bedroom type" if built else "recorded plot range"]})
     missing = ["launch date", "handover date", "total units"] + ([] if beds else ["bedroom types (official page not found)"])
     rows.append("(" + ",".join([
-        q(name), "'The Valley'", "'Emaar Properties'", q(ptype), q(styles),
+        q(name), "'The Valley'", "'Emaar Properties'", q(ptype), q(styles or ""),
         q(f"Emaar listed starting price AED {price:,} (checked 19 Oct 2026; not necessarily the original launch price)" if price else None),
         q(json.dumps(mix)) + "::jsonb", q(json.dumps(sources)) + "::jsonb", "'2026-10-19'",
         q("Not published on the official page, so left empty: " + ", ".join(missing) + "."),
