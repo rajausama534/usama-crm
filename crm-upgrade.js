@@ -131,11 +131,13 @@
       <div class="crmHeadActions"><button class="crmBtn" onclick="showOwnersView()">Owners</button><button class="crmBtn crmBtnPrimary" onclick="showLeadsView()">Leads</button></div></header>
       <div class="crmLoadingLine">Loading your numbers…</div>`;
     const t0=performance.now();
-    const [{data:s,error},activity,verified,market]=await Promise.all([
+    const [{data:s,error},activity,verified,market,occ]=await Promise.all([
       db.rpc('crm_dashboard_stats'),recentActivity().catch(()=>[]),
       db.from('property_transactions').select('community,cluster,unit,transaction_date,amount,area_sqft,area_type').order('transaction_date',{ascending:false}).limit(6),
-      db.from('dld_transactions').select('crm_cluster,transaction_date,amount,area_sqft,rooms,property_sub_type,procedure',{count:'exact'}).gte('transaction_date',new Date(Date.now()-90*864e5).toISOString().slice(0,10)).order('transaction_date',{ascending:false}).limit(6)
+      db.from('dld_transactions').select('crm_cluster,transaction_date,amount,area_sqft,rooms,property_sub_type,procedure',{count:'exact'}).gte('transaction_date',new Date(Date.now()-90*864e5).toISOString().slice(0,10)).order('transaction_date',{ascending:false}).limit(6),
+      db.rpc('crm_occupancy_stats')
     ]);
+    const oc=occ?.data?.by_status||{},observed=occ?.data?.observed_units||0;
     if(error){v.querySelector('.crmLoadingLine').textContent='Could not load the dashboard: '+error.message;return;}
     const o=s.owners||{},L=s.leads||{},os=s.owner_status||{},ls=s.lead_status||{};
     const available=(os['For Sale']||0)+(os['For Rent']||0);
@@ -149,6 +151,7 @@
         ${kpi('Communities',fmt(o.communities),`${fmt(o.clusters)} clusters`,'owners')}
         ${kpi('Available',fmt(available),`${fmt(os['For Sale']||0)} for sale · ${fmt(os['For Rent']||0)} for rent`,'status:For Sale')}
         ${kpi('Contacted · 7 days',fmt(o.contacted_7d),`${fmt(o.contacted_30d)} in the last 30 days`,'owners')}
+        ${kpi('Vacant',fmt(oc['Vacant']||0),observed?`${fmt(oc['Occupied']||0)} occupied · ${fmt(observed)} units observed`:'Log occupancy from an owner profile','owners')}
       </div>
       <section class="crmSectionTitle"><h2>Leads</h2></section>
       <div class="crmKpiGrid">
@@ -404,7 +407,7 @@
   const longDate=d=>new Date(d+(String(d).length===10?'T00:00:00':'')).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   async function enrichProfile(row){
     const left=document.querySelector('#profileContent .u6DetailLeft');
-    if(!left||!row||left.querySelector('.crmHistory'))return;
+    if(!left||!row||left.querySelector('.crmHistory:not(.crmUnitPanel)'))return;
     const box=document.createElement('div');box.className='crmHistory';
     box.innerHTML='<article class="crmCard"><header><h3>Transaction history</h3></header><div class="crmLoadingLine">Loading…</div></article><article class="crmCard"><header><h3>Ownership history</h3></header><div class="crmLoadingLine">Loading…</div></article>';
     left.append(box);
@@ -427,9 +430,77 @@
     const others=(same.data||[]).map(r=>`<li><time>Same unit</time><strong>${esc(r.owner||'-')}</strong><span>${esc([r.status,r.data_source].filter(Boolean).join(' · '))}</span></li>`);
     ownCard.querySelector('.crmLoadingLine').outerHTML=(items.length||others.length)?`<ul class="crmTimeline">${items.join('')}${others.join('')}</ul>`:'<div class="crmEmpty">No other owners or earlier changes recorded for this unit.</div>';
   }
+  // ------------------------------------------------------------------ owner profile: property details + occupancy log
+  const OCCUPANCY=['Occupied','Vacant','Available for rent','Available for sale','Under renovation','Landscaping','Under construction','Other'];
+  const unitKey=row=>({community:row.community,cluster:row.cluster,unit:row.unit});
+  const sqft=v=>v?`${fmt(v)} sq ft`:'—';
+  async function unitPanel(row){
+    const left=document.querySelector('#profileContent .u6DetailLeft');
+    if(!left||!row||left.querySelector('.crmUnitPanel'))return;
+    const box=document.createElement('div');box.className='crmHistory crmUnitPanel';
+    box.innerHTML='<article class="crmCard"><header><h3>Property details</h3></header><div class="crmLoadingLine">Loading…</div></article><article class="crmCard"><header><h3>Occupancy</h3></header><div class="crmLoadingLine">Loading…</div></article>';
+    const history=left.querySelector('.crmHistory:not(.crmUnitPanel)');history?left.insertBefore(box,history):left.append(box);
+    const k=unitKey(row);
+    const [det,obs]=await Promise.all([
+      db.from('unit_details').select('*').match(k).maybeSingle(),
+      db.from('unit_observations').select('status,note,observed_on,created_by').match(k).order('observed_on',{ascending:false}).order('id',{ascending:false}).limit(10)
+    ]);
+    const [detCard,obsCard]=box.querySelectorAll('.crmCard');
+    const d=det.data||{};
+    const renderDetails=()=>{
+      detCard.innerHTML=`<header><h3>Property details</h3><button type="button" class="crmBtn crmBtnSm" data-edit-details>Edit</button></header>
+        <dl class="crmFacts"><div><dt>Type</dt><dd>${esc(d.property_type||'—')}</dd></div><div><dt>Bedrooms</dt><dd>${esc(d.bedrooms||'—')}</dd></div>
+        <div><dt>BUA</dt><dd>${sqft(d.bua_sqft)}</dd></div><div><dt>Plot</dt><dd>${sqft(d.plot_sqft)}</dd></div><div><dt>Suite</dt><dd>${sqft(d.suite_sqft)}</dd></div></dl>
+        ${d.details_source?`<p class="crmSub">Source: ${esc(d.details_source)}</p>`:''}`;
+      detCard.querySelector('[data-edit-details]').onclick=()=>{
+        detCard.innerHTML=`<header><h3>Property details</h3></header><form class="crmInlineForm">
+          <label>Type<select name="property_type">${['','Villa','Townhouse','Apartment','Plot','Penthouse','Other'].map(t=>`<option ${t===(d.property_type||'')?'selected':''}>${t}</option>`).join('')}</select></label>
+          <label>Bedrooms<input name="bedrooms" value="${esc(d.bedrooms||'')}" placeholder="e.g. 4BR"></label>
+          <label>BUA (sq ft)<input name="bua_sqft" type="number" min="1" value="${d.bua_sqft||''}"></label>
+          <label>Plot (sq ft)<input name="plot_sqft" type="number" min="1" value="${d.plot_sqft||''}"></label>
+          <label>Suite (sq ft)<input name="suite_sqft" type="number" min="1" value="${d.suite_sqft||''}"></label>
+          <div class="crmInlineActions"><button type="button" class="crmBtn crmBtnSm" data-cancel>Cancel</button><button class="crmBtn crmBtnSm crmBtnPrimary">Save</button></div></form>`;
+        const f=detCard.querySelector('form');
+        f.querySelector('[data-cancel]').onclick=renderDetails;
+        f.onsubmit=async e=>{
+          e.preventDefault();
+          const num=v=>v===''?null:Number(v);
+          const payload={...k,property_type:f.property_type.value||null,bedrooms:f.bedrooms.value.trim()||null,bua_sqft:num(f.bua_sqft.value),plot_sqft:num(f.plot_sqft.value),suite_sqft:num(f.suite_sqft.value),details_source:'Entered in CRM',updated_at:new Date().toISOString(),updated_by:currentUserEmail};
+          const {error}=await db.from('unit_details').upsert(payload,{onConflict:'community,cluster,unit'});
+          if(error){toast(error.message,true);return;}
+          Object.assign(d,payload);renderDetails();toast('Property details saved');
+        };
+      };
+    };
+    renderDetails();
+    const list=obs.data||[];
+    const renderObs=()=>{
+      obsCard.innerHTML=`<header><h3>Occupancy</h3><span>${list[0]?`${esc(list[0].status)} · ${longDate(list[0].observed_on)}`:'Not recorded'}</span></header>
+        <form class="crmInlineForm crmObsForm"><label>Status<select name="status">${OCCUPANCY.map(s=>`<option>${s}</option>`).join('')}</select></label>
+          <label>Seen on<input name="observed_on" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+          <label class="crmWide">Note<input name="note" maxlength="2000" placeholder="Optional, e.g. landscaping in progress"></label>
+          <div class="crmInlineActions"><button class="crmBtn crmBtnSm crmBtnPrimary">Add observation</button></div></form>
+        ${list.length?`<ul class="crmTimeline">${list.map(o=>`<li><time>${longDate(o.observed_on)}</time><strong>${esc(o.status)}</strong><span>${esc([o.note,o.created_by].filter(Boolean).join(' · '))}</span></li>`).join('')}</ul>`:'<div class="crmEmpty">No observations yet. Earlier entries are never overwritten.</div>'}`;
+      const f=obsCard.querySelector('form');
+      f.onsubmit=async e=>{
+        e.preventDefault();
+        const entry={...k,status:f.status.value,note:f.note.value.trim()||null,observed_on:f.observed_on.value||null};
+        const {error}=await db.from('unit_observations').insert(entry);
+        if(error){toast(error.message,true);return;}
+        list.unshift({...entry,created_by:currentUserEmail});list.sort((a,b)=>String(b.observed_on).localeCompare(String(a.observed_on)));renderObs();toast('Observation added');
+      };
+    };
+    renderObs();
+  }
+
   if(typeof openOwnerProfile==='function'){
     const base=window.openOwnerProfile;
-    window.openOwnerProfile=async function(row){const r=await base.apply(this,arguments);enrichProfile(row).catch(e=>console.warn('Profile history failed',e));return r;};
+    window.openOwnerProfile=async function(row){
+      const r=await base.apply(this,arguments);
+      enrichProfile(row).catch(e=>console.warn('Profile history failed',e));
+      unitPanel(row).catch(e=>console.warn('Property panel failed',e));
+      return r;
+    };
   }
 
   // ------------------------------------------------------------------ search: wait for typing to pause
