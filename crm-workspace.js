@@ -43,7 +43,7 @@
       const items=[pick(/Edit WhatsApp/i),pick(/Manage Statuses/i),pick(/Manage Columns/i)];
       if(exportBtn&&!exportBtn.classList.contains('hidden')){exportBtn.textContent='Export CSV';items.push(exportBtn);}
       btns.append(moreMenu(items));
-      if(addBtn){addBtn.classList.add('crmBtn','crmBtnPrimary');btns.append(addBtn);}
+      if(addBtn){addBtn.classList.add('crmBtn','crmBtnPrimary');addBtn.id='crmAddOwnerBtn';btns.append(addBtn);}
     }
     // filters: search + community + cluster + status visible; unit, source and sort behind "Filters"
     const filters=card.querySelector('.filters');
@@ -93,7 +93,7 @@
       [...btns.querySelectorAll('button')].forEach(b=>{if(/Logout|Dashboard|Owner Database/i.test(b.textContent))b.remove();});
       if(sw)sw.classList.add('crmSeg');
       btns.append(moreMenu([exp,find(actions,/Manage Projects/i),find(actions,/Manage Pipeline/i),find(actions,/Manage Columns/i)]));
-      if(add){add.classList.add('crmBtn','crmBtnPrimary');btns.append(add);}
+      if(add){add.classList.add('crmBtn','crmBtnPrimary');add.id='crmAddLeadBtn';btns.append(add);}
     }
     // stage bar replaces the old quick-status chips (which still listed Contacted/Viewing)
     const quick=card.querySelector('.quickFilters');

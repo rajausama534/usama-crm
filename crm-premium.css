@@ -491,3 +491,16 @@ body.crmPremium #ownersTable td.owner-col-remarks{min-width:220px!important;colo
 body.crmPremium .crmOwnerName{display:block;font-weight:600;color:var(--c-text);line-height:1.35}
 body.crmPremium .quickFilters>.crmChipLabel{height:auto!important;min-height:0!important;padding:0 4px 0 0!important;border:0!important;background:none!important;color:var(--c-faint)!important}
 body.crmPremium .crmWorkspace .mainHeader .headerBtns>.crmBtnPrimary,body.crmPremium .crmWorkspace .mainHeader .headerBtns>button.crmBtnPrimary:not(#__){background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+
+body.crmPremium #crmAddOwnerBtn,body.crmPremium #crmAddLeadBtn{background:var(--c-accent)!important;background-image:none!important;border-color:var(--c-accent)!important;color:#fff!important}
+body.crmPremium #crmAddOwnerBtn:hover,body.crmPremium #crmAddLeadBtn:hover{filter:brightness(1.08)}
+body.crmPremium #ownersTable th{width:auto!important}
+/* leads table: old layers hard-code colours on cells, the notes preview and the sticky actions column */
+body.crmPremium #leadsTable thead th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
+body.crmPremium #leadsTable td,body.crmPremium #leadsTable td :is(div,span,a,p):not(.crmNext):not(.crmAssignee){color:var(--c-text)!important}
+body.crmPremium #leadsTable td:nth-child(2),body.crmPremium #leadsTable td:nth-child(3),body.crmPremium #leadsTable td:nth-child(4){color:var(--c-text)!important;opacity:1!important}
+body.crmPremium #leadsTable td :is(.notePreview,.leadNotePreview,[class*="note"],[class*="Note"]):not(.crmNext){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important;color:var(--c-muted)!important;border-radius:var(--r-sm)!important}
+body.crmPremium #leadsTable :is(td,th):last-child{background:var(--c-surface)!important}
+body.crmPremium #leadsTable thead th:last-child{background:var(--c-surface-2)!important}
+body.crmPremium #leadsTable td:last-child button{background:var(--c-surface-2)!important;border:1px solid var(--c-border-strong)!important;color:var(--c-text)!important}
+body.crmPremium .crmAssignee{color:var(--c-muted)!important}
