@@ -12,7 +12,11 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
-const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+// Projects on the newer API keys expose the secret key as SUPABASE_SECRET_KEYS (JSON) instead.
+const secretKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || (() => {
+  try { return Object.values(JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}"))[0] as string; } catch { return ""; }
+})();
+const admin = createClient(Deno.env.get("SUPABASE_URL")!, secretKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
