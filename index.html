@@ -2364,7 +2364,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     <div class="v7Brand"><strong>Usama</strong><span>CRM</span></div>
     <nav class="v7Nav">
       <button id="v7NavOwners" onclick="showOwnersView()"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Owners</button>
-      <button id="v7NavLeads" class="adminOnly" onclick="showLeadsView()"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10"/></svg>Leads</button>
+      <button id="v7NavLeads" onclick="showLeadsView()"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10"/></svg>Leads</button>
       <button id="v7NavCalendar" class="adminOnly" onclick="showCalendarModule()"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</button>
       <button id="v7NavBroadcast" class="adminOnly" onclick="openBroadcastModule()"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.6 9.6 0 0 1-4-.9L3 21l1.9-4.8A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c.7 3.2 2.5 5 5.7 5.7l1.3-1.3 2 .7c-.3 2-1.8 3.1-3.9 2.8-4.2-.7-7.3-3.8-8-8-.3-2.1.8-3.6 2.8-3.9l.7 2Z"/></svg>WhatsApp Broadcast</button>
     </nav>
@@ -2991,12 +2991,18 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 
       const email = data.session.user.email;
       currentUserEmail = email;
-      isAdmin = email === ADMIN_EMAIL;
-      window.isAdmin = isAdmin;
 
-      const { data: access } = await db.from("user_access").select("*").eq("email", email).single();
+      const { data: access } = await db.from("user_access").select("*").ilike("email", email).maybeSingle();
 
       currentAccess = access || {};
+      isAdmin = email.toLowerCase() === ADMIN_EMAIL || (currentAccess.role === "admin" && currentAccess.active !== false);
+      window.isAdmin = isAdmin;
+      if (!isAdmin && (!access || access.active === false)) {
+        await db.auth.signOut();
+        showOnly("loginView");
+        el("loginError").textContent = access ? "This account has been deactivated. Contact your administrator." : "This account has no CRM access yet. Contact your administrator.";
+        return;
+      }
       applyRoleUI();
 
       if (isAdmin || currentAccess?.can_export) {
@@ -3005,16 +3011,11 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
         el("exportBtn").classList.add("hidden");
       }
 
-      if (isAdmin) {
-        showChoiceView();
-        refreshHomeKpis();
-      } else {
-        showOwnersView();
-      }
+      showChoiceView();
     }
 
     function showOnly(viewId) {
-      ["loginView","choiceView","appView","leadsView"].forEach(id => el(id).classList.add("hidden"));
+      ["loginView","choiceView","appView","leadsView","dashboardView","usersView","calendarModuleView"].forEach(id => el(id)?.classList.add("hidden"));
       el(viewId).classList.remove("hidden");
     }
 
@@ -3030,11 +3031,8 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     }
 
     function showChoiceView() {
-      if (!isAdmin) {
-        showOwnersView();
-        return;
-      }
       applyRoleUI();
+      if (typeof showDashboardView === "function") return showDashboardView();
       showOnly("choiceView");
       refreshHomeKpis();
     }
@@ -3049,10 +3047,6 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     }
 
     async function showLeadsView() {
-      if (!isAdmin) {
-        showOwnersView();
-        return;
-      }
       applyRoleUI();
       showOnly("leadsView");
       setupLeadListeners();
@@ -4677,7 +4671,7 @@ Usama Bin Nusrat.`;
     const _oldOpenLeadModal=openLeadModal;
     openLeadModal=function(row=null){ _oldOpenLeadModal(row); ["follow_up_time","reminder_type","reminder_note"].forEach(f=>{const n=el(`form_${f}`);if(n)n.value=row?.[f]||(f==="reminder_type"?"Call":"");}); refreshLeadStatusUI(); };
     const _oldSaveLeadFromModal=saveLeadFromModal;
-    saveLeadFromModal=async function(){ const oldId=editingLeadId; const oldStatus=oldId?(await db.from(LEADS_TABLE).select("status").eq("id",oldId).single()).data?.status:null; const fields=["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","follow_up_time","reminder_type","reminder_note","notes","last_contacted"]; const payload={};fields.forEach(f=>payload[f]=el(`form_${f}`)?.value||null); let result; if(editingLeadId){result=await db.from(LEADS_TABLE).update(payload).eq("id",editingLeadId);}else{result=await db.from(LEADS_TABLE).insert([payload]).select("id").single();} if(result.error){alert("Failed to save lead: "+result.error.message);return;} const id=oldId||result.data?.id; if(id){if(!oldId)await logLeadActivity(id,"Lead Created","Lead added to the CRM.");else if(oldStatus!==payload.status)await logLeadActivity(id,"Status Change",`Status changed from ${oldStatus||"-"} to ${payload.status||"-"}.`);} closeLeadModal();showLeadSaved();await loadLeadSources();loadFollowupDashboard();leadViewMode==="kanban"?loadKanban():loadLeads(); };
+    saveLeadFromModal=async function(){ const oldId=editingLeadId; const oldStatus=oldId?(await db.from(LEADS_TABLE).select("status").eq("id",oldId).single()).data?.status:null; const fields=["lead_receive_date","name","phone","email","project_inquired","budget","property_type","bedroom","source","status","follow_up_date","follow_up_time","reminder_type","reminder_note","notes","last_contacted"]; const payload={};fields.forEach(f=>payload[f]=el(`form_${f}`)?.value||null); if(isAdmin){ if(el("form_assigned_to")) payload.assigned_to=el("form_assigned_to").value||null; } else if(!oldId){ payload.assigned_to=currentUserEmail; } let result; if(editingLeadId){result=await db.from(LEADS_TABLE).update(payload).eq("id",editingLeadId);}else{result=await db.from(LEADS_TABLE).insert([payload]).select("id").single();} if(result.error){alert("Failed to save lead: "+result.error.message);return;} const id=oldId||result.data?.id; if(id){if(!oldId)await logLeadActivity(id,"Lead Created","Lead added to the CRM.");else if(oldStatus!==payload.status)await logLeadActivity(id,"Status Change",`Status changed from ${oldStatus||"-"} to ${payload.status||"-"}.`);} closeLeadModal();showLeadSaved();await loadLeadSources();loadFollowupDashboard();leadViewMode==="kanban"?loadKanban():loadLeads(); };
 
     // Owner selection + broadcast. Selection is added to each rendered desktop/mobile row.
     const _oldRenderData=renderData;
@@ -4720,12 +4714,15 @@ Usama Bin Nusrat.`;
     loadData = async function(){
       showLoading();
       const from=currentPage*PAGE_SIZE,to=from+PAGE_SIZE-1;
-      let query=db.from(TABLE_NAME).select("*",{count:"exact"}).range(from,to);
+      let query=db.from("owners_list").select("*",{count:"exact"}).range(from,to);
       query=applyAccessFilter(query); query=applyFilters(query);
       const field=el("ownerSortField")?.value||"unit"; const asc=(el("ownerSortDirection")?.value||"asc")==="asc";
-      const dbField=field==="unit"?"unit_sort":field;
-      query=query.order(dbField,{ascending:asc,nullsFirst:false});
-      if(dbField!=="unit_sort") query=query.order("unit_sort",{ascending:true,nullsFirst:false});
+      if(field==="unit"){
+        query=query.order("community",{ascending:true}).order("cluster",{ascending:true}).order("unit_natural",{ascending:asc,nullsFirst:false});
+      }else{
+        query=query.order(field,{ascending:asc,nullsFirst:false}).order("unit_natural",{ascending:true,nullsFirst:false});
+      }
+      query=query.order("id",{ascending:true});
       const {data,error,count}=await query; hideLoading();
       if(error){el("status").textContent="Error loading data";el("tableBody").innerHTML=`<tr><td colspan="${visibleOwnerColumns().length}" class="empty">Error: ${escapeHtml(error.message)}</td></tr>`;return;}
       totalCount=count||0; renderData(data||[]); const start=totalCount===0?0:from+1,end=Math.min(to+1,totalCount),totalPages=Math.max(1,Math.ceil(totalCount/PAGE_SIZE));

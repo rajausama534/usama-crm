@@ -9,10 +9,6 @@
     const parts = esc(value).match(/\d+/g) || [];
     return parts.length ? String(Number(parts[parts.length - 1])) : '';
   };
-  const numberFromUnit = value => {
-    const match = esc(value).match(/\d+(?:\.\d+)?/);
-    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
-  };
   const normalizedForMatch = value => esc(value).toLowerCase().replace(/,/g,'').replace(/\s+/g,' ').trim();
 
   function isSystemOnlyActivity(activity){
@@ -151,75 +147,8 @@
     await markOwnerContacted(ownerId,'WhatsApp');
   };
 
-  function numericUnitSort(rows, direction='asc'){
-    const factor = direction === 'desc' ? -1 : 1;
-    return [...(rows || [])].sort((a,b) => {
-      const av = numberFromUnit(a.unit_sort ?? a.unit);
-      const bv = numberFromUnit(b.unit_sort ?? b.unit);
-      if(av !== bv) return (av - bv) * factor;
-      return esc(a.unit_sort ?? a.unit).localeCompare(esc(b.unit_sort ?? b.unit),undefined,{numeric:true,sensitivity:'base'}) * factor;
-    });
-  }
-
-  async function fetchAllFilteredOwners(){
-    const all = [];
-    const batch = 1000;
-    let from = 0;
-    while(true){
-      let q = db.from(TABLE_NAME).select('*').range(from,from + batch - 1);
-      if(typeof applyAccessFilter === 'function') q = applyAccessFilter(q);
-      if(typeof applyFilters === 'function') q = applyFilters(q);
-      const {data,error} = await q;
-      if(error) throw error;
-      all.push(...(data || []));
-      if(!data || data.length < batch) break;
-      from += batch;
-    }
-    return all;
-  }
-
-  function updateOwnerPager(count, from, to){
-    const totalPages = Math.max(1,Math.ceil(count / PAGE_SIZE));
-    const statusNode = document.getElementById('status');
-    const pageInfo = document.getElementById('pageInfo');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    if(statusNode) statusNode.textContent = `Showing ${count ? from + 1 : 0}-${Math.min(to,count)} of ${count} records`;
-    if(pageInfo) pageInfo.textContent = `${currentPage + 1} / ${totalPages}`;
-    if(prevBtn) prevBtn.disabled = currentPage === 0;
-    if(nextBtn) nextBtn.disabled = currentPage + 1 >= totalPages;
-  }
-
-  // Final loadData implementation: when a cluster is selected, always sort unit numbers numerically before pagination.
-  if(typeof window.loadData === 'function'){
-    const baseLoadData = window.loadData;
-    window.loadData = async function(){
-      const cluster = document.getElementById('clusterFilter')?.value || '';
-      if(!cluster) return baseLoadData.apply(this,arguments);
-
-      try{
-        if(typeof showLoading === 'function') showLoading();
-        const sortField = document.getElementById('ownerSortField');
-        const sortDirection = document.getElementById('ownerSortDirection');
-        if(sortField) sortField.value = 'unit';
-        if(sortDirection) sortDirection.value = 'asc';
-
-        const all = numericUnitSort(await fetchAllFilteredOwners(),'asc');
-        totalCount = all.length;
-        const from = currentPage * PAGE_SIZE;
-        const to = from + PAGE_SIZE;
-        const pageRows = all.slice(from,to);
-        if(typeof hideLoading === 'function') hideLoading();
-        renderData(pageRows);
-        updateOwnerPager(totalCount,from,to);
-        return;
-      }catch(error){
-        console.error('Cluster numeric sort failed:',error);
-        if(typeof hideLoading === 'function') hideLoading();
-        return baseLoadData.apply(this,arguments);
-      }
-    };
-  }
+  // Cluster lists are now sorted by unit number in the database (owners_list.unit_natural),
+  // so the browser no longer downloads a whole cluster to sort it.
 
   const clusterFilter = document.getElementById('clusterFilter');
   if(clusterFilter){
