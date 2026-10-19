@@ -132,7 +132,7 @@ body.crmPremium .crmAssignee.none{color:var(--c-faint)}
 
 /* ---------------------------------------------------------------- tables */
 body.crmPremium .crmTableWrap{overflow-x:auto}
-body.crmPremium .crmTable{width:100%;border-collapse:collapse;font-size:var(--t-sm)}
+body.crmPremium .crmTable{width:100%!important;min-width:0!important;table-layout:auto!important;border-collapse:collapse;font-size:var(--t-sm)}
 body.crmPremium .crmTable th{position:sticky;top:0;padding:var(--s-3);text-align:left;color:var(--c-muted);font-size:var(--t-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--c-border);background:var(--c-surface)}
 body.crmPremium .crmTable td{padding:var(--s-3);border-bottom:1px solid var(--c-border);vertical-align:top;text-align:left!important;overflow-wrap:anywhere}
 body.crmPremium .crmTable th{text-align:left!important}
