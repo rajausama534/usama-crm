@@ -140,14 +140,14 @@ body.crmPremium .crmAccessCell{max-width:260px;color:var(--c-muted)}
 body.crmPremium .crmTable td:first-child{width:240px;overflow-wrap:normal}
 body.crmPremium .crmTable strong,body.crmPremium .crmTable .crmSub{display:block;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important}
 body.crmPremium .crmRowActions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;min-width:150px}
-body.crmPremium #ownersTable,body.crmPremium #leadsTable{font-size:var(--t-sm)!important}
-body.crmPremium #ownersTable th,body.crmPremium #leadsTable th{background:var(--c-surface)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;letter-spacing:.05em!important}
-body.crmPremium #ownersTable td,body.crmPremium #leadsTable td{background:var(--c-bg)!important;color:var(--c-text)!important;border-bottom-color:var(--c-border)!important}
-body.crmPremium #ownersTable tr:hover td,body.crmPremium #leadsTable tr:hover td{background:var(--c-surface)!important}
+body.crmPremium #ownersTable,body.crmPremium #leadsView .leadsTable{font-size:var(--t-sm)!important}
+body.crmPremium #ownersTable th,body.crmPremium #leadsView .leadsTable th{background:var(--c-surface)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;letter-spacing:.05em!important}
+body.crmPremium #ownersTable td,body.crmPremium #leadsView .leadsTable td{background:var(--c-bg)!important;color:var(--c-text)!important;border-bottom-color:var(--c-border)!important}
+body.crmPremium #ownersTable tr:hover td,body.crmPremium #leadsView .leadsTable tr:hover td{background:var(--c-surface)!important}
 
 /* The sidebar already links Dashboard and Leads; drop the duplicate buttons from the Owners header. */
 body.crmPremium :is(#appView,#leadsView) .mainHeader .headerBtns button:is([onclick="showChoiceView()"],[onclick="showLeadsView()"],[onclick="showOwnersView()"]):not(#__){display:none!important}
-body.crmPremium #leadsTable td:first-child,body.crmPremium #leadsTable th:first-child{text-align:left!important}
+body.crmPremium #leadsView .leadsTable td:first-child,body.crmPremium #leadsView .leadsTable th:first-child{text-align:left!important}
 
 /* ---------------------------------------------------------------- owner profile history */
 body.crmPremium .crmHistory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4);margin-top:var(--s-5)}
@@ -257,18 +257,18 @@ body.crmPremium .kpiValue{color:var(--c-text)!important;font-size:var(--t-2xl)!i
 body.crmPremium .kpiHint{color:var(--c-faint)!important;font-size:var(--t-xs)!important}
 
 /* data tables */
-body.crmPremium :is(#ownersTable,#leadsTable){border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;overflow:hidden!important}
-body.crmPremium :is(#ownersTable,#leadsTable) th{height:44px!important;padding:0 var(--s-3)!important;text-transform:uppercase!important}
-body.crmPremium :is(#ownersTable,#leadsTable) td{height:auto!important;padding:var(--s-3)!important;font-size:var(--t-sm)!important;line-height:1.4!important;text-align:left!important;vertical-align:middle!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;overflow:hidden!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) th{height:44px!important;padding:0 var(--s-3)!important;text-transform:uppercase!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) td{height:auto!important;padding:var(--s-3)!important;font-size:var(--t-sm)!important;line-height:1.4!important;text-align:left!important;vertical-align:middle!important}
 body.crmPremium #ownersTable td.owner-col-unit{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important;font-weight:600!important;font-variant-numeric:tabular-nums!important}
-body.crmPremium :is(#ownersTable,#leadsTable) td:nth-child(n){font-family:inherit!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) td:nth-child(n){font-family:inherit!important}
 body.crmPremium #ownersTable td[class*="owner"]:not(.owner-col-unit),body.crmPremium #ownersTable td{word-break:normal!important}
 /* chips inside rows: one size */
-body.crmPremium :is(#ownersTable,#leadsTable) :is(.profileBtn,.moreUnitBtn,.copyBtn,.callBtn){height:24px!important;min-height:24px!important;padding:0 10px!important;border-radius:99px!important;border:1px solid var(--c-border-strong)!important;background:var(--c-surface-2)!important;color:var(--c-text)!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important}
-body.crmPremium :is(#ownersTable,#leadsTable) .moreUnitBtn{color:var(--c-accent-text)!important;border-color:rgba(91,108,255,.35)!important;background:var(--c-accent-soft)!important}
-body.crmPremium :is(#ownersTable,#leadsTable) .waBtn{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:var(--r-sm)!important;border:1px solid rgba(34,197,94,.35)!important;background:rgba(34,197,94,.12)!important;color:#86efac!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
-body.crmPremium :is(#ownersTable,#leadsTable) .waBtn:hover{background:rgba(34,197,94,.2)!important}
-body.crmPremium :is(#ownersTable,#leadsTable) select{height:32px!important;min-height:32px!important;border-radius:99px!important;font-size:var(--t-xs)!important;font-weight:600!important;padding:0 28px 0 12px!important;background-position:right 10px center!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) :is(.profileBtn,.moreUnitBtn,.copyBtn,.callBtn){height:24px!important;min-height:24px!important;padding:0 10px!important;border-radius:99px!important;border:1px solid var(--c-border-strong)!important;background:var(--c-surface-2)!important;color:var(--c-text)!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) .moreUnitBtn{color:var(--c-accent-text)!important;border-color:rgba(91,108,255,.35)!important;background:var(--c-accent-soft)!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) .waBtn{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:var(--r-sm)!important;border:1px solid rgba(34,197,94,.35)!important;background:rgba(34,197,94,.12)!important;color:#86efac!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) .waBtn:hover{background:rgba(34,197,94,.2)!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) select{height:32px!important;min-height:32px!important;border-radius:99px!important;font-size:var(--t-xs)!important;font-weight:600!important;padding:0 28px 0 12px!important;background-position:right 10px center!important}
 
 /* popups */
 body.crmPremium .modalOverlay{background:rgba(3,6,12,.72)!important;backdrop-filter:blur(4px)!important}
@@ -412,10 +412,10 @@ html[data-theme="light"] body.crmPremium :is(.modal,.profileModal,#profileConten
 html[data-theme="light"] body.crmPremium :is(.u6DetailRight,[class*="u6Activity"],.activityItem,#followupCards>*){background:var(--c-surface-2)!important}
 html[data-theme="light"] body.crmPremium :is([class*="u6Field"] span,[class*="u6Field"] small,.sub,.kpiHint,.profileSub,.muted,[class*="Label"],[class*="label"]):not(button){color:var(--c-muted)!important}
 html[data-theme="light"] body.crmPremium :is(h1,h2,h3,h4,strong,.profileTitle,.u6DetailTitle){color:var(--c-text)!important}
-html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsTable) td{background:var(--c-surface)!important;color:var(--c-text)!important}
-html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsTable) tr:hover td{background:var(--c-surface-2)!important}
-html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsTable) th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
-html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsTable) .waBtn,html[data-theme="light"] body.crmPremium .crmStatus.on{color:#15803d!important;background:rgba(22,163,74,.10)!important;border-color:rgba(22,163,74,.28)!important}
+html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsView .leadsTable) td{background:var(--c-surface)!important;color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsView .leadsTable) tr:hover td{background:var(--c-surface-2)!important}
+html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsView .leadsTable) th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsView .leadsTable) .waBtn,html[data-theme="light"] body.crmPremium .crmStatus.on{color:#15803d!important;background:rgba(22,163,74,.10)!important;border-color:rgba(22,163,74,.28)!important}
 html[data-theme="light"] body.crmPremium .crmStatus.off,html[data-theme="light"] body.crmPremium .crmBtnDanger{color:#b91c1c!important}
 html[data-theme="light"] body.crmPremium .crmToastError,html[data-theme="light"] body.crmPremium .crmFormError,html[data-theme="light"] body.crmPremium .crmOver{color:#b91c1c!important}
 html[data-theme="light"] body.crmPremium .crmNoteList li.is-overdue .crmNoteKind{color:#b91c1c!important}
@@ -451,7 +451,7 @@ body.crmPremium .kpiCard.is-clickable:hover{border-color:var(--c-border-strong)!
 body.crmPremium .kpiCard.is-clickable:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
 body.crmPremium #ownersTable td.owner-col-owner,body.crmPremium #ownersTable td[data-col="owner"]{font-weight:600}
 body.crmPremium #ownersTable td.owner-col-unit{min-width:110px}
-body.crmPremium :is(#ownersTable,#leadsTable){border-color:var(--c-border)!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border-color:var(--c-border)!important;box-shadow:none!important}
 /* stage bar */
 body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
 body.crmPremium .crmStage{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-muted);text-align:left;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
@@ -483,7 +483,7 @@ body.crmPremium .crmLogout:hover{color:var(--c-text);background:var(--c-surface-
 
 /* workspace fixes */
 body.crmPremium .tablebox{border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;overflow:auto!important}
-body.crmPremium :is(#ownersTable,#leadsTable){border:0!important;border-radius:0!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border:0!important;border-radius:0!important}
 body.crmPremium #ownersTable{table-layout:auto!important}
 body.crmPremium #ownersTable td.owner-col-unit{width:auto!important;min-width:120px!important}
 body.crmPremium #ownersTable td.owner-col-owner{min-width:220px!important}
@@ -496,19 +496,19 @@ body.crmPremium #crmAddOwnerBtn,body.crmPremium #crmAddLeadBtn{background:var(--
 body.crmPremium #crmAddOwnerBtn:hover,body.crmPremium #crmAddLeadBtn:hover{filter:brightness(1.08)}
 body.crmPremium #ownersTable th{width:auto!important}
 /* leads table: old layers hard-code colours on cells, the notes preview and the sticky actions column */
-body.crmPremium #leadsTable thead th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
-body.crmPremium #leadsTable td,body.crmPremium #leadsTable td :is(div,span,a,p):not(.crmNext):not(.crmAssignee){color:var(--c-text)!important}
-body.crmPremium #leadsTable td:nth-child(2),body.crmPremium #leadsTable td:nth-child(3),body.crmPremium #leadsTable td:nth-child(4){color:var(--c-text)!important;opacity:1!important}
-body.crmPremium #leadsTable td :is(.notePreview,.leadNotePreview,[class*="note"],[class*="Note"]):not(.crmNext){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important;color:var(--c-muted)!important;border-radius:var(--r-sm)!important}
-body.crmPremium #leadsTable :is(td,th):last-child{background:var(--c-surface)!important}
-body.crmPremium #leadsTable thead th:last-child{background:var(--c-surface-2)!important}
-body.crmPremium #leadsTable td:last-child button{background:var(--c-surface-2)!important;border:1px solid var(--c-border-strong)!important;color:var(--c-text)!important}
+body.crmPremium #leadsView .leadsTable thead th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
+body.crmPremium #leadsView .leadsTable td,body.crmPremium #leadsView .leadsTable td :is(div,span,a,p):not(.crmNext):not(.crmAssignee){color:var(--c-text)!important}
+body.crmPremium #leadsView .leadsTable td:nth-child(2),body.crmPremium #leadsView .leadsTable td:nth-child(3),body.crmPremium #leadsView .leadsTable td:nth-child(4){color:var(--c-text)!important;opacity:1!important}
+body.crmPremium #leadsView .leadsTable td :is(.notePreview,.leadNotePreview,[class*="note"],[class*="Note"]):not(.crmNext){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important;color:var(--c-muted)!important;border-radius:var(--r-sm)!important}
+body.crmPremium #leadsView .leadsTable :is(td,th):last-child{background:var(--c-surface)!important}
+body.crmPremium #leadsView .leadsTable thead th:last-child{background:var(--c-surface-2)!important}
+body.crmPremium #leadsView .leadsTable td:last-child button{background:var(--c-surface-2)!important;border:1px solid var(--c-border-strong)!important;color:var(--c-text)!important}
 body.crmPremium .crmAssignee{color:var(--c-muted)!important}
 /* leads table in light mode (old layers paint these cells dark with id-level rules) */
-html[data-theme="light"] body.crmPremium #leadsView :is(#leadsTable,#leadsTableHead) th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
-html[data-theme="light"] body.crmPremium #leadsView #leadsTable td,html[data-theme="light"] body.crmPremium #leadsView #leadsTable td.actionsSticky,html[data-theme="light"] body.crmPremium #leadsView #leadsTable th.actionsSticky{background:var(--c-surface)!important;color:var(--c-text)!important}
-html[data-theme="light"] body.crmPremium #leadsView #leadsTable .leadReadValue{color:var(--c-text)!important}
-html[data-theme="light"] body.crmPremium #leadsView #leadsTable .leadLatestNote{background:var(--c-surface-2)!important;color:var(--c-muted)!important;border-color:var(--c-border)!important}
-html[data-theme="light"] body.crmPremium #leadsView #leadsTable tr:hover td{background:var(--c-surface-2)!important}
+html[data-theme="light"] body.crmPremium #leadsView :is(#leadsView .leadsTable,#leadsView .leadsTableHead) th{background:var(--c-surface-2)!important;color:var(--c-muted)!important}
+html[data-theme="light"] body.crmPremium #leadsView .leadsTable td,html[data-theme="light"] body.crmPremium #leadsView .leadsTable td.actionsSticky,html[data-theme="light"] body.crmPremium #leadsView .leadsTable th.actionsSticky{background:var(--c-surface)!important;color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium #leadsView .leadsTable .leadReadValue{color:var(--c-text)!important}
+html[data-theme="light"] body.crmPremium #leadsView .leadsTable .leadLatestNote{background:var(--c-surface-2)!important;color:var(--c-muted)!important;border-color:var(--c-border)!important}
+html[data-theme="light"] body.crmPremium #leadsView .leadsTable tr:hover td{background:var(--c-surface-2)!important}
 html[data-theme="light"] body.crmPremium #appView #ownersTable td{background:var(--c-surface)!important;color:var(--c-text)!important}
 html[data-theme="light"] body.crmPremium #appView #ownersTable tr:hover td{background:var(--c-surface-2)!important}
