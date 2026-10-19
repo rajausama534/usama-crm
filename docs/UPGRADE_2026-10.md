@@ -46,3 +46,16 @@ Repair (needs approval): remove those 431 notes and add the correct per-unit sal
   price with one candidate on each side → `property_transactions` + note "Sold AED 4.28M — 10 Sep 2026 — Area 3,715 sq ft".
   Skipped: 25 Palmiera (CRM splits Palmiera 1/2/3, report has no phase), 44 where two units share date+price.
 - Re-run: `scripts/dld_fetch.py` → `scripts/dld_match.py` → `scripts/dld_import_sql.py` (idempotent).
+
+## Later on 19 Oct 2026
+- Owner Finder and Cluster Guide called an edge function in a Supabase project outside this account
+  (fkhboleibqrrqljmwbit), so both pages never worked. Their tables and `owner-finder-api` now live in the CRM
+  project; Owner Finder (uploaded third-party owner data) is admin-only. Earlier Cluster Guide entries stored
+  in that external project are not reachable.
+- Property details (`unit_details`: type, bedrooms, BUA, plot, suite kept separate) and an append-only
+  occupancy log (`unit_observations`) on every owner profile; dashboard shows vacant/occupied from the latest
+  observation per unit. Seeded 497 units from the FG2 (bedrooms + plot) and Rivana (bedrooms) reports.
+- Weekly DLD sync: `dld-sync` edge function + pg_cron job `dld-weekly-sync` (Mondays 03:00 UTC). Fetches the
+  last 21 days, maps to clusters with the same rules as the import scripts, inserts idempotently, refuses to
+  run twice within 6 days. First run: 8,870 fetched, 123 in CRM clusters, 0 new (all already imported).
+- Phone checks done: dashboard, Owners (card list), owner profile, Leads (card list), Add Lead form, Users.
