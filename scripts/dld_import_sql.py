@@ -51,22 +51,21 @@ def money_text(amount):
 def main(dld_path, matches_path, out_path):
     rows = [json.loads(l) for l in open(dld_path)]
     out = ["begin;"]
-    mapped = 0
+    values = []
     for r in rows:
         target = crm_target(r.get("PROJECT_EN"))
         if not target:
             continue
-        mapped += 1
         area = r.get("ACTUAL_AREA") or r.get("PROCEDURE_AREA")
-        out.append(
-            "insert into public.dld_transactions (transaction_number, transaction_date, procedure, is_offplan, property_type, "
-            "property_sub_type, rooms, amount, area_sqm, area_sqft, dld_area, dld_project, crm_community, crm_cluster) values ("
-            + ", ".join([q(r["TRANSACTION_NUMBER"]), q(r["INSTANCE_DATE"][:10]), q(r.get("PROCEDURE_EN")),
+        values.append("(" + ",".join([q(r["TRANSACTION_NUMBER"]), q(r["INSTANCE_DATE"][:10]), q(r.get("PROCEDURE_EN")),
                          "true" if r.get("IS_OFFPLAN") == 1 else "false", q(r.get("PROP_TYPE_EN")), q(r.get("PROP_SB_TYPE_EN")),
                          q(r.get("ROOMS_EN")), str(r["TRANS_VALUE"]), str(area) if area else "null",
                          str(round(area * SQM_TO_SQFT)) if area else "null", q(r.get("AREA_EN")), q(r.get("PROJECT_EN")),
-                         q(target[0]), q(target[1])])
-            + ") on conflict (transaction_number) do nothing;")
+                         q(target[0]), q(target[1])]) + ")")
+    mapped = len(values)
+    out.append("insert into public.dld_transactions (transaction_number, transaction_date, procedure, is_offplan, property_type, "
+               "property_sub_type, rooms, amount, area_sqm, area_sqft, dld_area, dld_project, crm_community, crm_cluster) values\n"
+               + ",\n".join(values) + "\non conflict (transaction_number) do nothing;")
 
     matches = json.load(open(matches_path))["matched"]
     linked = 0
@@ -96,6 +95,9 @@ def main(dld_path, matches_path, out_path):
             "and exists (select 1 from public.property_transactions p where p.dld_transaction_number = " + q(m["dld_transaction_number"]) + ") "
             f"and not exists (select 1 from public.owner_activities a where a.owner_id = o.id::text and a.details = {q(note)});")
         linked += 1
+    out.append("select json_build_object('dld_transactions', (select count(*) from public.dld_transactions), "
+               "'property_transactions', (select count(*) from public.property_transactions), "
+               "'dld_notes', (select count(*) from public.owner_activities where created_by = 'dld-import'))::text as result;")
     out.append("commit;")
     Path(out_path).write_text("\n".join(out) + "\n")
     print(f"{mapped} DLD sales mapped to a CRM cluster; {linked} unit-level matches written to {out_path}")
