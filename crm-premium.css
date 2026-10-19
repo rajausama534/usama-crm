@@ -1,0 +1,304 @@
+/* Usama CRM design system (loaded last; scoped to body.crmPremium so the old layers stay inert).
+   One font, one type scale, one spacing scale, one radius and one accent across every page. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --c-bg:#0b0f17;--c-surface:#111723;--c-surface-2:#161e2d;--c-raised:#1b2435;
+  --c-border:rgba(148,163,184,.14);--c-border-strong:rgba(148,163,184,.26);
+  --c-text:#e8edf5;--c-muted:#8a96aa;--c-faint:#5f6b7e;
+  --c-accent:#5b6cff;--c-accent-soft:rgba(91,108,255,.14);--c-accent-text:#aab4ff;
+  --c-success:#22c55e;--c-warning:#f59e0b;--c-danger:#ef4444;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;
+  --t-xs:12px;--t-sm:13px;--t-base:14px;--t-lg:16px;--t-xl:20px;--t-2xl:28px;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.18);
+  --sidebar:248px;
+}
+
+body.crmPremium{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;font-size:var(--t-base)!important;background:var(--c-bg)!important;color:var(--c-text)!important;letter-spacing:0!important;-webkit-font-smoothing:antialiased}
+body.crmPremium button,body.crmPremium input,body.crmPremium select,body.crmPremium textarea{font-family:inherit!important}
+body.crmPremium h1,body.crmPremium h2,body.crmPremium h3{letter-spacing:-.01em}
+
+/* ---------------------------------------------------------------- sidebar (desktop) */
+@media (min-width:1100px){
+  body.crmPremium:has(#v7Topbar:not(.hidden)){padding:0 0 0 var(--sidebar)!important}
+  body.crmPremium #v7Topbar{inset:0 auto 0 0!important;width:var(--sidebar)!important;height:100vh!important;flex-direction:column!important;align-items:stretch!important;gap:var(--s-5)!important;padding:var(--s-5) var(--s-3)!important;background:var(--c-surface)!important;border-right:1px solid var(--c-border)!important;border-bottom:0!important;overflow-y:auto}
+  body.crmPremium #v7Topbar .v7Brand{padding:0 var(--s-3);font-size:var(--t-xl)!important}
+  body.crmPremium #v7Topbar .v7Nav{flex-direction:column!important;align-self:stretch!important;gap:2px!important;overflow:visible!important;flex:1}
+  body.crmPremium #v7Topbar .v7Nav button{height:40px!important;justify-content:flex-start!important;border:0!important;border-radius:var(--r-sm)!important;padding:0 var(--s-3)!important}
+  body.crmPremium #v7Topbar .v7TopActions{flex-direction:column!important;align-items:stretch!important;gap:var(--s-2)!important;margin:0!important}
+  body.crmPremium #v7Topbar .v7Divider{display:none!important}
+  body.crmPremium .crmMenuToggle,body.crmPremium .crmNavScrim{display:none!important}
+}
+body.crmPremium #v7Topbar .v7Brand strong{color:var(--c-text)!important;font-weight:700}
+body.crmPremium #v7Topbar .v7Brand span{color:var(--c-accent)!important;font-weight:700}
+body.crmPremium #v7Topbar .v7Nav button{display:flex!important;align-items:center!important;gap:var(--s-3)!important;color:var(--c-muted)!important;font-size:var(--t-base)!important;font-weight:500!important;background:transparent!important;transition:background .15s,color .15s}
+body.crmPremium #v7Topbar .v7Nav button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* Links added by older layers have no icon: give them the same indent and a neutral marker. */
+body.crmPremium #v7Topbar .v7Nav button:not(:has(svg))::before{content:"";width:18px;height:18px;flex:none;border-radius:5px;border:1.8px solid currentColor;opacity:.55;transform:scale(.62)}
+body.crmPremium #v7Topbar .v7Nav button:hover{color:var(--c-text)!important;background:var(--c-surface-2)!important}
+body.crmPremium #v7Topbar .v7Nav button.active{color:var(--c-text)!important;background:var(--c-accent-soft)!important;box-shadow:inset 3px 0 0 var(--c-accent)}
+body.crmPremium .v7ExportBtn{border-radius:var(--r-sm)!important}
+
+/* ---------------------------------------------------------------- top bar + drawer (tablet / phone) */
+@media (max-width:1099px){
+  body.crmPremium:has(#v7Topbar:not(.hidden)){padding-top:60px!important}
+  /* backdrop-filter would make the header the containing block of the fixed drawer and clip it. */
+  body.crmPremium #v7Topbar{height:60px!important;gap:var(--s-2)!important;padding:0 var(--s-3)!important;background:var(--c-surface)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  body.crmPremium #v7Topbar .v7Brand{display:flex!important;gap:6px!important;min-width:0!important;font-size:var(--t-lg)!important}
+  body.crmPremium #v7Topbar .v7Brand strong{display:inline!important}
+  body.crmPremium .crmMenuToggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-text);cursor:pointer;flex:none}
+  body.crmPremium .crmMenuToggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  body.crmPremium #v7Topbar .v7Nav{position:fixed!important;top:60px;left:0;bottom:0;width:min(300px,84vw);flex-direction:column!important;gap:2px!important;padding:var(--s-3)!important;background:var(--c-surface)!important;border-right:1px solid var(--c-border);transform:translateX(-102%);transition:transform .2s ease;overflow-y:auto!important;z-index:1002}
+  body.crmPremium.crmNavOpen #v7Topbar .v7Nav{transform:none}
+  body.crmPremium #v7Topbar .v7Nav button{height:48px!important;border:0!important;border-radius:var(--r-sm)!important;padding:0 var(--s-3)!important}
+  body.crmPremium .crmNavScrim{position:fixed;inset:60px 0 0 0;background:rgba(0,0,0,.5);z-index:1001;display:none}
+  body.crmPremium.crmNavOpen .crmNavScrim{display:block}
+  body.crmPremium #v7Topbar .v7ExportBtn,body.crmPremium #v7Topbar .v7ProfileText{display:none!important}
+}
+
+/* ---------------------------------------------------------------- page scaffolding */
+body.crmPremium .crmPage{max-width:1440px!important;margin:0 auto!important;padding:var(--s-6)!important}
+body.crmPremium .crmPageHead{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;margin-bottom:var(--s-5)}
+body.crmPremium .crmPageHead h1{margin:0;font-size:var(--t-2xl);font-weight:400;color:var(--c-muted);line-height:1.2}
+body.crmPremium .crmPageHead h1 strong{color:var(--c-text);font-weight:700}
+body.crmPremium #usersView .crmPageHead h1{color:var(--c-text);font-weight:700}
+body.crmPremium .crmPageHead p{margin:var(--s-2) 0 0;color:var(--c-muted);font-size:var(--t-base)}
+body.crmPremium .crmHeadActions{display:flex;gap:var(--s-2);flex-wrap:wrap}
+body.crmPremium .crmSectionTitle h2{margin:var(--s-5) 0 var(--s-3);font-size:var(--t-xs);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--c-muted)}
+body.crmPremium .crmFootnote{margin-top:var(--s-5);color:var(--c-faint);font-size:var(--t-xs)}
+body.crmPremium .crmLoadingLine{padding:var(--s-5);color:var(--c-muted)}
+body.crmPremium .crmEmpty{padding:var(--s-4) 0;color:var(--c-muted);font-size:var(--t-sm)}
+body.crmPremium .crmSub{display:block;color:var(--c-muted);font-size:var(--t-xs);margin-top:2px}
+
+/* ---------------------------------------------------------------- buttons + fields */
+body.crmPremium .crmBtn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);height:40px;padding:0 var(--s-4);border:1px solid var(--c-border-strong);border-radius:var(--r-sm);background:var(--c-surface-2);color:var(--c-text);font-size:var(--t-sm);font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
+body.crmPremium .crmBtn:hover{background:var(--c-raised)}
+body.crmPremium .crmBtn:focus-visible,body.crmPremium .crmKpi:focus-visible,body.crmPremium .crmBarRow:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+body.crmPremium .crmBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+body.crmPremium .crmBtnPrimary{background:var(--c-accent);border-color:var(--c-accent);color:#fff}
+body.crmPremium .crmBtnPrimary:hover{background:#4c5cf0}
+body.crmPremium .crmBtnDanger{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+body.crmPremium .crmBtnSm{height:32px;padding:0 var(--s-3);font-size:var(--t-xs)}
+body.crmPremium .crmBtn:disabled{opacity:.55;cursor:wait}
+body.crmPremium .crmIconBtn{width:36px;height:36px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-muted);font-size:22px;cursor:pointer}
+body.crmPremium .crmIconBtn:hover{background:var(--c-surface-2);color:var(--c-text)}
+body.crmPremium .crmModal input:not([type=checkbox]),body.crmPremium .crmModal select{width:100%;height:42px;margin-top:6px;padding:0 var(--s-3);border:1px solid var(--c-border-strong);border-radius:var(--r-sm);background:var(--c-bg);color:var(--c-text);font-size:var(--t-base)}
+body.crmPremium .crmModal input:focus,body.crmPremium .crmModal select:focus{outline:none;border-color:var(--c-accent);box-shadow:0 0 0 3px var(--c-accent-soft)}
+body.crmPremium .crmCheck{display:flex!important;align-items:center;gap:var(--s-2);font-size:var(--t-sm);color:var(--c-text);cursor:pointer}
+body.crmPremium .crmCheck input{width:16px;height:16px;accent-color:var(--c-accent)}
+body.crmPremium .crmCheck small{color:var(--c-faint);margin-left:auto}
+
+/* ---------------------------------------------------------------- cards, KPIs, charts */
+body.crmPremium .crmKpiGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--s-3)}
+body.crmPremium .crmKpi{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:112px;padding:var(--s-4) var(--s-5);border:1px solid var(--c-border);border-radius:var(--r-lg);background:var(--c-surface);color:var(--c-text);text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
+body.crmPremium .crmKpi:hover:not(:disabled){border-color:var(--c-border-strong);transform:translateY(-1px)}
+body.crmPremium .crmKpi:disabled{cursor:default}
+body.crmPremium .crmKpiLabel{color:var(--c-muted);font-size:var(--t-sm);font-weight:500}
+body.crmPremium .crmKpiValue{font-size:var(--t-2xl);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+body.crmPremium .crmKpiHint{color:var(--c-faint);font-size:var(--t-xs)}
+body.crmPremium .crmCardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4);margin-top:var(--s-5)}
+body.crmPremium .crmCard{padding:var(--s-5);border:1px solid var(--c-border);border-radius:var(--r-lg);background:var(--c-surface);min-width:0}
+body.crmPremium .crmCardWide{grid-column:span 2}
+body.crmPremium .crmCard>header{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin-bottom:var(--s-4)}
+body.crmPremium .crmCard h3{margin:0;font-size:var(--t-lg);font-weight:600}
+body.crmPremium .crmCard>header span{color:var(--c-muted);font-size:var(--t-xs)}
+body.crmPremium .crmBars{display:flex;flex-direction:column;gap:2px}
+body.crmPremium .crmBarRow{display:grid;grid-template-columns:minmax(96px,150px) 1fr 84px;align-items:center;gap:var(--s-3);width:100%;padding:7px var(--s-2);border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-text);font-size:var(--t-sm);text-align:left;cursor:pointer}
+body.crmPremium .crmBarRow:hover:not(:disabled){background:var(--c-surface-2)}
+body.crmPremium .crmBarRow:disabled{cursor:default}
+body.crmPremium .crmBarLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.crmPremium .crmBarTrack{height:8px;border-radius:99px;background:var(--c-surface-2);overflow:hidden}
+body.crmPremium .crmBarFill{display:block;height:100%;border-radius:99px;background:var(--c-accent)}
+body.crmPremium .crmBarValue{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+body.crmPremium .crmBarValue small{margin-left:6px;color:var(--c-faint);font-weight:500}
+body.crmPremium .crmWeekChart{width:100%;height:auto}
+body.crmPremium .crmWeekChart rect{fill:var(--c-accent)}
+body.crmPremium .crmWeekChart g:hover rect{fill:#8590ff}
+body.crmPremium .crmWeekChart text{fill:var(--c-faint);font-size:11px}
+body.crmPremium .crmActivity{list-style:none;margin:0;padding:0}
+body.crmPremium .crmActivity li{display:grid;grid-template-columns:64px 1fr auto;gap:var(--s-3);align-items:start;padding:var(--s-3) 0;border-top:1px solid var(--c-border)}
+body.crmPremium .crmActivity li:first-child{border-top:0}
+body.crmPremium .crmActivity strong{font-size:var(--t-sm);font-weight:600}
+body.crmPremium .crmActivity p{margin:2px 0 0;color:var(--c-muted);font-size:var(--t-sm);overflow-wrap:anywhere}
+body.crmPremium .crmActivity time{color:var(--c-faint);font-size:var(--t-xs);white-space:nowrap}
+body.crmPremium .crmTag{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 var(--s-2);border-radius:99px;background:var(--c-surface-2);color:var(--c-muted);font-size:11px;font-weight:600}
+body.crmPremium .crmTagLead{background:var(--c-accent-soft);color:var(--c-accent-text)}
+body.crmPremium .crmStatus{display:inline-flex;height:22px;align-items:center;padding:0 var(--s-2);border-radius:99px;font-size:11px;font-weight:600}
+body.crmPremium .crmStatus.on{background:rgba(34,197,94,.14);color:#86efac}
+body.crmPremium .crmStatus.off{background:rgba(239,68,68,.14);color:#fca5a5}
+body.crmPremium .crmAssignee{display:block;margin-top:4px;color:var(--c-accent-text);font-size:var(--t-xs)}
+body.crmPremium .crmAssignee.none{color:var(--c-faint)}
+
+/* ---------------------------------------------------------------- tables */
+body.crmPremium .crmTableWrap{overflow-x:auto}
+body.crmPremium .crmTable{width:100%!important;min-width:0!important;table-layout:auto!important;border-collapse:collapse;font-size:var(--t-sm)}
+body.crmPremium .crmTable th{position:sticky;top:0;padding:var(--s-3);text-align:left;color:var(--c-muted);font-size:var(--t-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--c-border);background:var(--c-surface)}
+body.crmPremium .crmTable td{padding:var(--s-3);border-bottom:1px solid var(--c-border);vertical-align:top;text-align:left!important;overflow-wrap:anywhere}
+body.crmPremium .crmTable th{text-align:left!important}
+body.crmPremium .crmAccessCell{max-width:260px;color:var(--c-muted)}
+body.crmPremium .crmTable td:first-child{width:240px;overflow-wrap:normal}
+body.crmPremium .crmTable strong,body.crmPremium .crmTable .crmSub{display:block;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important}
+body.crmPremium .crmRowActions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;min-width:150px}
+body.crmPremium #ownersTable,body.crmPremium #leadsTable{font-size:var(--t-sm)!important}
+body.crmPremium #ownersTable th,body.crmPremium #leadsTable th{background:var(--c-surface)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;letter-spacing:.05em!important}
+body.crmPremium #ownersTable td,body.crmPremium #leadsTable td{background:var(--c-bg)!important;color:var(--c-text)!important;border-bottom-color:var(--c-border)!important}
+body.crmPremium #ownersTable tr:hover td,body.crmPremium #leadsTable tr:hover td{background:var(--c-surface)!important}
+
+/* The sidebar already links Dashboard and Leads; drop the duplicate buttons from the Owners header. */
+body.crmPremium :is(#appView,#leadsView) .mainHeader .headerBtns button:is([onclick="showChoiceView()"],[onclick="showLeadsView()"],[onclick="showOwnersView()"]):not(#__){display:none!important}
+body.crmPremium #leadsTable td:first-child,body.crmPremium #leadsTable th:first-child{text-align:left!important}
+
+/* ---------------------------------------------------------------- owner profile history */
+body.crmPremium .crmHistory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4);margin-top:var(--s-5)}
+body.crmPremium .crmTimeline{list-style:none;margin:0;padding:0}
+body.crmPremium .crmTimeline li{display:grid;grid-template-columns:110px 1fr;column-gap:var(--s-3);row-gap:2px;padding:var(--s-3) 0;border-top:1px solid var(--c-border)}
+body.crmPremium .crmTimeline li:first-child{border-top:0}
+body.crmPremium .crmTimeline time{grid-row:span 2;color:var(--c-muted);font-size:var(--t-xs)}
+body.crmPremium .crmTimeline strong{font-size:var(--t-sm)}
+body.crmPremium .crmTimeline span{color:var(--c-muted);font-size:var(--t-xs)}
+
+/* ---------------------------------------------------------------- modals + toasts */
+/* Every existing popup (owner profile, lead detail, editors) sits above the sidebar. */
+body.crmPremium .modalOverlay,body.crmPremium #u10OwnerEditor{z-index:2000!important}
+body.crmPremium .crmModalScrim{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:var(--s-4);background:rgba(3,6,12,.7)}
+body.crmPremium .crmModal{display:flex;flex-direction:column;width:min(720px,100%);max-height:calc(100vh - 32px);border:1px solid var(--c-border-strong);border-radius:var(--r-lg);background:var(--c-surface);box-shadow:var(--shadow)}
+body.crmPremium .crmModal>header,body.crmPremium .crmModal>footer{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);padding:var(--s-4) var(--s-5)}
+body.crmPremium .crmModal>header{border-bottom:1px solid var(--c-border)}
+body.crmPremium .crmModal>footer{justify-content:flex-end;border-top:1px solid var(--c-border)}
+body.crmPremium .crmModal h2{margin:0;font-size:var(--t-lg);font-weight:600}
+body.crmPremium .crmModalBody{padding:var(--s-5);overflow-y:auto}
+body.crmPremium .crmModalBody label{display:block;color:var(--c-muted);font-size:var(--t-sm);font-weight:500}
+body.crmPremium .crmFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4)}
+body.crmPremium .crmFormError{margin:0 var(--s-5) var(--s-3);color:#fca5a5;font-size:var(--t-sm)}
+body.crmPremium .crmAccessPicker{margin-top:var(--s-5)}
+body.crmPremium .crmAccessPicker h4{margin:0;font-size:var(--t-base)}
+body.crmPremium .crmAccessSearch{margin:var(--s-3) 0!important}
+body.crmPremium .crmCommunity{border:1px solid var(--c-border);border-radius:var(--r-md);margin-bottom:var(--s-2);background:var(--c-bg)}
+body.crmPremium .crmCommunity summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);min-height:48px;padding:0 var(--s-4);cursor:pointer;font-weight:600}
+body.crmPremium .crmClusterGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--s-2) var(--s-4);padding:var(--s-2) var(--s-4) var(--s-4)}
+body.crmPremium .crmToast{position:fixed;left:50%;bottom:24px;z-index:3100;transform:translateX(-50%);padding:var(--s-3) var(--s-4);border-radius:var(--r-sm);background:var(--c-raised);border:1px solid var(--c-border-strong);color:var(--c-text);font-size:var(--t-sm);box-shadow:var(--shadow)}
+body.crmPremium .crmToastError{border-color:rgba(239,68,68,.5);color:#fecaca}
+
+/* ---------------------------------------------------------------- responsive */
+@media (max-width:900px){
+  body.crmPremium .crmCardGrid,body.crmPremium .crmHistory{grid-template-columns:1fr}
+  body.crmPremium .crmCardWide{grid-column:auto}
+}
+@media (max-width:640px){
+  body.crmPremium .crmPage{padding:var(--s-4)!important}
+  body.crmPremium .crmPageHead h1{font-size:var(--t-xl)}
+  body.crmPremium .crmKpiGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-2)}
+  body.crmPremium .crmKpi{min-height:96px;padding:var(--s-3) var(--s-4)}
+  body.crmPremium .crmKpiValue{font-size:var(--t-xl)}
+  body.crmPremium .crmCard{padding:var(--s-4)}
+  body.crmPremium .crmBarRow{grid-template-columns:96px 1fr 70px;gap:var(--s-2)}
+  body.crmPremium .crmActivity li{grid-template-columns:1fr;gap:4px}
+  body.crmPremium .crmFormGrid{grid-template-columns:1fr}
+  body.crmPremium .crmModalScrim{padding:0;align-items:stretch}
+  body.crmPremium .crmModal{max-height:100vh;border-radius:0}
+  body.crmPremium .crmTimeline li{grid-template-columns:1fr}
+  body.crmPremium .crmTimeline time{grid-row:auto}
+  /* Users table becomes stacked cards on phones. */
+  body.crmPremium .crmTable thead{display:none}
+  body.crmPremium .crmTable tr{display:block;padding:var(--s-3) 0;border-bottom:1px solid var(--c-border)}
+  body.crmPremium .crmTable td{display:flex;justify-content:space-between;gap:var(--s-3);padding:6px 0;border:0}
+  body.crmPremium .crmTable td[data-label]::before{content:attr(data-label);color:var(--c-muted);font-size:var(--t-xs)}
+  body.crmPremium .crmTable td{width:auto!important;max-width:none!important;min-width:0!important}
+  body.crmPremium .crmTable td:first-child{display:block}
+  body.crmPremium .crmTable td:first-child::before{content:none}
+  body.crmPremium .crmRowActions{justify-content:flex-start}
+  body.crmPremium .crmBtn{min-height:44px}
+}
+
+/* =====================================================================================
+   Existing pages (Owners, Leads, Calendar, popups, login) on the same design system.
+   Every rule is scoped to body.crmPremium and only restyles; no markup or behaviour changes.
+   ===================================================================================== */
+body.crmPremium #appView,body.crmPremium #leadsView,body.crmPremium #calendarModuleView{max-width:1440px!important;margin:0 auto!important;padding:var(--s-6)!important;background:transparent!important}
+
+/* headers */
+body.crmPremium .mainHeader,body.crmPremium .compactPageHeader,body.crmPremium #leadsView>.mainHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:var(--s-4)!important;flex-wrap:wrap!important;margin:0 0 var(--s-5)!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important}
+body.crmPremium .mainHeader h1,body.crmPremium .compactPageHeader h1{margin:0!important;font-size:var(--t-2xl)!important;font-weight:700!important;letter-spacing:-.01em!important;color:var(--c-text)!important;text-align:left!important}
+body.crmPremium .mainHeader .sub,body.crmPremium .compactPageHeader .sub{color:var(--c-muted)!important;font-size:var(--t-base)!important}
+body.crmPremium .headerBtns{display:flex!important;gap:var(--s-2)!important;flex-wrap:wrap!important}
+
+/* buttons: one shape, two weights, no gradients or glows */
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.darkBtn,.reset,.headerBtns button,.actionsRow button,#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn,.pagination button,.calendarModuleToolbar button){display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;height:38px!important;min-height:38px!important;padding:0 var(--s-4)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-surface-2)!important;background-image:none!important;color:var(--c-text)!important;font-size:var(--t-sm)!important;font-weight:600!important;line-height:1!important;box-shadow:none!important;text-shadow:none!important;transform:none!important;white-space:nowrap!important;cursor:pointer!important;transition:background .15s,border-color .15s!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.darkBtn,.reset,.headerBtns button,.actionsRow button,#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn):hover{background:var(--c-raised)!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.reset){background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor) :is(.primaryBtn,.reset):hover{background:#4c5cf0!important}
+body.crmPremium :is(#appView,#leadsView) .reset{background:transparent!important;border-color:var(--c-border-strong)!important;color:var(--c-muted)!important}
+body.crmPremium :is(#prevBtn,#nextBtn,#leadPrevBtn,#leadNextBtn):disabled{opacity:.4!important;cursor:default!important}
+
+/* fields */
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){height:40px!important;min-height:40px!important;padding:0 var(--s-3)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-bg)!important;background-image:none!important;color:var(--c-text)!important;font-size:var(--t-base)!important;font-weight:400!important;box-shadow:none!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) select:not([multiple]):not([size="2"]){padding-right:32px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a96aa' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;-webkit-appearance:none!important;appearance:none!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) textarea{height:auto!important;min-height:84px!important;padding:var(--s-3)!important;line-height:1.5!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,select,textarea):focus{outline:none!important;border-color:var(--c-accent)!important;box-shadow:0 0 0 3px var(--c-accent-soft)!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,textarea)::placeholder{color:var(--c-faint)!important}
+body.crmPremium :is(.modal,#u10OwnerEditor) label{display:block!important;margin:0 0 6px!important;color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
+
+/* filter panel = one card: search + selects grid, quick status chips, sort + actions */
+body.crmPremium #appView>.card,body.crmPremium #leadsView .card{padding:var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important}
+body.crmPremium #appView .filters{display:grid!important;grid-template-columns:2fr repeat(5,minmax(0,1fr))!important;gap:var(--s-2)!important;margin:0 0 var(--s-3)!important}
+body.crmPremium #appView .filters>*{width:100%!important;min-width:0!important;margin:0!important}
+body.crmPremium .quickFilters{display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin:0 0 var(--s-3)!important}
+body.crmPremium .quickFilters>*{height:30px!important;min-height:30px!important;padding:0 12px!important;border:1px solid var(--c-border)!important;border-radius:99px!important;background:var(--c-surface-2)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium .quickFilters>*:hover{color:var(--c-text)!important;border-color:var(--c-border-strong)!important}
+body.crmPremium #appView :is(.actionsRow,.sortControls){display:flex!important;align-items:center!important;gap:var(--s-2)!important;flex-wrap:wrap!important}
+body.crmPremium #appView .topInfo{margin:var(--s-4) 0 var(--s-2)!important;color:var(--c-muted)!important;font-size:var(--t-sm)!important}
+
+/* owner KPI tiles match the dashboard */
+body.crmPremium .dashboardCards{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:var(--s-3)!important;margin:0 0 var(--s-4)!important}
+body.crmPremium .kpiCard{padding:var(--s-4) var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;min-height:0!important}
+body.crmPremium .kpiLabel{color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
+body.crmPremium .kpiValue{color:var(--c-text)!important;font-size:var(--t-2xl)!important;font-weight:700!important;line-height:1.15!important}
+body.crmPremium .kpiHint{color:var(--c-faint)!important;font-size:var(--t-xs)!important}
+
+/* data tables */
+body.crmPremium :is(#ownersTable,#leadsTable){border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;overflow:hidden!important}
+body.crmPremium :is(#ownersTable,#leadsTable) th{height:44px!important;padding:0 var(--s-3)!important;text-transform:uppercase!important}
+body.crmPremium :is(#ownersTable,#leadsTable) td{height:auto!important;padding:var(--s-3)!important;font-size:var(--t-sm)!important;line-height:1.4!important;text-align:left!important;vertical-align:middle!important}
+body.crmPremium #ownersTable td.owner-col-unit{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important;font-weight:600!important;font-variant-numeric:tabular-nums!important}
+body.crmPremium :is(#ownersTable,#leadsTable) td:nth-child(n){font-family:inherit!important}
+body.crmPremium #ownersTable td[class*="owner"]:not(.owner-col-unit),body.crmPremium #ownersTable td{word-break:normal!important}
+/* chips inside rows: one size */
+body.crmPremium :is(#ownersTable,#leadsTable) :is(.profileBtn,.moreUnitBtn,.copyBtn,.callBtn){height:24px!important;min-height:24px!important;padding:0 10px!important;border-radius:99px!important;border:1px solid var(--c-border-strong)!important;background:var(--c-surface-2)!important;color:var(--c-text)!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .moreUnitBtn{color:var(--c-accent-text)!important;border-color:rgba(91,108,255,.35)!important;background:var(--c-accent-soft)!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .waBtn{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:var(--r-sm)!important;border:1px solid rgba(34,197,94,.35)!important;background:rgba(34,197,94,.12)!important;color:#86efac!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium :is(#ownersTable,#leadsTable) .waBtn:hover{background:rgba(34,197,94,.2)!important}
+body.crmPremium :is(#ownersTable,#leadsTable) select{height:32px!important;min-height:32px!important;border-radius:99px!important;font-size:var(--t-xs)!important;font-weight:600!important;padding:0 28px 0 12px!important;background-position:right 10px center!important}
+
+/* popups */
+body.crmPremium .modalOverlay{background:rgba(3,6,12,.72)!important;backdrop-filter:blur(4px)!important}
+body.crmPremium .modal{border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;color:var(--c-text)!important}
+body.crmPremium .modal h2{font-size:var(--t-xl)!important;font-weight:700!important}
+body.crmPremium #profileContent{background:var(--c-surface)!important}
+body.crmPremium .u6DetailTitle{font-size:var(--t-xl)!important;font-weight:700!important;letter-spacing:-.01em!important}
+body.crmPremium .u6DetailSubtitle{color:var(--c-muted)!important;font-size:var(--t-sm)!important}
+body.crmPremium .u6StageBar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+body.crmPremium .u6Stage{height:30px!important;padding:0 12px!important;border-radius:99px!important;border:1px solid var(--c-border)!important;background:var(--c-surface-2)!important;color:var(--c-muted)!important;font-size:var(--t-xs)!important;font-weight:600!important;box-shadow:none!important}
+body.crmPremium .u6Stage.active{background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+
+/* leads extras */
+body.crmPremium #followupDashboard{padding:var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;margin-bottom:var(--s-4)!important}
+body.crmPremium #followupCards>*{border-radius:var(--r-md)!important;background:var(--c-bg)!important;box-shadow:none!important}
+
+/* login */
+body.crmPremium #loginView,#loginView.loginBox{max-width:400px!important;margin:12vh auto 0!important;padding:var(--s-6)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;font-family:Inter,system-ui,sans-serif!important}
+#loginView h1{font-size:var(--t-2xl)!important;font-weight:700!important;margin:0 0 4px!important}
+#loginView input{width:100%!important;height:44px!important;margin:var(--s-3) 0 0!important;padding:0 var(--s-3)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-bg)!important;color:var(--c-text)!important;font-size:var(--t-base)!important}
+#loginView .primaryBtn{width:100%!important;height:44px!important;margin-top:var(--s-4)!important;border:0!important;border-radius:var(--r-sm)!important;background:var(--c-accent)!important;background-image:none!important;color:#fff!important;font-weight:600!important;box-shadow:none!important}
+
+@media (max-width:1100px){
+  body.crmPremium #appView .filters{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  body.crmPremium #appView .filters>:first-child{grid-column:1/-1!important}
+}
+@media (max-width:640px){
+  body.crmPremium #appView,body.crmPremium #leadsView,body.crmPremium #calendarModuleView{padding:var(--s-4)!important}
+  body.crmPremium #appView .filters{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.crmPremium .quickFilters{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important}
+  body.crmPremium .quickFilters>*{flex:none!important}
+  body.crmPremium #appView :is(.actionsRow,.sortControls)>*{flex:1 1 calc(50% - 8px)!important}
+}
