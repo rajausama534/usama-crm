@@ -106,7 +106,7 @@ label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:600}
   <section class="panel detail" id="detail"><div class="empty"><div><b>Choose a project</b>Select a cluster on the left to see its verified details.</div></div></section>
 </main>
 <script>
-const CU='https://vnydxkmhrcesdffpfjpc.supabase.co',CK='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I',API=CU+'/functions/v1/owner-finder-api';
+const CU='https://vnydxkmhrcesdffpfjpc.supabase.co',CK='sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I',API=CU+'/functions/v1/cluster-guide-api';
 const db=supabase.createClient(CU,CK);
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
