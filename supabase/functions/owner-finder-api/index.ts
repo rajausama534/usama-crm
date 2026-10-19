@@ -1,9 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const CRM_URL = "https://vnydxkmhrcesdffpfjpc.supabase.co";
-const CRM_KEY = "sb_publishable_VP8ZvA5up64JFGkn5_7qbg_NYVJvt-I";
+// Runs inside the CRM project itself (it previously lived in a project outside this account).
 const CRM_ADMIN_EMAIL = "thechussar@gmail.com";
+const secretKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || (() => {
+  try { return Object.values(JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}"))[0] as string; } catch { return ""; }
+})();
+const admin = createClient(Deno.env.get("SUPABASE_URL")!, secretKey, { auth: { persistSession: false } });
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -62,18 +65,14 @@ Deno.serve(async (req) => {
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   if (!token) return json({ error: "Not signed in" }, 401);
 
-  const verify = await fetch(`${CRM_URL}/auth/v1/user`, {
-    headers: { Authorization: `Bearer ${token}`, apikey: CRM_KEY },
-  });
-  if (!verify.ok) return json({ error: "Invalid CRM session" }, 401);
-  const user = await verify.json();
-  const isCrmAdmin = String(user.email || "").toLowerCase() === CRM_ADMIN_EMAIL;
-
-  const admin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    { auth: { persistSession: false } },
-  );
+  const { data: auth_, error: authError } = await admin.auth.getUser(token);
+  if (authError || !auth_?.user) return json({ error: "Invalid CRM session" }, 401);
+  const user = auth_.user;
+  const email = String(user.email || "").toLowerCase();
+  const { data: access } = await admin.from("user_access").select("role,active").ilike("email", email).maybeSingle();
+  const isActive = email === CRM_ADMIN_EMAIL || access?.active === true;
+  const isCrmAdmin = email === CRM_ADMIN_EMAIL || (access?.role === "admin" && access?.active === true);
+  if (!isActive) return json({ error: "This account has no CRM access." }, 403);
 
   let body: any = {};
   try {
@@ -83,6 +82,8 @@ Deno.serve(async (req) => {
   }
 
   const action = String(body.action || "");
+  // Owner Finder holds uploaded third-party owner databases: administrators only.
+  if (!["listClusters"].includes(action) && !isCrmAdmin) return json({ error: "Admin access required" }, 403);
 
   try {
     if (action === "stats") {
