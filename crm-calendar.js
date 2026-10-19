@@ -242,6 +242,29 @@
     if(open&&typeof activeLeadDetailId!=='undefined'&&activeLeadDetailId)window.openLeadDetail(activeLeadDetailId);
   });
 
+  // The activity box's old "Schedule" button wrote a "Scheduled:" note the calendar never saw.
+  // Scheduling now creates a real calendar event (which also writes the history line).
+  const mapType=t=>({Call:'Phone Call','Follow-up':'Follow-Up',Meeting:'Meeting',Viewing:'Property Viewing',WhatsApp:'Follow-Up'})[t]||'Other';
+  if(typeof u10AddLeadActivity==='function'){
+    const base=window.u10AddLeadActivity;
+    window.u10AddLeadActivity=async function(id,schedule){
+      if(!schedule)return base.apply(this,arguments);
+      const type=$('activityType')?.value||'Follow-up',details=($('activityDetails')?.value||'').trim(),when=$('activityWhen')?.value;
+      const {data:lead}=await db.from('leads').select('name').eq('id',id).maybeSingle();
+      openEventEditor({lead_id:id,lead_name:lead?.name||'',event_type:mapType(type),title:`${mapType(type)} — ${lead?.name||'Lead'}`,notes:details||null,starts_at:when?new Date(when).toISOString():undefined});
+    };
+  }
+  if(typeof u10AddOwnerActivity==='function'){
+    const base=window.u10AddOwnerActivity;
+    window.u10AddOwnerActivity=async function(id,schedule){
+      if(!schedule)return base.apply(this,arguments);
+      const type=$('activityType')?.value||'Follow-up',details=($('activityDetails')?.value||'').trim(),when=$('activityWhen')?.value;
+      const {data:o}=await db.from('owners').select('owner,cluster,unit').eq('id',id).maybeSingle();
+      const who=o?`${o.owner||'Owner'} · ${o.cluster||''} ${o.unit||''}`.trim():'Owner';
+      openEventEditor({event_type:mapType(type),title:`Owner: ${who}`.slice(0,200),notes:details||null,starts_at:when?new Date(when).toISOString():undefined});
+    };
+  }
+
   // ------------------------------------------------------------------ notifications (bell)
   let notes=[];
   async function refreshBell(){
