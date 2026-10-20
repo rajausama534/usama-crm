@@ -6069,8 +6069,8 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { remarks:130, owner:130, community:90, cluster:90, status:120, unit:56 };
-  const fitOrder = ["remarks", "owner", "community", "cluster", "status", "unit"];
+  const fitMinimums = { whatsapp:52, remarks:130, owner:130, community:90, cluster:90, status:120, unit:56 };
+  const fitOrder = ["whatsapp", "remarks", "owner", "community", "cluster", "status", "unit"];
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
