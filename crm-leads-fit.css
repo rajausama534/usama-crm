@@ -37,16 +37,16 @@ body.crmPremium #leadsView .tablebox{overflow-x:hidden!important}
   body.crmPremium #leadsView .crmFitTable :is(th,td):first-child{padding-left:12px!important}
 
   /* column widths; Notes takes what is left */
-  body.crmPremium #leadsView .crmFitTable [data-col="name"]{width:14%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="phone"]{width:10.5%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="project_inquired"]{width:13%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="budget"]{width:7%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="bedroom"]{width:7.5%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:12%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="name"]{width:16%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="phone"]{width:118px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="project_inquired"]{width:14%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="budget"]{width:72px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="bedroom"]{width:82px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:130px!important}
   body.crmPremium #leadsView .crmFitTable [data-col="notes"]{width:auto!important}
   body.crmPremium #leadsView .crmFitTable [data-col="whatsapp"]{width:52px!important;text-align:center!important}
   body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:104px!important}
-  body.crmPremium #leadsView .crmFitTable [data-col]:not([data-col="name"],[data-col="phone"],[data-col="project_inquired"],[data-col="budget"],[data-col="bedroom"],[data-col="status"],[data-col="notes"],[data-col="whatsapp"],[data-col="actions"]){width:9%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col]:not([data-col="name"],[data-col="phone"],[data-col="project_inquired"],[data-col="budget"],[data-col="bedroom"],[data-col="status"],[data-col="notes"],[data-col="whatsapp"],[data-col="actions"]){width:110px!important}
   body.crmPremium #leadsView .crmFitTable th[data-col="whatsapp"]{font-size:0!important}
   body.crmPremium #leadsView .crmFitTable th[data-col="whatsapp"]::after{content:"WA";font-size:11px}
 
