@@ -1,0 +1,78 @@
+/* Leads page: fit everything on one screen, no sideways scrolling. Layout and spacing only. */
+
+/* page spacing */
+body.crmPremium #leadsView{padding:20px 22px!important}
+body.crmPremium #leadsView>.mainHeader{margin:0 0 12px!important}
+body.crmPremium #leadsView .crmPageSub{margin-top:2px!important}
+body.crmPremium #leadsView .card{padding:14px 16px!important;margin-bottom:12px!important}
+body.crmPremium #leadsView .crmFollowStrip{padding:10px 16px!important}
+body.crmPremium #leadsView .crmFollowStrip>:first-child{margin-bottom:8px!important}
+body.crmPremium #leadsView .crmFollowStrip .darkBtn{height:32px!important;min-height:32px!important}
+body.crmPremium #leadsView .reminderGrid{gap:8px!important;margin:0!important}
+body.crmPremium #leadsView .reminderCard{display:flex!important;align-items:baseline!important;gap:10px!important;padding:8px 12px!important;min-height:0!important}
+body.crmPremium #leadsView .reminderCard .reminderMeta{margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* search + selects + Filters + Reset on one compact line */
+body.crmPremium #leadsView .filters{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important;margin-bottom:10px!important}
+body.crmPremium #leadsView .filters>*{margin:0!important}
+body.crmPremium #leadsView .filters>input{flex:2 1 200px!important;min-width:0!important}
+body.crmPremium #leadsView .filters>select{flex:1 1 130px!important;min-width:0!important}
+body.crmPremium #leadsView .filters>:is(input,select,button){height:36px!important;min-height:36px!important}
+body.crmPremium #leadsView .filters>button{flex:0 0 auto!important;white-space:nowrap!important}
+
+/* stage cards: all 9 in one row, compact */
+body.crmPremium #leadsView .crmStageBar{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;gap:6px!important;margin:0 0 10px!important;overflow:visible!important;padding:0!important}
+body.crmPremium #leadsView .crmStage{flex:none!important;min-width:0!important;padding:6px 8px 6px 11px!important;gap:0!important}
+body.crmPremium #leadsView .crmStage span{font-size:11px!important;line-height:1.2!important;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+body.crmPremium #leadsView .crmStage{justify-content:space-between!important}
+body.crmPremium #leadsView .crmStage b{font-size:18px!important;line-height:1.2!important}
+
+/* table: fit the container */
+body.crmPremium #leadsView .tablebox{overflow-x:hidden!important}
+@media (min-width:801px){
+  body.crmPremium #leadsView .leadsTable.crmFitTable{table-layout:fixed!important;width:100%!important;min-width:0!important}
+  body.crmPremium #leadsView .crmFitTable :is(th,td){width:auto;min-width:0!important;max-width:none!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  body.crmPremium #leadsView .crmFitTable th{padding:8px 8px!important;height:auto!important;white-space:nowrap!important;letter-spacing:0!important;font-size:11px!important}
+  body.crmPremium #leadsView .crmFitTable td{padding:6px 8px!important;height:auto!important;vertical-align:middle!important}
+  body.crmPremium #leadsView .crmFitTable :is(th,td):first-child{padding-left:12px!important}
+
+  /* column widths; Notes takes what is left */
+  body.crmPremium #leadsView .crmFitTable [data-col="name"]{width:14%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="phone"]{width:10.5%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="project_inquired"]{width:13%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="budget"]{width:7%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="bedroom"]{width:7.5%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:12%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="notes"]{width:auto!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="whatsapp"]{width:52px!important;text-align:center!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:104px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col]:not([data-col="name"],[data-col="phone"],[data-col="project_inquired"],[data-col="budget"],[data-col="bedroom"],[data-col="status"],[data-col="notes"],[data-col="whatsapp"],[data-col="actions"]){width:9%!important}
+  body.crmPremium #leadsView .crmFitTable th[data-col="whatsapp"]{font-size:0!important}
+  body.crmPremium #leadsView .crmFitTable th[data-col="whatsapp"]::after{content:"WA";font-size:11px}
+
+  /* cell content: one line, ellipsis, full text in the tooltip */
+  body.crmPremium #leadsView .crmFitTable .leadReadValue{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;min-height:0!important;padding:0!important}
+  body.crmPremium #leadsView .crmFitTable td[data-col="name"] .leadReadValue{font-weight:600}
+  body.crmPremium #leadsView .crmFitTable td[data-col="name"] :is(.crmNext,.crmAssignee){margin-top:1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  body.crmPremium #leadsView .crmFitTable .leadLatestNote{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;min-height:0!important;max-height:none!important;height:32px!important;line-height:20px!important;padding:6px 10px!important;width:100%!important}
+  body.crmPremium #leadsView .crmFitTable .statusSelect{width:100%!important;min-width:0!important;height:32px!important;min-height:32px!important;padding-top:0!important;padding-bottom:0!important}
+
+  /* WhatsApp icon button */
+  body.crmPremium #leadsView .crmFitTable a.waBtn.crmWaIcon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:32px!important;height:32px!important;min-width:0!important;padding:0!important;margin:0!important;border-radius:8px!important}
+
+  /* actions */
+  body.crmPremium #leadsView .crmFitTable td[data-col="actions"] .leadActions{display:flex!important;flex-wrap:nowrap!important;gap:4px!important}
+  body.crmPremium #leadsView .crmFitTable td[data-col="actions"] .iconBtn{width:28px!important;height:28px!important;min-width:0!important;padding:0!important;margin:0!important}
+}
+
+@media (max-width:1100px){
+  body.crmPremium #leadsView .crmStageBar{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
+@media (max-width:900px){
+  body.crmPremium #leadsView .filters{flex-wrap:wrap!important}
+  body.crmPremium #leadsView .filters>input{flex-basis:100%!important}
+}
+@media (max-width:640px){
+  body.crmPremium #leadsView{padding:12px!important}
+  body.crmPremium #leadsView .crmStageBar{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
