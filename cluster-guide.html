@@ -146,7 +146,7 @@ async function open(id){
   d.innerHTML=`<div class="hero"><div class="eyebrow">${esc(c.community)}${c.developer?` · ${esc(c.developer)}`:''}</div><h1>${esc(c.name)}</h1>
       <div class="chips">${c.development_type?`<span class="chip">${esc(c.development_type)}</span>`:''}${beds.length?`<span class="chip">${esc(beds.join(', '))} bedrooms</span>`:''}${c.usp?`<span class="chip">${esc(c.usp)}</span>`:''}</div>
       ${canEdit?`<div style="margin-top:14px;display:flex;gap:8px"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`:''}</div>
-    <div class="facts">${fact('Handover',esc(c.handover_date))}${fact('Total units',c.total_units?fmt(c.total_units):'')}${fact('Bedroom types',beds.length?esc(beds.join(', ')):'')}${fact('Launch',esc(c.launch_date))}</div>
+    <div class="facts">${fact('Handover',esc(c.handover_date))}${fact('Total units',c.total_units?fmt(c.total_units):'')}${fact('Bedroom types',beds.length?esc(beds.join(', ')):'')}<div class="fact"><span>Owner records in your CRM</span><b id="crmCount">…</b></div></div>
     ${c.original_price_note?`<div class="section"><h2>Price</h2><div class="note">${esc(c.original_price_note)}</div></div>`:''}
     <div class="section"><h2>Property configurations</h2>${mix.length?`<div class="configs">${mix.map(m=>`<article class="config"><h3>${esc(m.bedrooms)} Bedrooms</h3><div class="type">${esc(m.unit_type||'')}</div><dl>
         ${m.bua_min_sqft||m.bua_max_sqft?`<dt>BUA (developer)</dt><dd>${range(m.bua_min_sqft,m.bua_max_sqft)} sq ft</dd>`:''}
@@ -161,6 +161,7 @@ async function open(id){
     <div class="section"><h2>Sources</h2>${(c.sources||[]).length?`<ul class="src">${c.sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a><small>${esc((s.fields||[]).join(', '))}${s.checked?` · checked ${esc(s.checked)}`:''}</small></li>`).join('')}</ul>`:'<div class="note">No sources recorded.</div>'}
       ${c.open_questions?`<div class="note" style="margin-top:10px">${esc(c.open_questions)}</div>`:''}</div>`;
   if(canEdit){$('edit').onclick=()=>editor(c);$('del').onclick=()=>remove(c);}
+  db.from('owners').select('id',{count:'exact',head:true}).eq('community',c.community).eq('cluster',c.name).then(({count})=>{const el=$('crmCount');if(el)el.textContent=count==null?'—':fmt(count);});
 }
 
 async function remove(c){
