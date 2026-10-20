@@ -6035,7 +6035,7 @@ setTimeout(()=>{
     cluster: 80,
     unit: 48,
     owner: 135,
-    whatsapp: 88,
+    whatsapp: 52,
     status: 125,
     remarks: 180
   };
@@ -6067,15 +6067,35 @@ setTimeout(()=>{
     if (persist) saveOwnerColumnsState();
   }
 
+  // Saved widths are preferences; when they do not fit the screen, shrink the flexible
+  // columns for display only (never saved) so the table needs no sideways scrolling.
+  const fitMinimums = { remarks:130, owner:130, community:90, cluster:90, status:120, unit:56 };
+  const fitOrder = ["remarks", "owner", "community", "cluster", "status", "unit"];
+  function paintOwnerWidth(key, width) {
+    document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
+      for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
+    });
+  }
   window.u11ApplyOwnerWidths = function () {
     ownerColumns.forEach(col => setOwnerColumnWidth(col.key, col.width, false));
     const table = document.getElementById("ownersTable");
-    if (table) {
-      const total = 42 + ownerColumns.filter(c => c.visible).reduce((sum, c) => sum + Number(c.width || 100), 0);
-      table.style.setProperty("width", `${total}px`, "important");
-      table.style.setProperty("min-width", `${total}px`, "important");
+    if (!table) return;
+    const visible = ownerColumns.filter(c => c.visible);
+    const shown = Object.fromEntries(visible.map(c => [c.key, Number(c.width || 100)]));
+    const available = table.closest(".tablebox")?.clientWidth || 0;
+    let excess = 42 + Object.values(shown).reduce((a, b) => a + b, 0) - available;
+    for (const key of fitOrder) {
+      if (!(available > 0) || excess <= 0) break;
+      if (!(key in shown)) continue;
+      const cut = Math.min(excess, Math.max(0, shown[key] - fitMinimums[key]));
+      if (cut) { shown[key] -= cut; excess -= cut; paintOwnerWidth(key, shown[key]); }
     }
+    const total = 42 + Object.values(shown).reduce((a, b) => a + b, 0);
+    table.style.setProperty("width", `${total}px`, "important");
+    table.style.setProperty("min-width", `${total}px`, "important");
   };
+  let ownerFitTimer;
+  window.addEventListener("resize", () => { clearTimeout(ownerFitTimer); ownerFitTimer = setTimeout(window.u11ApplyOwnerWidths, 150); });
 
   renderOwnerHead = function () {
     el("ownersTableHead").innerHTML = `<tr>${visibleOwnerColumns().map(c =>
