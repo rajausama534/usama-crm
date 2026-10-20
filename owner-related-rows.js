@@ -33,7 +33,11 @@
     const token=++latest;
     const ids=(rows||[]).map(r=>r?.id).filter(id=>id!==undefined&&id!==null);
     ensureRelated(ids).then(changed=>{
-      if(changed&&token===latest&&rows.some(r=>getRelatedRows(r).length>1))baseRender(rows);
+      if(changed&&token===latest){
+        rows.forEach(row=>document.querySelectorAll(`[data-record-id="${row.id}"] [data-related-units]`).forEach(node=>{
+          node.innerHTML=moreUnitButton(row);
+        }));
+      }
     });
     return result;
   };

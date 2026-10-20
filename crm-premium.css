@@ -52,7 +52,7 @@ body.crmPremium .v7ExportBtn{border-radius:var(--r-sm)!important}
   body.crmPremium #v7Topbar .v7Nav{position:fixed!important;top:60px;left:0;bottom:0;width:min(300px,84vw);flex-direction:column!important;gap:2px!important;padding:var(--s-3)!important;background:var(--c-surface)!important;border-right:1px solid var(--c-border);transform:translateX(-102%);transition:transform .2s ease;overflow-y:auto!important;z-index:1002}
   body.crmPremium.crmNavOpen #v7Topbar .v7Nav{transform:none}
   body.crmPremium #v7Topbar .v7Nav button{height:48px!important;border:0!important;border-radius:var(--r-sm)!important;padding:0 var(--s-3)!important}
-  body.crmPremium .crmNavScrim{position:fixed;inset:60px 0 0 0;background:rgba(0,0,0,.5);z-index:1001;display:none}
+  body.crmPremium .crmNavScrim{position:fixed;inset:60px 0 0 0;background:rgba(0,0,0,.5);z-index:999;display:none}
   body.crmPremium.crmNavOpen .crmNavScrim{display:block}
   body.crmPremium #v7Topbar .v7ExportBtn,body.crmPremium #v7Topbar .v7ProfileText{display:none!important}
 }
@@ -484,8 +484,8 @@ body.crmPremium .crmLogout:hover{color:var(--c-text);background:var(--c-surface-
 /* workspace fixes */
 body.crmPremium .tablebox{border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;overflow:auto!important}
 body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border:0!important;border-radius:0!important}
-body.crmPremium #ownersTable{table-layout:auto!important}
-body.crmPremium #ownersTable td.owner-col-unit{width:auto!important;min-width:120px!important}
+body.crmPremium #ownersTable{table-layout:fixed!important}
+body.crmPremium #ownersTable td.owner-col-unit{min-width:0!important}
 body.crmPremium #ownersTable td.owner-col-owner{min-width:220px!important}
 body.crmPremium #ownersTable td.owner-col-remarks{min-width:220px!important;color:var(--c-muted)!important}
 body.crmPremium .crmOwnerName{display:block;font-weight:600;color:var(--c-text);line-height:1.35}

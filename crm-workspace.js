@@ -6,6 +6,78 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const STAGES=['New','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
 
+
+  // Keep shared desktop/mobile renderers in the workspace, using existing actions and data.
+  const WA_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
+  function compactWhatsApp(markup){
+    const t=document.createElement('template');t.innerHTML=markup;
+    const a=t.content.querySelector('a');if(!a)return markup;
+    a.classList.add('crmWaIcon');a.setAttribute('aria-label','WhatsApp');a.title='WhatsApp';a.innerHTML=WA_ICON;
+    return t.innerHTML;
+  }
+  const ownerOrder=['community','cluster','unit','owner','status','remarks','whatsapp','actions'];
+  const saved=new Map(ownerColumns.map(c=>[c.key,c]));
+  ownerColumns.splice(0,ownerColumns.length,...ownerOrder.map(key=>saved.get(key)||{key,label:key==='actions'?'Actions':key,visible:true,width:220}),...ownerColumns.filter(c=>!ownerOrder.includes(c.key)));
+  const labels={owner:'Owner',remarks:'Notes',whatsapp:'WhatsApp'};
+  ownerColumns.forEach(c=>{if(labels[c.key])c.label=labels[c.key];});
+  // Versioned defaults are applied once; subsequent manual resizing remains intact.
+  if(localStorage.getItem('crm_owner_layout_v1')!=='1'){
+    const widths={community:140,cluster:140,unit:86,owner:210,status:160,remarks:270,whatsapp:60,actions:220};
+    ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='last_contacted')c.visible=false;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v1','1');
+  }
+  const baseLeadInput=window.leadInput;
+  window.leadInput=function(row,col){
+    const r=baseLeadInput(row,col);
+    if(col.key==='project_inquired')return r+`<span class="crmRequirementMeta">${esc([row.bedroom,row.property_type].filter(Boolean).join(' · '))}</span>`;
+    return r;
+  };
+  window.crmOpenOwnerRecord=async function(id){
+    let row=currentOwnerPageRows.find(r=>String(r.id)===String(id));
+    if(!row){const {data}=await db.from(TABLE_NAME).select('*').eq('id',id).maybeSingle();row=data;}
+    if(row)return openOwnerProfile(row);
+  };
+  const baseOwnerCell=window.ownerCell;
+  window.ownerCell=function(row,col){
+    if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
+    if(col.key==='whatsapp')return compactWhatsApp(whatsappButton(row));
+    if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)}${copyPhoneButton(row)}</div>`;
+    return baseOwnerCell(row,col);
+  };
+  window.crmRenderOwnerCards=function(rows){
+    $('mobileCards').innerHTML=rows.map(r=>`<article class="ownerCard crmRecordCard" data-record-id="${esc(r.id)}">
+      <div class="crmLocation"><span>${esc(r.community||'—')}</span><span>${esc(r.cluster||'—')}</span><label class="crmSelectRecord"><input type="checkbox" aria-label="Select owner ${esc(r.unit)}" ${selectedOwnerIds.has(String(r.id))?'checked':''} onchange="toggleOwnerSelection('${esc(r.id)}',this.checked)"></label></div>
+      <div class="crmRecordHeading"><strong class="crmUnit">Unit ${esc(r.unit||'—')}</strong>${statusDropdown(r)}</div>
+      <h3 class="crmRecordName">${esc(r.owner||'Unnamed owner')}</h3>
+      <button type="button" class="crmOwnerNote crmNoteButton" data-open-owner="${esc(r.id)}">${esc(r.__u10_latest||ownerRemarkValue(r)||'No notes yet')}</button>
+      <footer class="crmRecordActions">
+        <button type="button" class="crmBtn" data-open-owner="${esc(r.id)}">Open</button>${compactWhatsApp(whatsappButton(r))}${callButton(r)}
+        <details class="crmCardMore"><summary aria-label="More owner actions">•••</summary><div><span data-related-units>${moreUnitButton(r)}</span>${copyPhoneButton(r)}</div></details>
+      </footer></article>`).join('')||'<div class="empty">No owners match these filters.</div>';
+    $('mobileCards').querySelectorAll('[data-open-owner]').forEach(b=>b.onclick=()=>openOwnerProfile(rows.find(r=>String(r.id)===b.dataset.openOwner)));
+  };
+  window.crmRenderLeadCards=function(rows){
+    $('leadMobileCards').innerHTML=rows.map(r=>`<article class="leadCard crmRecordCard" data-record-id="${esc(r.id)}">
+      <div class="crmRecordHeading"><h3 class="crmRecordName">${esc(r.name||'Unnamed lead')}</h3><span class="crmBadge" data-status="${esc(r.status||'New')}">${esc(r.status||'New')}</span></div>
+      <a class="crmContact" href="tel:+${esc(formatPhone(r.phone))}">${esc(r.phone||'No phone')}</a>
+      <p class="crmRequirement">${esc([r.bedroom,r.property_type,r.project_inquired].filter(Boolean).join(' · ')||'Requirement not recorded')}${r.budget?`<small>Budget ${esc(r.budget)}</small>`:''}</p>
+      <div class="crmLeadMeta"><span>${esc(r.assigned_to||'Not assigned')}</span><span>Last contact: ${esc(r.last_contacted?formatCRMDate(r.last_contacted):'—')}</span></div>
+      <div class="crmFollowup">${r.follow_up_date?`Next: ${esc(formatCRMDate(r.follow_up_date))} ${esc(r.follow_up_time?.slice(0,5)||'')} · ${esc(r.reminder_type||'Follow-up')}`:'No follow-up scheduled'}</div>
+      <button type="button" class="crmNoteButton" data-open-lead="${esc(r.id)}">${esc(r.notes||'No notes yet')}</button>
+      <footer class="crmRecordActions"><button type="button" class="crmBtn" data-open-lead="${esc(r.id)}">Open lead</button>${compactWhatsApp(leadWhatsappButton(r))}${r.phone?`<a class="callBtn" href="tel:+${esc(formatPhone(r.phone))}">Call</a>`:''}</footer>
+      </article>`).join('')||'<div class="empty">No leads match these filters.</div>';
+    $('leadMobileCards').querySelectorAll('[data-open-lead]').forEach(b=>b.onclick=()=>openLeadDetail(b.dataset.openLead));
+  };
+  for(const [name,type] of [['openOwnerProfile','owner'],['openLeadDetail','lead']]){
+    const base=window[name];window[name]=async function(record){const r=await base.apply(this,arguments);CRMWorkspace.record(type,type==='owner'?record?.id:record);return r;};
+  }
+  function workspaceSwitch(header,selected){
+    if(!header||header.querySelector('.crmWorkspaceSwitch'))return;
+    const nav=document.createElement('nav');nav.className='crmWorkspaceSwitch';nav.setAttribute('aria-label','Workspace');
+    nav.innerHTML=`<button type="button" ${selected==='owners'?'aria-current="page"':''} data-to="owners">Owners</button><button type="button" ${selected==='leads'?'aria-current="page"':''} data-to="leads">Leads</button>`;
+    nav.querySelector('[data-to="owners"]').onclick=()=>showOwnersView();nav.querySelector('[data-to="leads"]').onclick=()=>showLeadsView();
+    header.after(nav);
+  }
+
   function moreMenu(items){
     const wrap=document.createElement('div');wrap.className='crmMore';
     wrap.innerHTML='<button type="button" class="crmBtn" aria-haspopup="menu" aria-expanded="false">More <span aria-hidden="true">▾</span></button><div class="crmMenu" role="menu" hidden></div>';
@@ -34,6 +106,7 @@
     v.classList.add('crmWorkspace');
     const header=v.querySelector('.mainHeader'),btns=header?.querySelector('.headerBtns');
     header.querySelector('h1')?.insertAdjacentHTML('afterend','<p class="crmPageSub">Every owner record you can access — search, filter and open a profile.</p>');
+    workspaceSwitch(header,'owners');
     const card=v.querySelector('.card'),actions=card?.querySelector('.actionsRow');
     const addBtn=[...(actions?.querySelectorAll('button')||[])].find(b=>/Add Owner/i.test(b.textContent));
     const pick=re=>[...(actions?.querySelectorAll('button')||[])].find(b=>re.test(b.textContent));
@@ -86,13 +159,15 @@
     v.classList.add('crmWorkspace');
     const header=v.querySelector('.mainHeader'),btns=header?.querySelector('.headerBtns');
     header.querySelector('h1')?.insertAdjacentHTML('afterend','<p class="crmPageSub">Your sales pipeline — who to call, what they want and when to follow up.</p>');
+    workspaceSwitch(header,'leads');
     const card=v.querySelector('.card'),actions=card?.querySelector('.actionsRow');
     const find=(root,re)=>[...(root?.querySelectorAll('button')||[])].find(b=>re.test(b.textContent));
     if(btns){
       const add=find(btns,/Add Lead/i),exp=find(btns,/Export/i),sw=btns.querySelector('.viewSwitch');
       [...btns.querySelectorAll('button')].forEach(b=>{if(/Logout|Dashboard|Owner Database/i.test(b.textContent))b.remove();});
       if(sw)sw.classList.add('crmSeg');
-      btns.append(moreMenu([exp,find(actions,/Manage Projects/i),find(actions,/Manage Pipeline/i),find(actions,/Manage Columns/i)]));
+      const mobileModes=['table','kanban'].map(mode=>{const b=document.createElement('button');b.type='button';b.dataset.mobileMode=mode;b.textContent=mode==='table'?'Table view':'Kanban view';b.onclick=()=>setLeadView(mode);return b;});
+      btns.append(moreMenu([...mobileModes,exp,find(actions,/Manage Projects/i),find(actions,/Manage Pipeline/i),find(actions,/Manage Columns/i)]));
       if(add){add.classList.add('crmBtn','crmBtnPrimary');add.id='crmAddLeadBtn';btns.append(add);}
     }
     // stage bar replaces the old quick-status chips (which still listed Contacted/Viewing)
@@ -131,7 +206,6 @@
 
   // Fit the leads table to the screen: tag columns for CSS widths, drop the forced min-width,
   // full text on hover, WhatsApp as an icon (same link and click handler).
-  const WA_ICON='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
   function fitLeadsTable(){
     const table=document.querySelector('#leadsView .leadsTable');if(!table)return;
     table.classList.add('crmFitTable');table.style.minWidth='';
@@ -156,9 +230,21 @@
   // The owner table is redrawn by several layers; watch the table body instead of wrapping each one.
   const tb=$('tableBody');if(tb)new MutationObserver(()=>tidyOwnerRows()).observe(tb,{childList:true});
   if(typeof renderLeads==='function'){const base=renderLeads;renderLeads=function(rows){const r=base.apply(this,arguments);setTimeout(()=>{leadNextAction(rows);fitLeadsTable();},0);return r;};}
+  // Render a preloaded page once after this workspace module installs.
+  if(currentOwnerPageRows?.length)renderData(currentOwnerPageRows);
   // sidebar: log out lives with the profile
   const acts=document.querySelector('#v7Topbar .v7TopActions');
   if(acts&&!acts.querySelector('.crmLogout')){const b=document.createElement('button');b.type='button';b.className='crmLogout';b.textContent='Log out';b.onclick=()=>logout();acts.append(b);}
   if(!$('appView')?.classList.contains('hidden')){upgradeOwners();tidyOwnerRows();}
   if(!$('leadsView')?.classList.contains('hidden')){upgradeLeads();}
+  const originalProfile=window.openV7ProfileSettings;
+  window.openV7ProfileSettings=function(){
+    if(isAdmin)return originalProfile();
+    const wrap=document.createElement('div');wrap.className='crmModalScrim';
+    wrap.innerHTML=`<section class="crmModal"><header><h2>My account</h2><button class="crmIconBtn" aria-label="Close">×</button></header><div class="crmModalBody"><strong>${esc(currentAccess?.name||'Agent')}</strong><p>${esc(currentUserEmail)}</p><button class="crmBtn" data-logout>Log out</button></div></section>`;
+    document.body.append(wrap);wrap.querySelector('.crmIconBtn').onclick=()=>wrap.remove();wrap.querySelector('[data-logout]').onclick=()=>logout();
+    wrap.onclick=e=>{if(e.target===wrap)wrap.remove();};
+  };
+  const primaryNav=document.querySelector('#v7Topbar .v7Nav');
+  if(primaryNav&&!primaryNav.querySelector('.crmMobileLogout')){const b=document.createElement('button');b.type='button';b.className='crmMobileLogout';b.textContent='Log out';b.onclick=()=>logout();primaryNav.append(b);}
 })();

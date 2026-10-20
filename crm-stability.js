@@ -31,19 +31,24 @@
     try{
       if(!Array.isArray(rows) || !rows.length || typeof db === 'undefined') return;
       const ids = rows.map(r => String(r.id)).filter(Boolean);
-      const {data,error} = await db.from(ACTIVITY_TABLE)
-        .select('owner_id,activity_type,details,created_at')
-        .in('owner_id',ids)
-        .order('created_at',{ascending:false});
-      if(error) throw error;
+      // Retain at most two candidates per visible owner, even for very long histories.
+      const grouped = {}, manual = new Set();
+      for(let from=0;;from+=500){
+        const result=await db.from(ACTIVITY_TABLE).select('id,owner_id,activity_type,details,created_at')
+          .in('owner_id',ids).order('created_at',{ascending:false}).order('id',{ascending:false}).range(from,from+499);
+        if(result.error)throw result.error;
+        if(token !== renderToken)return;
+        for(const activity of result.data||[]){
+          if(isSystemOnlyActivity(activity))continue;
+          const key=String(activity.owner_id), list=grouped[key]||(grouped[key]=[]);
+          if(!list.length)list.push(activity);
+          if(!manual.has(key)&&normalizedForMatch(activity.activity_type)!=='property transaction'){
+            manual.add(key);if(list[0]!==activity)list.unshift(activity);
+          }
+        }
+        if((result.data||[]).length<500||ids.every(id=>manual.has(id)))break;
+      }
       if(token !== renderToken) return;
-
-      const grouped = {};
-      (data || []).forEach(a => {
-        const key = String(a.owner_id);
-        if(!grouped[key]) grouped[key] = [];
-        grouped[key].push(a);
-      });
 
       const trs = [...(document.querySelectorAll('#tableBody tr') || [])];
       rows.forEach((row,index) => {
@@ -53,6 +58,7 @@
         const text = latestVisibleRemark(grouped[String(row.id)] || [], fallback);
         row.__u10_latest = text;
 
+        document.querySelectorAll(`#mobileCards [data-record-id="${row.id}"] .crmOwnerNote`).forEach(n=>{n.textContent=text;n.title=text;});
         const tr = trs[index];
         const cell = tr?.querySelector('.owner-col-remarks');
         if(cell){
@@ -105,7 +111,16 @@
         }]);
       }catch(_){ }
 
-      if(typeof loadData === 'function') await loadData();
+      // Patch the contacted row only. Replacing the whole list here collapses mobile scroll.
+      const row = (currentOwnerPageRows || []).find(r => String(r.id) === String(id));
+      if(row) Object.assign(row,payload);
+      document.querySelectorAll(`[data-record-id="${id}"] .statusSelect`).forEach(n=>{
+        if(payload.status){n.value=payload.status;n.className='statusSelect '+statusClass(payload.status);}
+      });
+      document.querySelectorAll(`[data-last-contacted="${id}"]`).forEach(n=>n.textContent=payload.last_contacted);
+      window.CRMStatus?.decorate(document);
+      // If contacting moves it out of a status-filtered result, reconcile without skeletons.
+      if(payload.status && document.getElementById('statusFilter')?.value) await loadData();
     }catch(error){
       console.warn('Automatic owner Contacted update failed:', error);
     }
@@ -146,6 +161,8 @@
   window.u6LogOwnerWhatsApp = async function(ownerId){
     await markOwnerContacted(ownerId,'WhatsApp');
   };
+  window.u6LogOwnerWhatsApp.__preserveRemarksPatch = true;
+  window.callButton.__contactedPatch = true;
 
   // Cluster lists are now sorted by unit number in the database (owners_list.unit_natural),
   // so the browser no longer downloads a whole cluster to sort it.
@@ -286,6 +303,7 @@
 
   async function runTransactionAppend(){
     if(typeof db === 'undefined' || typeof TABLE_NAME === 'undefined' || typeof currentUserEmail === 'undefined' || !currentUserEmail) return;
+    if(localStorage.getItem(TRANSACTION_IMPORT_KEY)==='done') return;
     if(typeof isAdmin !== 'undefined' && !isAdmin) return;
     try{
       const results = [];

@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "width": 320,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 2283,
+          "scrollAfter": 2283
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 6711,
+          "scrollAfter": 6711
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 9663,
+          "scrollAfter": 9663
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 12615,
+          "scrollAfter": 12615
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3789,
+          "scrollAfter": 3789
+        }
+      ]
+    },
+    {
+      "width": 375,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1895,
+          "scrollAfter": 1895
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 6322,
+          "scrollAfter": 6322
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 9274,
+          "scrollAfter": 9274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 12226,
+          "scrollAfter": 12226
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3401,
+          "scrollAfter": 3401
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1895,
+          "scrollAfter": 1895
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 6322,
+          "scrollAfter": 6322
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 9274,
+          "scrollAfter": 9274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 12226,
+          "scrollAfter": 12226
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3401,
+          "scrollAfter": 3401
+        }
+      ]
+    },
+    {
+      "width": 430,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1895,
+          "scrollAfter": 1895
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 6322,
+          "scrollAfter": 6322
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 9274,
+          "scrollAfter": 9274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 12226,
+          "scrollAfter": 12226
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3401,
+          "scrollAfter": 3401
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "leadsFit": {
+        "client": 1077,
+        "scroll": 1077
+      }
+    }
+  ]
+}

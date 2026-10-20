@@ -4,6 +4,7 @@
 <script>/* apply saved theme before first paint (no flash) */try{if(localStorage.getItem("crm_theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}
 /* keep deep links (#calendar, #lead=…, #dxb=…) before the auth client tidies the address */window.__crmInitialHash=location.hash;</script>
 
+  <script src="crm-state.js?v=1"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Usama CRM</title>
@@ -1777,7 +1778,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 .v7UploadBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border-radius:8px;background:#0b1520;border:1px solid #2b3b4e;color:#fff;font-weight:700;cursor:pointer}
 
 @media(max-width:900px){
-  body{padding:66px 0 0!important}.v7Topbar{padding:0 10px;gap:8px}.v7Brand{min-width:auto}.v7Brand strong{display:none}.v7Nav button{padding:0 11px;font-size:12px}.v7ProfileText{display:none}.v7TopIcon{display:none}.mainHeader{border-radius:0!important;border-left:0!important;border-right:0!important}.card{border-radius:0!important;border-left:0!important;border-right:0!important}.v7ProfileFields{grid-template-columns:1fr}.v7ProfileFields .full{grid-column:auto}
+  body{padding:66px 0 0!important}.v7Topbar{padding:0 10px;gap:8px}.v7Brand{min-width:auto}.v7Brand strong{display:none}.v7Nav button{padding:0 11px;font-size:12px}.v7ProfileText{display:none}.mainHeader{border-radius:0!important;border-left:0!important;border-right:0!important}.card{border-radius:0!important;border-left:0!important;border-right:0!important}.v7ProfileFields{grid-template-columns:1fr}.v7ProfileFields .full{grid-column:auto}
 }
 
 
@@ -1971,7 +1972,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     height:58px!important;
     padding:0 7px!important;
     gap:4px!important;
-    overflow:hidden!important;
+    overflow:visible!important;
   }
   .v7Brand{
     min-width:56px!important;
@@ -2361,6 +2362,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
 <link rel="stylesheet" href="crm-premium.css?v=20261020m">
 <link rel="stylesheet" href="crm-leads-fit.css?v=2">
+<link rel="stylesheet" href="crm-workspace-refinement.css?v=1">
 </head>
 
 <body>
@@ -2376,9 +2378,9 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     <div class="v7TopActions">
       <button class="v7ExportBtn adminOnly" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2"/></svg>Export CSV</button>
       <span class="v7Divider"></span>
-      <button class="v7TopIcon" onclick="toggleV8Theme()" title="Appearance"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
-      <button class="v7TopIcon v7Bell" onclick="openTodayNotifications()" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><b id="v7NotificationBadge">0</b></button>
-      <button class="v7Profile" onclick="openV7ProfileSettings()" title="Profile settings">
+      <button id="crmThemeToggle" class="v7TopIcon" onclick="toggleV8Theme()" title="Switch theme" aria-label="Switch theme"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+      <button class="v7TopIcon v7Bell" onclick="openTodayNotifications()" title="Notifications" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><b id="v7NotificationBadge" aria-live="polite">0</b></button>
+      <button class="v7Profile" onclick="openV7ProfileSettings()" title="Profile settings" aria-label="Profile settings">
         <span id="v7TopAvatar" class="v7Avatar">U</span>
         <span class="v7ProfileText"><span id="v7TopName" class="v7ProfileName">Usama</span><span id="v7TopRole" class="v7ProfileRole">Admin</span></span>
         <svg class="v7Chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
@@ -3019,12 +3021,15 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
         el("exportBtn").classList.add("hidden");
       }
 
-      showChoiceView();
+      await window.crmEnhancementsReady;
+      if (!(await CRMWorkspace.resume(email))) showChoiceView();
     }
 
     function showOnly(viewId) {
+      window.CRMWorkspace?.beforeView(viewId);
       ["loginView","choiceView","appView","leadsView","dashboardView","usersView","calendarModuleView"].forEach(id => el(id)?.classList.add("hidden"));
       el(viewId).classList.remove("hidden");
+      window.CRMWorkspace?.afterView(viewId);
     }
 
     function applyRoleUI() {
@@ -3045,13 +3050,13 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
       refreshHomeKpis();
     }
 
-    async function showOwnersView() {
+    async function showOwnersView(options = {}) {
       applyRoleUI();
       showOnly("appView");
       setupListeners();
-      await loadDropdowns();
-      await loadOwnerKpis();
-      loadData();
+      if (!crmFilterOptionRows.length && !options.restoring) await loadDropdowns();
+      loadOwnerKpis();
+      await loadData();
     }
 
     async function showLeadsView() {
@@ -3059,7 +3064,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
       showOnly("leadsView");
       setupLeadListeners();
       await loadLeadSources();
-      loadLeads();
+      await loadLeads();
     }
 
     async function login() {
@@ -3084,12 +3089,13 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
     }
 
     async function logout() {
+      window.CRMWorkspace?.clear();
       await db.auth.signOut();
       location.reload();
     }
 
     function today() {
-      return new Date().toISOString().slice(0, 10);
+      return new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Dubai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
     }
 
     function clean(value) {
@@ -3364,20 +3370,13 @@ ${agentName}`;
       el("loadingBadge").classList.add("show");
       el("status").textContent = "Loading database...";
 
-      const ownerColCount = visibleOwnerColumns().length;
+      el("appView").setAttribute("aria-busy", "true");
+      // Existing rows stay mounted until the requested page is ready.
 
-      renderOwnerHead();
-
-      el("tableBody").innerHTML = Array.from({ length: 8 }).map(() =>
-        `<tr>${Array.from({length:ownerColCount}).map(() => `<td><div class="skeleton"></div></td>`).join("")}</tr>`
-      ).join("");
-
-      el("mobileCards").innerHTML = Array.from({ length: 4 }).map(() =>
-        `<div class="ownerCard"><div class="skeleton" style="height:22px;margin-bottom:12px;"></div><div class="skeleton" style="margin-bottom:10px;"></div><div class="skeleton"></div></div>`
-      ).join("");
     }
 
     function hideLoading() {
+      el("appView").removeAttribute("aria-busy");
       el("loadingBadge").classList.remove("show");
     }
 
@@ -3698,13 +3697,14 @@ ${agentName}`;
       }
 
       el("tableBody").innerHTML = rows.map(row =>
-        `<tr>${cols.map(col => `<td class="owner-col-${col.key}" style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`
+        `<tr data-record-id="${row.id}">${cols.map(col => `<td class="owner-col-${col.key}" style="width:${col.width}px">${ownerCell(row, col)}</td>`).join("")}</tr>`
       ).join("");
 
+      if(window.crmRenderOwnerCards){window.crmRenderOwnerCards(rows);return;}
       el("mobileCards").innerHTML = rows.map(row => {
         const remarks = ownerRemarkValue(row);
 
-        return `<div class="ownerCard">
+        return `<div class="ownerCard" data-record-id="${row.id}">
           <div class="ownerTop">
             <div class="ownerName">${escapeHtml(clean(row.owner))}</div>
             <div class="unitBadge">Unit ${escapeHtml(clean(row.unit))}</div>
@@ -3800,6 +3800,7 @@ ${agentName}`;
     }
 
     function closeOwnerProfile() {
+      window.CRMWorkspace?.record("owner",null);
       el("profileModal").classList.remove("show");
     }
 
@@ -3828,6 +3829,7 @@ ${agentName}`;
     let crmFilterOptionRows = [];
 
     async function loadDropdowns() {
+      const selectedCommunity=el("communityFilter").value, selectedCluster=el("clusterFilter").value, selectedSource=el("sourceFilter").value;
       const { data: options, error: optionsError } = await db.rpc("crm_filter_options");
       if (optionsError) console.warn("Filter options unavailable:", optionsError.message);
       crmFilterOptionRows = options || [];
@@ -3845,8 +3847,11 @@ ${agentName}`;
         ...allRows.map(x => crmCanonicalCommunity(x.community)).filter(Boolean),
         ...catalogRows.map(x => crmCanonicalCommunity(x.community)).filter(Boolean)
       ])]);
+      el("communityFilter").value=selectedCommunity;
       updateClusterDropdown();
+      el("clusterFilter").value=selectedCluster;
       fillSelect("sourceFilter", [...new Set(allRows.map(x => x.data_source).filter(Boolean))]);
+      el("sourceFilter").value=selectedSource;
     }
 
     function updateClusterDropdown() {
@@ -4628,7 +4633,7 @@ Usama Bin Nusrat.`;
     }
 
     const _oldStatusDropdown = statusDropdown;
-    statusDropdown = function(row){ const current=clean(row.status)==="-"?"New":row.status; return `<select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">${getOwnerStatuses().map(s=>`<option ${s===current?"selected":""}>${escapeHtml(s)}</option>`).join("")}</select>`; };
+    statusDropdown = function(row){ const current=clean(row.status)==="-"?"New":row.status; return `<select class="statusSelect ${statusClass(current)}" onchange="updateStatus(${row.id}, this.value); this.className='statusSelect ' + statusClass(this.value)">${uniqClean([...getOwnerStatuses(),current]).map(s=>`<option ${s===current?"selected":""}>${escapeHtml(s)}</option>`).join("")}</select>`; };
 
     function openRemarkModal(id, value){ el("remarkModalOwnerId").value=id; el("remarkModalText").value=value||""; el("remarkModal").classList.add("show"); }
     function closeRemarkModal(){ el("remarkModal").classList.remove("show"); }
@@ -4649,7 +4654,7 @@ Usama Bin Nusrat.`;
     const _oldLeadDropdownOptions=leadDropdownOptions;
     leadDropdownOptions=function(field){ if(field==="status")return getPipelineStages(); return _oldLeadDropdownOptions(field); };
 
-    function setLeadView(mode){ leadViewMode=mode; const tableBox=document.querySelector("#leadsView .tablebox"); const mobile=el("leadMobileCards"); const pager=document.querySelector("#leadsView .pager"); const kanban=el("kanbanWrap"); el("tableViewBtn").classList.toggle("active",mode==="table"); el("kanbanViewBtn").classList.toggle("active",mode==="kanban"); if(mode==="kanban"){tableBox.classList.add("hidden");mobile.classList.add("hidden");pager.classList.add("hidden");kanban.classList.remove("hidden");loadKanban();}else{tableBox.classList.remove("hidden");kanban.classList.add("hidden");pager.classList.remove("hidden");if(window.innerWidth<=800)mobile.classList.remove("hidden");loadLeads();} }
+    async function setLeadView(mode){ leadViewMode=mode; const tableBox=document.querySelector("#leadsView .tablebox"); const mobile=el("leadMobileCards"); const pager=document.querySelector("#leadsView .pager"); const kanban=el("kanbanWrap"); el("tableViewBtn").classList.toggle("active",mode==="table"); el("kanbanViewBtn").classList.toggle("active",mode==="kanban"); if(mode==="kanban"){tableBox.classList.add("hidden");mobile.classList.add("hidden");pager.classList.add("hidden");kanban.classList.remove("hidden");await loadKanban();}else{tableBox.classList.remove("hidden");kanban.classList.add("hidden");pager.classList.remove("hidden");if(window.innerWidth<=800)mobile.classList.remove("hidden");await loadLeads();} }
 
     async function fetchFilteredLeads(limit=1000){ let q=db.from(LEADS_TABLE).select("*").limit(limit); q=applyLeadFilters(q); q=q.order("created_at",{ascending:false}); const {data,error}=await q; if(error){alert(error.message);return [];} return data||[]; }
     async function loadKanban(){ if(!isAdmin)return; const rows=await fetchFilteredLeads(2000); const stages=uniqClean([...getPipelineStages(),...rows.map(r=>r.status||"New")]); el("kanbanBoard").innerHTML=stages.map(stage=>{const items=rows.filter(r=>(r.status||"New")===stage);return `<div class="kanbanCol"><div class="kanbanHead"><span>${escapeHtml(stage)}</span><span class="kanbanCount">${items.length}</span></div><div class="kanbanDrop" ondragover="event.preventDefault()" ondrop="dropLeadToStage(event,'${escapeHtml(stage)}')">${items.map(kanbanCardHtml).join("")}</div></div>`;}).join(""); }
@@ -4659,7 +4664,7 @@ Usama Bin Nusrat.`;
 
     async function logLeadActivity(leadId,type,details){ const {error}=await db.from("lead_activities").insert([{lead_id:leadId,activity_type:type,details,created_by:currentUserEmail||null}]); if(error) console.warn("Activity log failed",error.message); }
     async function openLeadDetail(id){ activeLeadDetailId=id; const [{data:lead,error},{data:acts}]=await Promise.all([db.from(LEADS_TABLE).select("*").eq("id",id).single(),db.from("lead_activities").select("*").eq("lead_id",id).order("created_at",{ascending:false})]); if(error){alert(error.message);return;} renderLeadDetail(lead,acts||[]); el("leadDetailModal").classList.add("show"); }
-    function closeLeadDetail(){ el("leadDetailModal").classList.remove("show"); activeLeadDetailId=null; }
+    function closeLeadDetail(){ window.CRMWorkspace?.record("lead",null); el("leadDetailModal").classList.remove("show"); activeLeadDetailId=null; }
     function renderLeadDetail(lead,acts){ el("leadDetailContent").innerHTML=`<div class="profileHeader"><div><div class="profileTitle">${escapeHtml(clean(lead.name))}</div><div class="profileSub">${escapeHtml(clean(lead.phone))} · ${escapeHtml(clean(lead.project_inquired))}</div></div><div style="display:flex;gap:8px"><button class="darkBtn" onclick='openLeadModal(${JSON.stringify(lead).replaceAll("'","&#039;")})'>Edit Lead</button><button class="darkBtn" onclick="closeLeadDetail()">Close</button></div></div><div class="leadDetailGrid"><div><div class="activityComposer"><h2>Add Activity</h2><div class="formGrid"><div><label>Type</label><select id="activityType"><option>Call</option><option>WhatsApp</option><option>Meeting</option><option>Email</option><option>Note</option></select></div><div><label>Date & time</label><input id="activityWhen" type="datetime-local" value="${localDateTimeValue()}"></div><div class="formFull"><label>What was discussed?</label><textarea id="activityDetails" rows="4" placeholder="Write the discussion, outcome and next action..."></textarea></div></div><div class="modalActions"><button class="primaryBtn" onclick="addLeadActivity('${lead.id}')">Save Activity</button></div></div><div class="timelineBox"><h2>Activity Timeline</h2><div class="activityList">${acts.length?acts.map(a=>`<div class="activityEntry"><div class="activityTop"><span class="activityType">${escapeHtml(a.activity_type)}</span><span class="activityTime">${new Date(a.created_at).toLocaleString()}</span></div><div class="activityText">${escapeHtml(a.details||"")}</div></div>`).join(""):`<div class="empty">No activity yet</div>`}</div></div></div><div><div class="profileGrid" style="grid-template-columns:1fr"><div class="profileBox"><label>Status</label><div>${escapeHtml(clean(lead.status))}</div></div><div class="profileBox"><label>Budget</label><div>${escapeHtml(clean(lead.budget))}</div></div><div class="profileBox"><label>Follow-up</label><div>${escapeHtml(clean(lead.follow_up_date))} ${escapeHtml(lead.follow_up_time||"")}</div></div><div class="profileBox"><label>Reminder</label><div>${escapeHtml(lead.reminder_type||"Call")} — ${escapeHtml(lead.reminder_note||"")}</div></div></div><div class="modalActions"><button class="primaryBtn" onclick="markFollowupDone('${lead.id}')">Mark Follow-up Done</button></div></div></div>`; }
     async function addLeadActivity(id){ const type=el("activityType").value; const details=el("activityDetails").value.trim(); const when=el("activityWhen").value; if(!details){alert("Write the discussion first.");return;} const payload={lead_id:id,activity_type:type,details,created_by:currentUserEmail||null}; if(when)payload.created_at=new Date(when).toISOString(); const {error}=await db.from("lead_activities").insert([payload]); if(error){alert(error.message);return;} await db.from(LEADS_TABLE).update({last_contacted:today()}).eq("id",id); openLeadDetail(id); }
     async function markFollowupDone(id){ await logLeadActivity(id,"Follow-up Completed","Follow-up marked as completed."); const {error}=await db.from(LEADS_TABLE).update({follow_up_date:null,follow_up_time:null,reminder_note:null}).eq("id",id); if(error){alert(error.message);return;} closeLeadDetail();loadFollowupDashboard();if(leadViewMode==="kanban")loadKanban();else loadLeads(); }
@@ -4719,7 +4724,11 @@ Usama Bin Nusrat.`;
 
     // Owner sorting: unit uses unit_sort for correct numeric order.
     const _v2LoadData = loadData;
+    let ownerLoadVersion = 0, ownerRenderedQuery = "";
     loadData = async function(){
+      const version = ++ownerLoadVersion;
+      const queryKey = window.CRMWorkspace?.signature("appView");
+      const position = queryKey === ownerRenderedQuery ? window.CRMWorkspace?.position("appView") : null;
       showLoading();
       const from=currentPage*PAGE_SIZE,to=from+PAGE_SIZE-1;
       let query=db.from("owners_list").select("*",{count:"exact"}).range(from,to);
@@ -4731,9 +4740,16 @@ Usama Bin Nusrat.`;
         query=query.order(field,{ascending:asc,nullsFirst:false}).order("unit_natural",{ascending:true,nullsFirst:false});
       }
       query=query.order("id",{ascending:true});
-      const {data,error,count}=await query; hideLoading();
+      const {data,error,count}=await query;
+      if(version !== ownerLoadVersion) return;
+      hideLoading();
       if(error){el("status").textContent="Error loading data";el("tableBody").innerHTML=`<tr><td colspan="${visibleOwnerColumns().length}" class="empty">Error: ${escapeHtml(error.message)}</td></tr>`;return;}
-      totalCount=count||0; renderData(data||[]); const start=totalCount===0?0:from+1,end=Math.min(to+1,totalCount),totalPages=Math.max(1,Math.ceil(totalCount/PAGE_SIZE));
+      totalCount=count||0;
+      if(currentPage > 0 && currentPage >= Math.max(1,Math.ceil(totalCount/PAGE_SIZE))){currentPage=Math.max(0,Math.ceil(totalCount/PAGE_SIZE)-1);return loadData();}
+      renderData(data||[]); ownerRenderedQuery=queryKey;
+      if(position) requestAnimationFrame(()=>CRMWorkspace.restorePosition("appView",position));
+      CRMWorkspace.settled("appView");
+      const start=totalCount===0?0:from+1,end=Math.min(to+1,totalCount),totalPages=Math.max(1,Math.ceil(totalCount/PAGE_SIZE));
       el("status").textContent=`Showing ${start}-${end} of ${totalCount} records`;el("pageInfo").textContent=`${currentPage+1} / ${totalPages}`;el("prevBtn").disabled=currentPage===0;el("nextBtn").disabled=currentPage+1>=totalPages;
     };
 
@@ -4743,13 +4759,15 @@ Usama Bin Nusrat.`;
       if(search) query=query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%,project_inquired.ilike.%${search}%`);
       if(status)query=query.eq("status",status); if(source)query=query.eq("source",source); if(project)query=query.eq("project_inquired",project); if(follow)query=query.eq("follow_up_date",follow); return query;
     };
+    let leadLoadVersion = 0;
     loadLeads = async function(){
+      const version = ++leadLoadVersion;
       el("leadLoadingBadge").classList.add("show"); const from=leadPage*PAGE_SIZE,to=from+PAGE_SIZE-1;
       let q=db.from(LEADS_TABLE).select("*",{count:"exact"}).range(from,to); q=applyLeadFilters(q);
       const field=el("leadSortField")?.value||"lead_receive_date",asc=(el("leadSortDirection")?.value||"desc")==="asc"; q=q.order(field,{ascending:asc,nullsFirst:false});
-      const {data,error,count}=await q; el("leadLoadingBadge").classList.remove("show");
+      const {data,error,count}=await q; if(version !== leadLoadVersion)return; el("leadLoadingBadge").classList.remove("show");
       if(error){el("leadStatusText").textContent="Error loading leads";el("leadsTableBody").innerHTML=`<tr><td class="empty">${escapeHtml(error.message)}</td></tr>`;return;}
-      leadTotalCount=count||0; renderLeads(data||[]); const totalPages=Math.max(1,Math.ceil(leadTotalCount/PAGE_SIZE)); const start=leadTotalCount?from+1:0,end=Math.min(to+1,leadTotalCount);
+      leadTotalCount=count||0; renderLeads(data||[]); CRMWorkspace.settled("leadsView"); const totalPages=Math.max(1,Math.ceil(leadTotalCount/PAGE_SIZE)); const start=leadTotalCount?from+1:0,end=Math.min(to+1,leadTotalCount);
       el("leadStatusText").textContent=`Showing ${start}-${end} of ${leadTotalCount} leads`;el("leadPageInfo").textContent=`${leadPage+1} / ${totalPages}`;el("leadPrevBtn").disabled=leadPage===0;el("leadNextBtn").disabled=leadPage+1>=totalPages;
     };
     fetchFilteredLeads = async function(limit=2000){let q=db.from(LEADS_TABLE).select("*").limit(limit);q=applyLeadFilters(q);const field=el("leadSortField")?.value||"lead_receive_date",asc=(el("leadSortDirection")?.value||"desc")==="asc";q=q.order(field,{ascending:asc,nullsFirst:false});const {data,error}=await q;if(error){alert(error.message);return [];}return data||[];};
@@ -4765,7 +4783,7 @@ Usama Bin Nusrat.`;
     renderLeads = function(rows){
       renderLeadHead(); const cols=visibleLeadColumns(); const colCount=cols.length+1;
       if(!rows.length){el("leadsTableBody").innerHTML=`<tr><td colspan="${colCount}" class="empty">No leads found</td></tr>`;el("leadMobileCards").innerHTML=`<div class="empty">No leads found</div>`;return;}
-      el("leadsTableBody").innerHTML=rows.map(row=>`<tr>${cols.map(col=>`<td style="width:${col.width}px">${leadInput(row,col)}</td>`).join('')}<td class="actionsSticky" style="width:150px"><div class="leadActions"><button class="iconBtn" title="Open full lead" onclick="openLeadDetail('${row.id}')">☰</button><button class="iconBtn" title="Edit full lead" onclick='openLeadModal(${JSON.stringify(row).replaceAll("'","&#039;")})'>✎</button><button class="iconBtn dangerIcon" title="Delete" onclick="deleteLead('${row.id}')">⌫</button></div></td></tr>`).join('');
+      el("leadsTableBody").innerHTML=rows.map(row=>`<tr data-record-id="${row.id}">${cols.map(col=>`<td style="width:${col.width}px">${leadInput(row,col)}</td>`).join('')}<td class="actionsSticky" style="width:150px"><div class="leadActions"><button class="iconBtn" title="Open full lead" onclick="openLeadDetail('${row.id}')">☰</button><button class="iconBtn" title="Edit full lead" onclick='openLeadModal(${JSON.stringify(row).replaceAll("'","&#039;")})'>✎</button><button class="iconBtn dangerIcon" title="Delete" onclick="deleteLead('${row.id}')">⌫</button></div></td></tr>`).join('');
       el("leadMobileCards").innerHTML=rows.map(row=>`<div class="leadCard"><div class="ownerTop"><div class="ownerName">${escapeHtml(clean(row.name))}</div><div class="unitBadge">${escapeHtml(clean(row.status||'New'))}</div></div><div class="infoLine"><span>Phone</span>${escapeHtml(clean(row.phone))}</div><div class="infoLine"><span>Project</span>${escapeHtml(clean(row.project_inquired))}</div><div class="infoLine"><span>Latest Note</span><div class="leadLatestNote" onclick="openLeadDetail('${row.id}')">${escapeHtml(row.notes||'No notes yet')}</div></div><div class="mobileActionGrid"><button class="primaryBtn" onclick="openLeadDetail('${row.id}')">Open Lead</button>${leadWhatsappButton(row)}</div></div>`).join('');
     };
 
@@ -4813,7 +4831,7 @@ ${agent}`;}
 
     // Enhance showLeadsView and startup UI.
     const _oldShowLeadsView=showLeadsView;
-    showLeadsView=async function(){ await _oldShowLeadsView(); await loadProjects(); refreshLeadStatusUI(); loadFollowupDashboard(); if(leadViewMode==="kanban")setLeadView("kanban"); };
+    showLeadsView=async function(){ await _oldShowLeadsView(); await loadProjects(); refreshLeadStatusUI(); loadFollowupDashboard(); if(leadViewMode==="kanban")await setLeadView("kanban"); };
     refreshOwnerStatusUI(); refreshLeadStatusUI(); loadProjects();
 
   
@@ -4824,8 +4842,7 @@ ${agent}`;}
 
     const originalShowOnlyV5 = showOnly;
     showOnly = function(viewId){
-      ["loginView","choiceView","appView","leadsView","calendarModuleView","dashboardView","usersView"].forEach(id=>el(id)?.classList.add("hidden"));
-      el(viewId)?.classList.remove("hidden");
+      return originalShowOnlyV5(viewId);
     };
 
     const originalShowChoiceViewV5 = showChoiceView;
@@ -4956,7 +4973,7 @@ function u6Value(value){
   return (value===null || value===undefined || value==="" || value==="EMPTY") ? "-" : String(value);
 }
 function u6Field(label,value){
-  return `<div class="u6Field"><label>${escapeHtml(label)}</label><div>${escapeHtml(u6Value(value))}</div></div>`;
+  return `<div class="u6Field"><label>${escapeHtml(label)}</label><div ${label==="Status"?`class="crmBadge" data-status="${escapeHtml(value||"New")}"`:""}>${escapeHtml(u6Value(value))}</div></div>`;
 }
 function u6TimelineItem(type,details,date){
   const d=date ? new Date(date) : new Date();
@@ -5270,7 +5287,7 @@ document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
   ["todayNotificationsModal","profileModal","leadDetailModal","broadcastModal","leadModal","columnsModal","projectModal","ownerStatusModal","whatsappModal","propertiesModal"].forEach(id=>{
     const node=el(id);
-    if(node?.classList.contains("show"))node.classList.remove("show");
+    if(node?.classList.contains("show")){node.classList.remove("show");if(id==="profileModal")CRMWorkspace.record("owner",null);if(id==="leadDetailModal")CRMWorkspace.record("lead",null);}
   });
 });
 
@@ -5436,7 +5453,7 @@ broadcastScopeChanged=function(){const inside=el('broadcastScope').value==='insi
 searchBroadcastOwners=function(){return loadBroadcastRangeContacts();};
 
 // keep bell badge synchronized
-setInterval(()=>{const a=el('homeNotificationBadge'),b=el('v7NotificationBadge');if(a&&b)b.textContent=a.textContent||'0';},1500);
+// The event-backed calendar owns the notification badge. No legacy polling override.
 
 
 
@@ -5630,21 +5647,7 @@ function u10ActivityStatusClass(status){
 function u10IsFuture(value){ return new Date(value).getTime()>Date.now()+30000; }
 function u10SqlDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toISOString().slice(0,10);}
 
-/* Correct owner column order and compact defaults */
-(function(){
-  const desired=[
-    {key:"community",label:"Community",visible:true,width:145},
-    {key:"cluster",label:"Cluster",visible:true,width:145},
-    {key:"unit",label:"Unit",visible:true,width:66},
-    {key:"owner",label:"Owner Name",visible:true,width:215},
-    {key:"whatsapp",label:"WhatsApp",visible:true,width:108},
-    {key:"status",label:"Status",visible:true,width:164},
-    {key:"remarks",label:"Latest Remark",visible:true,width:390}
-  ];
-  ownerColumns.splice(0,ownerColumns.length,...desired);
-  saveOwnerColumnsState();
-})();
-
+/* Owner column defaults and saved widths are reconciled once by the workspace. */
 /* True pointer-based resizing */
 startColumnResize=function(e,table,key){
   e.preventDefault();e.stopPropagation();
@@ -5671,19 +5674,7 @@ startColumnResize=function(e,table,key){
   document.addEventListener("touchmove",move,{passive:false});document.addEventListener("touchend",up);
 };
 
-/* Clean latest remark in the outside table only */
-const u10OriginalLoadData=loadData;
-loadData=async function(){
-  await u10OriginalLoadData();
-  try{
-    const ids=(currentOwnerPageRows||[]).map(x=>String(x.id));
-    if(!ids.length)return;
-    const {data}=await db.from(U6_OWNER_ACTIVITIES).select("*").in("owner_id",ids).order("created_at",{ascending:false});
-    const by={};(data||[]).forEach(a=>{if(!by[a.owner_id])by[a.owner_id]=[];by[a.owner_id].push(a)});
-    currentOwnerPageRows.forEach(r=>r.__u10_latest=u10LatestManualText(by[String(r.id)]||[],ownerRemarkValue(r)||"-"));
-    renderData(currentOwnerPageRows);
-  }catch(e){console.warn("Manual remark load failed",e);}
-};
+/* Latest notes are hydrated in-place by crm-stability.js. */
 const u10OwnerCellBase=ownerCell;
 ownerCell=function(row,col){
   if(col.key==="remarks"){
@@ -5964,6 +5955,7 @@ loadCalendarModule=async function(){
   el("calendarModuleContent").innerHTML=`<div class="calendarDateTitle">${title}</div>${items.length?items.map(i=>`<div class="calendarItemV5" onclick="${i.click}"><b>${new Date(i.when).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",hour12:true})}</b><span><b>${escapeHtml(i.name)}</b><br><small>${escapeHtml(i.sub)} — ${escapeHtml(i.details)}</small></span><span>${escapeHtml(i.type)}</span></div>`).join(""):`<div class="empty">No scheduled calls or meetings</div>`}`;
 };
 async function u10RefreshNotifications(){
+  if(window.crmRefreshNotifications)return window.crmRefreshNotifications();
   try{
     const now=new Date(),end=new Date(now.getTime()+24*60*60*1000);
     const [{data:o},{data:l}]=await Promise.all([
@@ -5974,13 +5966,14 @@ async function u10RefreshNotifications(){
     const badge=document.getElementById("v7NotificationBadge");if(badge){badge.textContent=count;badge.style.display=count?"grid":"none";}
   }catch(e){console.warn(e)}
 }
-setTimeout(u10RefreshNotifications,1200);
+// Notification refresh is owned by crm-calendar.js.
 
 /* Mobile lead cards: Call button + coloured status */
 const u10OriginalRenderLeads=renderLeads;
 renderLeads=function(rows){
   u10OriginalRenderLeads(rows);
   if(!rows?.length)return;
+  if(window.crmRenderLeadCards){window.crmRenderLeadCards(rows);return;}
   el("leadMobileCards").innerHTML=rows.map(row=>{
     const phone=formatPhone(row.phone);
     return `<div class="leadCard">
@@ -6031,10 +6024,10 @@ setTimeout(()=>{
     const saved = savedOwnerColumns.get(c.key);
     return {
       ...c,
-      visible: true,
+      visible: saved?.visible !== false,
       width: Number(saved?.width) > 0 ? Number(saved.width) : c.width
     };
-  }));
+  }), ...ownerColumns.filter(c=>!compactOwnerColumns.some(d=>d.key===c.key)));
   saveOwnerColumnsState();
 
   const minimums = {
@@ -6078,7 +6071,7 @@ setTimeout(()=>{
     ownerColumns.forEach(col => setOwnerColumnWidth(col.key, col.width, false));
     const table = document.getElementById("ownersTable");
     if (table) {
-      const total = ownerColumns.filter(c => c.visible).reduce((sum, c) => sum + Number(c.width || 100), 0);
+      const total = 42 + ownerColumns.filter(c => c.visible).reduce((sum, c) => sum + Number(c.width || 100), 0);
       table.style.setProperty("width", `${total}px`, "important");
       table.style.setProperty("min-width", `${total}px`, "important");
     }
@@ -6450,6 +6443,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=9"></script>
+<script src="crm-enhancements.js?v=10"></script>
 </body>
 </html>

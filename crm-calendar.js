@@ -55,6 +55,7 @@
   window.showCalendarModule=async function(date){
     const v=ensureView();
     showOnly('dashboardView');$('dashboardView').classList.add('hidden');v.classList.remove('hidden');
+    CRMWorkspace.afterView('crmCalendarView');
     document.querySelectorAll('#v7Topbar .v7Nav button').forEach(b=>b.classList.toggle('active',b.id==='v7NavCalendar'));
     document.body.classList.remove('crmNavOpen');
     if(date)cursor=startOfDay(new Date(date));
@@ -91,7 +92,7 @@
   function chip(e){
     const d=new Date(e.starts_at);
     const cls=[`crmEv`,`crmEv-${TYPE_CLASS[e.event_type]||'other'}`,e.status!=='Scheduled'?`is-${e.status.toLowerCase()}`:'',isOverdue(e)?'is-overdue':''].join(' ');
-    return `<button type="button" class="${cls}" data-ev="${e.id}" title="${esc(e.event_type+' · '+e.title)}"><span class="crmEvTime">${fmtTime(d)}</span><span class="crmEvTitle">${esc(e.leads?.name||e.title)}</span></button>`;
+    return `<button type="button" class="${cls}" data-lead-stage="${esc(e.leads?.status||'')}" data-ev="${e.id}" title="${esc(e.event_type+' · '+e.title)}"><span class="crmEvTime">${fmtTime(d)}</span><span class="crmEvTitle">${esc(e.leads?.name||e.title)}</span></button>`;
   }
 
   async function render(){
@@ -198,7 +199,7 @@
       const when=new Date(`${f.date.value}T${f.time.value||'10:00'}:00`);
       if(!f.date.value||isNaN(when)){err.textContent='Choose a date and time.';err.hidden=false;return;}
       const lead_id=f.lead_id.value||null;
-      const title=f.title.value.trim()||`${f.event_type.value}${f.lead_search.value?` — ${f.lead_search.value}`:''}`;
+      const title=f.elements.namedItem('title').value.trim()||`${f.event_type.value}${f.lead_search.value?` — ${f.lead_search.value}`:''}`;
       const payload={event_type:f.event_type.value,title,notes:f.notes.value.trim()||null,starts_at:when.toISOString(),remind_minutes:Number(f.remind_minutes.value),lead_id,assigned_to:isAdmin?f.assigned_to.value:me(),updated_at:new Date().toISOString()};
       const btn=f.querySelector('[type=submit]');btn.disabled=true;
       const {error}=isNew?await db.from('crm_events').insert(payload):await db.from('crm_events').update(payload).eq('id',e.id);
@@ -274,6 +275,7 @@
     const unread=notes.filter(n=>!n.is_read).length;
     ['v7NotificationBadge','homeNotificationBadge'].forEach(id=>{const b=$(id);if(b){b.textContent=unread;b.style.display=unread?'':'none';}});
   }
+  window.crmRefreshNotifications=refreshBell;
   window.openTodayNotifications=async function(){
     await refreshBell();
     document.querySelector('.crmNotePanel')?.remove();
@@ -291,7 +293,8 @@
     p.querySelectorAll('[data-note]').forEach(b=>b.onclick=async()=>{
       const n=notes.find(x=>x.event_id===b.dataset.note&&x.kind===b.dataset.kind);close();
       await markRead([n]);refreshBell();
-      if(n.lead_id)crmOpenLead(n.lead_id);else showCalendarModule(n.starts_at);
+      const {data:event}=await db.from('crm_events').select('*,leads(name,phone,status)').eq('id',n.event_id).maybeSingle();
+      if(event)openEventEditor(event);else if(n.lead_id)crmOpenLead(n.lead_id);else showCalendarModule(n.starts_at);
     });
   };
   if(typeof currentUserEmail!=='undefined'&&currentUserEmail){refreshBell();setInterval(refreshBell,120000);}

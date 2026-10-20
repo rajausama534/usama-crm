@@ -32,11 +32,14 @@
     nav.append(users);
     const toggle=document.createElement('button');
     toggle.className='crmMenuToggle';toggle.type='button';toggle.setAttribute('aria-label','Open menu');toggle.innerHTML=icon('menu');
-    toggle.onclick=()=>document.body.classList.toggle('crmNavOpen');
+    toggle.setAttribute('aria-controls','crmPrimaryNav');toggle.setAttribute('aria-expanded','false');nav.id='crmPrimaryNav';
+    const closeNav=()=>{document.body.classList.remove('crmNavOpen');toggle.setAttribute('aria-expanded','false');};
+    toggle.onclick=()=>{const open=document.body.classList.toggle('crmNavOpen');toggle.setAttribute('aria-expanded',String(open));};
     bar.prepend(toggle);
-    const scrim=document.createElement('div');scrim.className='crmNavScrim';scrim.onclick=()=>document.body.classList.remove('crmNavOpen');
+    const scrim=document.createElement('div');scrim.className='crmNavScrim';scrim.onclick=closeNav;
     document.body.append(scrim);
-    nav.addEventListener('click',()=>document.body.classList.remove('crmNavOpen'));
+    nav.addEventListener('click',e=>{if(e.target.closest('button,a'))closeNav();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNav();});
     for(const id of ['dashboardView','usersView']){
       if($(id))continue;
       const v=document.createElement('div');v.id=id;v.className='wrap crmPage hidden';
@@ -379,6 +382,7 @@
     sel.innerHTML='<option value="">All assignees</option><option value="__none">Not assigned</option>'+list.map(u=>`<option value="${esc(u.email)}">${esc(u.name||u.email)}</option>`).join('');
     sel.onchange=()=>{leadPage=0;loadLeads();};
   }
+  window.crmPrepareLeadFilters=addLeadAssigneeFilter;
   if(typeof applyLeadFilters==='function'){
     const base=applyLeadFilters;
     applyLeadFilters=function(q){
@@ -390,7 +394,7 @@
   }
   if(typeof showLeadsView==='function'){
     const base=window.showLeadsView;
-    window.showLeadsView=async function(){const r=await base.apply(this,arguments);addLeadAssigneeFilter();return r;};
+    window.showLeadsView=async function(){const r=await base.apply(this,arguments);await addLeadAssigneeFilter();return r;};
   }
   // Show the assignee under the lead name in the table.
   if(typeof renderLeads==='function'){
