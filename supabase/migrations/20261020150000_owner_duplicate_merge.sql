@@ -34,7 +34,7 @@ declare
   g record; ids bigint[]; parent bigint[]; i int; j int; ri record; rj record; n int := 0;
   rows_ jsonb; comp jsonb; k bigint;
 begin
-  truncate public.owner_merge_plan;
+  delete from public.owner_merge_plan;
   for g in
     select community, cluster, unit from public.owners
     where community is not null and cluster is not null and coalesce(unit, '') <> ''
