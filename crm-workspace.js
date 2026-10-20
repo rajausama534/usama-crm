@@ -129,6 +129,24 @@
     });
   }
 
+  // Fit the leads table to the screen: tag columns for CSS widths, drop the forced min-width,
+  // full text on hover, WhatsApp as an icon (same link and click handler).
+  const WA_ICON='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
+  function fitLeadsTable(){
+    const table=document.querySelector('#leadsView .leadsTable');if(!table)return;
+    table.classList.add('crmFitTable');table.style.minWidth='';
+    const keys=[...table.querySelectorAll('thead th')].map(th=>th.dataset.key||(th.classList.contains('actionsSticky')?'actions':''));
+    table.querySelectorAll('thead th').forEach((th,i)=>{th.dataset.col=keys[i];});
+    table.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,i)=>{
+      if(td.colSpan>1)return;
+      td.dataset.col=keys[i]||'';
+      const v=td.querySelector('.leadReadValue');if(v&&!v.title)v.title=v.textContent.trim();
+      const n=td.querySelector('.leadLatestNote');if(n)n.title=n.textContent.trim();
+      const wa=td.querySelector('a.waBtn');
+      if(wa&&!wa.dataset.icon){wa.dataset.icon='1';wa.classList.add('crmWaIcon');wa.title='WhatsApp';wa.setAttribute('aria-label','WhatsApp');wa.innerHTML=WA_ICON;}
+    }));
+  }
+
   // ------------------------------------------------------------------ wire up
   if(typeof leadStatuses==='function'){window.leadStatuses=()=>[...STAGES];}
   try{if(typeof DEFAULT_PIPELINE_STAGES!=='undefined'){DEFAULT_PIPELINE_STAGES.splice(0,DEFAULT_PIPELINE_STAGES.length,...STAGES);}}catch(_){}
@@ -137,7 +155,7 @@
   wrap('showLeadsView',()=>{upgradeLeads();paintStageBar();});
   // The owner table is redrawn by several layers; watch the table body instead of wrapping each one.
   const tb=$('tableBody');if(tb)new MutationObserver(()=>tidyOwnerRows()).observe(tb,{childList:true});
-  if(typeof renderLeads==='function'){const base=renderLeads;renderLeads=function(rows){const r=base.apply(this,arguments);setTimeout(()=>leadNextAction(rows),0);return r;};}
+  if(typeof renderLeads==='function'){const base=renderLeads;renderLeads=function(rows){const r=base.apply(this,arguments);setTimeout(()=>{leadNextAction(rows);fitLeadsTable();},0);return r;};}
   // sidebar: log out lives with the profile
   const acts=document.querySelector('#v7Topbar .v7TopActions');
   if(acts&&!acts.querySelector('.crmLogout')){const b=document.createElement('button');b.type='button';b.className='crmLogout';b.textContent='Log out';b.onclick=()=>logout();acts.append(b);}
