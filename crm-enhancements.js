@@ -19,5 +19,6 @@
     .then(()=>load('crm-upgrade.js?v=20261020'))
     .then(()=>load('crm-calendar.js?v=20261020b'))
     .then(()=>load('crm-workspace.js?v=20261020c'))
+    .then(()=>load('crm-dxb.js?v=20261020'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
