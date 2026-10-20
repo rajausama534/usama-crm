@@ -2361,7 +2361,7 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
 <link rel="stylesheet" href="crm-premium.css?v=20261020-polish">
-<link rel="stylesheet" href="crm-leads-fit.css?v=3">
+<link rel="stylesheet" href="crm-leads-fit.css?v=4">
 <link rel="stylesheet" href="crm-workspace-refinement.css?v=2">
 </head>
 
@@ -6069,7 +6069,7 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { whatsapp:48, remarks:64, owner:80, community:60, cluster:60, status:200, unit:48 };
+  const fitMinimums = { whatsapp:46, remarks:120, owner:120, community:80, cluster:80, status:156, unit:48 };
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
