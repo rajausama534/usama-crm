@@ -453,7 +453,7 @@ body.crmPremium #ownersTable td.owner-col-owner,body.crmPremium #ownersTable td[
 body.crmPremium #ownersTable td.owner-col-unit{min-width:110px}
 body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border-color:var(--c-border)!important;box-shadow:none!important}
 /* stage bar */
-body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
+body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
 body.crmPremium .crmStage{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-muted);text-align:left;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
 body.crmPremium .crmStage::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--st,var(--c-border-strong))}
 body.crmPremium .crmStage span{font-size:var(--t-xs);font-weight:600}
@@ -461,7 +461,7 @@ body.crmPremium .crmStage b{color:var(--c-text);font-size:var(--t-xl);font-weigh
 body.crmPremium .crmStage:hover{border-color:var(--c-border-strong)}
 body.crmPremium .crmStage.active{border-color:var(--c-accent);background:var(--c-accent-soft);color:var(--c-text)}
 body.crmPremium .crmStage-0{--st:#94a3b8}body.crmPremium .crmStage-1{--st:#f59e0b}body.crmPremium .crmStage-2{--st:#38bdf8}body.crmPremium .crmStage-3{--st:#a78bfa}
-body.crmPremium .crmStage-4{--st:#5b6cff}body.crmPremium .crmStage-5{--st:#22c55e}body.crmPremium .crmStage-6{--st:#ef4444}
+body.crmPremium .crmStage-4{--st:#c084fc}body.crmPremium .crmStage-5{--st:#5b6cff}body.crmPremium .crmStage-6{--st:#22c55e}body.crmPremium .crmStage-7{--st:#ef4444}
 body.crmPremium .crmNext{display:block;margin-top:4px;color:var(--c-accent-text);font-size:var(--t-xs);font-weight:600}
 body.crmPremium .crmNext.none{color:var(--c-faint);font-weight:500}
 body.crmPremium .crmNext.late{color:#fca5a5}
@@ -473,7 +473,7 @@ body.crmPremium .crmLogout:hover{color:var(--c-text);background:var(--c-surface-
 @media (max-width:1100px){
   body.crmPremium .crmWorkspace .filters,body.crmPremium #leadsView .filters{grid-template-columns:repeat(2,minmax(0,1fr)) auto auto!important}
   body.crmPremium .crmWorkspace .filters>:first-child{grid-column:1/-1!important}
-  body.crmPremium .crmStageBar{grid-template-columns:repeat(4,minmax(0,1fr))}
+  body.crmPremium .crmStageBar{grid-template-columns:repeat(5,minmax(0,1fr))}
 }
 @media (max-width:640px){
   body.crmPremium .crmStageBar{display:flex;overflow-x:auto;padding-bottom:4px}
