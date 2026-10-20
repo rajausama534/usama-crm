@@ -37,12 +37,12 @@ body.crmPremium #leadsView .tablebox{overflow-x:hidden!important}
   body.crmPremium #leadsView .crmFitTable :is(th,td):first-child{padding-left:12px!important}
 
   /* column widths; Notes takes what is left */
-  body.crmPremium #leadsView .crmFitTable [data-col="name"]{width:16%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="name"]{width:14%!important}
   body.crmPremium #leadsView .crmFitTable [data-col="phone"]{width:118px!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="project_inquired"]{width:14%!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="budget"]{width:72px!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="bedroom"]{width:82px!important}
-  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:130px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="project_inquired"]{width:12%!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="budget"]{width:66px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="bedroom"]{width:76px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:116px!important}
   body.crmPremium #leadsView .crmFitTable [data-col="notes"]{width:auto!important}
   body.crmPremium #leadsView .crmFitTable [data-col="whatsapp"]{width:52px!important;text-align:center!important}
   body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:104px!important}
@@ -67,6 +67,13 @@ body.crmPremium #leadsView .tablebox{overflow-x:hidden!important}
 
 @media (max-width:1100px){
   body.crmPremium #leadsView .crmStageBar{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
+@media (min-width:801px) and (max-width:1100px){
+  body.crmPremium #leadsView .crmFitTable [data-col="phone"]{width:106px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="status"]{width:104px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="whatsapp"]{width:44px!important}
+  body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:98px!important}
+  body.crmPremium #leadsView .crmFitTable td{font-size:12.5px!important}
 }
 @media (max-width:900px){
   body.crmPremium #leadsView .filters{flex-wrap:wrap!important}
