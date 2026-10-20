@@ -105,12 +105,12 @@ begin
       into ph1, ph2 from public.owners kp where kp.id = k.keep_id;
     update public.owners o set
       owner = coalesce(best, o.owner),
-      phone1 = ph1,
-      phone2 = case when ph2 is not distinct from ph1 then o.phone2 else ph2 end,
-      admin_remarks = coalesce(nullif(o.admin_remarks, ''), (select x.admin_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.admin_remarks, '') <> '' order by x.id desc limit 1)),
-      agent_remarks = coalesce(nullif(o.agent_remarks, ''), (select x.agent_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.agent_remarks, '') <> '' order by x.id desc limit 1)),
-      remarks = coalesce(nullif(o.remarks, ''), (select x.remarks from public.owners x where x.id = any(k.rm) and coalesce(x.remarks, '') <> '' order by x.id desc limit 1)),
-      email = coalesce(nullif(o.email, ''), (select x.email from public.owners x where x.id = any(k.rm) and coalesce(x.email, '') <> '' order by x.id desc limit 1)),
+      phone1 = coalesce(ph1, o.phone1),
+      phone2 = case when ph2 is null or ph2 is not distinct from ph1 then o.phone2 else ph2 end,
+      admin_remarks = coalesce(nullif(o.admin_remarks, ''), (select x.admin_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.admin_remarks, '') <> '' order by x.id desc limit 1), o.admin_remarks),
+      agent_remarks = coalesce(nullif(o.agent_remarks, ''), (select x.agent_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.agent_remarks, '') <> '' order by x.id desc limit 1), o.agent_remarks),
+      remarks = coalesce(nullif(o.remarks, ''), (select x.remarks from public.owners x where x.id = any(k.rm) and coalesce(x.remarks, '') <> '' order by x.id desc limit 1), o.remarks),
+      email = coalesce(nullif(o.email, ''), (select x.email from public.owners x where x.id = any(k.rm) and coalesce(x.email, '') <> '' order by x.id desc limit 1), o.email),
       last_contacted = greatest(o.last_contacted, (select max(x.last_contacted) from public.owners x where x.id = any(k.rm)))
     where o.id = k.keep_id;
     -- remarks that differ from the keeper's are kept as a note on the keeper
