@@ -524,3 +524,4 @@ html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,
 html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is([class*="abel"],[class*="Label"]){color:var(--c-muted)!important}
 html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is([class*="Note"],[class*="note"],[class*="emark"]){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important}
 html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"])>*{background:var(--c-surface)!important;border-color:var(--c-border)!important}
+body.crmPremium .crmTable td{color:var(--c-text)!important}

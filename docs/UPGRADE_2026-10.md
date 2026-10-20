@@ -78,3 +78,10 @@ Repair (needs approval): remove those 431 notes and add the correct per-unit sal
   not yet researched.
 - Measured on preview: dashboard 0.44 s, owners 1.8 s, owner search 0.75 s, Alana filter 0.5 s,
   leads 0.43 s, lead search 0.24 s, calendar 0.19 s.
+
+## DXBinteract → CRM (20 Oct 2026)
+- No API/terms permitting automated collection were found, so there is no background scraper. The CRM Chrome
+  extension (`extension/`, reload it in chrome://extensions) adds **Send sales to Usama CRM** on dxbinteract.com.
+  It reads the sales rows on screen when clicked (unit no., price, plot, BUA, beds, date, sold by) and opens the
+  CRM, which previews exact-unit matches (`crm_import_external_sales`, dry run) and imports only on confirmation.
+  Re-sending never duplicates; existing notes are untouched. Tested with Farm Gardens 138 and 131 (preview only).
