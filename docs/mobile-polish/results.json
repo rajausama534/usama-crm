@@ -1,0 +1,3371 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "width": 320,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 2091,
+          "scrollAfter": 2091
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 6352,
+          "scrollAfter": 6352
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 9301,
+          "scrollAfter": 9301
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 12251,
+          "scrollAfter": 12251
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3662,
+          "scrollAfter": 3662
+        }
+      ]
+    },
+    {
+      "width": 375,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1717,
+          "scrollAfter": 1717
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 5651,
+          "scrollAfter": 5651
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 8274,
+          "scrollAfter": 8274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 10897,
+          "scrollAfter": 10897
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3091,
+          "scrollAfter": 3091
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1717,
+          "scrollAfter": 1717
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 5651,
+          "scrollAfter": 5651
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 8274,
+          "scrollAfter": 8274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 10897,
+          "scrollAfter": 10897
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3091,
+          "scrollAfter": 3091
+        }
+      ]
+    },
+    {
+      "width": 430,
+      "flows": [
+        {
+          "villa": 5,
+          "scrollBefore": 1717,
+          "scrollAfter": 1717
+        },
+        {
+          "villa": 20,
+          "scrollBefore": 5651,
+          "scrollAfter": 5651
+        },
+        {
+          "villa": 30,
+          "scrollBefore": 8274,
+          "scrollAfter": 8274
+        },
+        {
+          "villa": 40,
+          "scrollBefore": 10897,
+          "scrollAfter": 10897
+        },
+        {
+          "villa": 33,
+          "scrollBefore": 3091,
+          "scrollAfter": 3091
+        }
+      ]
+    },
+    {
+      "width": 1280,
+      "leadsFit": {
+        "client": 917,
+        "scroll": 917
+      }
+    },
+    {
+      "width": 1440,
+      "leadsFit": {
+        "client": 1077,
+        "scroll": 1077
+      }
+    }
+  ],
+  "measurements": [
+    {
+      "kind": "owners",
+      "width": 320,
+      "page": 320,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 178,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 178,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 320,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 320,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 283,
+          "min": 13,
+          "max": 307
+        }
+      ]
+    },
+    {
+      "kind": "unit30Reload",
+      "width": 320,
+      "before30": 70.46875,
+      "after30": 70.46875
+    },
+    {
+      "kind": "leads",
+      "width": 320,
+      "page": 320,
+      "stageClient": 266,
+      "stageScroll": 266,
+      "selects": [],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "mobileLeadNote",
+      "width": 320,
+      "align": "left",
+      "whiteSpace": "normal",
+      "height": 60,
+      "card": 339.375,
+      "text": "A long note with sensible wrapping. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. "
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 320,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "owners",
+      "width": 375,
+      "page": 375,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 178,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 178,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 375,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 375,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 338,
+          "min": 13,
+          "max": 362
+        }
+      ]
+    },
+    {
+      "kind": "unit30Reload",
+      "width": 375,
+      "before30": 69.765625,
+      "after30": 69.765625
+    },
+    {
+      "kind": "leads",
+      "width": 375,
+      "page": 375,
+      "stageClient": 321,
+      "stageScroll": 321,
+      "selects": [],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "mobileLeadNote",
+      "width": 375,
+      "align": "left",
+      "whiteSpace": "normal",
+      "height": 60,
+      "card": 339.375,
+      "text": "A long note with sensible wrapping. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. "
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 375,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "owners",
+      "width": 390,
+      "page": 390,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 178,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 178,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 390,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 390,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 353,
+          "min": 13,
+          "max": 377
+        }
+      ]
+    },
+    {
+      "kind": "unit30Reload",
+      "width": 390,
+      "before30": 69.765625,
+      "after30": 69.765625
+    },
+    {
+      "kind": "leads",
+      "width": 390,
+      "page": 390,
+      "stageClient": 336,
+      "stageScroll": 336,
+      "selects": [],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "mobileLeadNote",
+      "width": 390,
+      "align": "left",
+      "whiteSpace": "normal",
+      "height": 60,
+      "card": 339.375,
+      "text": "A long note with sensible wrapping. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. "
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 390,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "owners",
+      "width": 430,
+      "page": 430,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 178,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 178,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 430,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 430,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 37,
+          "right": 393,
+          "min": 13,
+          "max": 417
+        }
+      ]
+    },
+    {
+      "kind": "unit30Reload",
+      "width": 430,
+      "before30": 69.765625,
+      "after30": 69.765625
+    },
+    {
+      "kind": "leads",
+      "width": 430,
+      "page": 430,
+      "stageClient": 376,
+      "stageScroll": 376,
+      "selects": [],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "mobileLeadNote",
+      "width": 430,
+      "align": "left",
+      "whiteSpace": "normal",
+      "height": 60,
+      "card": 339.375,
+      "text": "A long note with sensible wrapping. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. Please discuss the corner villa and arrange a viewing after 6 pm. "
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 430,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "ownerActions",
+      "width": 1280,
+      "left": 975,
+      "right": 1211,
+      "buttons": [
+        {
+          "text": "Profile",
+          "left": 987,
+          "right": 1048
+        },
+        {
+          "text": "6 Units",
+          "left": 1054,
+          "right": 1118
+        },
+        {
+          "text": "Call",
+          "left": 1124,
+          "right": 1156.453125
+        },
+        {
+          "text": "Copy",
+          "left": 1162.453125,
+          "right": 1199
+        }
+      ]
+    },
+    {
+      "kind": "owners",
+      "width": 1280,
+      "page": 1265,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 174,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 174,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 1280,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 297.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 1280,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 297.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 624.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 640.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 297.5,
+          "right": 967.5,
+          "min": 273.5,
+          "max": 991.5
+        }
+      ]
+    },
+    {
+      "kind": "leads",
+      "width": 1280,
+      "page": 1265,
+      "stageClient": 919,
+      "stageScroll": 919,
+      "selects": [
+        {
+          "value": "New",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 95
+        },
+        {
+          "value": "No Response",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 155
+        },
+        {
+          "value": "Interested",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 138
+        },
+        {
+          "value": "Viewing Scheduled",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 197
+        },
+        {
+          "value": "Visit Done",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 135
+        },
+        {
+          "value": "Negotiation",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 147
+        },
+        {
+          "value": "Won",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 98
+        },
+        {
+          "value": "Lost",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 94
+        }
+      ],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1280,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "ownerActions",
+      "width": 1440,
+      "left": 1137,
+      "right": 1373,
+      "buttons": [
+        {
+          "text": "Profile",
+          "left": 1149,
+          "right": 1210
+        },
+        {
+          "text": "6 Units",
+          "left": 1216,
+          "right": 1280
+        },
+        {
+          "text": "Call",
+          "left": 1286,
+          "right": 1318.453125
+        },
+        {
+          "text": "Copy",
+          "left": 1324.453125,
+          "right": 1361
+        }
+      ]
+    },
+    {
+      "kind": "owners",
+      "width": 1440,
+      "page": 1425,
+      "selects": [
+        {
+          "value": "Not Interested",
+          "width": 174,
+          "needed": 162
+        },
+        {
+          "value": "Invalid Number",
+          "width": 174,
+          "needed": 166
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 1440,
+      "theme": "light",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "title",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)",
+          "left": 377.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null,
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(240, 242, 247)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        }
+      ]
+    },
+    {
+      "kind": "eventForm",
+      "width": 1440,
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "event_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "lead_search",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "title",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)",
+          "left": 377.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null,
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "remind_minutes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 704.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 720.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        },
+        {
+          "name": "notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(22, 30, 45)",
+          "placeholder": null,
+          "left": 377.5,
+          "right": 1047.5,
+          "min": 353.5,
+          "max": 1071.5
+        }
+      ]
+    },
+    {
+      "kind": "leads",
+      "width": 1440,
+      "page": 1425,
+      "stageClient": 1079,
+      "stageScroll": 1079,
+      "selects": [
+        {
+          "value": "New",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 95
+        },
+        {
+          "value": "No Response",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 155
+        },
+        {
+          "value": "Interested",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 138
+        },
+        {
+          "value": "Viewing Scheduled",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 197
+        },
+        {
+          "value": "Visit Done",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 135
+        },
+        {
+          "value": "Negotiation",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 147
+        },
+        {
+          "value": "Won",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 98
+        },
+        {
+          "value": "Lost",
+          "font": "14px Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+          "padding": "0px 32px 0px 12px",
+          "width": 202,
+          "needed": 94
+        }
+      ],
+      "font": "Poppins, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#profileModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#profileModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "u6OwnerActivityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "u6OwnerActivityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#leadDetailModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#leadDetailModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "activityType",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "activityDetails",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#leadModal",
+      "theme": "light",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(15, 23, 42)",
+          "bg": "rgb(244, 246, 250)",
+          "placeholder": "rgb(91, 100, 116)"
+        }
+      ]
+    },
+    {
+      "kind": "profileFields",
+      "width": 1440,
+      "selector": "#leadModal",
+      "theme": "dark",
+      "fields": [
+        {
+          "name": "form_lead_receive_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_name",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_phone",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_email",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_project_inquired",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_budget",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_property_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_bedroom",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_source",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_status",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_assigned_to",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_date",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_follow_up_time",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_type",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_reminder_note",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        },
+        {
+          "name": "form_last_contacted",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": null
+        },
+        {
+          "name": "form_notes",
+          "fg": "rgb(232, 237, 245)",
+          "bg": "rgb(11, 15, 23)",
+          "placeholder": "rgb(138, 150, 170)"
+        }
+      ]
+    }
+  ]
+}

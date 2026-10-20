@@ -28,7 +28,7 @@ Screenshots and `results.json` go to `CRM_TEST_OUTPUT` (default:
 
 ## Assertions
 
-- 320, 375, 390 and 430 px touch-enabled mobile viewports, plus 1440 px desktop.
+- 320, 375, 390 and 430 px touch-enabled mobile viewports, plus 1280 and 1440 px desktop.
 - Menu taps and direct Owners ↔ Leads taps change the displayed view.
 - WhatsApp links open an intercepted external tab; switching back preserves
   exact scroll, filters, page and the original owner-card DOM node.
@@ -58,3 +58,27 @@ integration test. The suite does not prove production RLS, deployed functions,
 Safari behavior, iOS/Android memory eviction or the native WhatsApp app handoff.
 The branch preview should be checked with an authorized account and a physical
 phone before merge. No production data changes are needed for the UI rollout.
+
+## Mobile polish round (2026-10-20)
+
+Set `CRM_TEST_FONT_DIR` to a directory containing actual Poppins 400/500/600
+TrueType files named `poppins-400.ttf`, `poppins-500.ttf`, `poppins-600.ttf`.
+The harness serves these locally through intercepted Google Fonts requests and
+waits for `document.fonts.ready`. Without this option it deliberately tests the
+system fallback. Download the currently published font URLs from the Google
+Fonts Poppins stylesheet before running; production fonts are not bundled here.
+
+The expanded checks cover full Owner/Lead status text measured with the loaded
+font, stage controls without horizontal overflow, missing-phone placeholders and
+disabled WhatsApp buttons, hydrated related-unit actions, real SVG navigation
+icons, wrapped left-aligned long notes and bounded card height. They also cover
+light/dark event fields, entered values, placeholders, minimum 4.5:1 text contrast,
+date/time boundaries, footer buttons, owner/lead activity fields and Edit Lead
+form accessibility above the profile. Dashboard labels and semantic bar colors
+are checked after the asynchronous dashboard render completes.
+
+Each mobile width also positions Unit 30 at approximately 70px, reloads the tab,
+and checks its restored screen coordinate and retained community/cluster.
+`results.json` includes measured coordinates, widths, text requirements and field
+colors. All screenshots contain generated fixture records. This is Chromium
+browser simulation, not a physical phone/Safari/native WhatsApp test.

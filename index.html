@@ -1734,7 +1734,7 @@ body{padding:76px 20px 20px!important;background:linear-gradient(180deg,#05080d,
 
 .card{background:#060b12!important;border:1px solid #172536!important;border-radius:12px!important;box-shadow:none!important;padding:14px!important}
 .filters{gap:8px!important}.actionsRow{gap:8px!important}.quickFilters{gap:6px!important}
-input,select,textarea{background:#060b12!important;border-color:#1d2b3c!important;border-radius:8px!important}
+input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-color:var(--c-border-strong);border-radius:8px}
 .darkBtn{background:#060b12!important;border-color:#253447!important}.primaryBtn,.reset{background:linear-gradient(135deg,#126fd9,#0ca89a)!important}
 
 .tablebox{background:#05090f!important;border-color:#172536!important;border-radius:10px!important;max-height:72vh!important}
@@ -2360,9 +2360,9 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
-<link rel="stylesheet" href="crm-premium.css?v=20261020m">
-<link rel="stylesheet" href="crm-leads-fit.css?v=2">
-<link rel="stylesheet" href="crm-workspace-refinement.css?v=1">
+<link rel="stylesheet" href="crm-premium.css?v=20261020-polish">
+<link rel="stylesheet" href="crm-leads-fit.css?v=3">
+<link rel="stylesheet" href="crm-workspace-refinement.css?v=2">
 </head>
 
 <body>
@@ -6069,7 +6069,7 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { whatsapp:52, remarks:150, owner:140, community:90, cluster:90, status:118, unit:56 };
+  const fitMinimums = { whatsapp:48, remarks:64, owner:80, community:60, cluster:60, status:200, unit:48 };
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
@@ -6081,6 +6081,7 @@ setTimeout(()=>{
     if (!table) return;
     const visible = ownerColumns.filter(c => c.visible);
     const shown = Object.fromEntries(visible.map(c => [c.key, Number(c.width || 100)]));
+    if ("status" in shown && shown.status < fitMinimums.status) { shown.status = fitMinimums.status; paintOwnerWidth("status", shown.status); }
     // Profile + related units + Call + Copy must never be clipped.
     if ("actions" in shown && shown.actions < 236) { shown.actions = 236; paintOwnerWidth("actions", 236); }
     const available = table.closest(".tablebox")?.clientWidth || 0;
@@ -6465,6 +6466,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=10"></script>
+<script src="crm-enhancements.js?v=11"></script>
 </body>
 </html>

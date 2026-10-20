@@ -44,7 +44,11 @@
     for(const node of nodes){
       let value=node.tagName==='SELECT'?node.value:node.hasAttribute('data-stage')?(node.dataset.stage||'All'):node.dataset.status||node.dataset.leadStage||node.dataset.crmStatus||node.textContent.trim();
       if(node.matches('.crmBarLabel,.kpiLabel')&&!known.has(value))continue;
-      if(value)apply(node,value);
+      if(value){
+        apply(node,value);
+        // The label and track are siblings: share only the tone variables with the row.
+        if(node.matches(".crmBarLabel"))node.closest(".crmBarRow")?.setAttribute("data-crm-tone",tone(value));
+      }
     }
   }
   window.CRMStatus={mapping,tone,decorate};

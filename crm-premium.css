@@ -1,21 +1,21 @@
 /* Usama CRM design system (loaded last; scoped to body.crmPremium so the old layers stay inert).
    One font, one type scale, one spacing scale, one radius and one accent across every page. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 :root{
   --c-bg:#0b0f17;--c-surface:#111723;--c-surface-2:#161e2d;--c-raised:#1b2435;
   --c-border:rgba(148,163,184,.14);--c-border-strong:rgba(148,163,184,.26);
   --c-text:#e8edf5;--c-muted:#8a96aa;--c-faint:#5f6b7e;
-  --c-accent:#5b6cff;--c-accent-soft:rgba(91,108,255,.14);--c-accent-text:#aab4ff;
+  --c-accent:#5260e6;--c-accent-soft:rgba(91,108,255,.14);--c-accent-text:#aab4ff;
   --c-success:#22c55e;--c-warning:#f59e0b;--c-danger:#ef4444;
   --r-sm:8px;--r-md:12px;--r-lg:16px;
   --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;
-  --t-xs:12px;--t-sm:13px;--t-base:14px;--t-lg:16px;--t-xl:20px;--t-2xl:28px;
+  --t-xs:12px;--t-sm:13px;--t-base:14px;--t-lg:16px;--t-xl:20px;--t-2xl:24px;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.18);
   --sidebar:248px;
 }
 
-body.crmPremium{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;font-size:var(--t-base)!important;background:var(--c-bg)!important;color:var(--c-text)!important;letter-spacing:0!important;-webkit-font-smoothing:antialiased}
+body.crmPremium{font-family:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif!important;font-size:var(--t-base)!important;background:var(--c-bg)!important;color:var(--c-text)!important;letter-spacing:0!important;-webkit-font-smoothing:antialiased}
 body.crmPremium button,body.crmPremium input,body.crmPremium select,body.crmPremium textarea{font-family:inherit!important}
 body.crmPremium h1,body.crmPremium h2,body.crmPremium h3{letter-spacing:-.01em}
 
@@ -34,8 +34,6 @@ body.crmPremium #v7Topbar .v7Brand strong{color:var(--c-text)!important;font-wei
 body.crmPremium #v7Topbar .v7Brand span{color:var(--c-accent)!important;font-weight:700}
 body.crmPremium #v7Topbar .v7Nav button{display:flex!important;align-items:center!important;gap:var(--s-3)!important;color:var(--c-muted)!important;font-size:var(--t-base)!important;font-weight:500!important;background:transparent!important;transition:background .15s,color .15s}
 body.crmPremium #v7Topbar .v7Nav button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-/* Links added by older layers have no icon: give them the same indent and a neutral marker. */
-body.crmPremium #v7Topbar .v7Nav button:not(:has(svg))::before{content:"";width:18px;height:18px;flex:none;border-radius:5px;border:1.8px solid currentColor;opacity:.55;transform:scale(.62)}
 body.crmPremium #v7Topbar .v7Nav button:hover{color:var(--c-text)!important;background:var(--c-surface-2)!important}
 body.crmPremium #v7Topbar .v7Nav button.active{color:var(--c-text)!important;background:var(--c-accent-soft)!important;box-shadow:inset 3px 0 0 var(--c-accent)}
 body.crmPremium .v7ExportBtn{border-radius:var(--r-sm)!important}
@@ -104,10 +102,10 @@ body.crmPremium .crmCard>header{display:flex;align-items:baseline;justify-conten
 body.crmPremium .crmCard h3{margin:0;font-size:var(--t-lg);font-weight:600}
 body.crmPremium .crmCard>header span{color:var(--c-muted);font-size:var(--t-xs)}
 body.crmPremium .crmBars{display:flex;flex-direction:column;gap:2px}
-body.crmPremium .crmBarRow{display:grid;grid-template-columns:minmax(96px,150px) 1fr 84px;align-items:center;gap:var(--s-3);width:100%;padding:7px var(--s-2);border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-text);font-size:var(--t-sm);text-align:left;cursor:pointer}
+body.crmPremium .crmBarRow{display:grid;grid-template-columns:minmax(140px,180px) minmax(0,1fr) 84px;align-items:center;gap:var(--s-3);width:100%;padding:7px var(--s-2);border:0;border-radius:var(--r-sm);background:transparent;color:var(--c-text);font-size:var(--t-sm);text-align:left;cursor:pointer}
 body.crmPremium .crmBarRow:hover:not(:disabled){background:var(--c-surface-2)}
 body.crmPremium .crmBarRow:disabled{cursor:default}
-body.crmPremium .crmBarLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.crmPremium .crmBarLabel{min-width:0;white-space:normal;overflow-wrap:normal}
 body.crmPremium .crmBarTrack{height:8px;border-radius:99px;background:var(--c-surface-2);overflow:hidden}
 body.crmPremium .crmBarFill{display:block;height:100%;border-radius:99px;background:var(--c-accent)}
 body.crmPremium .crmBarValue{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
@@ -161,6 +159,7 @@ body.crmPremium .crmTimeline span{color:var(--c-muted);font-size:var(--t-xs)}
 /* ---------------------------------------------------------------- modals + toasts */
 /* Every existing popup (owner profile, lead detail, editors) sits above the sidebar. */
 body.crmPremium .modalOverlay,body.crmPremium #u10OwnerEditor{z-index:2000!important}
+body.crmPremium #leadModal{z-index:2100!important}
 body.crmPremium .crmModalScrim{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:var(--s-4);background:rgba(3,6,12,.7)}
 body.crmPremium .crmModal{display:flex;flex-direction:column;width:min(720px,100%);max-height:calc(100vh - 32px);border:1px solid var(--c-border-strong);border-radius:var(--r-lg);background:var(--c-surface);box-shadow:var(--shadow)}
 body.crmPremium .crmModal>header,body.crmPremium .crmModal>footer{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);padding:var(--s-4) var(--s-5)}
@@ -192,7 +191,7 @@ body.crmPremium .crmToastError{border-color:rgba(239,68,68,.5);color:#fecaca}
   body.crmPremium .crmKpi{min-height:96px;padding:var(--s-3) var(--s-4)}
   body.crmPremium .crmKpiValue{font-size:var(--t-xl)}
   body.crmPremium .crmCard{padding:var(--s-4)}
-  body.crmPremium .crmBarRow{grid-template-columns:96px 1fr 70px;gap:var(--s-2)}
+  body.crmPremium .crmBarRow{grid-template-columns:minmax(0,1fr) 70px;gap:var(--s-2)}
   body.crmPremium .crmActivity li{grid-template-columns:1fr;gap:4px}
   body.crmPremium .crmFormGrid{grid-template-columns:1fr}
   body.crmPremium .crmModalScrim{padding:0;align-items:stretch}
@@ -219,7 +218,7 @@ body.crmPremium #appView,body.crmPremium #leadsView,body.crmPremium #calendarMod
 
 /* headers */
 body.crmPremium .mainHeader,body.crmPremium .compactPageHeader,body.crmPremium #leadsView>.mainHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:var(--s-4)!important;flex-wrap:wrap!important;margin:0 0 var(--s-5)!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important}
-body.crmPremium .mainHeader h1,body.crmPremium .compactPageHeader h1{margin:0!important;font-size:var(--t-2xl)!important;font-weight:700!important;letter-spacing:-.01em!important;color:var(--c-text)!important;text-align:left!important}
+body.crmPremium .mainHeader h1,body.crmPremium .compactPageHeader h1{margin:0!important;font-size:var(--t-2xl)!important;font-weight:600!important;letter-spacing:-.01em!important;color:var(--c-text)!important;text-align:left!important}
 body.crmPremium .mainHeader .sub,body.crmPremium .compactPageHeader .sub{color:var(--c-muted)!important;font-size:var(--t-base)!important}
 body.crmPremium .headerBtns{display:flex!important;gap:var(--s-2)!important;flex-wrap:wrap!important}
 
@@ -236,7 +235,7 @@ body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEdit
 body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) select:not([multiple]):not([size="2"]){padding-right:32px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a96aa' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;-webkit-appearance:none!important;appearance:none!important}
 body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) textarea{height:auto!important;min-height:84px!important;padding:var(--s-3)!important;line-height:1.5!important}
 body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,select,textarea):focus{outline:none!important;border-color:var(--c-accent)!important;box-shadow:0 0 0 3px var(--c-accent-soft)!important}
-body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,textarea)::placeholder{color:var(--c-faint)!important}
+body.crmPremium :is(#appView,#leadsView,#calendarModuleView,.modal,#u10OwnerEditor,#profileModal) :is(input,textarea)::placeholder{color:var(--c-muted)!important}
 body.crmPremium :is(.modal,#u10OwnerEditor) label{display:block!important;margin:0 0 6px!important;color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
 
 /* filter panel = one card: search + selects grid, quick status chips, sort + actions */
@@ -253,7 +252,7 @@ body.crmPremium #appView .topInfo{margin:var(--s-4) 0 var(--s-2)!important;color
 body.crmPremium .dashboardCards{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:var(--s-3)!important;margin:0 0 var(--s-4)!important}
 body.crmPremium .kpiCard{padding:var(--s-4) var(--s-5)!important;border:1px solid var(--c-border)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:none!important;min-height:0!important}
 body.crmPremium .kpiLabel{color:var(--c-muted)!important;font-size:var(--t-sm)!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
-body.crmPremium .kpiValue{color:var(--c-text)!important;font-size:var(--t-2xl)!important;font-weight:700!important;line-height:1.15!important}
+body.crmPremium .kpiValue{color:var(--c-text)!important;font-size:var(--t-2xl)!important;font-weight:600!important;line-height:1.15!important}
 body.crmPremium .kpiHint{color:var(--c-faint)!important;font-size:var(--t-xs)!important}
 
 /* data tables */
@@ -286,8 +285,8 @@ body.crmPremium #followupDashboard{padding:var(--s-5)!important;border:1px solid
 body.crmPremium #followupCards>*{border-radius:var(--r-md)!important;background:var(--c-bg)!important;box-shadow:none!important}
 
 /* login */
-body.crmPremium #loginView,#loginView.loginBox{max-width:400px!important;margin:12vh auto 0!important;padding:var(--s-6)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;font-family:Inter,system-ui,sans-serif!important}
-#loginView h1{font-size:var(--t-2xl)!important;font-weight:700!important;margin:0 0 4px!important}
+body.crmPremium #loginView,#loginView.loginBox{max-width:400px!important;margin:12vh auto 0!important;padding:var(--s-6)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-lg)!important;background:var(--c-surface)!important;box-shadow:var(--shadow)!important;font-family:Poppins,system-ui,sans-serif!important}
+#loginView h1{font-size:var(--t-2xl)!important;font-weight:600!important;margin:0 0 4px!important}
 #loginView input{width:100%!important;height:44px!important;margin:var(--s-3) 0 0!important;padding:0 var(--s-3)!important;border:1px solid var(--c-border-strong)!important;border-radius:var(--r-sm)!important;background:var(--c-bg)!important;color:var(--c-text)!important;font-size:var(--t-base)!important}
 #loginView .primaryBtn{width:100%!important;height:44px!important;margin-top:var(--s-4)!important;border:0!important;border-radius:var(--r-sm)!important;background:var(--c-accent)!important;background-image:none!important;color:#fff!important;font-weight:600!important;box-shadow:none!important}
 
@@ -544,3 +543,5 @@ body.crmPremium .crmQDone{padding:14px 16px;border-radius:var(--r-md);background
 /* profile / lead detail: each side scrolls inside the window (the grid row grew to full content height and was clipped) */
 @media (min-width:801px){.u6DetailShell>.u6DetailLeft,.u6DetailShell>.u6DetailRight{max-height:90vh!important;overflow-y:auto!important;overscroll-behavior:contain}}
 body.crmPremium #profileContent .crmHistory.crmUnitPanel{grid-template-columns:1fr!important}
+
+@media(max-width:800px){body.crmPremium .crmBarTrack{grid-row:2;grid-column:1/-1}body.crmPremium .crmBarValue{grid-column:2;grid-row:1}body.crmPremium .crmBarRow{grid-template-columns:minmax(0,1fr) 70px;row-gap:7px;padding:9px 8px}}

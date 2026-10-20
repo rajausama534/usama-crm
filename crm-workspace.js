@@ -36,11 +36,19 @@
     if(!row){const {data}=await db.from(TABLE_NAME).select('*').eq('id',id).maybeSingle();row=data;}
     if(row)return openOwnerProfile(row);
   };
+  const ownerPhone=row=>formatPhone(get(row,["phone1","phone2","phone","mobile","contact"]));
+  const ownerCopy=row=>ownerPhone(row)?copyPhoneButton(row):'';
+  function ownerContact(row){
+    if(ownerPhone(row))return compactWhatsApp(whatsappButton(row));
+    return `<button type="button" class="waBtn crmWaIcon" disabled aria-label="WhatsApp unavailable: no phone number" title="No phone number">${WA_ICON}</button>`;
+  }
+  const broadcastIcon=$('v7NavBroadcast')?.querySelector('svg');
+  if(broadcastIcon){broadcastIcon.outerHTML=WA_ICON;const svg=$('v7NavBroadcast').querySelector('svg');svg.style.stroke='none';}
   const baseOwnerCell=window.ownerCell;
   window.ownerCell=function(row,col){
     if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
-    if(col.key==='whatsapp')return compactWhatsApp(whatsappButton(row));
-    if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)}${copyPhoneButton(row)}</div>`;
+    if(col.key==='whatsapp')return ownerContact(row);
+    if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)||'<span class="crmNoPhone">No phone number</span>'}${ownerCopy(row)}</div>`;
     return baseOwnerCell(row,col);
   };
   window.crmRenderOwnerCards=function(rows){
@@ -50,8 +58,8 @@
       <h3 class="crmRecordName">${esc(r.owner||'Unnamed owner')}</h3>
       <button type="button" class="crmOwnerNote crmNoteButton" data-open-owner="${esc(r.id)}">${esc(r.__u10_latest||ownerRemarkValue(r)||'No notes yet')}</button>
       <footer class="crmRecordActions">
-        <button type="button" class="crmBtn" data-open-owner="${esc(r.id)}">Open</button>${compactWhatsApp(whatsappButton(r))}${callButton(r)}
-        <details class="crmCardMore"><summary aria-label="More owner actions">•••</summary><div><span data-related-units>${moreUnitButton(r)}</span>${copyPhoneButton(r)}</div></details>
+        <button type="button" class="crmBtn" data-open-owner="${esc(r.id)}">Open</button>${ownerContact(r)}${ownerPhone(r)?callButton(r):'<span class="crmNoPhone">No phone number</span>'}
+        <details class="crmCardMore"><summary aria-label="More owner actions">•••</summary><div><span data-related-units>${moreUnitButton(r)}</span>${ownerCopy(r)}</div></details>
       </footer></article>`).join('')||'<div class="empty">No owners match these filters.</div>';
     $('mobileCards').querySelectorAll('[data-open-owner]').forEach(b=>b.onclick=()=>openOwnerProfile(rows.find(r=>String(r.id)===b.dataset.openOwner)));
   };
@@ -246,5 +254,5 @@
     wrap.onclick=e=>{if(e.target===wrap)wrap.remove();};
   };
   const primaryNav=document.querySelector('#v7Topbar .v7Nav');
-  if(primaryNav&&!primaryNav.querySelector('.crmMobileLogout')){const b=document.createElement('button');b.type='button';b.className='crmMobileLogout';b.textContent='Log out';b.onclick=()=>logout();primaryNav.append(b);}
+  if(primaryNav&&!primaryNav.querySelector('.crmMobileLogout')){const b=document.createElement('button');b.type='button';b.className='crmMobileLogout';b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-7-4h13"/></svg><span>Log out</span>';b.onclick=()=>logout();primaryNav.append(b);}
 })();

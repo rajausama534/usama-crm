@@ -196,7 +196,7 @@
         const btn=document.createElement('button');
         btn.type='button';
         btn.dataset.unitFinderEntry='nav';
-        btn.textContent='Unit Finder';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10 12 3l9 7v11h-6v-7H9v7H3Z"/></svg><span>Unit Finder</span>';
         btn.addEventListener('click',openUnitFinder);
         nav.appendChild(btn);
       }
@@ -204,7 +204,7 @@
         const btn=document.createElement('button');
         btn.type='button';
         btn.dataset.ownerFinderEntry='nav';
-        btn.textContent='Owner Finder';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 21v-2a7 7 0 0 1 10-6m5 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm2 5 3 3"/></svg><span>Owner Finder</span>';
         btn.addEventListener('click',openOwnerFinder);
         nav.appendChild(btn);
       }
@@ -212,7 +212,7 @@
         const btn=document.createElement('button');
         btn.type='button';
         btn.dataset.clusterGuideEntry='nav';
-        btn.textContent='Cluster Guide';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/></svg><span>Cluster Guide</span>';
         btn.addEventListener('click',openClusterGuide);
         nav.appendChild(btn);
       }
