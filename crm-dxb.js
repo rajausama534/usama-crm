@@ -3,7 +3,8 @@
   // Receives sales sent by the Chrome extension from DXBinteract (index.html#dxb=...), previews the
   // exact-unit matches (database dry run) and imports them only when the admin confirms.
   if(typeof db==='undefined')return;
-  const m=location.hash.match(/^#dxb=(.+)$/);if(!m)return;
+  const m=(window.__crmInitialHash||location.hash).match(/^#dxb=(.+)$/);if(!m)return;
+  window.__crmInitialHash='';
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const toast=(msg,err)=>{const t=document.createElement('div');t.className='crmToast'+(err?' crmToastError':'');t.textContent=msg;document.body.append(t);setTimeout(()=>t.remove(),4200);};
   let payload;

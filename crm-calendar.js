@@ -298,7 +298,7 @@
   else{const t=setInterval(()=>{if(typeof currentUserEmail!=='undefined'&&currentUserEmail){clearInterval(t);refreshBell();setInterval(refreshBell,120000);}},1000);}
 
   // Deep links: index.html#calendar, index.html#lead=<id>
-  const hash=location.hash;
+  const hash=window.__crmInitialHash||location.hash;
   if(hash==='#calendar')setTimeout(()=>showCalendarModule(),300);
   const m=hash.match(/^#lead=([0-9a-f-]{36})$/i);if(m)setTimeout(()=>crmOpenLead(m[1]),300);
 })();
