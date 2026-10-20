@@ -1,5 +1,5 @@
 -- Merge duplicate owner rows that are the SAME PERSON on the SAME UNIT (approved 20 Oct 2026).
--- Same person = all words of the shorter name appear in the longer name, or the same phone number.
+-- Same person = all words of the shorter name appear in the longer name (a shared phone alone is NOT enough).
 -- Different people on one unit (joint / previous owners) are left alone.
 -- Keeper = the most recently worked row (status set, contacted, remarks or manual notes); if none was worked,
 --          the newest row (highest id = latest import).
@@ -61,9 +61,8 @@ begin
         if (
              (jsonb_array_length(rows_ -> i -> 'words') > 0 and jsonb_array_length(rows_ -> j -> 'words') > 0 and
               ((rows_ -> i -> 'words') <@ (rows_ -> j -> 'words') or (rows_ -> j -> 'words') <@ (rows_ -> i -> 'words')))
-             or (coalesce(rows_ -> i ->> 'p1', '') <> '' and (rows_ -> i ->> 'p1') in (rows_ -> j ->> 'p1', rows_ -> j ->> 'p2'))
-             or (coalesce(rows_ -> i ->> 'p2', '') <> '' and (rows_ -> i ->> 'p2') in (rows_ -> j ->> 'p1', rows_ -> j ->> 'p2'))
            ) then
+          -- names only: a shared phone matched different people (agents' numbers, spouses), so it is not used
           -- merge components: relabel every member of j's component to i's root
           k := parent[j + 1];
           for ri in select generate_subscripts(parent, 1) s loop
