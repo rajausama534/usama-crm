@@ -525,3 +525,18 @@ html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,
 html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"]) :is([class*="Note"],[class*="note"],[class*="emark"]){background:var(--c-surface-2)!important;border:1px solid var(--c-border)!important}
 html[data-theme="light"] body.crmPremium :is(#leadMobileCards,#ownerMobileCards,[id*="MobileCards"],[class*="mobileCards"])>*{background:var(--c-surface)!important;border-color:var(--c-border)!important}
 body.crmPremium .crmTable td{color:var(--c-text)!important}
+/* broadcast: custom range + send queue */
+body.crmPremium .crmRangeBox{display:flex;gap:8px;align-items:flex-end;margin-top:8px}
+body.crmPremium .crmRangeBox label{display:grid;gap:4px;font-size:var(--t-xs);color:var(--c-muted);font-weight:600}
+body.crmPremium .crmRangeBox input{width:96px!important}
+body.crmPremium .crmPickNo{display:inline-block;min-width:34px;color:var(--c-accent-text);font-variant-numeric:tabular-nums}
+body.crmPremium .crmSendQueue{margin:12px 0}
+body.crmPremium .crmQHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;color:var(--c-muted);font-size:var(--t-sm);font-weight:600}
+body.crmPremium .crmQApp{display:flex;align-items:center;gap:6px}
+body.crmPremium .crmQApp select{height:32px!important;min-height:32px!important;width:auto!important}
+body.crmPremium .crmQCard{padding:14px 16px;border:1px solid var(--c-border);border-radius:var(--r-md);background:var(--c-bg)}
+body.crmPremium .crmQCard strong{display:block;font-size:var(--t-lg)}
+body.crmPremium .crmQCard span{color:var(--c-muted);font-size:var(--t-sm)}
+body.crmPremium .crmQCard p{margin:10px 0 0;white-space:pre-wrap;font-size:var(--t-sm)}
+body.crmPremium .crmQActions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+body.crmPremium .crmQDone{padding:14px 16px;border-radius:var(--r-md);background:var(--c-accent-soft)}
