@@ -6069,8 +6069,7 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { whatsapp:52, remarks:130, owner:130, community:90, cluster:90, status:120, unit:56 };
-  const fitOrder = ["whatsapp", "remarks", "owner", "community", "cluster", "status", "unit"];
+  const fitMinimums = { whatsapp:52, remarks:150, owner:140, community:90, cluster:90, status:118, unit:56 };
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
@@ -6082,13 +6081,16 @@ setTimeout(()=>{
     if (!table) return;
     const visible = ownerColumns.filter(c => c.visible);
     const shown = Object.fromEntries(visible.map(c => [c.key, Number(c.width || 100)]));
+    // Profile + related units + Call + Copy must never be clipped.
+    if ("actions" in shown && shown.actions < 236) { shown.actions = 236; paintOwnerWidth("actions", 236); }
     const available = table.closest(".tablebox")?.clientWidth || 0;
-    let excess = 42 + Object.values(shown).reduce((a, b) => a + b, 0) - available;
-    for (const key of fitOrder) {
-      if (!(available > 0) || excess <= 0) break;
-      if (!(key in shown)) continue;
-      const cut = Math.min(excess, Math.max(0, shown[key] - fitMinimums[key]));
-      if (cut) { shown[key] -= cut; excess -= cut; paintOwnerWidth(key, shown[key]); }
+    const excess = 42 + Object.values(shown).reduce((a, b) => a + b, 0) - available;
+    // Shrink every flexible column in proportion to how much room it has above its minimum.
+    const room = Object.keys(fitMinimums).filter(k => k in shown).map(k => [k, Math.max(0, shown[k] - fitMinimums[k])]);
+    const totalRoom = room.reduce((a, [, r]) => a + r, 0);
+    if (available > 0 && excess > 0 && totalRoom > 0) {
+      const ratio = Math.min(1, excess / totalRoom);
+      for (const [key, r] of room) { shown[key] = Math.floor(shown[key] - r * ratio); paintOwnerWidth(key, shown[key]); }
     }
     const total = 42 + Object.values(shown).reduce((a, b) => a + b, 0);
     table.style.setProperty("width", `${total}px`, "important");
