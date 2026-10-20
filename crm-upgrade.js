@@ -56,7 +56,7 @@
   }
 
   // ------------------------------------------------------------------ dashboard
-  const LEAD_STAGES=['New','Call Back','Interested','Viewing Done','Negotiation','Won','Lost'];
+  const LEAD_STAGES=['New','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
   const OWNER_ORDER=['For Sale','For Rent','Sold','Rented','Contacted','Call Back','No Response','Not Interested','Invalid Number','Agent','New','-'];
 
   function displayName(){
@@ -160,7 +160,7 @@
         ${kpi('New this week',fmt(L.new_7d),'Created in the last 7 days','leads')}
         ${kpi('Follow-ups today',fmt(L.followups_today),'Scheduled for today','leads')}
         ${kpi('Overdue follow-ups',fmt(L.followups_overdue),'Date has passed','leads')}
-        ${kpi('Interested → Negotiation',fmt((ls['Interested']||0)+(ls['Viewing Done']||0)+(ls['Negotiation']||0)),'Interested, viewing done or negotiating','leads')}
+        ${kpi('Interested → Negotiation',fmt((ls['Interested']||0)+(ls['Viewing Scheduled']||0)+(ls['Visit Done']||0)+(ls['Negotiation']||0)),'Interested, viewing or negotiating','leads')}
       </div>
       <section class="crmSectionTitle"><h2>Today &amp; this week</h2></section>
       <div class="crmKpiGrid">${(()=>{const ev=agenda?.data||[],now=new Date(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);

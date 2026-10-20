@@ -2615,11 +2615,12 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
         <select id="leadStatusFilter">
           <option value="">All Statuses</option>
           <option>New</option>
-          <option>Contacted</option>
-          <option>Call Back</option>
+          <option>No Response</option>
           <option>Interested</option>
-          <option>Viewing</option>
+          <option>Viewing Scheduled</option>
+          <option>Visit Done</option>
           <option>Negotiation</option>
+          <option>Won</option>
           <option>Lost</option>
         </select>
         <select id="leadSourceFilter"><option value="">All Sources</option></select>
@@ -2629,11 +2630,12 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
 
       <div class="quickFilters">
         <button onclick="quickLeadStatus('New')">New</button>
-        <button onclick="quickLeadStatus('Contacted')">Contacted</button>
-        <button onclick="quickLeadStatus('Call Back')">Call Back</button>
+        <button onclick="quickLeadStatus('No Response')">No Response</button>
         <button onclick="quickLeadStatus('Interested')">Interested</button>
-        <button onclick="quickLeadStatus('Viewing')">Viewing</button>
+        <button onclick="quickLeadStatus('Viewing Scheduled')">Viewing Scheduled</button>
+        <button onclick="quickLeadStatus('Visit Done')">Visit Done</button>
         <button onclick="quickLeadStatus('Negotiation')">Negotiation</button>
+        <button onclick="quickLeadStatus('Won')">Won</button>
         <button onclick="quickLeadStatus('Lost')">Lost</button>
       </div>
 
@@ -2768,11 +2770,12 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
           <label>Status</label>
           <select id="form_status">
             <option>New</option>
-            <option>Contacted</option>
-            <option>Call Back</option>
+            <option>No Response</option>
             <option>Interested</option>
-            <option>Viewing</option>
+            <option>Viewing Scheduled</option>
+            <option>Visit Done</option>
             <option>Negotiation</option>
+            <option>Won</option>
             <option>Lost</option>
           </select>
         </div>
@@ -3147,7 +3150,7 @@ input,select,textarea{background:#060b12!important;border-color:#1d2b3c!importan
         if (isAdmin) {
           leads = await countRows(LEADS_TABLE);
           interested = await countRows(LEADS_TABLE, "status", "Interested");
-          viewing = await countRows(LEADS_TABLE, "status", "Viewing");
+          viewing = await countRows(LEADS_TABLE, "status", "Viewing Scheduled");
         }
 
         safeText("homeOwners", owners);
@@ -4042,7 +4045,7 @@ ${agentName}`;
     }
 
     function leadStatuses() {
-      return ["New", "Call Back", "Interested", "Viewing Done", "Negotiation", "Won", "Lost"];
+      return ["New","No Response","Interested","Viewing Scheduled","Visit Done","Negotiation","Won","Lost"];
     }
 
     function leadDropdownOptions(key) {
@@ -4599,7 +4602,7 @@ Usama Bin Nusrat.`;
     const OWNER_STATUS_KEY = "usama_owner_custom_statuses_v1";
     const PIPELINE_STAGE_KEY = "usama_lead_pipeline_stages_v1";
     const DEFAULT_OWNER_STATUSES = ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
-    const DEFAULT_PIPELINE_STAGES = ["New","Call Back","Interested","Viewing Done","Negotiation","Won","Lost"];
+    const DEFAULT_PIPELINE_STAGES = ["New","No Response","Interested","Viewing Scheduled","Visit Done","Negotiation","Won","Lost"];
     let leadViewMode = "table";
     let selectedOwnerIds = new Set();
     let currentOwnerPageRows = [];
@@ -4608,7 +4611,7 @@ Usama Bin Nusrat.`;
 
     function uniqClean(values){ return [...new Set((values||[]).map(v=>String(v||"").trim()).filter(Boolean))]; }
     function getOwnerStatuses(){ try{return uniqClean([...DEFAULT_OWNER_STATUSES,...JSON.parse(localStorage.getItem(OWNER_STATUS_KEY)||"[]")]);}catch{return [...DEFAULT_OWNER_STATUSES];} }
-    function getPipelineStages(){ try{return uniqClean([...DEFAULT_PIPELINE_STAGES,...JSON.parse(localStorage.getItem(PIPELINE_STAGE_KEY)||"[]")]);}catch{return [...DEFAULT_PIPELINE_STAGES];} }
+    function getPipelineStages(){ return [...DEFAULT_PIPELINE_STAGES]; }
     function saveCustomOwnerStatuses(values){ localStorage.setItem(OWNER_STATUS_KEY,JSON.stringify(uniqClean(values.filter(v=>!DEFAULT_OWNER_STATUSES.includes(v))))); refreshOwnerStatusUI(); }
     function savePipelineStages(values){ localStorage.setItem(PIPELINE_STAGE_KEY,JSON.stringify(uniqClean(values))); refreshLeadStatusUI(); }
 
@@ -5136,7 +5139,7 @@ async function u6AddOwnerActivity(ownerId){
 /* LEAD DETAIL — all information left, timeline right */
 renderLeadDetail = function(lead,acts){
   const stages=getPipelineStages ? getPipelineStages() :
-    ["New","Contacted","Call Back","Interested","Viewing","Negotiation","Lost"];
+    ["New","No Response","Interested","Viewing Scheduled","Visit Done","Negotiation","Won","Lost"];
 
   const createdDate=lead.created_at||lead.lead_receive_date||null;
   const timeline=[

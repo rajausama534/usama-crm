@@ -4,7 +4,7 @@
   // one primary action, a "More" menu, primary filters visible, secondary filters behind "Filters".
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const STAGES=['New','Call Back','Interested','Viewing Done','Negotiation','Won','Lost'];
+  const STAGES=['New','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
 
   function moreMenu(items){
     const wrap=document.createElement('div');wrap.className='crmMore';
