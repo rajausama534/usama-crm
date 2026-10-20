@@ -540,3 +540,6 @@ body.crmPremium .crmQCard span{color:var(--c-muted);font-size:var(--t-sm)}
 body.crmPremium .crmQCard p{margin:10px 0 0;white-space:pre-wrap;font-size:var(--t-sm)}
 body.crmPremium .crmQActions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 body.crmPremium .crmQDone{padding:14px 16px;border-radius:var(--r-md);background:var(--c-accent-soft)}
+
+/* profile / lead detail: each side scrolls inside the window (the grid row grew to full content height and was clipped) */
+@media (min-width:801px){.u6DetailShell>.u6DetailLeft,.u6DetailShell>.u6DetailRight{max-height:90vh!important;overflow-y:auto!important;overscroll-behavior:contain}}
