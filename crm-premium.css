@@ -421,6 +421,7 @@ html[data-theme="light"] body.crmPremium .crmNoteList li.is-overdue .crmNoteKind
 html[data-theme="light"] body.crmPremium .crmNoteList li.is-due_soon .crmNoteKind{color:#b45309!important}
 html[data-theme="light"] body.crmPremium .crmSideGroup.is-overdue>header span{color:#b91c1c}
 html[data-theme="light"] body.crmPremium .modalOverlay,html[data-theme="light"] body.crmPremium .crmModalScrim{background:rgba(15,23,42,.35)!important}
+html[data-theme="light"] body.crmPremium .modalRow{color:var(--c-text)!important;border-top-color:var(--c-border)!important}
 html[data-theme="light"] body.crmPremium [data-crm-status]{background:var(--c-surface-2)!important;color:var(--c-text)!important;border-color:var(--c-border-strong)!important}
 html[data-theme="light"] #loginView{background:#fff!important;color:#0f172a!important}
 html[data-theme="light"] #loginView input{background:#f4f6fa!important;color:#0f172a!important}
@@ -545,3 +546,9 @@ body.crmPremium .crmQDone{padding:14px 16px;border-radius:var(--r-md);background
 body.crmPremium #profileContent .crmHistory.crmUnitPanel{grid-template-columns:1fr!important}
 
 @media(max-width:800px){body.crmPremium .crmBarTrack{grid-row:2;grid-column:1/-1}body.crmPremium .crmBarValue{grid-column:2;grid-row:1}body.crmPremium .crmBarRow{grid-template-columns:minmax(0,1fr) 70px;row-gap:7px;padding:9px 8px}}
+
+/* More Units modal: keep the title and Close button visible while the unit list scrolls */
+body.crmPremium #propertiesModal .modal{padding-top:0!important;padding-bottom:0!important}
+body.crmPremium #propertiesModal #modalTitle{position:sticky;top:0;z-index:1;margin:0!important;padding:var(--s-4,16px) 0 var(--s-3,12px);background:var(--c-surface)}
+body.crmPremium #propertiesModal .modalActions{position:sticky;bottom:0;margin:0!important;padding:var(--s-3,12px) 0 var(--s-4,16px);background:var(--c-surface);border-top:1px solid var(--c-border)}
+body.crmPremium #propertiesModal .modalRow{color:var(--c-text)}
