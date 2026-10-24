@@ -4,7 +4,9 @@
 -- private.crm_sale_note            builds the note
 -- private.crm_reformat_sale_text   rewrites every old-style sale note inside a piece of text
 -- private.crm_reformat_sale_notes  preview (dry run) or apply on owner_activities.details and
---                                  owners.admin_remarks / agent_remarks, with backup tables
+--                                  owners.admin_remarks / agent_remarks, with backup tables.
+--                                  It also takes "merge" out of notes moved over by the duplicate-owner
+--                                  merge: type "Merged note" -> "Note", prefix "From merged duplicate (X): " removed.
 -- public.crm_import_external_sales now writes new notes in this format.
 
 create or replace function private.crm_sale_note(beds text, amount numeric, sold_on date, size_sqft numeric)
@@ -71,14 +73,17 @@ create table if not exists private.sale_notes_backup_20261024 (
   source text not null,         -- 'activity' | 'admin_remarks' | 'agent_remarks'
   id text not null,
   original text,
+  original_type text,           -- activity type before the change (activities only)
   backed_up_at timestamptz not null default now(),
   primary key (source, id)
 );
+alter table private.sale_notes_backup_20261024 add column if not exists original_type text;
 
 -- select * from private.crm_reformat_sale_notes(true);   -- preview: before / after, nothing changes
 -- select * from private.crm_reformat_sale_notes(false);  -- apply (originals kept in private.sale_notes_backup_20261024)
+drop function if exists private.crm_reformat_sale_notes(boolean);
 create or replace function private.crm_reformat_sale_notes(dry_run boolean default true)
-returns table (source text, id text, owner text, before text, after text)
+returns table (source text, id text, owner text, type_before text, type_after text, before text, after text)
 language plpgsql set search_path = '' as $$
 begin
   drop table if exists sale_note_changes;
@@ -97,22 +102,26 @@ begin
     left join public.dld_transactions dt on dt.transaction_number = pt.dld_transaction_number
   ),
   candidates as (
-    select 'activity'::text as source, a.id::text as id, a.owner_id, a.details as before from public.owner_activities a where a.details ~* 'AED'
+    select 'activity'::text as source, a.id::text as id, a.owner_id, a.activity_type as type_before, a.details as before
+    from public.owner_activities a
+    where a.details ~* 'AED' or a.activity_type = 'Merged note' or a.details ~ '^From merged duplicate \('
     union all
-    select 'admin_remarks', o.id::text, o.id::text, o.admin_remarks from public.owners o where o.admin_remarks ~* 'AED'
+    select 'admin_remarks', o.id::text, o.id::text, null, o.admin_remarks from public.owners o where o.admin_remarks ~* 'AED'
     union all
-    select 'agent_remarks', o.id::text, o.id::text, o.agent_remarks from public.owners o where o.agent_remarks ~* 'AED'
+    select 'agent_remarks', o.id::text, o.id::text, null, o.agent_remarks from public.owners o where o.agent_remarks ~* 'AED'
   )
-  select c.source, c.id, c.owner_id, c.before,
-         private.crm_reformat_sale_text(c.before, f.beds, f.size_sqft) as after
+  select c.source, c.id, c.owner_id, c.type_before,
+         case when c.type_before = 'Merged note' then 'Note' else c.type_before end as type_after,
+         c.before,
+         private.crm_reformat_sale_text(regexp_replace(c.before, '^From merged duplicate \([^)]*\):\s*', ''), f.beds, f.size_sqft) as after
   from candidates c left join unit_facts f on f.owner_id = c.owner_id;
-  delete from sale_note_changes s where s.after is not distinct from s.before;
+  delete from sale_note_changes s where s.after is not distinct from s.before and s.type_after is not distinct from s.type_before;
 
   if not dry_run then
-    insert into private.sale_notes_backup_20261024 (source, id, original)
-    select s.source, s.id, s.before from sale_note_changes s
+    insert into private.sale_notes_backup_20261024 (source, id, original, original_type)
+    select s.source, s.id, s.before, s.type_before from sale_note_changes s
     on conflict do nothing;
-    update public.owner_activities a set details = s.after
+    update public.owner_activities a set details = s.after, activity_type = s.type_after
       from sale_note_changes s where s.source = 'activity' and a.id::text = s.id;
     update public.owners o set admin_remarks = s.after
       from sale_note_changes s where s.source = 'admin_remarks' and o.id::text = s.id;
@@ -121,7 +130,7 @@ begin
   end if;
 
   return query
-    select s.source, s.id, concat_ws(' · ', o.owner, o.cluster, o.unit), s.before, s.after
+    select s.source, s.id, concat_ws(' · ', o.owner, o.cluster, o.unit), s.type_before, s.type_after, s.before, s.after
     from sale_note_changes s left join public.owners o on o.id::text = s.owner_id
     order by o.cluster, o.unit, s.source;
 end $$;
@@ -177,3 +186,51 @@ begin
 end $$;
 revoke execute on function public.crm_import_external_sales(jsonb, text, boolean) from public, anon;
 grant execute on function public.crm_import_external_sales(jsonb, text, boolean) to authenticated;
+
+-- Future duplicate-owner merges keep a differing remark as a plain "Note", without "merge" wording.
+create or replace function private.apply_owner_merge_plan() returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare k record; moved int := 0; removed int := 0; best text; ph1 text; ph2 text; rem record;
+begin
+  for k in select keep_id, array_agg(remove_id) rm from public.owner_merge_plan group by keep_id loop
+    -- fullest name among the same person's rows
+    select o.owner into best from public.owners o where o.id = k.keep_id or o.id = any(k.rm)
+      order by array_length(private.name_words(o.owner), 1) desc nulls last, length(coalesce(o.owner, '')) desc limit 1;
+    -- phones: keep keeper's, fill blanks from the others (newest first)
+    select coalesce(nullif(kp.phone1, ''), (select o.phone1 from public.owners o where o.id = any(k.rm) and coalesce(o.phone1, '') <> '' order by o.id desc limit 1)),
+           coalesce(nullif(kp.phone2, ''), (select o.phone2 from public.owners o where o.id = any(k.rm) and coalesce(o.phone2, '') <> '' and o.phone2 is distinct from kp.phone1 order by o.id desc limit 1))
+      into ph1, ph2 from public.owners kp where kp.id = k.keep_id;
+    update public.owners o set
+      owner = coalesce(best, o.owner),
+      phone1 = coalesce(ph1, o.phone1),
+      phone2 = case when ph2 is null or ph2 is not distinct from ph1 then o.phone2 else ph2 end,
+      admin_remarks = coalesce(nullif(o.admin_remarks, ''), (select x.admin_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.admin_remarks, '') <> '' order by x.id desc limit 1), o.admin_remarks),
+      agent_remarks = coalesce(nullif(o.agent_remarks, ''), (select x.agent_remarks from public.owners x where x.id = any(k.rm) and coalesce(x.agent_remarks, '') <> '' order by x.id desc limit 1), o.agent_remarks),
+      remarks = coalesce(nullif(o.remarks, ''), (select x.remarks from public.owners x where x.id = any(k.rm) and coalesce(x.remarks, '') <> '' order by x.id desc limit 1), o.remarks),
+      email = coalesce(nullif(o.email, ''), (select x.email from public.owners x where x.id = any(k.rm) and coalesce(x.email, '') <> '' order by x.id desc limit 1), o.email),
+      last_contacted = greatest(o.last_contacted, (select max(x.last_contacted) from public.owners x where x.id = any(k.rm)))
+    where o.id = k.keep_id;
+    -- remarks that differ from the keeper's are kept as a plain note on the keeper (no "merge" wording)
+    for rem in select x.id, x.owner, nullif(x.admin_remarks, '') ar, nullif(x.agent_remarks, '') gr, nullif(x.remarks, '') r
+               from public.owners x where x.id = any(k.rm) loop
+      insert into public.owner_activities (owner_id, activity_type, details, created_by)
+      select k.keep_id::text, 'Note', t, 'owner-merge'
+      from unnest(array[rem.ar, rem.gr, rem.r]) t
+      where t is not null
+        and t not in (select coalesce(admin_remarks, '') from public.owners where id = k.keep_id
+                      union select coalesce(agent_remarks, '') from public.owners where id = k.keep_id
+                      union select coalesce(remarks, '') from public.owners where id = k.keep_id);
+    end loop;
+    -- notes and WhatsApp logs follow the keeper
+    update public.owner_activities set owner_id = k.keep_id::text where owner_id = any(select x::text from unnest(k.rm) x);
+    get diagnostics moved = row_count;
+    update public.whatsapp_broadcast_log set owner_id = k.keep_id::text where owner_id = any(select x::text from unnest(k.rm) x);
+    -- back up, then remove
+    insert into public.owners_merged_20261020 select o.*, k.keep_id, now() from public.owners o where o.id = any(k.rm) on conflict do nothing;
+    delete from public.owners o where o.id = any(k.rm)
+      and exists (select 1 from public.owners_merged_20261020 b where b.id = o.id);
+    get diagnostics removed = row_count;
+  end loop;
+  return jsonb_build_object('backed_up', (select count(*) from public.owners_merged_20261020), 'owners_now', (select count(*) from public.owners));
+end $$;
+revoke all on function private.apply_owner_merge_plan() from public, anon, authenticated;
