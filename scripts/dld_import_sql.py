@@ -48,6 +48,19 @@ def money_text(amount):
     return f"AED {amount:,.0f}"
 
 
+def sale_note(beds, amount, sold_on, size_sqft=None):
+    """The one CRM sale-note format: "4BR SOLD 7.5M Dec-2025, size 6,444 sq ft" (same as private.crm_sale_note)."""
+    if amount >= 1_000_000:
+        price = f"{amount / 1_000_000:.2f}".rstrip("0").rstrip(".") + "M"
+    elif amount >= 1_000:
+        price = f"{amount / 1_000:.1f}".rstrip("0").rstrip(".") + "K"
+    else:
+        price = f"{amount:,.0f}"
+    digits = re.search(r"\d+", str(beds or ""))
+    note = " ".join(([digits.group() + "BR"] if digits else []) + ["SOLD", price, sold_on.strftime("%b-%Y")])
+    return note + (f", size {round(size_sqft):,} sq ft" if size_sqft else "")
+
+
 def main(dld_path, matches_path, out_path):
     rows = [json.loads(l) for l in open(dld_path)]
     out = ["begin;"]
@@ -76,9 +89,8 @@ def main(dld_path, matches_path, out_path):
             continue  # e.g. "Palmiera" in a report vs Palmiera 1/2/3 in the CRM: phase unknown, skip
         community, cluster = target[0]
         n = int(m["unit"])
-        area_label = "Plot" if m["area_type"] == "plot" else "Area"
-        date_text = __import__("datetime").date.fromisoformat(m["transaction_date"]).strftime("%-d %b %Y")
-        note = f"Sold {money_text(m['amount'])} — {date_text}" + (f" — {area_label} {m['area_sqft']:,} sq ft" if m["area_sqft"] else "")
+        sold_on = __import__("datetime").date.fromisoformat(m["transaction_date"])
+        note = sale_note(m.get("rooms"), m["amount"], sold_on, m["area_sqft"])
         unit_rows = f"from public.owners o where o.community = {q(community)} and o.cluster = {q(cluster)} and private.unit_number(o.unit) = {n}"
         # Only link when the CRM has exactly one unit label for this number in this cluster.
         out.append(

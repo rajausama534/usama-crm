@@ -102,7 +102,7 @@ def main(dld_path, units_path, out_path):
                     "transaction_date": date.isoformat(), "amount": amount,
                     "area_sqft": round(area_sqm * SQM_TO_SQFT) if area_sqm else None,
                     "area_type": "plot" if is_land else "property",
-                    "dld_transaction_number": r["TRANSACTION_NUMBER"],
+                    "dld_transaction_number": r["TRANSACTION_NUMBER"], "rooms": r.get("ROOMS_EN"),
                     "dld_procedure": r.get("PROCEDURE_EN"), "source_file": f,
                 })
     # Two report lines pointing at the same DLD sale would be a contradiction: drop both.

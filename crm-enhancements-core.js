@@ -224,7 +224,9 @@
   const migrationTimer=setInterval(()=>{
     if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){
       clearInterval(migrationTimer);
-      runMigration();
+      // Retired 24 Oct 2026: sale notes now use one format (see supabase/migrations/20261024100000_sale_note_format.sql),
+      // so this importer would no longer recognise its notes and would add them again in the old format.
+      // runMigration();
     }
   },1000);
   setTimeout(()=>clearInterval(migrationTimer),120000);
@@ -307,7 +309,9 @@
   const timer=setInterval(()=>{
     if(typeof currentUserEmail!=='undefined'&&currentUserEmail&&typeof isAdmin!=='undefined'&&isAdmin){
       clearInterval(timer);
-      runRivanaMigration();
+      // Retired 24 Oct 2026: sale notes now use one format (see supabase/migrations/20261024100000_sale_note_format.sql),
+      // so this importer would no longer recognise its notes and would add them again in the old format.
+      // runRivanaMigration();
     }
   },1000);
   setTimeout(()=>clearInterval(timer),120000);

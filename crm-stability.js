@@ -321,7 +321,9 @@
     attempts++;
     if(typeof currentUserEmail !== 'undefined' && currentUserEmail && (typeof isAdmin === 'undefined' || isAdmin)){
       clearInterval(readyTimer);
-      runTransactionAppend();
+      // Retired 24 Oct 2026: sale notes now use one format (see supabase/migrations/20261024100000_sale_note_format.sql),
+      // so this importer would no longer recognise its notes and would add them again in the old format.
+      // runTransactionAppend();
       try{ if(typeof refreshOwnerStatusUI === 'function') refreshOwnerStatusUI(); }catch(_){ }
       try{ if(typeof loadData === 'function') loadData(); }catch(_){ }
     }else if(attempts >= 120){
