@@ -25,7 +25,8 @@ $$;
 --   Type: 4BR\nPlot: 9,628 sqft\nLast Transaction: AED 8,001,888 - 22 Mar 2024
 --   4BR\nSize: 8,267 sqft\nSold Price: AED 9,500,000 (2nd Transaction) - 10 Sep 2026
 --   2nd Transaction: AED 9,500,000 - 10 Sep 2026\n4BR\nSize: 8,267 sqft
---   Last Sale Transaction: AED 7,050,000 - 17 Aug 2026   (also "Sale - Sold:", "Last Transaction - Sold:")
+--   Last Sale Transaction: AED 7,050,000 - 17 Aug 2026   (also "Sale - Sold:", "Last Transaction - Sold:", "Last Transaction:")
+--   (hand-edited copies too: "Type:" missing, parts on one line, "SOLD AED 7,506,888 - 13 May 2026")
 --   Sold AED 7.5M — 17 Aug 2026 — Plot 6,444 sq ft · BUA 3,900 sq ft   (also "— Area …", "(Alana sales report)")
 -- Rental notes are not sales and are left as they are.
 create or replace function private.crm_reformat_sale_text(txt text, fallback_beds text default null, fallback_size numeric default null)
@@ -40,20 +41,20 @@ begin
     guard := guard + 1;
     exit when guard > 100;
     -- each branch: whole match, beds, size, amount, millions flag, date
-    m := regexp_match(out, '(Type:\s*(\d+)\s*BR\s*\n\s*Plot:\s*([\d,]+)\s*sq\s*ft\s*\n\s*Last Transaction:\s*AED\s*([\d,]+)()\s*-\s*' || dt || ')', 'i');
+    m := regexp_match(out, '((?:Type:\s*)?(\d+)\s*BR\s+Plot:\s*([\d,]+)\s*sq\s*ft\s+Last Transaction:\s*AED\s*([\d,]+)()\s*-\s*' || dt || ')', 'i');
     if m is null then
-      m := regexp_match(out, '((\d+)\s*BR\s*\n\s*Size:\s*([\d,]+)\s*sq\s*ft\s*\n\s*Sold Price:\s*AED\s*([\d,]+)()(?:\s*\([^)\n]*\))?\s*-\s*' || dt || ')', 'i');
+      m := regexp_match(out, '((\d+)\s*BR\s+Size:\s*([\d,]+)\s*sq\s*ft\s+Sold Price:\s*AED\s*([\d,]+)()(?:\s*\([^)\n]*\))?\s*-\s*' || dt || ')', 'i');
     end if;
     if m is null then
       m := regexp_match(out, '(\d+(?:st|nd|rd|th) Transaction:\s*AED\s*([\d,]+)\s*-\s*' || dt || '(?:\s*\n\s*(\d+)\s*BR)?(?:\s*\n\s*Size:\s*([\d,]+)\s*sq\s*ft)?)', 'i');
       if m is not null then m := array[m[1], m[4], m[5], m[2], '', m[3]]; end if;
     end if;
     if m is null then
-      m := regexp_match(out, '((?:Last Sale Transaction|Sale - Sold|Last Transaction - Sold):\s*AED\s*([\d,]+)\s*-\s*' || dt || ')', 'i');
+      m := regexp_match(out, '((?:Last Sale Transaction|Sale - Sold|Last Transaction - Sold|Last Transaction):\s*AED\s*([\d,]+)\s*-\s*' || dt || ')', 'i');
       if m is not null then m := array[m[1], null, null, m[2], '', m[3]]; end if;
     end if;
     if m is null then
-      m := regexp_match(out, '(Sold AED\s*([\d,]+(?:\.\d+)?)(M?)\s*—\s*' || dt || '(?:\s*—\s*(?:Plot|Area)\s*([\d,]+)\s*sq ft(?:\s*·\s*BUA\s*[\d,]+\s*sq ft)?)?(?:\s*\(Alana sales report\))?)', 'i');
+      m := regexp_match(out, '(Sold AED\s*([\d,]+(?:\.\d+)?)(M?)\s*[—-]\s*' || dt || '(?:\s*—\s*(?:Plot|Area)\s*([\d,]+)\s*sq ft(?:\s*·\s*BUA\s*[\d,]+\s*sq ft)?)?(?:\s*\(Alana sales report\))?)', 'i');
       if m is not null then m := array[m[1], null, m[5], m[2], m[3], m[4]]; end if;
     end if;
     exit when m is null;
