@@ -49,7 +49,7 @@ def money_text(amount):
 
 
 def sale_note(beds, amount, sold_on, size_sqft=None):
-    """The one CRM sale-note format: "4BR SOLD 7.5M Dec-2025, size 6,444 sq ft" (same as private.crm_sale_note)."""
+    """The one CRM sale-note format: "4BR 7.5M Dec-2025 6444 sq ft" (same as private.crm_sale_note)."""
     if amount >= 1_000_000:
         price = f"{amount / 1_000_000:.2f}".rstrip("0").rstrip(".") + "M"
     elif amount >= 1_000:
@@ -57,8 +57,8 @@ def sale_note(beds, amount, sold_on, size_sqft=None):
     else:
         price = f"{amount:,.0f}"
     digits = re.search(r"\d+", str(beds or ""))
-    note = " ".join(([digits.group() + "BR"] if digits else []) + ["SOLD", price, sold_on.strftime("%b-%Y")])
-    return note + (f", size {round(size_sqft):,} sq ft" if size_sqft else "")
+    parts = ([digits.group() + "BR"] if digits else []) + [price, sold_on.strftime("%b-%Y")]
+    return " ".join(parts + ([f"{round(size_sqft)} sq ft"] if size_sqft else []))
 
 
 def main(dld_path, matches_path, out_path):
