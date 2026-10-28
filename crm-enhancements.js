@@ -22,6 +22,6 @@
     .then(()=>load('crm-dxb.js?v=20261020b'))
     .then(()=>load('crm-broadcast.js?v=20261020'))
     .then(()=>load('crm-status-system.js?v=2'))
-    .then(()=>load('crm-leads-bulk.js?v=1'))
+    .then(()=>load('crm-leads-bulk.js?v=2'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();

@@ -179,8 +179,9 @@ body.crmPremium #leadsView .crmFitTable [data-col="select"] input{width:16px;hei
 body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:84px!important}
 body.crmPremium #leadsView .crmFitTable .crmLeadViewBtn{height:32px!important;min-height:32px!important;padding:0 14px!important;margin:0!important;font-size:12.5px!important}
 body.crmPremium #leadsView .crmFitTable tr.crmPicked td{background:color-mix(in srgb,var(--c-accent,#4f46e5) 9%,var(--c-surface,#fff))!important}
+body.crmPremium #crmLeadBulkBar[hidden]{display:none!important}
 body.crmPremium #crmLeadBulkBar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 10px;font-size:12.5px;color:var(--c-muted)}
-body.crmPremium #crmLeadBulkBar .crmBulkPick,body.crmPremium #crmLeadBulkBar .crmBulkActions{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+body.crmPremium #crmLeadBulkBar .crmBulkActions{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 body.crmPremium #crmLeadBulkBar button{height:30px;min-height:30px;padding:0 10px;margin:0;border-radius:8px;border:1px solid var(--c-border);background:var(--c-surface);color:var(--c-text);font-size:12.5px;cursor:pointer}
 body.crmPremium #crmLeadBulkBar select{height:30px;min-height:30px;padding:0 8px;margin:0;border-radius:8px;font-size:12.5px;width:auto}
 body.crmPremium #crmLeadBulkBar strong{color:var(--c-text)}

@@ -1,5 +1,5 @@
 // Leads table: one View button per row (edit / delete live inside the lead view),
-// row checkboxes with quick "first 5 / 10 / 25 / 50" selection, and bulk status / assign / delete.
+// row checkboxes, and bulk status / assign / delete once something is ticked.
 (()=>{
   'use strict';
   const $=id=>document.getElementById(id);
@@ -26,12 +26,11 @@
   async function paintBar(){
     const b=bar();if(!b)return;
     const n=selected.size,stages=getPipelineStages(),people=await loadUsers();
-    b.innerHTML=`<div class="crmBulkPick"><span>Select</span>${[5,10,25,50].map(k=>`<button type="button" data-first="${k}">${k}</button>`).join('')}<button type="button" data-first="all">Page</button>${n?'<button type="button" data-clear>Clear</button>':''}</div>`+
-      (n?`<div class="crmBulkActions"><strong>${n} selected</strong>
+    b.hidden=!n;
+    b.innerHTML=n?`<div class="crmBulkActions"><strong>${n} selected</strong>
         <select data-status><option value="">Change status…</option>${stages.map(s=>`<option>${esc(s)}</option>`).join('')}</select>
         ${isAdmin?`<select data-assign><option value="">Assign to…</option><option value="__none">Not assigned</option>${people.map(u=>`<option value="${esc(u.email)}">${esc(u.name||u.email)}</option>`).join('')}</select>
-        <button type="button" class="crmBulkDelete" data-delete>Delete</button>`:''}</div>`:'');
-    b.querySelectorAll('[data-first]').forEach(x=>x.onclick=()=>{selected.clear();const k=x.dataset.first==='all'?pageIds.length:Number(x.dataset.first);pageIds.slice(0,k).forEach(id=>selected.add(id));syncBoxes();});
+        <button type="button" class="crmBulkDelete" data-delete>Delete</button>`:''}<button type="button" data-clear>Clear</button></div>`:'';
     b.querySelector('[data-clear]')?.addEventListener('click',()=>{selected.clear();syncBoxes();});
     b.querySelector('[data-status]')?.addEventListener('change',e=>e.target.value&&bulkStatus(e.target.value));
     b.querySelector('[data-assign]')?.addEventListener('change',e=>e.target.value&&bulkAssign(e.target.value==='__none'?null:e.target.value));
