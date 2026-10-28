@@ -78,14 +78,6 @@
   for(const [name,type] of [['openOwnerProfile','owner'],['openLeadDetail','lead']]){
     const base=window[name];window[name]=async function(record){const r=await base.apply(this,arguments);CRMWorkspace.record(type,type==='owner'?record?.id:record);return r;};
   }
-  function workspaceSwitch(header,selected){
-    if(!header||header.querySelector('.crmWorkspaceSwitch'))return;
-    const nav=document.createElement('nav');nav.className='crmWorkspaceSwitch';nav.setAttribute('aria-label','Workspace');
-    nav.innerHTML=`<button type="button" ${selected==='owners'?'aria-current="page"':''} data-to="owners">Owners</button><button type="button" ${selected==='leads'?'aria-current="page"':''} data-to="leads">Leads</button>`;
-    nav.querySelector('[data-to="owners"]').onclick=()=>showOwnersView();nav.querySelector('[data-to="leads"]').onclick=()=>showLeadsView();
-    header.after(nav);
-  }
-
   function moreMenu(items){
     const wrap=document.createElement('div');wrap.className='crmMore';
     wrap.innerHTML='<button type="button" class="crmBtn" aria-haspopup="menu" aria-expanded="false">More <span aria-hidden="true">▾</span></button><div class="crmMenu" role="menu" hidden></div>';
@@ -113,27 +105,26 @@
     const v=$('appView');if(!v||v.dataset.ws)return;v.dataset.ws='1';
     v.classList.add('crmWorkspace');
     const header=v.querySelector('.mainHeader'),btns=header?.querySelector('.headerBtns');
-    header.querySelector('h1')?.insertAdjacentHTML('afterend','<p class="crmPageSub">Every owner record you can access — search, filter and open a profile.</p>');
-    workspaceSwitch(header,'owners');
     const card=v.querySelector('.card'),actions=card?.querySelector('.actionsRow');
     const addBtn=[...(actions?.querySelectorAll('button')||[])].find(b=>/Add Owner/i.test(b.textContent));
     const pick=re=>[...(actions?.querySelectorAll('button')||[])].find(b=>re.test(b.textContent));
-    const exportBtn=$('exportBtn');
+    const exportBtn=$('exportBtn');let ownerMore=null;
     if(btns){
       [...btns.querySelectorAll('button')].forEach(b=>{if(/Logout|Dashboard|Leads/i.test(b.textContent))b.remove();});
-      const items=[pick(/Edit WhatsApp/i),pick(/Manage Statuses/i),pick(/Manage Columns/i)];
+      if(addBtn)addBtn.id='crmAddOwnerBtn';
+      const items=[addBtn,pick(/Edit WhatsApp/i),pick(/Manage Statuses/i),pick(/Manage Columns/i)];
       if(exportBtn&&!exportBtn.classList.contains('hidden')){exportBtn.textContent='Export CSV';items.push(exportBtn);}
-      btns.append(moreMenu(items));
-      if(addBtn){addBtn.classList.add('crmBtn','crmBtnPrimary');addBtn.id='crmAddOwnerBtn';btns.append(addBtn);}
+      ownerMore=moreMenu(items);
     }
     // filters: search + community + cluster + status visible; unit, source and sort behind "Filters"
     const filters=card.querySelector('.filters');
-    const unit=$('unitFilter'),source=$('sourceFilter'),sortF=$('ownerSortField'),sortD=$('ownerSortDirection');
+    const unit=$('unitFilter'),source=$('sourceFilter'),sortF=$('ownerSortField'),sortD=$('ownerSortDirection'),status=$('statusFilter');
+    if(status)status.dataset.label='Status';
     if(unit)unit.dataset.label='Unit number';if(source)source.dataset.label='Source';if(sortF)sortF.dataset.label='Sort by';if(sortD)sortD.dataset.label='Order';
-    const {adv,btn}=advancedToggle(card,[unit,source,sortF,sortD],'Filters');
+    const {adv,btn}=advancedToggle(card,[status,unit,source,sortF,sortD],'Filters');
     const reset=card.querySelector('.reset');
     if(reset){reset.className='crmLinkBtn';reset.textContent='Reset';}
-    filters.append(btn);if(reset)filters.append(reset);
+    filters.append(btn);if(reset)filters.append(reset);if(ownerMore)filters.append(ownerMore);
     filters.after(adv);
     actions?.remove();
     card.querySelector('.quickFilters')?.insertAdjacentHTML('afterbegin','<span class="crmChipLabel">Status</span>');
@@ -166,28 +157,28 @@
     const v=$('leadsView');if(!v||v.dataset.ws)return;v.dataset.ws='1';
     v.classList.add('crmWorkspace');
     const header=v.querySelector('.mainHeader'),btns=header?.querySelector('.headerBtns');
-    header.querySelector('h1')?.insertAdjacentHTML('afterend','<p class="crmPageSub">Your sales pipeline — who to call, what they want and when to follow up.</p>');
-    workspaceSwitch(header,'leads');
     const card=v.querySelector('.card'),actions=card?.querySelector('.actionsRow');
     const find=(root,re)=>[...(root?.querySelectorAll('button')||[])].find(b=>re.test(b.textContent));
+    let leadMore=null;
     if(btns){
       const add=find(btns,/Add Lead/i),exp=find(btns,/Export/i),sw=btns.querySelector('.viewSwitch');
       [...btns.querySelectorAll('button')].forEach(b=>{if(/Logout|Dashboard|Owner Database/i.test(b.textContent))b.remove();});
       if(sw)sw.classList.add('crmSeg');
       const mobileModes=['table','kanban'].map(mode=>{const b=document.createElement('button');b.type='button';b.dataset.mobileMode=mode;b.textContent=mode==='table'?'Table view':'Kanban view';b.onclick=()=>setLeadView(mode);return b;});
-      btns.append(moreMenu([...mobileModes,exp,find(actions,/Manage Projects/i),find(actions,/Manage Pipeline/i),find(actions,/Manage Columns/i)]));
-      if(add){add.classList.add('crmBtn','crmBtnPrimary');add.id='crmAddLeadBtn';btns.append(add);}
+      if(add)add.id='crmAddLeadBtn';
+      leadMore=moreMenu([add,...mobileModes,exp,find(actions,/Manage Projects/i),find(actions,/Manage Pipeline/i),find(actions,/Manage Columns/i)]);
     }
     // stage bar replaces the old quick-status chips (which still listed Contacted/Viewing)
     const quick=card.querySelector('.quickFilters');
     const bar=document.createElement('div');bar.id='crmStageBar';bar.className='crmStageBar';
     (quick||card.firstElementChild).before(bar);quick?.remove();
     const filters=card.querySelector('.filters');
+    const st=$('leadStatusFilter');if(st)st.dataset.label='Status';
     const src=$('leadSourceFilter'),proj=$('leadProjectFilter'),fu=$('leadFollowUpFilter'),sf=$('leadSortField'),sd=$('leadSortDirection');
     if(src)src.dataset.label='Source';if(proj)proj.dataset.label='Project';if(fu)fu.dataset.label='Follow-up date';if(sf)sf.dataset.label='Sort by';if(sd)sd.dataset.label='Order';
-    const {adv,btn}=advancedToggle(card,[src,proj,fu,sf,sd],'Filters');
+    const {adv,btn}=advancedToggle(card,[st,src,proj,fu,sf,sd],'Filters');
     const reset=find(actions,/Reset/i);if(reset){reset.className='crmLinkBtn';reset.textContent='Reset';}
-    filters.append(btn);if(reset)filters.append(reset);filters.after(adv);
+    filters.append(btn);if(reset)filters.append(reset);if(leadMore)filters.append(leadMore);filters.after(adv);
     actions?.remove();
     $('leadStatusFilter')?.addEventListener('change',paintStageBar);
     $('followupDashboard')?.classList.add('crmFollowStrip');
@@ -200,9 +191,9 @@
     const body=$('leadsTableBody');if(!body)return;
     const now=new Date();
     [...body.querySelectorAll('tr')].forEach((tr,i)=>{
-      const lead=(rows||[])[i],cell=tr.querySelector('td');
+      const lead=(rows||[])[i],cell=tr.querySelector('td:not([data-col="select"])');
       if(!lead||!cell||cell.querySelector('.crmNext'))return;
-      let html='<span class="crmNext none">No follow-up</span>';
+      let html=''; // nothing under the name when no follow-up is set
       if(lead.follow_up_date){
         const when=new Date(`${lead.follow_up_date}T${lead.follow_up_time||'09:00'}`);
         const label=when.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+(lead.follow_up_time?' '+String(lead.follow_up_time).slice(0,5):'');

@@ -16,11 +16,12 @@
     // existing Alana sale notes and attached one wrong sale to every Alana villa.
     // rivana-transactions.js is retired: sale notes now use one format (20261024100000_sale_note_format.sql).
     .then(()=>load('owner-related-rows.js?v=20261020-ui1'))
-    .then(()=>load('crm-upgrade.js?v=20261020-ui1'))
-    .then(()=>load('crm-calendar.js?v=20261020-ui1'))
-    .then(()=>load('crm-workspace.js?v=20261020-ui2'))
+    .then(()=>load('crm-upgrade.js?v=20261028'))
+    .then(()=>load('crm-calendar.js?v=20261028'))
+    .then(()=>load('crm-workspace.js?v=20261028'))
     .then(()=>load('crm-dxb.js?v=20261020b'))
     .then(()=>load('crm-broadcast.js?v=20261020'))
     .then(()=>load('crm-status-system.js?v=2'))
+    .then(()=>load('crm-leads-bulk.js?v=1'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();

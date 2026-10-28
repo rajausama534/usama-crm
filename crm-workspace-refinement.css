@@ -21,6 +21,9 @@ body.crmPremium .quickFilters button{flex:none;height:36px!important;border-radi
 body.crmPremium #appView .tablebox{overflow:auto!important;max-height:72vh!important;border-radius:12px!important;overflow-anchor:none}
 body.crmPremium #appView #ownersTable{table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important;overflow:visible!important}
 body.crmPremium #appView #ownersTable :is(td,th){box-sizing:border-box!important;min-width:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important}
+/* Body cells wrap between whole words (Excel "Wrap text"): the row grows instead of cutting text with "…". */
+body.crmPremium #appView #ownersTable td:not(:has(.crmOwnerActions)){white-space:normal!important;text-overflow:clip!important;overflow-wrap:normal!important;word-break:keep-all!important;hyphens:none!important;line-height:1.35!important}
+body.crmPremium #ownersTable .ownerIdentityName{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal;word-break:keep-all}
 body.crmPremium #appView #ownersTable th{position:sticky!important;top:0!important;z-index:2;height:48px!important;background:var(--c-surface-2)!important}
 body.crmPremium #appView #ownersTable td{height:68px!important;padding:12px!important;vertical-align:middle!important;border-bottom:1px solid var(--c-border)!important;background:var(--c-surface)!important}
 body.crmPremium #ownersTable .owner-col-remarks .latestRemarkRead{height:40px!important;min-height:40px!important;max-height:40px!important;line-height:20px!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important;white-space:normal!important;padding:0!important;border:0!important;background:none!important}
@@ -161,3 +164,51 @@ body.crmPremium .crmWaIcon:disabled{opacity:.45;cursor:not-allowed}
 }
 
 body.crmPremium .crmCardMore:not(:has(button,a)){display:none}
+
+/* Owners page: no summary number cards above the table (they took a full row of space). */
+body.crmPremium #appView>.dashboardCards{display:none!important}
+
+/* Leads table: wrap between whole words instead of cutting text with "…". */
+body.crmPremium #leadsView .leadsTable.crmFitTable td{white-space:normal!important;text-overflow:clip!important;overflow-wrap:normal!important;word-break:keep-all!important;hyphens:none!important}
+body.crmPremium #leadsView .leadsTable.crmFitTable :is(.leadReadValue,td[data-col="name"] .crmNext,td[data-col="name"] .crmAssignee){white-space:normal!important;text-overflow:clip!important;overflow:visible!important;line-height:1.35!important}
+body.crmPremium #leadsView .leadsTable.crmFitTable .leadLatestNote{white-space:normal!important;text-overflow:clip!important;height:auto!important;max-height:none!important;line-height:1.35!important;display:-webkit-box!important;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden!important}
+
+/* Leads: row checkboxes, one View button, bulk action bar. */
+body.crmPremium #leadsView .crmFitTable [data-col="select"]{width:40px!important;padding-left:12px!important;padding-right:0!important;text-align:center!important}
+body.crmPremium #leadsView .crmFitTable [data-col="select"] input{width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--c-accent,#4f46e5)}
+body.crmPremium #leadsView .crmFitTable [data-col="actions"]{width:84px!important}
+body.crmPremium #leadsView .crmFitTable .crmLeadViewBtn{height:32px!important;min-height:32px!important;padding:0 14px!important;margin:0!important;font-size:12.5px!important}
+body.crmPremium #leadsView .crmFitTable tr.crmPicked td{background:color-mix(in srgb,var(--c-accent,#4f46e5) 9%,var(--c-surface,#fff))!important}
+body.crmPremium #crmLeadBulkBar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 10px;font-size:12.5px;color:var(--c-muted)}
+body.crmPremium #crmLeadBulkBar .crmBulkPick,body.crmPremium #crmLeadBulkBar .crmBulkActions{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+body.crmPremium #crmLeadBulkBar button{height:30px;min-height:30px;padding:0 10px;margin:0;border-radius:8px;border:1px solid var(--c-border);background:var(--c-surface);color:var(--c-text);font-size:12.5px;cursor:pointer}
+body.crmPremium #crmLeadBulkBar select{height:30px;min-height:30px;padding:0 8px;margin:0;border-radius:8px;font-size:12.5px;width:auto}
+body.crmPremium #crmLeadBulkBar strong{color:var(--c-text)}
+body.crmPremium #crmLeadBulkBar .crmBulkDelete{color:#b42318;border-color:#f3b8b3}
+
+/* Clean Owners / Leads pages: title only up top; Add, Export, WhatsApp template etc. live in "More" on the filter row. */
+body.crmPremium :is(#appView,#leadsView)>.mainHeader .headerBtns{display:none!important}
+body.crmPremium :is(#appView,#leadsView)>.mainHeader{margin-bottom:12px!important}
+body.crmPremium :is(#appView,#leadsView) .crmWorkspaceSwitch,body.crmPremium :is(#appView,#leadsView) .crmPageSub{display:none!important}
+body.crmPremium :is(#appView,#leadsView) .filters>.crmMore{flex:0 0 auto;margin-left:auto!important}
+body.crmPremium :is(#appView,#leadsView) .filters>:is(.crmFilterToggle,.crmLinkBtn){flex:0 0 auto!important;width:auto!important}
+body.crmPremium :is(#appView,#leadsView) .filters>.crmMore>.crmBtn{height:36px!important;min-height:36px!important;white-space:nowrap}
+body.crmPremium :is(#appView,#leadsView) .filters>.crmMore .crmMenu{right:0;left:auto;z-index:30}
+body.crmPremium :is(#appView,#leadsView) .topInfo>div:last-child:not(:first-child){display:none!important}
+
+/* Calendar reminder pop-ups (bottom-right) and the "Done" summary on completed events. */
+.crmAlertStack{position:fixed;right:18px;bottom:18px;z-index:10050;display:flex;flex-direction:column;gap:10px;max-width:min(360px,calc(100vw - 32px))}
+.crmAlert{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:12px;background:var(--c-surface,#fff);color:var(--c-text,#111827);border:1px solid var(--c-border,#e5e7eb);border-left:4px solid #4f46e5;box-shadow:0 12px 32px rgba(0,0,0,.22);font-size:13px}
+.crmAlert.is-log{border-left-color:#d97706}
+.crmAlert strong{font-size:14px}
+.crmAlert>span{color:var(--c-muted,#6b7280)}
+.crmAlert>div{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.crmAlert{position:relative;padding-right:38px!important}
+.crmAlert>div .crmIconBtn{position:absolute;top:8px;right:8px}
+.crmDoneBox{margin:10px 0 4px;padding:10px 12px;border-radius:10px;border:1px solid var(--c-border,#e5e7eb);background:var(--c-surface-2,#f8fafc);font-size:13px}
+.crmDoneBox p{margin:6px 0 0;white-space:pre-wrap}
+.crmDoneLoc{display:flex;gap:8px;align-items:center;margin-top:4px}
+.crmDoneLoc a{font-weight:600}
+.crmDoneNoLoc{color:#b42318;font-weight:600}
+.crmDoneFor{margin:0 0 10px}
+.crmDoneHint{margin:8px 0 0;font-size:12.5px;color:var(--c-muted,#6b7280)}

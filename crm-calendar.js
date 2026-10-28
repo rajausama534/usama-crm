@@ -7,6 +7,9 @@
   const TYPES=['Call Back','Follow-Up','Phone Call','Meeting','Property Viewing','Reminder','Task','Other'];
   const TYPE_CLASS={'Call Back':'call','Follow-Up':'follow','Phone Call':'call','Meeting':'meet','Property Viewing':'view','Reminder':'remind','Task':'task','Other':'other'};
   const DAY=864e5;
+  const REMIND_OPTIONS=[[0,'At the time'],[15,'15 minutes before'],[30,'30 minutes before'],[60,'1 hour before'],[120,'2 hours before'],[1440,'1 day before']];
+  // Meetings and viewings ask for the person's live location when marked done.
+  const NEEDS_LOCATION=['Meeting','Property Viewing'];
   const pad=n=>String(n).padStart(2,'0');
   const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const hm=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -156,14 +159,14 @@
     wrap.innerHTML=`<form class="crmModal crmEventModal" novalidate>
       <header><h2>${isNew?'Add follow-up':esc(e.event_type)}</h2><button type="button" class="crmIconBtn" data-close aria-label="Close">×</button></header>
       <div class="crmModalBody">
-        ${!isNew?`<div class="crmEventMeta"><span class="crmStatus ${e.status==='Scheduled'?(isOverdue(e)?'off':'on'):''}">${isOverdue(e)?'Overdue':esc(e.status)}</span>${e.lead_id?`<button type="button" class="crmBtn crmBtnSm" data-open-lead>Open lead: ${esc(leadName)}</button>`:''}</div>`:''}
+        ${!isNew?`<div class="crmEventMeta"><span class="crmStatus ${e.status==='Scheduled'?(isOverdue(e)?'off':'on'):''}">${isOverdue(e)?'Overdue':esc(e.status)}</span>${e.lead_id?`<button type="button" class="crmBtn crmBtnSm" data-open-lead>Open lead: ${esc(leadName)}</button>`:''}</div>${e.status==='Completed'?doneSummary(e):''}`:''}
         <div class="crmFormGrid">
           <label>Type<select name="event_type">${TYPES.map(t=>`<option ${t===(e.event_type||'Follow-Up')?'selected':''}>${t}</option>`).join('')}</select></label>
           <label>Lead<div class="crmLeadPick"><input name="lead_search" autocomplete="off" placeholder="Search lead name or phone" value="${esc(leadName)}"><input type="hidden" name="lead_id" value="${esc(e.lead_id||'')}"><div class="crmLeadResults" hidden></div></div></label>
           <label class="crmWide">Title<input name="title" maxlength="200" value="${esc(e.title||'')}" placeholder="e.g. Call back about Farm Gardens 5BR"></label>
           <label>Date<input name="date" type="date" value="${ymd(start)}"></label>
           <label>Time<input name="time" type="time" value="${hm(start)}"></label>
-          <label>Reminder<select name="remind_minutes">${[[0,'At the time'],[15,'15 minutes before'],[30,'30 minutes before'],[60,'1 hour before'],[1440,'1 day before']].map(([m,t])=>`<option value="${m}" ${m===(e.remind_minutes??30)?'selected':''}>${t}</option>`).join('')}</select></label>
+          <label>Reminder<select name="remind_minutes">${REMIND_OPTIONS.map(([m,t])=>`<option value="${m}" ${m===(e.remind_minutes??30)?'selected':''}>${t}</option>`).join('')}</select></label>
           <label>Assigned to<select name="assigned_to" ${isAdmin?'':'disabled'}>${users.map(u=>`<option value="${esc(u.email)}" ${String(u.email).toLowerCase()===String(e.assigned_to||me()).toLowerCase()?'selected':''}>${esc(u.name||u.email)}</option>`).join('')}</select></label>
           <label class="crmWide">Notes<textarea name="notes" maxlength="4000" rows="3">${esc(e.notes||'')}</textarea></label>
         </div>
@@ -187,7 +190,7 @@
     });
     const after=async msg=>{close();toast(msg);if(!$('crmCalendarView')?.classList.contains('hidden')){await render();renderSide();}document.dispatchEvent(new CustomEvent('crm:events-changed',{detail:{lead_id:e.lead_id||f.lead_id.value}}));refreshBell();};
     wrap.querySelector('[data-open-lead]')?.addEventListener('click',()=>{close();crmOpenLead(e.lead_id);});
-    wrap.querySelector('[data-complete]')?.addEventListener('click',async()=>{const {error}=await db.from('crm_events').update({status:'Completed',completed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',e.id);if(error){err.textContent=error.message;err.hidden=false;return;}after('Marked as done');});
+    wrap.querySelector('[data-complete]')?.addEventListener('click',()=>{close();completeEvent(e);});
     wrap.querySelector('[data-cancel-ev]')?.addEventListener('click',async()=>{const {error}=await db.from('crm_events').update({status:'Cancelled',updated_at:new Date().toISOString()}).eq('id',e.id);if(error){err.textContent=error.message;err.hidden=false;return;}after('Event cancelled');});
     wrap.querySelector('[data-delete]')?.addEventListener('click',async()=>{
       const btn=wrap.querySelector('[data-delete]');
@@ -208,6 +211,109 @@
       after(isNew?'Follow-up saved':'Event updated');
     };
   }
+
+  // ------------------------------------------------------------------ done: outcome + live location
+  function doneSummary(e){
+    const when=e.done_location_at||e.completed_at;
+    let loc='';
+    if(e.done_location_status==='captured')loc=`<a href="https://www.google.com/maps?q=${e.done_lat},${e.done_lng}" target="_blank" rel="noopener">View on map</a> <span>±${Math.round(e.done_accuracy_m||0)} m</span>`;
+    else if(e.done_location_status)loc=`<span class="crmDoneNoLoc">Location not shared (${esc(e.done_location_status)})</span>`;
+    else if(NEEDS_LOCATION.includes(e.event_type))loc='<span class="crmDoneNoLoc">No location recorded</span>';
+    return `<div class="crmDoneBox"><strong>Done${when?` · ${fmtDay(new Date(when))} ${fmtTime(new Date(when))}`:''}</strong>${loc?`<div class="crmDoneLoc">${loc}</div>`:''}${e.outcome?`<p>${esc(e.outcome)}</p>`:''}</div>`;
+  }
+  function getLocation(){
+    return new Promise(resolve=>{
+      if(!navigator.geolocation)return resolve({done_location_status:'unsupported'});
+      navigator.geolocation.getCurrentPosition(
+        p=>resolve({done_location_status:'captured',done_lat:p.coords.latitude,done_lng:p.coords.longitude,done_accuracy_m:p.coords.accuracy}),
+        er=>resolve({done_location_status:er.code===1?'denied':er.code===3?'timeout':'unavailable'}),
+        {enableHighAccuracy:true,timeout:20000,maximumAge:0});
+    });
+  }
+  window.crmCompleteEvent=completeEvent;
+  async function completeEvent(e){
+    const needLoc=NEEDS_LOCATION.includes(e.event_type);
+    const wrap=document.createElement('div');wrap.className='crmModalScrim';
+    wrap.innerHTML=`<form class="crmModal crmEventModal" novalidate>
+      <header><h2>Log ${esc(e.event_type.toLowerCase())}</h2><button type="button" class="crmIconBtn" data-close aria-label="Close">×</button></header>
+      <div class="crmModalBody">
+        <p class="crmDoneFor"><strong>${esc(e.leads?.name||e.title)}</strong> · ${fmtDay(new Date(e.starts_at))} ${fmtTime(new Date(e.starts_at))}</p>
+        <label class="crmWide">What happened?<textarea name="outcome" rows="4" maxlength="4000" placeholder="Outcome, client feedback and next step…">${esc(e.outcome||'')}</textarea></label>
+        ${needLoc?'<p class="crmDoneHint">Your current location will be saved with this meeting. Allow location when the browser asks.</p>':''}
+      </div>
+      <p class="crmFormError" hidden></p>
+      <footer><span class="crmSpacer"></span><button type="button" class="crmBtn" data-close>Cancel</button><button type="submit" class="crmBtn crmBtnPrimary">${needLoc?'Done · share location':'Mark done'}</button></footer></form>`;
+    document.body.append(wrap);
+    const f=wrap.querySelector('form'),err=wrap.querySelector('.crmFormError'),close=()=>wrap.remove();
+    wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);
+    f.outcome.focus();
+    f.onsubmit=async ev=>{
+      ev.preventDefault();err.hidden=true;
+      const outcome=f.outcome.value.trim();
+      if(needLoc&&!outcome){err.textContent='Write what happened in the meeting first.';err.hidden=false;return;}
+      const btn=f.querySelector('[type=submit]');btn.disabled=true;
+      if(needLoc)btn.textContent='Getting your location…';
+      const loc=needLoc?await getLocation():{};
+      const {error}=await db.from('crm_events').update({status:'Completed',completed_at:new Date().toISOString(),updated_at:new Date().toISOString(),outcome:outcome||null,...loc}).eq('id',e.id);
+      btn.disabled=false;btn.textContent=needLoc?'Done · share location':'Mark done';
+      if(error){err.textContent=error.message;err.hidden=false;return;}
+      close();
+      toast(!needLoc?'Marked as done':loc.done_location_status==='captured'?'Meeting logged with your location':'Meeting logged — location was not shared',needLoc&&loc.done_location_status!=='captured');
+      dismissAlerts(e.id);
+      if(!$('crmCalendarView')?.classList.contains('hidden')){await render();renderSide();}
+      document.dispatchEvent(new CustomEvent('crm:events-changed',{detail:{lead_id:e.lead_id}}));refreshBell();
+    };
+  }
+
+  // ------------------------------------------------------------------ reminder pop-ups
+  // While the CRM is open: a pop-up (plus a desktop notification and a short sound) at the chosen
+  // reminder time, and a "log it" prompt once the meeting time has passed and it is still open.
+  const ALERT_KEY='crm_event_alerts_v1';
+  const alertState=()=>{try{return JSON.parse(localStorage.getItem(ALERT_KEY)||'{}');}catch(_){return {};}};
+  const saveAlertState=st=>{try{localStorage.setItem(ALERT_KEY,JSON.stringify(st));}catch(_){}};
+  function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();[0,0.25].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(0.15,c.currentTime+t);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+t+0.2);o.connect(g).connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+0.2);});}catch(_){}}
+  function dismissAlerts(id){document.querySelectorAll(`.crmAlert[data-alert-ev="${id}"]`).forEach(x=>x.remove());}
+  function showAlert(e,kind){
+    let stack=$('crmAlertStack');
+    if(!stack){stack=document.createElement('div');stack.id='crmAlertStack';stack.className='crmAlertStack';document.body.append(stack);}
+    if(stack.querySelector(`[data-alert-ev="${e.id}"][data-kind="${kind}"]`))return;
+    const start=new Date(e.starts_at),mins=Math.round((start-Date.now())/60000);
+    const who=e.leads?.name||e.title;
+    const head=kind==='remind'?(mins>0?`${e.event_type} in ${mins>=60?Math.round(mins/60)+' h':mins+' min'}`:`${e.event_type} now`):`Log your ${e.event_type.toLowerCase()}`;
+    const card=document.createElement('div');card.className=`crmAlert is-${kind}`;card.dataset.alertEv=e.id;card.dataset.kind=kind;card.setAttribute('role','alert');
+    card.innerHTML=`<strong>${esc(head)}</strong><span>${esc(who)} · ${fmtTime(start)}</span>
+      <div><button type="button" class="crmBtn crmBtnSm" data-a-open>Open</button>${kind==='log'?'<button type="button" class="crmBtn crmBtnSm crmBtnPrimary" data-a-done>Log / Done</button>':''}<button type="button" class="crmBtn crmBtnSm" data-a-snooze>Snooze 10 min</button><button type="button" class="crmIconBtn" data-a-x aria-label="Dismiss">×</button></div>`;
+    stack.append(card);
+    const st=alertState(),key=`${e.id}|${kind}|${e.starts_at}`;
+    st[key]=Date.now()+365*DAY;saveAlertState(st);
+    card.querySelector('[data-a-open]').onclick=()=>{card.remove();openEventEditor(e);};
+    card.querySelector('[data-a-done]')?.addEventListener('click',()=>{card.remove();completeEvent(e);});
+    card.querySelector('[data-a-snooze]').onclick=()=>{const s2=alertState();s2[key]=Date.now()+10*60000;saveAlertState(s2);card.remove();};
+    card.querySelector('[data-a-x]').onclick=()=>card.remove();
+    beep();
+    if('Notification' in window&&Notification.permission==='granted'){try{const n=new Notification(head,{body:`${who} · ${fmtTime(start)}`,tag:key});n.onclick=()=>{window.focus();n.close();};}catch(_){}}
+  }
+  async function checkAlerts(){
+    if(!me())return;
+    const now=Date.now();
+    const {data}=await db.from('crm_events').select('*,leads(name,phone,status)').eq('status','Scheduled').ilike('assigned_to',me())
+      .gte('starts_at',new Date(now-12*3600e3).toISOString()).lte('starts_at',new Date(now+25*3600e3).toISOString()).order('starts_at');
+    const st=alertState();
+    for(const k of Object.keys(st))if(st[k]<now-2*DAY)delete st[k];
+    saveAlertState(st);
+    for(const e of data||[]){
+      const start=new Date(e.starts_at).getTime(),end=e.ends_at?new Date(e.ends_at).getTime():start+30*60000;
+      const due=(kind,ok)=>ok&&!(st[`${e.id}|${kind}|${e.starts_at}`]>now);
+      if(due('remind',now>=start-(e.remind_minutes||0)*60000&&now<start+15*60000))showAlert(e,'remind');
+      else if(due('log',now>=end))showAlert(e,'log');
+    }
+  }
+  // Desktop notifications need a click to be allowed; ask when someone saves or opens an event.
+  document.addEventListener('click',ev=>{
+    if('Notification' in window&&Notification.permission==='default'&&ev.target.closest?.('.crmEventModal [type=submit],#crmAlertStack'))Notification.requestPermission().catch(()=>{});
+  },true);
+  document.addEventListener('crm:events-changed',()=>checkAlerts().catch(()=>{}));
+  const startAlerts=()=>{checkAlerts().catch(()=>{});setInterval(()=>checkAlerts().catch(()=>{}),30000);};
 
   // ------------------------------------------------------------------ open a lead from anywhere
   window.crmOpenLead=async function(id){
@@ -297,8 +403,8 @@
       if(event)openEventEditor(event);else if(n.lead_id)crmOpenLead(n.lead_id);else showCalendarModule(n.starts_at);
     });
   };
-  if(typeof currentUserEmail!=='undefined'&&currentUserEmail){refreshBell();setInterval(refreshBell,120000);}
-  else{const t=setInterval(()=>{if(typeof currentUserEmail!=='undefined'&&currentUserEmail){clearInterval(t);refreshBell();setInterval(refreshBell,120000);}},1000);}
+  if(typeof currentUserEmail!=='undefined'&&currentUserEmail){refreshBell();setInterval(refreshBell,120000);startAlerts();}
+  else{const t=setInterval(()=>{if(typeof currentUserEmail!=='undefined'&&currentUserEmail){clearInterval(t);refreshBell();setInterval(refreshBell,120000);startAlerts();}},1000);}
 
   // Deep links: index.html#calendar, index.html#lead=<id>
   const hash=window.__crmInitialHash||location.hash;

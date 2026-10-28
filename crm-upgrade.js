@@ -404,7 +404,7 @@
       if(isAdmin)loadAssignees().then(()=>{
         const body=$('leadsTableBody');if(!body)return;
         [...body.querySelectorAll('tr')].forEach((tr,i)=>{
-          const lead=(rows||[])[i];const cell=tr.querySelector('td');
+          const lead=(rows||[])[i];const cell=tr.querySelector('td:not([data-col="select"])');
           if(!lead||!cell||cell.querySelector('.crmAssignee'))return;
           cell.insertAdjacentHTML('beforeend',`<span class="crmAssignee ${lead.assigned_to?'':'none'}">${lead.assigned_to?'→ '+esc(assigneeLabel(lead.assigned_to)):'Not assigned'}</span>`);
         });
