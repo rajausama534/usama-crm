@@ -3425,41 +3425,11 @@ ${agentName}`;
       if (lastCell) lastCell.textContent = today();
     }
 
+    // Owner visibility is enforced by the database (owners_select policy), which understands
+    // community, "Community::Cluster" and legacy bare-cluster assignments. Filtering again here
+    // with .in("cluster", ...) hid every row for "Community::Cluster" entries.
     function applyAccessFilter(query) {
-      if (isAdmin) return query;
-
-      const assignedCommunities = Array.isArray(currentAccess?.assigned_communities)
-        ? currentAccess.assigned_communities.filter(Boolean)
-        : [];
-
-      const assignedClusters = Array.isArray(currentAccess?.assigned_clusters)
-        ? currentAccess.assigned_clusters.filter(Boolean)
-        : [];
-
-      const hasCommunities = assignedCommunities.length > 0;
-      const hasClusters = assignedClusters.length > 0;
-
-      // No assigned access: return no rows without causing bigint/text error.
-      if (!hasCommunities && !hasClusters) {
-        return query.eq("id", -999999999);
-      }
-
-      // Community access OR cluster access.
-      if (hasCommunities && hasClusters) {
-        return query.or(
-          `community.in.(${assignedCommunities.map(v => `"${String(v).replaceAll('"', '\"')}"`).join(",")}),cluster.in.(${assignedClusters.map(v => `"${String(v).replaceAll('"', '\"')}"`).join(",")})`
-        );
-      }
-
-      if (hasCommunities) {
-        return query.in("community", assignedCommunities);
-      }
-
-      if (hasClusters) {
-        return query.in("cluster", assignedClusters);
-      }
-
-      return query.eq("id", -999999999);
+      return query;
     }
 
     // Canonical display labels without touching stored owner records.
