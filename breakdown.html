@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Property Breakdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crm-breakdown.css?v=3">
+<style>
+  body{margin:0;background:#eef2f7;padding:28px 16px}
+  .pbBar{max-width:820px;margin:0 auto 12px;display:flex;justify-content:flex-end}
+  .pbBar button:disabled{opacity:.6}
+  .pbBar button{font:600 13px "Poppins",system-ui,sans-serif;padding:9px 16px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer}
+  .pbError{max-width:520px;margin:60px auto;text-align:center;font:15px "Poppins",system-ui,sans-serif;color:#334155}
+  @media (max-width:640px){body{padding:0;background:#fff}.pbBar{padding:10px 12px 0;margin:0}}
+  @media print{body{background:#fff;padding:0}.pbBar{display:none}}
+</style>
+</head>
+<body>
+<div class="pbBar"><button type="button" id="pbPdf">Download PDF</button></div>
+<main id="pbRoot"></main>
+<script src="crm-breakdown-doc.js?v=2"></script>
+<script>
+  // Read-only client view: everything comes from the link itself, nothing is loaded from the CRM.
+  (function(){
+    const root=document.getElementById('pbRoot'),q=new URLSearchParams(location.search);
+    try{
+      const d=PropertyBreakdown.decode(q.get('d')||q.get('data'));
+      root.innerHTML=PropertyBreakdown.render(d);
+      document.title=(d.title||'Property')+(d.subtitle?' · '+d.subtitle:'');
+      const btn=document.getElementById('pbPdf');
+      btn.onclick=async()=>{btn.disabled=true;btn.textContent='Making PDF…';
+        try{await PropertyBreakdown.downloadPdf(d);}catch(e){alert('The PDF could not be made. Please try again.');}
+        btn.disabled=false;btn.textContent='Download PDF';};
+    }catch(e){
+      document.querySelector('.pbBar').remove();
+      root.innerHTML='<p class="pbError">This breakdown link is incomplete. Please ask your agent to send it again.</p>';
+    }
+  })();
+</script>
+</body>
+</html>
