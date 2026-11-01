@@ -54,64 +54,82 @@
   };
 
   function build(v){
-    v.innerHTML=`<header class="crmPageHead"><div><h1>Breakdown</h1></div>
+    const card=(title,body,cls='')=>`<section class="pbCard ${cls}"><h3>${title}</h3>${body}</section>`;
+    const fields=list=>`<fieldset>${list.map(([k,label,cls,ph,mode])=>`<label class="${cls||''}">${label}<input name="${k}" ${mode?`inputmode="${mode}"`:''} placeholder="${esc(ph||'')}" autocomplete="off"></label>`).join('')}</fieldset>`;
+    v.innerHTML=`<header class="pbTop">
+        <div class="pbTopTitle"><h1>Breakdown</h1><span class="pbStatus" data-status></span></div>
         <div class="pbActions">
-          <button type="button" class="crmBtn" data-new>New</button>
-          <button type="button" class="crmBtn" data-import>Import link</button>
-          <button type="button" class="crmBtn" data-pdf>Download PDF</button>
+          <div class="pbPop"><button type="button" class="crmBtn" data-pop="saved" aria-haspopup="menu">Saved <b class="pbCount" data-count></b> ▾</button>
+            <div class="pbPopPanel pbSavedPanel" data-panel="saved" hidden><input type="search" placeholder="Search saved breakdowns…" data-search><ul class="pbSavedList"></ul></div></div>
+          <button type="button" class="crmBtn" data-new>+ New</button>
           <button type="button" class="crmBtn" data-save>Save</button>
-          <div class="pbShare"><button type="button" class="crmBtn crmBtnPrimary" data-share aria-haspopup="menu">Share with client ▾</button>
-            <div class="pbShareMenu" role="menu" hidden>
+          <div class="pbPop"><button type="button" class="crmBtn crmBtnPrimary" data-pop="share" aria-haspopup="menu">Share with client ▾</button>
+            <div class="pbPopPanel pbMenu" data-panel="share" role="menu" hidden>
               <button type="button" data-wa><strong>Send link on WhatsApp</strong><small>Opens WhatsApp with the client link ready to send</small></button>
-              <button type="button" data-share-pdf><strong>Send PDF</strong><small>Share the PDF file (WhatsApp, email…)</small></button>
+              <button type="button" data-share-pdf><strong>Send PDF</strong><small>Attach the PDF in WhatsApp, email… (downloads on a computer)</small></button>
+              <button type="button" data-pdf><strong>Download PDF</strong><small>High-quality A4 PDF</small></button>
               <button type="button" data-copy><strong>Copy client link</strong><small>Paste it anywhere</small></button>
               <button type="button" data-open-link><strong>Open client page</strong><small>See exactly what the client sees</small></button>
             </div></div>
+          <div class="pbPop"><button type="button" class="crmBtn pbMoreBtn" data-pop="more" aria-label="More actions" aria-haspopup="menu">⋯</button>
+            <div class="pbPopPanel pbMenu" data-panel="more" role="menu" hidden>
+              <button type="button" data-import><strong>Import old link</strong><small>From the old breakdown generator</small></button>
+              <button type="button" class="pbDanger" data-delete><strong>Delete this breakdown</strong></button>
+            </div></div>
         </div></header>
-      <div class="pbLayout">
-        <aside class="pbSaved"><h3>Saved</h3><input type="search" placeholder="Search saved…" data-search><ul class="pbSavedList"></ul></aside>
+      <div class="pbTabs" role="tablist"><button type="button" role="tab" data-tab="edit" aria-selected="true">Edit</button><button type="button" role="tab" data-tab="preview" aria-selected="false">Preview</button></div>
+      <div class="pbLayout" data-show="edit">
         <form class="pbForm" novalidate>
           <p class="pbLinked" hidden></p>
-          ${GROUPS.map(([title,fields])=>`<div><h3>${title}</h3><fieldset>${fields.map(([k,label,cls,ph,mode])=>
-            `<label class="${cls||''}">${label}<input name="${k}" ${mode?`inputmode="${mode}"`:''} placeholder="${esc(ph||'')}" autocomplete="off"></label>`).join('')}${title==='Price'?'<dl class="pbCalc" data-calc></dl>':''}</fieldset></div>`).join('')}
-          <div><h3>Remaining payment plan</h3><div data-inst></div>
-            <button type="button" class="crmBtn crmBtnSm" data-add-inst style="margin-top:8px">+ Add installment</button>
-            <p class="pbHint">Only for off-plan resales still paying the developer. Leave empty for ready properties.</p></div>
-          <div><h3>Plans & photos</h3><div class="pbUploads">${UPLOADS.map(([k,label,hint])=>`<div class="pbUpload" data-up="${k}">
-            <header><strong>${label}</strong><label class="crmBtn crmBtnSm">+ Add<input type="file" multiple accept="${k==='pictures'?'image/*':'image/*,application/pdf'}" data-file="${k}" aria-label="Add ${label.toLowerCase()} (${hint})"></label></header>
-            <div class="pbThumbs"></div></div>`).join('')}</div></div>
-          <div><h3>Notes & contact</h3><fieldset>
+          ${card('Property',fields(GROUPS[0][1]))}
+          ${card('Price',fields(GROUPS[1][1])+'<dl class="pbCalc" data-calc></dl>','pbPriceCard')}
+          ${card('Payment plan',`<div data-inst></div><button type="button" class="crmBtn crmBtnSm pbAddInst" data-add-inst>+ Add installment</button>
+            <p class="pbHint">Only for off-plan resales still paying the developer. Leave empty for ready properties.</p>`)}
+          ${card('Plans & photos',`<div class="pbUploads">${UPLOADS.map(([k,label,hint])=>`<div class="pbUpload" data-up="${k}">
+            <header><span><strong>${label}</strong><small>${hint}</small></span><label class="crmBtn crmBtnSm">+ Add<input type="file" multiple accept="${k==='pictures'?'image/*':'image/*,application/pdf'}" data-file="${k}" aria-label="Add ${label.toLowerCase()}"></label></header>
+            <div class="pbThumbs"></div></div>`).join('')}</div>`)}
+          ${card('Notes & contact',`<fieldset>
             <label class="pbWide">Notes on the page<textarea name="notes" rows="3" placeholder="e.g. Ready to move, vacant on transfer"></textarea></label>
             <label class="pbWide">Your WhatsApp number (shown to the client)<input name="whatsapp" inputmode="tel" placeholder="9715…" autocomplete="off"></label>
-          </fieldset></div>
-          <button type="button" class="crmBtn crmBtnDanger" data-delete hidden>Delete this breakdown</button>
+          </fieldset>`)}
         </form>
         <section class="pbPreview" aria-label="Client preview"></section>
       </div>`;
     const f=v.querySelector('.pbForm');
     f.addEventListener('input',ev=>{
       const n=ev.target.name;if(!n||n.startsWith('inst'))return;
-      if(n==='unitPrice'&&(!cur.data.paymentSeller||cur.data.paymentSeller===cur.data.unitPrice)){cur.data.paymentSeller=ev.target.value;f.paymentSeller.value=ev.target.value;}
+      if(n==='unitPrice'&&(!cur.data.paymentSeller||PB.num(cur.data.paymentSeller)===PB.num(cur.data.unitPrice))){cur.data.paymentSeller=ev.target.value;f.paymentSeller.value=ev.target.value;}
       cur.data[n]=ev.target.value;
       if(n==='whatsapp'){try{localStorage.setItem(WA_KEY,ev.target.value);}catch(_){}}
       changed();
     });
-    v.querySelector('[data-add-inst]').onclick=()=>{cur.data.installments.push({label:'',amount:''});paintInst();changed();};
-    v.querySelector('[data-new]').onclick=()=>{if(dirty&&!confirm('Discard the unsaved changes?'))return;load(blank());};
+    // Amounts get thousands separators when you leave the field (no cursor jumps while typing).
+    f.addEventListener('focusout',ev=>{
+      const t=ev.target,n=t.name;if(!['unitPrice','paymentSeller','instAmount'].includes(n))return;
+      if(n==='instAmount'){t.value=cur.data.installments[t.dataset.i].amount=fmtAmount(t.value);return;}
+      ['unitPrice','paymentSeller'].forEach(k=>{if(f[k].value)f[k].value=cur.data[k]=fmtAmount(f[k].value);});
+    });
+    // pop-up panels: one open at a time, closed by an outside click or Escape
+    const panels=[...v.querySelectorAll('[data-panel]')];
+    const closeAll=()=>panels.forEach(p=>p.hidden=true);
+    v.querySelectorAll('[data-pop]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=v.querySelector(`[data-panel="${b.dataset.pop}"]`),open=p.hidden;closeAll();p.hidden=!open;if(open)p.querySelector('input')?.focus();});
+    document.addEventListener('click',e=>{if(!e.target.closest?.('.pbPop'))closeAll();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+    v.querySelectorAll('.pbMenu').forEach(m=>m.addEventListener('click',closeAll));
+    v.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{v.querySelector('.pbLayout').dataset.show=b.dataset.tab;v.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));window.scrollTo({top:0,behavior:'smooth'});});
+    v.querySelector('[data-add-inst]').onclick=()=>{cur.data.installments.push({label:'',amount:''});paintInst();changed();v.querySelector('[data-inst] .pbInst:last-child input')?.focus();};
+    v.querySelector('[data-new]').onclick=()=>{if(dirty&&!confirm('Discard the unsaved changes?'))return;load(blank());f.title.focus();};
     v.querySelector('[data-save]').onclick=save;
-    const menu=v.querySelector('.pbShareMenu');
-    v.querySelector('[data-share]').onclick=e=>{e.stopPropagation();menu.hidden=!menu.hidden;};
-    document.addEventListener('click',e=>{if(!e.target.closest?.('.pbShare'))menu.hidden=true;});
-    menu.addEventListener('click',()=>{menu.hidden=true;});
     v.querySelector('[data-copy]').onclick=async()=>{try{await navigator.clipboard.writeText(clientLink());toast('Client link copied');}catch(_){prompt('Copy this link:',clientLink());}};
     v.querySelector('[data-open-link]').onclick=()=>window.open(clientLink(),'_blank','noopener');
     v.querySelector('[data-wa]').onclick=sendWhatsApp;
-    v.querySelector('[data-pdf]').onclick=()=>withPdf(btnBusy(v.querySelector('[data-pdf]'),'Making PDF…'),blob=>{download(blob);toast('PDF downloaded');});
-    v.querySelector('[data-share-pdf]').onclick=()=>withPdf(btnBusy(v.querySelector('[data-share]'),'Making PDF…'),sharePdf);
+    const shareBtn=v.querySelector('[data-pop="share"]');
+    v.querySelector('[data-pdf]').onclick=()=>withPdf(btnBusy(shareBtn,'Making PDF…'),blob=>{download(blob);toast('PDF downloaded');});
+    v.querySelector('[data-share-pdf]').onclick=()=>withPdf(btnBusy(shareBtn,'Making PDF…'),sharePdf);
     v.querySelectorAll('[data-file]').forEach(inp=>inp.onchange=()=>{const files=[...inp.files];inp.value='';addFiles(inp.dataset.file,files);});
     v.querySelector('[data-import]').onclick=()=>{
       const t=prompt('Paste a breakdown link (from this CRM or the old breakdown generator):');if(!t)return;
-      try{if(dirty&&!confirm('Discard the unsaved changes?'))return;load({...blank(),data:PB.fromLink(t)});dirty=true;toast('Imported — press Save to keep it');}
+      try{if(dirty&&!confirm('Discard the unsaved changes?'))return;load({...blank(),data:PB.fromLink(t)});dirty=true;paintStatus();toast('Imported — press Save to keep it');}
       catch(_){toast('That link could not be read',true);}
     };
     v.querySelector('[data-delete]').onclick=async()=>{
@@ -123,10 +141,16 @@
     v.querySelector('[data-search]').oninput=paintSaved;
     load(cur);
   }
+  const fmtAmount=v=>{const n=PB.num(v);return n?Math.round(n).toLocaleString('en-US'):String(v||'').trim();};
+  function paintStatus(){
+    const el=document.querySelector('#crmBreakdownView [data-status]');if(!el)return;
+    const [text,cls]=dirty?['Unsaved changes','is-dirty']:cur.id?['Saved','is-saved']:['New','is-new'];
+    el.textContent=text;el.className='pbStatus '+cls;
+  }
 
   function paintInst(){
     const box=document.querySelector('#crmBreakdownView [data-inst]');if(!box)return;
-    box.innerHTML=cur.data.installments.map((x,i)=>`<div class="pbInst"><input name="instLabel" data-i="${i}" value="${esc(x.label)}" placeholder="e.g. 60% on completion"><input name="instAmount" data-i="${i}" inputmode="numeric" value="${esc(x.amount)}" placeholder="AED"><button type="button" class="crmBtn" data-rm="${i}" aria-label="Remove installment">×</button></div>`).join('');
+    box.innerHTML=cur.data.installments.map((x,i)=>`<div class="pbInst"><input name="instLabel" data-i="${i}" value="${esc(x.label)}" placeholder="e.g. 60% on completion"><input name="instAmount" data-i="${i}" inputmode="numeric" value="${esc(fmtAmount(x.amount))}" placeholder="AED"><button type="button" class="crmBtn" data-rm="${i}" aria-label="Remove installment">×</button></div>`).join('');
     box.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{cur.data.installments[inp.dataset.i][inp.name==='instLabel'?'label':'amount']=inp.value;changed();});
     box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{cur.data.installments.splice(Number(b.dataset.rm),1);paintInst();changed();});
   }
@@ -140,12 +164,14 @@
     PB.FIELDS.forEach(k=>{if(f[k])f[k].value=cur.data[k]||'';});
     paintInst();paintMedia();
     v.querySelector('[data-delete]').hidden=!cur.id;
+    ['unitPrice','paymentSeller'].forEach(k=>{if(f[k].value)f[k].value=fmtAmount(f[k].value);});
+    paintStatus();
     const linked=v.querySelector('.pbLinked');
     linked.hidden=!(cur.lead||cur.owner_id);
     linked.textContent=cur.lead?`For lead: ${cur.lead.name||'—'}${cur.lead.phone?' · '+cur.lead.phone:''}`:cur.owner_id?'Started from an owner record':'';
     paintPreview();paintSaved();
   }
-  function changed(){dirty=true;clearTimeout(timer);timer=setTimeout(paintPreview,120);}
+  function changed(){if(!dirty){dirty=true;paintStatus();}clearTimeout(timer);timer=setTimeout(paintPreview,120);}
   function paintPreview(){
     const p=document.querySelector('#crmBreakdownView .pbPreview');if(p)p.innerHTML=PB.render(cur.data);
     const box=document.querySelector('#crmBreakdownView [data-calc]');if(!box)return;
@@ -246,6 +272,7 @@
   }
   function paintSaved(){
     const ul=document.querySelector('#crmBreakdownView .pbSavedList');if(!ul)return;
+    const count=document.querySelector('#crmBreakdownView [data-count]');if(count)count.textContent=saved.length||'';
     const q=(document.querySelector('#crmBreakdownView [data-search]')?.value||'').toLowerCase().trim();
     const list=saved.filter(s=>!q||[s.title,s.data?.subtitle,s.data?.project,s.leads?.name].join(' ').toLowerCase().includes(q));
     ul.innerHTML=list.map(s=>{
@@ -256,6 +283,7 @@
     ul.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{
       if(dirty&&!confirm('Discard the unsaved changes?'))return;
       const s=saved.find(x=>x.id===b.dataset.open);if(s)load({...s,lead:s.leads||null});
+      document.querySelectorAll('#crmBreakdownView [data-panel]').forEach(p=>p.hidden=true);
     });
   }
 
@@ -266,7 +294,7 @@
     const res=cur.id?await db.from('crm_breakdowns').update(payload).eq('id',cur.id).select('id').single():await db.from('crm_breakdowns').insert(payload).select('id').single();
     btn.disabled=false;
     if(res.error)return toast('Could not save: '+res.error.message,true);
-    cur.id=res.data.id;dirty=false;
+    cur.id=res.data.id;dirty=false;paintStatus();
     document.querySelector('#crmBreakdownView [data-delete]').hidden=false;
     toast('Breakdown saved');loadSaved();
   }

@@ -24,6 +24,6 @@
     .then(()=>load('crm-status-system.js?v=2'))
     .then(()=>load('crm-leads-bulk.js?v=2'))
     .then(()=>load('crm-breakdown-doc.js?v=2'))
-    .then(()=>load('crm-breakdown.js?v=2'))
+    .then(()=>load('crm-breakdown.js?v=3'))
     .catch(error=>console.error('CRM enhancement loader failed:',error));
 })();
