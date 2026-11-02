@@ -453,7 +453,7 @@ body.crmPremium #ownersTable td.owner-col-owner,body.crmPremium #ownersTable td[
 body.crmPremium #ownersTable td.owner-col-unit{min-width:110px}
 body.crmPremium :is(#ownersTable,#leadsView .leadsTable){border-color:var(--c-border)!important;box-shadow:none!important}
 /* stage bar */
-body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
+body.crmPremium .crmStageBar{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;margin:0 0 var(--s-4)}
 body.crmPremium .crmStage{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--r-md);background:var(--c-bg);color:var(--c-muted);text-align:left;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
 body.crmPremium .crmStage::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--st,var(--c-border-strong))}
 body.crmPremium .crmStage span{font-size:var(--t-xs);font-weight:600}

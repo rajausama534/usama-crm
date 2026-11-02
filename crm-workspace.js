@@ -4,7 +4,7 @@
   // one primary action, a "More" menu, primary filters visible, secondary filters behind "Filters".
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const STAGES=['New','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
+  const STAGES=['New','Contacted','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
 
 
   // Keep shared desktop/mobile renderers in the workspace, using existing actions and data.

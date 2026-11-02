@@ -12,7 +12,7 @@ body.crmPremium :is(#appView,#leadsView) .filters{display:grid!important;grid-te
 body.crmPremium #leadsView .filters{grid-template-columns:minmax(200px,2fr) repeat(2,minmax(120px,1fr)) auto auto!important}
 body.crmPremium :is(#appView,#leadsView) .filters>:is(input,select,button){height:42px!important;min-height:42px!important;min-width:0!important;width:100%;font-size:14px!important}
 body.crmPremium :is(#appView,#leadsView) .crmAdvFilters{margin-bottom:18px}
-body.crmPremium #leadsView .crmStageBar{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;gap:10px!important;margin-bottom:20px!important}
+body.crmPremium #leadsView .crmStageBar{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:10px!important;margin-bottom:20px!important}
 body.crmPremium #leadsView .crmStage{padding:12px 10px 12px 14px!important;min-height:62px;gap:8px!important}
 body.crmPremium #leadsView .crmStage span{font-size:12px!important;line-height:1.35!important;overflow-wrap:normal!important;-webkit-line-clamp:2}
 body.crmPremium #leadsView .crmStage b{font-size:18px!important}

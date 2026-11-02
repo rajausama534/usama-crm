@@ -1,5 +1,6 @@
 (()=>{
   'use strict';
+  // Leads: WhatsApp or Call on a New lead moves it to Contacted (same rule as owners) and stamps last contact.
 
   async function autoMarkLeadContacted(id){
     try{
@@ -17,7 +18,12 @@
         try { await logLeadActivity(id, 'Status Change', 'Status changed from New to Contacted automatically after contact.'); } catch (_) {}
       }
 
-      if (typeof loadLeads === 'function') loadLeads();
+      if (currentStatus === 'New') {
+        if (typeof loadLeads === 'function') loadLeads();
+        // refresh the stage counts (New / Contacted) above the table
+        document.getElementById('leadStatusFilter')?.dispatchEvent(new Event('change'));
+        if (typeof activeLeadDetailId !== 'undefined' && String(activeLeadDetailId) === String(id) && typeof openLeadDetail === 'function') openLeadDetail(id);
+      }
     } catch (e) {
       console.warn('Auto contact status update failed:', e);
     }

@@ -59,7 +59,7 @@
   }
 
   // ------------------------------------------------------------------ dashboard
-  const LEAD_STAGES=['New','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
+  const LEAD_STAGES=['New','Contacted','No Response','Interested','Viewing Scheduled','Visit Done','Negotiation','Won','Lost'];
   const OWNER_ORDER=['For Sale','For Rent','Sold','Rented','Contacted','Call Back','No Response','Not Interested','Invalid Number','Agent','New','-'];
 
   function displayName(){

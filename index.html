@@ -2361,8 +2361,8 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
 <link rel="stylesheet" href="crm-premium.css?v=20261020-polish">
-<link rel="stylesheet" href="crm-leads-fit.css?v=4">
-<link rel="stylesheet" href="crm-workspace-refinement.css?v=4">
+<link rel="stylesheet" href="crm-leads-fit.css?v=5">
+<link rel="stylesheet" href="crm-workspace-refinement.css?v=5">
 <link rel="stylesheet" href="crm-breakdown.css?v=4">
 </head>
 
@@ -4579,7 +4579,7 @@ Usama Bin Nusrat.`;
     const OWNER_STATUS_KEY = "usama_owner_custom_statuses_v1";
     const PIPELINE_STAGE_KEY = "usama_lead_pipeline_stages_v1";
     const DEFAULT_OWNER_STATUSES = ["New","For Sale","For Rent","Sold","Call Back","No Response","Not Interested","Invalid Number"];
-    const DEFAULT_PIPELINE_STAGES = ["New","No Response","Interested","Viewing Scheduled","Visit Done","Negotiation","Won","Lost"];
+    const DEFAULT_PIPELINE_STAGES = ["New","Contacted","No Response","Interested","Viewing Scheduled","Visit Done","Negotiation","Won","Lost"];
     let leadViewMode = "table";
     let selectedOwnerIds = new Set();
     let currentOwnerPageRows = [];
@@ -6437,6 +6437,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=16"></script>
+<script src="crm-enhancements.js?v=17"></script>
 </body>
 </html>
