@@ -34,8 +34,9 @@ body.crmPremium :is(h1,.mainHeader h1,.crmPageHead h1){font-weight:700!important
 .hreSub{font-family:Inter,sans-serif;font-size:10.5px;letter-spacing:.15em;font-weight:600;line-height:1.15;color:var(--hre-logo,#1e3a8a)}
 .hreTag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.12em;padding:3px 7px;border-radius:6px;color:var(--c-accent-text);background:var(--c-accent-soft)}
 body.crmPremium #v7Topbar .v7Brand.hreLogo{padding:6px 4px 18px!important}
-/* the old sidebar brand styles target every span inside it, so each part is pinned here */
-body.crmPremium #v7Topbar .v7Brand.hreLogo{display:flex!important;align-items:center!important;gap:9px!important;overflow:visible!important}
+/* No logo block at the top of the sidebar (requested 2 Nov 2026); the login page keeps the logo.
+   The part rules below stay in case it comes back. */
+body.crmPremium #v7Topbar .v7Brand.hreLogo{display:none!important}
 body.crmPremium #v7Topbar .v7Brand.hreLogo>*{flex:none!important;margin:0!important;padding:0;background:none;line-height:1.1!important}
 body.crmPremium #v7Topbar .v7Brand.hreLogo .hreWord{font-size:26px!important;font-weight:700!important;color:var(--hre-logo)!important}
 body.crmPremium #v7Topbar .v7Brand.hreLogo .hreWord b{color:var(--hre-red)!important}
@@ -87,6 +88,3 @@ body.crmPremium :is(.tablebox,.pbPreview,.crmMenu,.pbSavedList){scrollbar-width:
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar{width:10px;height:10px;background:transparent}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-thumb{background:var(--c-border-strong);border-radius:10px;border:3px solid var(--c-surface)}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-track{background:transparent}
-
-/* No logo block at the top of the sidebar (requested 2 Nov 2026); the login page keeps the logo. */
-body.crmPremium #v7Topbar .v7Brand{display:none!important}
