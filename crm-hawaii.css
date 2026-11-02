@@ -87,3 +87,6 @@ body.crmPremium :is(.tablebox,.pbPreview,.crmMenu,.pbSavedList){scrollbar-width:
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar{width:10px;height:10px;background:transparent}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-thumb{background:var(--c-border-strong);border-radius:10px;border:3px solid var(--c-surface)}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-track{background:transparent}
+
+/* No logo block at the top of the sidebar (requested 2 Nov 2026); the login page keeps the logo. */
+body.crmPremium #v7Topbar .v7Brand{display:none!important}
