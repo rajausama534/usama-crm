@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>/* apply saved theme before first paint (no flash) */try{if(localStorage.getItem("crm_theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}
+<script>/* apply saved theme before first paint (no flash) */try{if(localStorage.getItem("crm_theme")!=="dark")document.documentElement.dataset.theme="light"}catch(e){document.documentElement.dataset.theme="light"}
 /* keep deep links (#calendar, #lead=…, #dxb=…) before the auth client tidies the address */window.__crmInitialHash=location.hash;</script>
 
   <script src="crm-state.js?v=1"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usama CRM</title>
+  <title>Hawaii Real Estate CRM</title>
+  <link rel="icon" href="hawaii-favicon.svg" type="image/svg+xml">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://vnydxkmhrcesdffpfjpc.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- pinned: same version the CRM already ran, but cacheable and without a version lookup on every load -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -2360,16 +2366,17 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
 
 </style>
 <link rel="stylesheet" href="crm-cleanup.css?v=4">
-<link rel="stylesheet" href="crm-premium.css?v=20261020-polish">
+<link rel="stylesheet" href="crm-premium.css?v=20261102">
 <link rel="stylesheet" href="crm-leads-fit.css?v=5">
 <link rel="stylesheet" href="crm-workspace-refinement.css?v=5">
 <link rel="stylesheet" href="crm-breakdown.css?v=4">
+<link rel="stylesheet" href="crm-hawaii.css?v=1">
 </head>
 
 <body>
 
   <header id="v7Topbar" class="v7Topbar hidden">
-    <div class="v7Brand"><strong>Usama</strong><span>CRM</span></div>
+    <div class="v7Brand hreLogo" aria-label="Hawaii Real Estate CRM"><span class="hreWord">Hawai<b>i</b></span><span class="hreSep"></span><span class="hreSub">REAL<br>ESTATE</span><span class="hreTag">CRM</span></div>
     <nav class="v7Nav">
       <button id="v7NavOwners" onclick="showOwnersView()"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Owners</button>
       <button id="v7NavLeads" onclick="showLeadsView()"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10"/></svg>Leads</button>
@@ -2390,8 +2397,9 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
   </header>
 
   <div id="loginView" class="loginBox">
-    <h1>Usama CRM</h1>
-    <div class="sub">Sign in to continue.</div>
+    <div class="hreLogo hreLoginLogo" aria-label="Hawaii Real Estate"><span class="hreWord">Hawai<b>i</b></span><span class="hreSep"></span><span class="hreSub">REAL<br>ESTATE</span></div>
+    <h1>Sign in to your CRM</h1>
+    <div class="sub">Hawaii Real Estate · Sales workspace</div>
     <input id="loginEmail" type="email" placeholder="Email" />
     <input id="loginPassword" type="password" placeholder="Password" />
     <button class="primaryBtn" onclick="login()">Login</button>
@@ -2402,8 +2410,8 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
   <div id="choiceView" class="crmHome hidden">
     <header class="crmHomeTop">
       <div class="crmBrand">
-        <div class="crmBrandLogo">U</div>
-        <span>Usama CRM</span>
+        <div class="crmBrandLogo">H</div>
+        <span>Hawaii Real Estate CRM</span>
       </div>
 
       <div class="crmHomeUser">
@@ -2867,9 +2875,14 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
           <input id="wa_agent_name" placeholder="Usama" />
         </div>
 
+        <div>
+          <label>Job Title Optional</label>
+          <input id="wa_title" placeholder="Head of Sales" />
+        </div>
+
         <div class="formFull">
           <label>Company Optional</label>
-          <input id="wa_company" placeholder="BFG Properties" />
+          <input id="wa_company" placeholder="Hawaii Real Estate" />
         </div>
 
         <div class="formFull">
@@ -2933,7 +2946,8 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
     const DEFAULT_WHATSAPP_TEMPLATE = {
       greeting: "Hello",
       agentName: "Usama",
-      company: "BFG Properties",
+      title: "Head of Sales",
+      company: "Hawaii Real Estate",
       message: "Would you consider selling if you receive a strong offer?"
     };
 
@@ -2987,7 +3001,7 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
     checkSession();
 
     document.addEventListener("input", function(e) {
-      if (["wa_greeting", "wa_agent_name", "wa_company", "wa_message"].includes(e.target.id)) {
+      if (["wa_greeting", "wa_agent_name", "wa_title", "wa_company", "wa_message"].includes(e.target.id)) {
         updateWhatsappPreview();
       }
     });
@@ -3214,9 +3228,15 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
       const fallback = {
         greeting: DEFAULT_WHATSAPP_TEMPLATE.greeting,
         agentName: fallbackAgentName || DEFAULT_WHATSAPP_TEMPLATE.agentName,
+        title: (currentAccess?.whatsapp_title ?? (isAdmin ? DEFAULT_WHATSAPP_TEMPLATE.title : "")).trim(),
         company: (currentAccess?.whatsapp_company || DEFAULT_WHATSAPP_TEMPLATE.company).trim(),
         message: (currentAccess?.whatsapp_message || DEFAULT_WHATSAPP_TEMPLATE.message).trim()
       };
+      // The company is now Hawaii Real Estate: templates saved with BFG switch over automatically.
+      // Only a company typed in this browser's template settings overrides it (old profile values
+      // such as "New Company" or BFG are ignored).
+      const company = c => !c || /\bbfg\b/i.test(c) ? DEFAULT_WHATSAPP_TEMPLATE.company : c;
+      fallback.company = DEFAULT_WHATSAPP_TEMPLATE.company;
 
       try {
         const saved = JSON.parse(localStorage.getItem(WHATSAPP_TEMPLATE_KEY) || "null");
@@ -3225,7 +3245,8 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
         return {
           greeting: (saved.greeting || fallback.greeting).trim(),
           agentName: (saved.agentName || fallback.agentName).trim(),
-          company: (saved.company ?? fallback.company).trim(),
+          title: (saved.title ?? fallback.title).trim(),
+          company: company(saved.company || fallback.company).trim(),
           message: (saved.message || fallback.message).trim()
         };
       } catch {
@@ -3241,6 +3262,15 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
       return getSavedWhatsappTemplate().company;
     }
 
+    // "This is Usama, Head of Sales at Hawaii Real Estate." (title and company are optional)
+    function whatsappIntro(t = getSavedWhatsappTemplate()) {
+      const name = t.agentName || "Agent";
+      if (t.title && t.company) return `This is ${name}, ${t.title} at ${t.company}.`;
+      if (t.company) return `This is ${name} from ${t.company}.`;
+      if (t.title) return `This is ${name}, ${t.title}.`;
+      return `This is ${name}.`;
+    }
+
     function getWhatsappMessageBody() {
       return getSavedWhatsappTemplate().message;
     }
@@ -3253,9 +3283,7 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
       const community = get(row, ["community"]);
       const firstName = owner ? String(owner).trim().split(" ")[0] : "Owner";
       const agentName = template.agentName || "Agent";
-      const introLine = template.company
-        ? `This is ${agentName} from ${template.company}.`
-        : `This is ${agentName}.`;
+      const introLine = whatsappIntro(template);
 
       return `${template.greeting || "Hello"} Mr. ${firstName},
 
@@ -3284,6 +3312,7 @@ ${agentName}`;
       const template = getSavedWhatsappTemplate();
       el("wa_greeting").value = template.greeting;
       el("wa_agent_name").value = template.agentName;
+      el("wa_title").value = template.title || "";
       el("wa_company").value = template.company;
       el("wa_message").value = template.message;
       updateWhatsappPreview();
@@ -3297,6 +3326,7 @@ ${agentName}`;
     function resetWhatsappMessageForm() {
       el("wa_greeting").value = DEFAULT_WHATSAPP_TEMPLATE.greeting;
       el("wa_agent_name").value = DEFAULT_WHATSAPP_TEMPLATE.agentName;
+      el("wa_title").value = isAdmin ? DEFAULT_WHATSAPP_TEMPLATE.title : "";
       el("wa_company").value = DEFAULT_WHATSAPP_TEMPLATE.company;
       el("wa_message").value = DEFAULT_WHATSAPP_TEMPLATE.message;
       updateWhatsappPreview();
@@ -3306,8 +3336,9 @@ ${agentName}`;
       const greeting = (el("wa_greeting")?.value || "Hello").trim();
       const agentName = (el("wa_agent_name")?.value || "Agent Name").trim();
       const company = (el("wa_company")?.value || "").trim();
+      const title = (el("wa_title")?.value || "").trim();
       const messageBody = (el("wa_message")?.value || DEFAULT_WHATSAPP_TEMPLATE.message).trim();
-      const introLine = company ? `This is ${agentName} from ${company}.` : `This is ${agentName}.`;
+      const introLine = whatsappIntro({ agentName, title, company });
 
       el("wa_preview").textContent = `${greeting} Mr. Owner Name,
 
@@ -3325,6 +3356,7 @@ ${agentName}`;
       const template = {
         greeting: el("wa_greeting").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.greeting,
         agentName: el("wa_agent_name").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.agentName,
+        title: el("wa_title").value.trim(),
         company: el("wa_company").value.trim(),
         message: el("wa_message").value.trim() || DEFAULT_WHATSAPP_TEMPLATE.message
       };
@@ -3334,6 +3366,7 @@ ${agentName}`;
       currentAccess = {
         ...currentAccess,
         whatsapp_agent_name: template.agentName,
+        whatsapp_title: template.title,
         whatsapp_company: template.company,
         whatsapp_message: template.message
       };
@@ -4042,12 +4075,12 @@ ${agentName}`;
 
       const msg = `Hello ${row.name || ""},
 
-This is Usama from BFG Properties.
+${whatsappIntro()}
 
 You inquired about ${row.project_inquired || "a property"}. When is a good time to discuss your requirement?
 
 Regards,
-Usama Bin Nusrat.`;
+${getWhatsappAgentName()}`;
 
       return `<a class="waBtn" target="_blank" onclick="markLeadContacted('${row.id}')" href="https://wa.me/${formatted}?text=${encodeURIComponent(msg)}">WhatsApp</a>`;
     }
@@ -4775,7 +4808,7 @@ Usama Bin Nusrat.`;
     async function saveLeadFollowup(id){const follow_up_date=el("detailFollowupDate").value||null,follow_up_time=el("detailFollowupTime").value||null,reminder_type=el("detailReminderType").value||"Call",reminder_note=el("detailReminderNote").value.trim()||null;if(!follow_up_date){alert("Choose a follow-up date.");return;}const {error}=await db.from(LEADS_TABLE).update({follow_up_date,follow_up_time,reminder_type,reminder_note}).eq("id",id);if(error){alert(error.message);return;}await logLeadActivity(id,"Follow-up Set",`${reminder_type} follow-up set for ${follow_up_date}${follow_up_time?' at '+follow_up_time:''}${reminder_note?' — '+reminder_note:''}`);showLeadSaved();await openLeadDetail(id);loadFollowupDashboard();if(leadViewMode==='kanban')loadKanban();else loadLeads();}
 
     // Broadcast: three recipient modes and the same full personalized message structure as Edit WhatsApp.
-    function buildBroadcastMessage(row){const greeting=(el("broadcastGreeting").value||"Hello").trim(),agent=(el("broadcastAgentName").value||"Agent").trim(),company=(el("broadcastCompany").value||"").trim(),body=(el("broadcastMessage").value||"").trim();const owner=get(row,["owner"]),first=owner?String(owner).trim().split(/\s+/)[0]:"Owner",intro=company?`This is ${agent} from ${company}.`:`This is ${agent}.`;return `${greeting} Mr. ${first},
+    function buildBroadcastMessage(row){const greeting=(el("broadcastGreeting").value||"Hello").trim(),agent=(el("broadcastAgentName").value||"Agent").trim(),company=(el("broadcastCompany").value||"").trim(),body=(el("broadcastMessage").value||"").trim();const owner=get(row,["owner"]),first=owner?String(owner).trim().split(/\s+/)[0]:"Owner",intro=whatsappIntro({agentName:agent,title:getSavedWhatsappTemplate().title,company});return `${greeting} Mr. ${first},
 
 ${intro}
 
@@ -5141,7 +5174,7 @@ renderLeadDetail = function(lead,acts){
   ].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
 
   const formattedPhone=formatPhone(lead.phone);
-  const waMessage=`Hello ${lead.name||""},\n\nThis is ${getWhatsappAgentName ? getWhatsappAgentName() : "Usama"}.\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName ? getWhatsappAgentName() : "Usama"}`;
+  const waMessage=`Hello ${lead.name||""},\n\n${whatsappIntro()}\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName ? getWhatsappAgentName() : "Usama"}`;
 
   el("leadDetailContent").innerHTML=`
     <button class="u6CloseButton" onclick="closeLeadDetail()" aria-label="Close">×</button>
@@ -5268,7 +5301,9 @@ let v7PendingAvatar = null;
 function getV7Profile(){
   const saved=JSON.parse(localStorage.getItem('usama_crm_profile')||'{}');
   const fallbackName=(typeof currentAccess!=='undefined' && (currentAccess?.full_name||currentAccess?.name)) || (typeof currentUserEmail!=='undefined' && currentUserEmail?.split('@')[0]) || 'Usama';
-  return {name:saved.name||fallbackName,role:saved.role||'Admin',avatar:saved.avatar||''};
+  // Usama is Head of Sales at Hawaii Real Estate; the old default label "Admin" is replaced, a custom one is kept.
+  const role=saved.role&&saved.role!=='Admin'?saved.role:(typeof isAdmin!=='undefined'&&!isAdmin?'Agent':'Head of Sales');
+  return {name:saved.name||fallbackName,role,avatar:saved.avatar||''};
 }
 function renderV7Avatar(node,profile){
   if(!node)return;
@@ -5859,7 +5894,7 @@ renderLeadDetail=function(lead,acts){
   const stages=getPipelineStages();
   const latest=u10LatestManualText(acts,lead.notes||"-");
   const formattedPhone=formatPhone(lead.phone);
-  const waMessage=`Hello ${lead.name||""},\n\nThis is ${getWhatsappAgentName()}.\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName()}`;
+  const waMessage=`Hello ${lead.name||""},\n\n${whatsappIntro()}\n\nI am following up regarding your enquiry for ${lead.project_inquired||"the property"}.\n\nRegards,\n${getWhatsappAgentName()}`;
   el("leadDetailContent").innerHTML=`
     <button class="u6CloseButton" onclick="closeLeadDetail()">×</button>
     <div class="u6DetailShell">
@@ -6004,7 +6039,7 @@ setTimeout(()=>{
   const minimums = {
     community: 80,
     cluster: 80,
-    unit: 96,
+    unit: 118,
     owner: 135,
     whatsapp: 52,
     status: 125,
@@ -6040,7 +6075,7 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { whatsapp:46, remarks:120, owner:120, community:80, cluster:80, status:156, unit:96 };
+  const fitMinimums = { whatsapp:46, remarks:120, owner:120, community:80, cluster:80, status:156, unit:118 };
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
@@ -6437,6 +6472,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=17"></script>
+<script src="crm-enhancements.js?v=18"></script>
 </body>
 </html>

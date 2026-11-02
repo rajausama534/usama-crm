@@ -1,0 +1,89 @@
+/* Hawaii Real Estate theme for the CRM (loaded last). Same palette and type as the website:
+   navy #1e3a8a, red #b91c1c, Poppins headings, Inter text. Only colours, type and finish change;
+   layout and data are untouched. Light is the default, dark is a deep navy. */
+
+html[data-theme="light"]{
+  --c-bg:#f5f7fb;--c-surface:#ffffff;--c-surface-2:#f1f4f9;--c-raised:#ffffff;
+  --c-border:rgba(15,31,77,.10);--c-border-strong:rgba(15,31,77,.18);
+  --c-text:#0b1530;--c-muted:#5b6475;--c-faint:#8b93a3;
+  --c-accent:#1e3a8a;--c-accent-soft:rgba(30,58,138,.08);--c-accent-text:#1e3a8a;
+  --c-danger:#b91c1c;
+  --shadow:0 1px 2px rgba(15,31,77,.05),0 8px 24px rgba(15,31,77,.07);
+  --hre-red:#b91c1c;--hre-navy:#1e3a8a;--hre-logo:#1e3a8a;
+}
+:root:not([data-theme="light"]){
+  --c-bg:#0a1124;--c-surface:#0f1830;--c-surface-2:#14203d;--c-raised:#18264a;
+  --c-border:rgba(148,170,220,.13);--c-border-strong:rgba(148,170,220,.24);
+  --c-text:#e9eefb;--c-muted:#97a3bf;--c-faint:#66728f;
+  --c-accent:#4c6fe0;--c-accent-soft:rgba(76,111,224,.16);--c-accent-text:#a9bcff;
+  --c-danger:#f05252;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.25);
+  --hre-red:#f05252;--hre-navy:#4c6fe0;--hre-logo:#ffffff;
+}
+
+/* type: Inter for text, Poppins for headings and numbers that act as headings */
+body.crmPremium{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;text-rendering:optimizeLegibility}
+body.crmPremium :is(h1,h2,h3,.crmPageHead h1,.mainHeader h1,.kpiValue,.crmStage b,.v7Brand){font-family:Poppins,Inter,system-ui,sans-serif!important}
+body.crmPremium :is(h1,.mainHeader h1,.crmPageHead h1){font-weight:700!important;letter-spacing:-.015em!important}
+
+/* logo: "Hawaii | REAL ESTATE" exactly like the website header */
+.hreLogo{display:flex;align-items:center;gap:9px;line-height:1;color:var(--hre-logo,#1e3a8a);text-decoration:none}
+.hreWord{font-family:Poppins,Inter,sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em;color:var(--hre-logo,#1e3a8a)}
+.hreWord b{color:var(--hre-red,#b91c1c);font-weight:700}
+.hreSep{width:1px;height:26px;background:currentColor;opacity:.45}
+.hreSub{font-family:Inter,sans-serif;font-size:10.5px;letter-spacing:.15em;font-weight:600;line-height:1.15;color:var(--hre-logo,#1e3a8a)}
+.hreTag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.12em;padding:3px 7px;border-radius:6px;color:var(--c-accent-text);background:var(--c-accent-soft)}
+body.crmPremium #v7Topbar .v7Brand.hreLogo{padding:6px 4px 18px!important}
+/* the old sidebar brand styles target every span inside it, so each part is pinned here */
+body.crmPremium #v7Topbar .v7Brand.hreLogo{display:flex!important;align-items:center!important;gap:9px!important;overflow:visible!important}
+body.crmPremium #v7Topbar .v7Brand.hreLogo>*{flex:none!important;margin:0!important;padding:0;background:none;line-height:1.1!important}
+body.crmPremium #v7Topbar .v7Brand.hreLogo .hreWord{font-size:26px!important;font-weight:700!important;color:var(--hre-logo)!important}
+body.crmPremium #v7Topbar .v7Brand.hreLogo .hreWord b{color:var(--hre-red)!important}
+body.crmPremium #v7Topbar .v7Brand.hreLogo .hreSep{width:1px!important;height:26px!important;background:var(--hre-logo)!important;opacity:.45}
+body.crmPremium #v7Topbar .v7Brand.hreLogo .hreSub{font-size:10.5px!important;font-weight:600!important;letter-spacing:.15em!important;color:var(--hre-logo)!important;line-height:1.15!important}
+body.crmPremium #v7Topbar .v7Brand.hreLogo .hreTag{margin-left:auto!important;font-size:10px!important;font-weight:700!important;letter-spacing:.12em!important;padding:3px 7px!important;border-radius:6px;color:var(--c-accent-text)!important;background:var(--c-accent-soft)!important}
+.hreLoginLogo{justify-content:center;margin:0 0 22px}
+.hreLoginLogo .hreWord{font-size:34px}
+.hreLoginLogo .hreSep{height:32px}
+.hreLoginLogo .hreSub{font-size:12px}
+
+/* login card */
+body.crmPremium #loginView{background:var(--c-surface)!important;border:1px solid var(--c-border)!important;box-shadow:var(--shadow)!important;border-radius:20px!important}
+body.crmPremium #loginView h1{font-size:20px!important;text-align:center;margin:0 0 4px!important;color:var(--c-text)!important}
+body.crmPremium #loginView .sub{text-align:center;color:var(--c-muted)!important;margin-bottom:18px!important}
+
+/* sidebar: navy active item with the website's red marker */
+body.crmPremium #v7Topbar{background:var(--c-surface)!important;border-color:var(--c-border)!important}
+body.crmPremium #v7Topbar .v7Nav button{transition:background .15s ease,color .15s ease!important}
+body.crmPremium #v7Topbar .v7Nav button.active{background:var(--c-accent-soft)!important;color:var(--c-accent-text)!important;box-shadow:inset 3px 0 0 var(--hre-red)!important}
+body.crmPremium #v7Topbar .v7Nav button:not(.active):hover{background:var(--c-surface-2)!important}
+
+/* buttons: primary = navy like the website, hover a shade darker */
+body.crmPremium :is(.crmBtnPrimary,.primaryBtn,button.crmBtn.crmBtnPrimary){background:var(--c-accent)!important;border-color:var(--c-accent)!important;color:#fff!important}
+html[data-theme="light"] body.crmPremium :is(.crmBtnPrimary,.primaryBtn):hover{background:#172e6e!important;border-color:#172e6e!important}
+:root:not([data-theme="light"]) body.crmPremium :is(.crmBtnPrimary,.primaryBtn):hover{background:#3d5ed0!important;border-color:#3d5ed0!important}
+body.crmPremium :is(.crmBtn,.darkBtn,.primaryBtn,.callBtn,.profileBtn,.copyBtn,button){transition:background-color .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease,transform .1s ease}
+body.crmPremium :is(.crmBtn,.darkBtn,.primaryBtn):active{transform:translateY(1px)}
+body.crmPremium :is(input,select,textarea):focus-visible{outline:none!important;border-color:var(--c-accent)!important;box-shadow:0 0 0 3px var(--c-accent-soft)!important}
+body.crmPremium :is(button,a):focus-visible{outline:2px solid var(--c-accent)!important;outline-offset:2px}
+body.crmPremium .crmBtnDanger{color:var(--c-danger)!important}
+
+/* cards and tables: a touch more air and the website's soft navy shadow */
+body.crmPremium :is(.crmCard,.card,.kpiCard,.dashboardCards>div,.pbCard,.crmSideGroup){box-shadow:var(--shadow)!important;border-color:var(--c-border)!important}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) tbody tr{transition:background-color .12s ease}
+body.crmPremium :is(#ownersTable,#leadsView .leadsTable) thead th{color:var(--c-muted)!important;font-weight:600!important;letter-spacing:.04em!important}
+html[data-theme="light"] body.crmPremium :is(#ownersTable,#leadsView .leadsTable) thead th{background:#f7f9fc!important}
+
+/* smooth page changes, respecting reduced-motion settings */
+@media (prefers-reduced-motion:no-preference){
+  body.crmPremium :is(#appView,#leadsView,#dashboardView,#crmCalendarView,#crmBreakdownView):not(.hidden){animation:hreIn .18s ease-out}
+  @keyframes hreIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  html{scroll-behavior:smooth}
+}
+body.crmPremium ::selection{background:rgba(30,58,138,.18)}
+
+/* scrollbars: thin and quiet instead of the old black bar */
+body.crmPremium :is(.tablebox,.pbPreview,.crmMenu,.pbSavedList){scrollbar-width:thin;scrollbar-color:var(--c-border-strong) transparent}
+body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar{width:10px;height:10px;background:transparent}
+body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-thumb{background:var(--c-border-strong);border-radius:10px;border:3px solid var(--c-surface)}
+body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-track{background:transparent}

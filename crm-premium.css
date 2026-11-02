@@ -1,6 +1,6 @@
 /* Usama CRM design system (loaded last; scoped to body.crmPremium so the old layers stay inert).
    One font, one type scale, one spacing scale, one radius and one accent across every page. */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+/* fonts are loaded once from index.html (an @import here held up the first paint) */
 
 :root{
   --c-bg:#0b0f17;--c-surface:#111723;--c-surface-2:#161e2d;--c-raised:#1b2435;
