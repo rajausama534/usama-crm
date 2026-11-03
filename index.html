@@ -6093,7 +6093,8 @@ setTimeout(()=>{
     const shown = Object.fromEntries(visible.map(c => [c.key, Number(c.width || 100)]));
     if ("status" in shown && shown.status < fitMinimums.status) { shown.status = fitMinimums.status; paintOwnerWidth("status", shown.status); }
     // Profile + related units + Call + Copy must never be clipped.
-    if ("actions" in shown && shown.actions < 236) { shown.actions = 236; paintOwnerWidth("actions", 236); }
+    // Action buttons wrap onto two lines (crm-hawaii.css), so 172px is enough.
+    if ("actions" in shown && shown.actions < 172) { shown.actions = 172; paintOwnerWidth("actions", 172); }
     const available = table.closest(".tablebox")?.clientWidth || 0;
     const excess = 42 + Object.values(shown).reduce((a, b) => a + b, 0) - available;
     // Shrink every flexible column in proportion to how much room it has above its minimum.
@@ -6476,6 +6477,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=24"></script>
+<script src="crm-enhancements.js?v=25"></script>
 </body>
 </html>
