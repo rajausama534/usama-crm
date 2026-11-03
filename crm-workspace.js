@@ -15,10 +15,10 @@
     a.classList.add('crmWaIcon');a.setAttribute('aria-label','WhatsApp');a.title='WhatsApp';a.innerHTML=WA_ICON;
     return t.innerHTML;
   }
-  const ownerOrder=['community','cluster','unit','owner','beds','size','status','remarks','whatsapp','actions'];
+  const ownerOrder=['community','cluster','unit','owner','beds','size','lastprice','status','remarks','whatsapp','actions'];
   const saved=new Map(ownerColumns.map(c=>[c.key,c]));
   ownerColumns.splice(0,ownerColumns.length,...ownerOrder.map(key=>saved.get(key)||{key,label:key==='actions'?'Actions':key,visible:true,width:220}),...ownerColumns.filter(c=>!ownerOrder.includes(c.key)));
-  const labels={owner:'Owner',beds:'BR',size:'Size',remarks:'Notes',whatsapp:'WhatsApp'};
+  const labels={owner:'Owner',beds:'BR',size:'Size',lastprice:'Last Price',remarks:'Notes',whatsapp:'WhatsApp'};
   ownerColumns.forEach(c=>{if(labels[c.key])c.label=labels[c.key];});
   // Versioned defaults are applied once; subsequent manual resizing remains intact.
   if(localStorage.getItem('crm_owner_layout_v1')!=='1'){
@@ -26,6 +26,9 @@
     ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='last_contacted')c.visible=false;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v1','1');
   }
   // BR and Size columns (from unit_details, filled from DXB Interact): sensible widths once.
+  if(localStorage.getItem('crm_owner_layout_v3')!=='1'){
+    ownerColumns.forEach(c=>{if(c.key==='lastprice')c.width=112;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v3','1');
+  }
   if(localStorage.getItem('crm_owner_layout_v2')!=='1'){
     ownerColumns.forEach(c=>{if(c.key==='beds')c.width=70;if(c.key==='size')c.width=118;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v2','1');
   }
@@ -52,6 +55,7 @@
   const udKey=r=>[r.community,r.cluster,r.unit].map(v=>String(v??'')).join('|');
   const udCache=new Map();
   const sq=v=>v?Math.round(v).toLocaleString('en-US'):'';
+  const price=v=>v>=1e6?(Math.round(v/1e4)/100).toString()+'M':v>=1e3?Math.round(v/1e3)+'K':String(v||'');
   async function fillUnitDetails(){
     const spans=[...document.querySelectorAll('.crmUD:not([data-done])')];if(!spans.length)return;
     const want=[...new Set(spans.map(s=>s.dataset.ud))].filter(k=>!udCache.has(k));
@@ -60,14 +64,28 @@
       const {data,error}=await db.from('unit_details').select('community,cluster,unit,bedrooms,bua_sqft,plot_sqft')
         .in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
       if(error){console.warn('Unit details unavailable:',error.message);return;}
+      // Last purchase: newest "Sold" sale, DXB Interact records first (an older manual import
+      // has dated rows that DXB does not show); other sources only when a unit has no DXB sale.
+      const {data:tx}=await db.from('property_transactions').select('community,cluster,unit,transaction_date,amount,source,sold_by')
+        .eq('kind','Sold').in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
+      const last=new Map();
+      (tx||[]).forEach(t=>{const k=udKey(t),dxb=/^DXB/i.test(t.source||''),cur=last.get(k);
+        if(!cur||(dxb&&!cur.dxb)||(dxb===cur.dxb&&t.transaction_date>cur.transaction_date))last.set(k,{...t,dxb});});
       want.forEach(k=>udCache.set(k,null));
       (data||[]).forEach(d=>udCache.set(udKey(d),d));
+      last.forEach((t,k)=>udCache.set(k,{...(udCache.get(k)||{}),last:t}));
     }
     document.querySelectorAll('.crmUD:not([data-done])').forEach(el=>{
       if(!udCache.has(el.dataset.ud))return;
       const d=udCache.get(el.dataset.ud),beds=(String(d?.bedrooms||'').match(/\d+/)||[''])[0],f=el.dataset.f;
       el.dataset.done='1';
       if(f==='beds')el.textContent=beds||'—';
+      else if(f==='lastprice'){
+        const t=d?.last;if(!t){el.textContent='—';return;}
+        const when=new Date(t.transaction_date+'T00:00:00');
+        el.innerHTML=`${price(t.amount)}<small>${when.toLocaleDateString('en-GB',{month:'short',year:'numeric'})}${t.sold_by?' · '+esc(t.sold_by):''}</small>`;
+        el.title=`AED ${Math.round(t.amount).toLocaleString('en-US')} · ${when.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}${t.sold_by?' · '+t.sold_by:''}`;
+      }
       else if(f==='size'){
         if(!d?.bua_sqft&&!d?.plot_sqft){el.textContent='—';return;}
         el.innerHTML=d.bua_sqft?`${sq(d.bua_sqft)}${d.plot_sqft?`<small>Plot ${sq(d.plot_sqft)}</small>`:''}`:`<small>Plot</small> ${sq(d.plot_sqft)}`;
@@ -79,7 +97,7 @@
   window.ownerCell=function(row,col){
     if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
     if(col.key==='whatsapp')return ownerContact(row);
-    if(col.key==='beds'||col.key==='size')return `<span class="crmUD" data-ud="${esc(udKey(row))}" data-f="${col.key}">…</span>`;
+    if(col.key==='beds'||col.key==='size'||col.key==='lastprice')return `<span class="crmUD" data-ud="${esc(udKey(row))}" data-f="${col.key}">…</span>`;
     if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)||'<span class="crmNoPhone">No phone number</span>'}${ownerCopy(row)}</div>`;
     return baseOwnerCell(row,col);
   };
