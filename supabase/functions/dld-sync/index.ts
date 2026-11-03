@@ -3,6 +3,8 @@
 // and inserts them into dld_transactions. Idempotent (transaction number is the primary key).
 // Unit-level links still come only from unit-numbered sales reports, never from this job.
 // It writes only public DLD data and refuses to run more than once every 6 days, so it needs no caller secret.
+// "Fetch latest" on the CRM's Cluster Data page calls it with {"manual": true}: allowed once an hour,
+// looking back 30 days.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const secretKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || (() => {
@@ -34,10 +36,16 @@ async function fetchDay(from: Date, to: Date, skip: number) {
   return (await r.json()).response.result as Record<string, any>[];
 }
 
-Deno.serve(async () => {
+const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
+const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: CORS });
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const manual = await req.json().then((b) => b?.manual === true).catch(() => false);
   const { data: last } = await db.from("dld_sync_runs").select("started_at").order("started_at", { ascending: false }).limit(1).maybeSingle();
-  if (last && Date.now() - new Date(last.started_at).getTime() < 6 * 864e5) {
-    return Response.json({ skipped: "ran less than 6 days ago", last: last.started_at });
+  const gap = manual ? 3600e3 : 6 * 864e5;
+  if (last && Date.now() - new Date(last.started_at).getTime() < gap) {
+    return reply({ skipped: manual ? "fetched less than an hour ago" : "ran less than 6 days ago", last: last.started_at });
   }
   const { data: run } = await db.from("dld_sync_runs").insert({}).select("id").single();
   try {
@@ -60,7 +68,7 @@ Deno.serve(async () => {
       return hits.size === 1 ? [...hits.values()][0] : null;
     };
 
-    const to = new Date(), from = new Date(Date.now() - 21 * 864e5);
+    const to = new Date(), from = new Date(Date.now() - (manual ? 30 : 21) * 864e5);
     let fetched = 0, mapped = 0;
     for (let skip = 0; ; skip += 5000) {
       const rows = await fetchDay(from, to, skip);
@@ -85,9 +93,9 @@ Deno.serve(async () => {
       await new Promise((r) => setTimeout(r, 2000));
     }
     await db.from("dld_sync_runs").update({ finished_at: new Date().toISOString(), fetched, mapped }).eq("id", run!.id);
-    return Response.json({ fetched, mapped });
+    return reply({ fetched, mapped });
   } catch (e) {
     await db.from("dld_sync_runs").update({ finished_at: new Date().toISOString(), error: String((e as Error).message || e) }).eq("id", run!.id);
-    return Response.json({ error: String((e as Error).message || e) }, { status: 500 });
+    return reply({ error: String((e as Error).message || e) }, 500);
   }
 });

@@ -83,3 +83,35 @@ body.crmPremium #ownersTable td.owner-col-status .statusSelect{width:100%!import
 body.crmPremium #appView #ownersTable td{padding:10px 8px!important}
 body.crmPremium #appView #ownersTable th{padding-left:8px!important;padding-right:8px!important}
 body.crmPremium #appView #ownersTable :is(th,td).owner-col-actions{width:172px!important;min-width:172px!important;max-width:172px!important}
+
+/* Cluster Data page */
+#crmClusterDataView{padding:22px 28px 40px}
+#crmClusterDataView .cdTop{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 16px}
+#crmClusterDataView .cdTop h1{margin:0}
+#crmClusterDataView .cdSub{margin:4px 0 0;font-size:12.5px;color:var(--c-muted)}
+#crmClusterDataView .cdPick{display:flex;gap:8px;flex-wrap:wrap}
+#crmClusterDataView .cdPick select{height:40px;min-width:200px;margin:0;border-radius:10px;font-size:14px}
+#crmClusterDataView .cdEmpty{padding:40px 16px;text-align:center;border:1px dashed var(--c-border-strong);border-radius:14px;color:var(--c-muted)}
+#crmClusterDataView .cdCards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 14px}
+#crmClusterDataView .cdCard{background:var(--c-surface);border:1px solid var(--c-border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+#crmClusterDataView .cdCard span{display:block;font-size:12px;color:var(--c-muted);font-weight:600}
+#crmClusterDataView .cdCard strong{display:block;font-family:Poppins,Inter,sans-serif;font-size:20px;margin:4px 0 2px;color:var(--c-text)}
+#crmClusterDataView .cdCard small{font-size:12px;color:var(--c-muted)}
+#crmClusterDataView .crmCard{padding:14px 16px;margin:0 0 14px;border-radius:14px}
+#crmClusterDataView .cdTableHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+#crmClusterDataView .cdTableHead h2{margin:0;font-size:17px}
+#crmClusterDataView .cdTableHead h2 small{font-size:12.5px;color:var(--c-muted);font-weight:500;margin-left:6px}
+#crmClusterDataView .cdTableHead input{height:38px;width:280px;max-width:100%;margin:0;border-radius:10px}
+#crmClusterDataView .cdTableWrap{overflow:auto;max-height:66vh;border:1px solid var(--c-border);border-radius:12px}
+#crmClusterDataView .cdTable{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;font-variant-numeric:tabular-nums}
+#crmClusterDataView .cdTable th{position:sticky;top:0;z-index:1;background:var(--c-surface-2);text-align:left;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--c-muted);padding:10px;white-space:nowrap;cursor:pointer;user-select:none}
+#crmClusterDataView .cdTable th[data-dir="asc"] i::after{content:" ▲";font-size:9px}
+#crmClusterDataView .cdTable th[data-dir="desc"] i::after{content:" ▼";font-size:9px}
+#crmClusterDataView .cdDldTable th{cursor:default}
+#crmClusterDataView .cdTable td{padding:9px 10px;border-top:1px solid var(--c-border);vertical-align:middle;color:var(--c-text)}
+#crmClusterDataView .cdTable td small{display:block;font-size:11px;color:var(--c-muted)}
+#crmClusterDataView .cdTable .cdNum{text-align:right}
+#crmClusterDataView .cdTable tbody tr[data-owner]:not([data-owner=""]){cursor:pointer}
+#crmClusterDataView .cdTable tbody tr:hover td{background:var(--c-accent-soft)}
+#crmClusterDataView .cdStatus{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid transparent;margin:1px 0;white-space:nowrap}
+@media (max-width:900px){#crmClusterDataView{padding:14px 12px 40px}#crmClusterDataView .cdCards{grid-template-columns:repeat(2,minmax(0,1fr))}#crmClusterDataView .cdPick select{min-width:0;flex:1}}
