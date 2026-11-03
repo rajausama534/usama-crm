@@ -75,3 +75,11 @@ body.crmPremium #ownersTable td.owner-col-beds{text-align:center!important}
 body.crmPremium #ownersTable th.owner-col-beds{text-align:center!important}
 body.crmPremium #ownersTable .crmUD small{display:block;font-size:11px;font-weight:500;color:var(--c-muted);margin-top:1px}
 body.crmPremium .crmRecordCard .crmUD{font-weight:500;color:var(--c-muted)}
+
+/* compact owners table: community under the cluster, action buttons may wrap to two lines */
+body.crmPremium #ownersTable .crmSubLoc{display:block;font-size:11px;font-weight:500;color:var(--c-muted);margin-top:1px}
+body.crmPremium #ownersTable .crmOwnerActions{flex-wrap:wrap!important;row-gap:4px!important}
+body.crmPremium #ownersTable td.owner-col-status .statusSelect{width:100%!important;min-width:0!important}
+body.crmPremium #appView #ownersTable td{padding:10px 8px!important}
+body.crmPremium #appView #ownersTable th{padding-left:8px!important;padding-right:8px!important}
+body.crmPremium #appView #ownersTable :is(th,td).owner-col-actions{width:172px!important;min-width:172px!important;max-width:172px!important}

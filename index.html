@@ -2369,7 +2369,7 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
 <link rel="stylesheet" href="crm-leads-fit.css?v=5">
 <link rel="stylesheet" href="crm-workspace-refinement.css?v=5">
 <link rel="stylesheet" href="crm-breakdown.css?v=4">
-<link rel="stylesheet" href="crm-hawaii.css?v=6">
+<link rel="stylesheet" href="crm-hawaii.css?v=7">
 </head>
 
 <body>
@@ -6035,11 +6035,15 @@ setTimeout(()=>{
   const minimums = {
     community: 80,
     cluster: 80,
-    unit: 118,
-    owner: 135,
-    whatsapp: 52,
-    status: 125,
-    remarks: 180
+    unit: 100,
+    owner: 120,
+    beds: 44,
+    size: 84,
+    lastprice: 92,
+    whatsapp: 46,
+    status: 138,
+    remarks: 120,
+    actions: 150
   };
 
   const maximums = {
@@ -6047,6 +6051,9 @@ setTimeout(()=>{
     cluster: 320,
     unit: 160,
     owner: 420,
+    beds: 90,
+    size: 160,
+    lastprice: 170,
     whatsapp: 150,
     status: 220,
     remarks: 700
@@ -6071,7 +6078,7 @@ setTimeout(()=>{
 
   // Saved widths are preferences; when they do not fit the screen, shrink the flexible
   // columns for display only (never saved) so the table needs no sideways scrolling.
-  const fitMinimums = { whatsapp:46, remarks:120, owner:120, community:80, cluster:80, status:156, unit:118 };
+  const fitMinimums = { whatsapp:46, remarks:120, owner:120, community:80, cluster:80, status:140, unit:100 };
   function paintOwnerWidth(key, width) {
     document.querySelectorAll(`#ownersTable .owner-col-${key}`).forEach(node => {
       for (const prop of ["width", "min-width", "max-width"]) node.style.setProperty(prop, `${width}px`, "important");
@@ -6468,6 +6475,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=21"></script>
+<script src="crm-enhancements.js?v=22"></script>
 </body>
 </html>

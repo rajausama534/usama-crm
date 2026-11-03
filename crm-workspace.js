@@ -26,6 +26,13 @@
     ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='last_contacted')c.visible=false;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v1','1');
   }
   // BR and Size columns (from unit_details, filled from DXB Interact): sensible widths once.
+  // Compact layout (3 Nov 2026): community moves under the cluster name, tight widths for the
+  // new BR / Size / Last Price columns, so the whole table fits without sideways scrolling.
+  if(localStorage.getItem('crm_owner_layout_v4')!=='1'){
+    const widths={cluster:100,unit:100,owner:150,beds:48,size:92,lastprice:100,status:140,remarks:150,whatsapp:46,actions:170};
+    ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='community')c.visible=false;});
+    saveOwnerColumnsState();['crm_owner_layout_v2','crm_owner_layout_v3','crm_owner_layout_v4'].forEach(k=>localStorage.setItem(k,'1'));
+  }
   if(localStorage.getItem('crm_owner_layout_v3')!=='1'){
     ownerColumns.forEach(c=>{if(c.key==='lastprice')c.width=112;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v3','1');
   }
@@ -95,6 +102,7 @@
   }
   const baseOwnerCell=window.ownerCell;
   window.ownerCell=function(row,col){
+    if(col.key==='cluster')return `${esc(row.cluster||'—')}${row.community&&!ownerColumns.find(c=>c.key==='community')?.visible?`<small class="crmSubLoc">${esc(row.community)}</small>`:''}`;
     if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
     if(col.key==='whatsapp')return ownerContact(row);
     if(col.key==='beds'||col.key==='size'||col.key==='lastprice')return `<span class="crmUD" data-ud="${esc(udKey(row))}" data-f="${col.key}">…</span>`;

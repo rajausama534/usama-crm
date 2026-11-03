@@ -14,7 +14,7 @@
     'owner-related-rows.js?v=20261020-ui1',
     'crm-upgrade.js?v=20261102',
     'crm-calendar.js?v=20261028',
-    'crm-workspace.js?v=20261103c',
+    'crm-workspace.js?v=20261103d',
     'crm-dxb.js?v=20261020b',
     'crm-broadcast.js?v=20261020',
     'crm-status-system.js?v=2',
