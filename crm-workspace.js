@@ -64,13 +64,13 @@
       const {data,error}=await db.from('unit_details').select('community,cluster,unit,bedrooms,bua_sqft,plot_sqft')
         .in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
       if(error){console.warn('Unit details unavailable:',error.message);return;}
-      // Last purchase: newest "Sold" sale, DXB Interact records first (an older manual import
-      // has dated rows that DXB does not show); other sources only when a unit has no DXB sale.
+      // Last purchase: always the newest "Sold" sale by date, from any source (user's rule,
+      // 3 Nov 2026); on the same date a DXB Interact record wins.
       const {data:tx}=await db.from('property_transactions').select('community,cluster,unit,transaction_date,amount,source,sold_by')
         .eq('kind','Sold').in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
       const last=new Map();
       (tx||[]).forEach(t=>{const k=udKey(t),dxb=/^DXB/i.test(t.source||''),cur=last.get(k);
-        if(!cur||(dxb&&!cur.dxb)||(dxb===cur.dxb&&t.transaction_date>cur.transaction_date))last.set(k,{...t,dxb});});
+        if(!cur||t.transaction_date>cur.transaction_date||(t.transaction_date===cur.transaction_date&&dxb&&!cur.dxb))last.set(k,{...t,dxb});});
       want.forEach(k=>udCache.set(k,null));
       (data||[]).forEach(d=>udCache.set(udKey(d),d));
       last.forEach((t,k)=>udCache.set(k,{...(udCache.get(k)||{}),last:t}));
