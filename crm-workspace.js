@@ -15,15 +15,19 @@
     a.classList.add('crmWaIcon');a.setAttribute('aria-label','WhatsApp');a.title='WhatsApp';a.innerHTML=WA_ICON;
     return t.innerHTML;
   }
-  const ownerOrder=['community','cluster','unit','owner','status','remarks','whatsapp','actions'];
+  const ownerOrder=['community','cluster','unit','owner','beds','size','status','remarks','whatsapp','actions'];
   const saved=new Map(ownerColumns.map(c=>[c.key,c]));
   ownerColumns.splice(0,ownerColumns.length,...ownerOrder.map(key=>saved.get(key)||{key,label:key==='actions'?'Actions':key,visible:true,width:220}),...ownerColumns.filter(c=>!ownerOrder.includes(c.key)));
-  const labels={owner:'Owner',remarks:'Notes',whatsapp:'WhatsApp'};
+  const labels={owner:'Owner',beds:'BR',size:'Size',remarks:'Notes',whatsapp:'WhatsApp'};
   ownerColumns.forEach(c=>{if(labels[c.key])c.label=labels[c.key];});
   // Versioned defaults are applied once; subsequent manual resizing remains intact.
   if(localStorage.getItem('crm_owner_layout_v1')!=='1'){
     const widths={community:140,cluster:140,unit:86,owner:210,status:160,remarks:270,whatsapp:60,actions:220};
     ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='last_contacted')c.visible=false;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v1','1');
+  }
+  // BR and Size columns (from unit_details, filled from DXB Interact): sensible widths once.
+  if(localStorage.getItem('crm_owner_layout_v2')!=='1'){
+    ownerColumns.forEach(c=>{if(c.key==='beds')c.width=70;if(c.key==='size')c.width=118;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v2','1');
   }
   const baseLeadInput=window.leadInput;
   window.leadInput=function(row,col){
@@ -44,17 +48,45 @@
   }
   const broadcastIcon=$('v7NavBroadcast')?.querySelector('svg');
   if(broadcastIcon){broadcastIcon.outerHTML=WA_ICON;const svg=$('v7NavBroadcast').querySelector('svg');svg.style.stroke='none';}
+  // Bedrooms and sizes per unit (public.unit_details; RLS limits it to locations the user can see).
+  const udKey=r=>[r.community,r.cluster,r.unit].map(v=>String(v??'')).join('|');
+  const udCache=new Map();
+  const sq=v=>v?Math.round(v).toLocaleString('en-US'):'';
+  async function fillUnitDetails(){
+    const spans=[...document.querySelectorAll('.crmUD:not([data-done])')];if(!spans.length)return;
+    const want=[...new Set(spans.map(s=>s.dataset.ud))].filter(k=>!udCache.has(k));
+    if(want.length){
+      const parts=want.map(k=>k.split('|'));
+      const {data,error}=await db.from('unit_details').select('community,cluster,unit,bedrooms,bua_sqft,plot_sqft')
+        .in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
+      if(error){console.warn('Unit details unavailable:',error.message);return;}
+      want.forEach(k=>udCache.set(k,null));
+      (data||[]).forEach(d=>udCache.set(udKey(d),d));
+    }
+    document.querySelectorAll('.crmUD:not([data-done])').forEach(el=>{
+      if(!udCache.has(el.dataset.ud))return;
+      const d=udCache.get(el.dataset.ud),beds=(String(d?.bedrooms||'').match(/\d+/)||[''])[0],f=el.dataset.f;
+      el.dataset.done='1';
+      if(f==='beds')el.textContent=beds||'—';
+      else if(f==='size'){
+        if(!d?.bua_sqft&&!d?.plot_sqft){el.textContent='—';return;}
+        el.innerHTML=d.bua_sqft?`${sq(d.bua_sqft)}${d.plot_sqft?`<small>Plot ${sq(d.plot_sqft)}</small>`:''}`:`<small>Plot</small> ${sq(d.plot_sqft)}`;
+        el.title=[d.bua_sqft&&`BUA ${sq(d.bua_sqft)} sq ft`,d.plot_sqft&&`Plot ${sq(d.plot_sqft)} sq ft`].filter(Boolean).join(' · ');
+      }else el.textContent=[beds&&`· ${beds}BR`,d?.bua_sqft&&`${sq(d.bua_sqft)} sq ft`].filter(Boolean).join(' · ');
+    });
+  }
   const baseOwnerCell=window.ownerCell;
   window.ownerCell=function(row,col){
     if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
     if(col.key==='whatsapp')return ownerContact(row);
+    if(col.key==='beds'||col.key==='size')return `<span class="crmUD" data-ud="${esc(udKey(row))}" data-f="${col.key}">…</span>`;
     if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)||'<span class="crmNoPhone">No phone number</span>'}${ownerCopy(row)}</div>`;
     return baseOwnerCell(row,col);
   };
   window.crmRenderOwnerCards=function(rows){
     $('mobileCards').innerHTML=rows.map(r=>`<article class="ownerCard crmRecordCard" data-record-id="${esc(r.id)}">
       <div class="crmLocation"><span>${esc(r.community||'—')}</span><span>${esc(r.cluster||'—')}</span><label class="crmSelectRecord"><input type="checkbox" aria-label="Select owner ${esc(r.unit)}" ${selectedOwnerIds.has(String(r.id))?'checked':''} onchange="toggleOwnerSelection('${esc(r.id)}',this.checked)"></label></div>
-      <div class="crmRecordHeading"><strong class="crmUnit">Unit ${esc(r.unit||'—')}</strong>${statusDropdown(r)}</div>
+      <div class="crmRecordHeading"><strong class="crmUnit">Unit ${esc(r.unit||'—')} <span class="crmUD" data-ud="${esc(udKey(r))}" data-f="summary"></span></strong>${statusDropdown(r)}</div>
       <h3 class="crmRecordName">${esc(r.owner||'Unnamed owner')}</h3>
       <button type="button" class="crmOwnerNote crmNoteButton" data-open-owner="${esc(r.id)}">${esc(r.__u10_latest||ownerRemarkValue(r)||'No notes yet')}</button>
       <footer class="crmRecordActions">
@@ -137,6 +169,7 @@
   // Owner names are stored in capitals; show them in readable case (display only, data unchanged).
   const titleCase=s=>s.toLowerCase().replace(/(^|[\s\-'(])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
   function tidyOwnerRows(){
+    fillUnitDetails().catch(e=>console.warn('Unit details',e));
     document.querySelectorAll('#tableBody td.owner-col-owner .ownerIdentityName, #tableBody td.owner-col-owner, .mobileOwnerCard h3, [class*="obileCard"] [class*="ame"]').forEach(td=>{
       const n=[...td.childNodes].find(x=>x.nodeType===3&&x.textContent.trim());
       if(n&&n.textContent===n.textContent.toUpperCase()&&/[A-Z]/.test(n.textContent)){td.title=n.textContent.trim();n.textContent=titleCase(n.textContent);}

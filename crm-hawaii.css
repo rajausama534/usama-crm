@@ -68,3 +68,10 @@ body.crmPremium :is(.tablebox,.pbPreview,.crmMenu,.pbSavedList){scrollbar-width:
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar{width:10px;height:10px;background:transparent}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-thumb{background:var(--c-border-strong);border-radius:10px;border:3px solid var(--c-surface)}
 body.crmPremium :is(.tablebox,.pbPreview)::-webkit-scrollbar-track{background:transparent}
+
+/* BR and Size columns */
+body.crmPremium #ownersTable :is(td.owner-col-beds,td.owner-col-size){font-variant-numeric:tabular-nums;font-weight:600}
+body.crmPremium #ownersTable td.owner-col-beds{text-align:center!important}
+body.crmPremium #ownersTable th.owner-col-beds{text-align:center!important}
+body.crmPremium #ownersTable .crmUD small{display:block;font-size:11px;font-weight:500;color:var(--c-muted);margin-top:1px}
+body.crmPremium .crmRecordCard .crmUD{font-weight:500;color:var(--c-muted)}
