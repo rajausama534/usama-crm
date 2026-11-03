@@ -33,6 +33,12 @@
     ownerColumns.forEach(c=>{if(widths[c.key])c.width=widths[c.key];if(c.key==='community')c.visible=false;});
     saveOwnerColumnsState();['crm_owner_layout_v2','crm_owner_layout_v3','crm_owner_layout_v4'].forEach(k=>localStorage.setItem(k,'1'));
   }
+  // BR / Size / Last Price are short values: keep their widths in range on every load, so an
+  // old saved width (or a one-time reset that was skipped) can never push other columns off screen.
+  const UD_RANGE={beds:[44,64],size:[84,112],lastprice:[92,120]};
+  let udFixed=false;
+  ownerColumns.forEach(c=>{const r=UD_RANGE[c.key];if(!r)return;const w=Math.min(r[1],Math.max(r[0],Number(c.width)||r[0]));if(w!==c.width){c.width=w;udFixed=true;}});
+  if(udFixed)saveOwnerColumnsState();
   if(localStorage.getItem('crm_owner_layout_v3')!=='1'){
     ownerColumns.forEach(c=>{if(c.key==='lastprice')c.width=112;});saveOwnerColumnsState();localStorage.setItem('crm_owner_layout_v3','1');
   }
