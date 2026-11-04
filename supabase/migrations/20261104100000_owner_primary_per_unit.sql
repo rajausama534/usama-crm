@@ -66,4 +66,11 @@ begin
   return case when tg_op = 'DELETE' then old else new end;
 end $$;
 
+-- owners_list (the Owners page reads it) gets is_primary, appended at the end; same rows, same access rule.
+create or replace view public.owners_list with (security_invoker = true) as
+  select o.id, o.community, o.cluster, o.unit, o.owner, o.phone1, o.phone2, o.email, o.remarks, o.data_source, o.last_updated, o.whatsapp_status,
+         o.unit_sort, o.status, o.last_contacted, o.follow_up_date, o.admin_remarks, o.agent_remarks, o.assigned_to, o.manager_remarks,
+         private.natural_key(o.unit) as unit_natural, o.is_primary
+  from public.owners o;
+
 select private.refresh_owner_primary();

@@ -102,7 +102,7 @@
       (data||[]).forEach(d=>udCache.set(udKey(d),d));
       const {data:co}=await db.from('owners').select('id,community,cluster,unit,owner,phone1,phone2,status')
         .eq('is_primary',false).in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
-      (co||[]).forEach(o=>{const k=udKey(o);if(!want.includes(k))return;const cur=coCache.get(k)||[];cur.push(o);coCache.set(k,cur);});
+      (co||[]).forEach(o=>{const k=udKey(o);if(!want.includes(k))return;const cur=coCache.get(k)||[];if(!cur.some(x=>x.id===o.id))cur.push(o);coCache.set(k,cur);});
       want.forEach(k=>{if(!coCache.has(k))coCache.set(k,[]);});
       last.forEach((t,k)=>udCache.set(k,{...(udCache.get(k)||{}),last:t}));
     }
