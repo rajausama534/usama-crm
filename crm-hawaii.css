@@ -102,6 +102,7 @@ body.crmPremium #appView #ownersTable :is(th,td).owner-col-actions{width:172px!i
 #crmClusterDataView .cdTableHead h2{margin:0;font-size:17px}
 #crmClusterDataView .cdTableHead h2 small{font-size:12.5px;color:var(--c-muted);font-weight:500;margin-left:6px}
 #crmClusterDataView .cdTableHead input{height:38px;width:280px;max-width:100%;margin:0;border-radius:10px}
+#crmClusterDataView .cdTools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #crmClusterDataView .cdTableWrap{overflow:auto;max-height:66vh;border:1px solid var(--c-border);border-radius:12px}
 #crmClusterDataView .cdTable{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;font-variant-numeric:tabular-nums}
 #crmClusterDataView .cdTable th{position:sticky;top:0;z-index:1;background:var(--c-surface-2);text-align:left;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--c-muted);padding:10px;white-space:nowrap;cursor:pointer;user-select:none}

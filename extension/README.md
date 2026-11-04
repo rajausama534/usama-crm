@@ -30,3 +30,18 @@ The extension reads the listing page already open in your browser, which avoids 
    and sending the same page again never creates duplicates.
 
 Only the rows already visible on the page are read, only when you click, using your own browser session.
+
+## Update a whole cluster from DXB Interact (one click)
+
+1. Install or reload the extension (steps above, or the ↻ arrow on its card in `chrome://extensions`).
+2. Log in to dxbinteract.com in the same Chrome.
+3. In the CRM open **Cluster Data**, pick the community and the cluster, and press **Update from DXB Interact**.
+4. A DXB Interact tab opens and works by itself: it searches the cluster, sets the dates to all years (2012 → today),
+   reads every page of sales and sends them back to the CRM tab, then closes. Keep the CRM tab open meanwhile.
+5. The CRM saves new sales (never twice), then fills each unit's bedrooms / BUA / plot only where empty, updates the
+   sale line in the owner notes (other note text stays) and marks New / Contacted owners as Sold after a resale in the
+   last 12 months. A short summary is shown at the end.
+
+If the CRM says the extension did not answer, it is not installed or not reloaded yet.
+Lists on DXB Interact stop at 300 rows, so bigger clusters are read newest-first and oldest-first, and very big
+ones one year at a time.

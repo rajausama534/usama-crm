@@ -109,7 +109,7 @@
         ${card('Latest sale',latest?'AED '+price(latest.lastPrice):'—',latest?`Unit ${esc(latest.unit)} · ${day(latest.lastDate)}`:'')}
       </section>
       <section class="crmCard cdTableCard">
-        <header class="cdTableHead"><h2>${esc(cluster)} <small>${esc(community)}</small></h2><input type="search" placeholder="Search unit, owner or status…" data-search></header>
+        <header class="cdTableHead"><h2>${esc(cluster)} <small>${esc(community)}</small></h2><div class="cdTools"><input type="search" placeholder="Search unit, owner or status…" data-search>${typeof isAdmin!=='undefined'&&isAdmin?'<button type="button" class="crmBtn crmBtnPrimary" data-dxb>Update from DXB Interact</button>':''}</div></header>
         <div class="cdTableWrap"><table class="cdTable"><thead><tr>${[['unit','Unit'],['beds','BR'],['bua','BUA'],['plot','Plot'],['lastPrice','Last price'],['lastDate','Date'],['salesCount','Sales'],['owners','Owners'],['status','Status']].map(([k,l])=>`<th data-sort="${k}" class="${['beds','bua','plot','lastPrice','salesCount'].includes(k)?'cdNum':''}">${l}<i></i></th>`).join('')}</tr></thead><tbody></tbody></table></div>
       </section>
       <section class="crmCard cdDld"><header class="cdTableHead"><div><h2>Latest DLD sales</h2><p class="cdSub">Official Dubai Land Department data for this cluster. DLD does not publish unit numbers.</p></div>
@@ -117,6 +117,7 @@
     body.querySelector('[data-search]').oninput=paintRows;
     body.querySelectorAll('[data-sort]').forEach(th=>th.onclick=()=>{const k=th.dataset.sort;sort={key:k,dir:sort.key===k?-sort.dir:(k==='unit'?1:-1)};paintRows();});
     body.querySelector('[data-fetch]').onclick=fetchLatest;
+    const dxb=body.querySelector('[data-dxb]');if(dxb)dxb.onclick=()=>updateFromDxb(community,cluster);
     paintRows();
   }
 
@@ -151,6 +152,67 @@
         <td>${day(d.transaction_date)}</td><td>${esc(d.property_sub_type||d.property_type||'—')}</td><td>${esc(String(d.rooms||'').replace(/ B\/R/i,'BR')||'—')}</td>
         <td class="cdNum">${num(d.area_sqft)||'—'}</td><td class="cdNum"><strong>${price(d.amount)}</strong></td><td>${d.is_offplan?'Off-plan':'Ready'} · ${esc(d.procedure||'')}</td></tr>`).join('')}</tbody></table></div>`
        :'<p class="crmEmpty">No DLD sales recorded for this cluster yet.</p>');
+  }
+
+  // ------------------------------------------------------------------ Update from DXB Interact
+  // Opens DXB Interact in a new tab; the "Usama CRM Helper" Chrome extension reads every sale of this
+  // cluster there and posts the rows back here. Then: save new sales (never duplicates), and fill
+  // bedrooms / sizes / notes / status from them (crm_refresh_cluster_from_sales — only empty fields, typed text kept).
+  const DXB_ORIGIN='https://dxbinteract.com';
+  function updateFromDxb(community,cluster){
+    const id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+    const w=document.createElement('div');w.className='crmModalScrim';
+    w.innerHTML=`<div class="crmModal" style="width:min(560px,100%)"><header><h2>Update ${esc(cluster)} from DXB Interact</h2><button type="button" class="crmIconBtn" data-close aria-label="Close">×</button></header>
+      <div class="crmModalBody"><p data-msg style="margin:0">Opening DXB Interact in a new tab…</p><p class="crmSub" data-sub style="margin:8px 0 0">Leave that tab open. It closes by itself when it is done (usually under a minute).</p></div>
+      <footer><button type="button" class="crmBtn" data-close>Close</button></footer></div>`;
+    document.body.append(w);
+    const msg=w.querySelector('[data-msg]'),sub=w.querySelector('[data-sub]');
+    let heard=false,finished=false;
+    const done=()=>{finished=true;window.removeEventListener('message',onMsg);clearTimeout(timer);};
+    w.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{done();w.remove();});
+    const job=encodeURIComponent(JSON.stringify({id,project:cluster,community}));
+    const tab=window.open(`${DXB_ORIGIN}/dubai-house-prices#usama-fetch=${job}`,'_blank');
+    if(!tab){msg.textContent='Your browser blocked the new tab. Allow pop-ups for this site and press the button again.';sub.textContent='';return;}
+    const timer=setTimeout(()=>{if(heard||finished)return;done();
+      msg.innerHTML='<strong>The CRM Helper extension did not answer.</strong>';
+      sub.innerHTML=`It is needed to read DXB Interact in your browser. To install it once:<ol style="margin:8px 0 0;padding-left:18px">
+        <li>In Chrome open <strong>chrome://extensions</strong> and switch on <strong>Developer mode</strong> (top right).</li>
+        <li>Click <strong>Load unpacked</strong> and choose the folder <strong>usama-crm › extension</strong> on your Mac (or click the ↻ arrow on "Usama CRM Helper" if it is already there).</li>
+        <li>Make sure you are logged in to DXB Interact, then press <strong>Update from DXB Interact</strong> again.</li></ol>`;},30000);
+    async function onMsg(e){
+      if(e.origin!==DXB_ORIGIN||!e.data||e.data.id!==id)return;
+      heard=true;const d=e.data;
+      if(d.type==='usama-dxb-hello'||d.type==='usama-dxb-progress'){if(d.text)msg.textContent=d.text;return;}
+      if(d.type==='usama-dxb-error'){done();msg.innerHTML=`<strong>DXB Interact stopped:</strong> ${esc(d.text)}`;sub.textContent='Nothing was changed in the CRM.';return;}
+      if(d.type!=='usama-dxb-sales')return;
+      done();
+      await saveDxb(community,cluster,d,msg,sub);
+    }
+    window.addEventListener('message',onMsg);
+  }
+
+  async function saveDxb(community,cluster,d,msg,sub){
+    const rows=(d.rows||[]).map(r=>({...r,community,cluster}));
+    msg.textContent=`Read ${num(rows.length)} sales from DXB Interact. Saving…`;sub.textContent='';
+    try{
+      let imported=0,skipped=[];
+      for(let i=0;i<rows.length;i+=400){
+        const {data,error}=await db.rpc('crm_import_external_sales',{rows:rows.slice(i,i+400),source:'dxbinteract',dry_run:false});
+        if(error)throw error;
+        (data||[]).forEach(x=>{if(x.result==='imported')imported++;else if(/^skipped/.test(x.result))skipped.push(x.result);});
+      }
+      msg.textContent='Filling bedrooms, sizes and notes…';
+      const {data:s,error}=await db.rpc('crm_refresh_cluster_from_sales',{p_community:community,p_cluster:cluster});
+      if(error)throw error;
+      const line=(n,t)=>`<li><strong>${num(n)||'0'}</strong> ${t}</li>`;
+      const missing=d.total&&rows.length<d.total?`<p class="crmSub" style="margin:8px 0 0">DXB Interact shows ${num(d.total)} sales; ${num(rows.length)} could be read.</p>`:'';
+      const skippedTxt=s?.skipped_units?.length?`<p class="crmSub" style="margin:8px 0 0">Not filled because DXB sales disagree on bedrooms or size: unit ${s.skipped_units.map(esc).join(', ')}.</p>`:'';
+      const noUnit=skipped.length?`<p class="crmSub" style="margin:4px 0 0">${skipped.length} sales had no matching unit in the CRM and were left out.</p>`:'';
+      msg.innerHTML=`<strong>${esc(cluster)} is up to date.</strong><ul style="margin:10px 0 0;padding-left:18px">
+        ${line(imported,'new sales saved')}${line(s?.units_filled,'units got bedrooms / sizes')}${line(s?.notes_updated,'owner notes updated')}${line(s?.marked_sold,'owners marked Sold')}${s?.share_transfers?line(s.share_transfers,'co-owner share transfers marked'):''}</ul>${missing}${skippedTxt}${noUnit}`;
+      sub.textContent='';
+      if(loaded?.cluster===cluster)load(community,cluster);
+    }catch(e){msg.innerHTML=`<strong>Could not save:</strong> ${esc(e.message||e)}`;}
   }
 
   async function fetchLatest(){
