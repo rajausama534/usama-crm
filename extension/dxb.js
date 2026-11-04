@@ -215,10 +215,19 @@
     fire(pick.a, ['mousedown', 'mouseup', 'click']);
     await sleep(800);
     job.stage = 'range'; saveJob(job);
+    return submitAndContinue(job);
+  }
+
+  // Press Search. DXB either reloads the page (this script then starts again on the new page) or swaps the
+  // results in place and changes the address; in that case carry on here.
+  async function submitAndContinue(job) {
+    const before = location.pathname;
     document.querySelector('.search-choose-btns.submit-btn label').click();
-    await sleep(25000);
-    // Still here: the search did not reload the page. Try once more from the top.
-    if (loadJob()?.stage === 'range' && !/\/valuation\//.test(location.pathname)) { job.stage = 'search'; saveJob(job); location.reload(); }
+    const moved = await waitFor(() => location.pathname !== before && /\/valuation\//.test(location.pathname), 30000);
+    if (!moved) { location.reload(); return; }
+    await waitFor(() => document.querySelector('.date-range-text') && /Transactions\s*\n+\s*[\d,]+/.test(document.body.innerText), 20000);
+    await sleep(2500);
+    return step(job);
   }
 
   // Set the date range of the current part (all years by default), then search again (page reloads).
@@ -249,9 +258,7 @@
     host.querySelector('.drp-btn-apply').click();
     await sleep(1500);
     job.stage = 'read'; saveJob(job);
-    document.querySelector('.search-choose-btns.submit-btn label').click();
-    await sleep(25000);
-    if (loadJob()?.stage === 'read' && document.querySelector('.date-range-text')) location.reload();
+    return submitAndContinue(job);
   }
 
   function locationOk(job) {
@@ -308,7 +315,9 @@
     const shown = await waitFor(() => document.querySelector('.date-range-text'));
     if (!shown || clean(shown.innerText) !== rangeText(target)) { job.stage = 'range'; saveJob(job); return doRange(job); }
     if (!locationOk(job)) throw new Error(`The page is not showing ${job.project}.`);
-    const totalTxt = await waitFor(() => (document.body.innerText.match(/Transactions\s*\n+\s*([\d,]+)/) || [])[1]);
+    const readTotal = () => (document.body.innerText.match(/Transactions\s*\n+\s*([\d,]+)/) || [])[1];
+    let totalTxt = await waitFor(readTotal);
+    for (let i = 0; i < 10; i++) { await sleep(1000); const t = readTotal(); if (t === totalTxt) break; totalTxt = t; }
     const total = num(totalTxt) || 0;
     // Too many for one list: split the period into single years (each year is read on its own).
     if (total > LIST_CAP * 2 && !job.split) {
