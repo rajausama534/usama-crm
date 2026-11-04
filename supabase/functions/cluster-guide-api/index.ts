@@ -60,6 +60,30 @@ function cleanCluster(input: any) {
     development_type: cleanText(input?.development_type, 200) || null,
     original_price_note: cleanText(input?.original_price_note, 1000) || null,
     open_questions: cleanText(input?.open_questions, 2000) || null,
+    launch_on: /^\d{4}-\d{2}-\d{2}$/.test(String(input?.launch_on || "")) ? String(input.launch_on) : null,
+    layouts: Array.isArray(input?.layouts)
+      ? input.layouts.slice(0, 60).map((row: any) => ({
+          bedrooms: cleanText(row?.bedrooms, 30),
+          name: cleanText(row?.name, 100),
+          unit_type: cleanText(row?.unit_type, 100),
+          bua_sqft: cleanNumber(row?.bua_sqft),
+          bua_min_sqft: cleanNumber(row?.bua_min_sqft),
+          bua_max_sqft: cleanNumber(row?.bua_max_sqft),
+          plot_min_sqft: cleanNumber(row?.plot_min_sqft),
+          plot_max_sqft: cleanNumber(row?.plot_max_sqft),
+          units: Math.floor(cleanNumber(row?.units)),
+          launch_price_aed: cleanNumber(row?.launch_price_aed),
+          note: cleanText(row?.note, 300),
+        })).filter((row: any) => row.bedrooms || row.name)
+      : [],
+    launch_prices: Array.isArray(input?.launch_prices)
+      ? input.launch_prices.slice(0, 20).map((row: any) => ({
+          bedrooms: cleanText(row?.bedrooms, 30),
+          aed: cleanNumber(row?.aed),
+          source: cleanText(row?.source, 200),
+          url: /^https?:\/\//.test(String(row?.url || "")) ? cleanText(row.url, 500) : "",
+        })).filter((row: any) => row.bedrooms && row.aed)
+      : [],
   };
 }
 
@@ -83,13 +107,14 @@ Deno.serve(async (req) => {
     if (action === "listClusters") {
       // Summary only; the full guide is loaded when a cluster is opened (getCluster).
       const { data, error } = await admin.from("cluster_guides")
-        .select("id,name,community,developer,development_type,total_units,handover_date,unit_mix,verified_on")
+        .select("id,name,community,developer,development_type,total_units,handover_date,unit_mix,layouts,verified_on")
         .order("community", { ascending: true }).order("name", { ascending: true });
       if (error) throw error;
       const clusters = (data || []).map((c: any) => ({
         id: c.id, name: c.name, community: c.community, developer: c.developer, development_type: c.development_type,
         total_units: c.total_units, handover_date: c.handover_date, verified_on: c.verified_on,
-        bedrooms: (c.unit_mix || []).map((m: any) => String(m.bedrooms)).filter(Boolean),
+        bedrooms: [...new Set([...(c.layouts || []), ...(c.unit_mix || [])].map((m: any) => String(m.bedrooms || "")).filter(Boolean))]
+          .sort((a, b) => Number(a) - Number(b)),
       }));
       return json({ clusters, canEdit: isCrmAdmin });
     }
@@ -99,7 +124,37 @@ Deno.serve(async (req) => {
       const { data, error } = await admin.from("cluster_guides").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       if (!data) return json({ error: "Not found" }, 404);
-      return json({ cluster: data, canEdit: isCrmAdmin });
+      // Live figures are worked out on every open (fast); "Update info" also fetches new DLD sales first.
+      const { data: stats, error: statsError } = await admin.rpc("cluster_guide_stats", { p_id: id });
+      if (statsError) console.error(statsError);
+      return json({ cluster: { ...data, stats: stats ?? data.stats }, canEdit: isCrmAdmin });
+    }
+
+    if (action === "refreshCluster") {
+      // Any CRM user may refresh: it only reads public DLD data and recomputes derived figures.
+      const id = cleanText(body.id, 100);
+      const { data: guide, error } = await admin.from("cluster_guides").select("id").eq("id", id).maybeSingle();
+      if (error) throw error;
+      if (!guide) return json({ error: "Not found" }, 404);
+      let dld: any = null;
+      try {
+        const r = await fetch(Deno.env.get("SUPABASE_URL") + "/functions/v1/dld-sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: req.headers.get("Authorization") || "" },
+          body: JSON.stringify({ manual: true }),
+        });
+        dld = await r.json().catch(() => null);
+      } catch (e) {
+        dld = { error: String((e as Error)?.message || e) };
+      }
+      const { data: tagged, error: tagError } = await admin.rpc("cluster_guide_tag_layouts", { p_id: id });
+      if (tagError) throw tagError;
+      const { data: stats, error: statsError } = await admin.rpc("cluster_guide_stats", { p_id: id });
+      if (statsError) throw statsError;
+      const { data: saved, error: saveError } = await admin.from("cluster_guides")
+        .update({ stats, stats_refreshed_at: new Date().toISOString() }).eq("id", id).select("*").single();
+      if (saveError) throw saveError;
+      return json({ cluster: { ...saved, stats }, dld, tagged, canEdit: isCrmAdmin });
     }
 
     if (action === "saveCluster") {

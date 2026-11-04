@@ -83,7 +83,24 @@ label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:600}
 .mix th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:6px}
 .mix td{padding:4px}
 .mix input{height:34px;font-size:13px;padding:0 8px}
-@media (max-width:980px){.layout{grid-template-columns:1fr}.list{position:static;max-height:none}.list-body{max-height:40vh}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.meta{margin-top:10px;color:var(--faint);font-size:12px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--bg)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.tbl th{padding:10px 12px;text-align:left;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl td b,.tbl td:first-child{white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td b{font-weight:700}
+.tbl .sub{display:block;min-width:110px;color:var(--muted);font-size:11px;font-weight:500;margin-top:2px}
+.tbl .tot td{background:var(--surface-2);font-weight:600}
+.tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;vertical-align:middle}
+.up{color:var(--ok);font-weight:700}.down{color:#f87171;font-weight:700}
+html[data-theme="light"] .down{color:#b91c1c}
+.dim{color:var(--faint)}
+.flag{margin-top:10px;padding:10px 14px;border-radius:var(--r);background:rgba(245,158,11,.12);color:var(--warn);font-size:13px}
+.facts.six{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fact small{display:block;margin-top:2px;color:var(--muted);font-size:11px}
+@media (max-width:980px){.facts.six{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.list{position:static;max-height:none}.list-body{max-height:40vh}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.layout{padding:12px;gap:12px}.top{padding:10px 12px}.hero,.facts,.section{padding-left:16px;padding-right:16px}.hero h1{font-size:24px}.grid2{grid-template-columns:1fr}.mix{display:block;overflow-x:auto}}
 </style>
 </head>
@@ -133,35 +150,103 @@ function renderList(){
   $('list').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>open(b.dataset.id));
 }
 
-async function open(id){
+const aed=n=>n?'AED '+fmt(Math.round(n)):'';
+const short=n=>!n?'':n>=1e6?'AED '+(Math.round(n/1e4)/100)+'M':'AED '+Math.round(n/1e3)+'K';
+const day=d=>d?new Date(String(d).slice(0,10)+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const when=d=>d?new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+const sq=(a,b)=>a||b?range(Math.round(a||b),Math.round(b||a))+' sq ft':'';
+const pct=(now,then)=>now&&then?Math.round((now/then-1)*1000)/10:null;
+const signed=v=>v==null?'<span class="dim">—</span>':`<span class="${v>=0?'up':'down'}">${v>=0?'+':''}${v}%</span>`;
+const na='<span class="dim">—</span>';
+
+// One row per bedroom type: researched launch price (else earliest recorded sales), CRM units and sizes, live market.
+function bedroomRows(c){
+  const st=c.stats||{},lp=c.launch_prices||[],lay=c.layouts||[];
+  const keys=new Set([...(st.bedrooms||[]).map(x=>String(x.bedrooms)),...lp.map(x=>String(x.bedrooms)),...lay.map(x=>String(x.bedrooms)),...(c.unit_mix||[]).map(x=>String(x.bedrooms))].filter(Boolean));
+  return [...keys].sort((a,b)=>Number(a)-Number(b)).map(b=>{
+    const s=(st.bedrooms||[]).find(x=>String(x.bedrooms)===b)||{},pub=lp.find(x=>String(x.bedrooms)===b);
+    const ls=lay.filter(x=>String(x.bedrooms)===b),m=s.market;
+    const devBua=ls.flatMap(x=>[x.bua_min_sqft||x.bua_sqft,x.bua_max_sqft||x.bua_sqft]).filter(Boolean);
+    const devPlot=ls.flatMap(x=>[x.plot_min_sqft,x.plot_max_sqft]).filter(Boolean);
+    const launch=pub?{v:pub.aed,src:pub.source||'Published'}:s.first_sales?{v:s.first_sales.min,src:`First recorded sales, ${day(s.first_sales.first_date)}`}:null;
+    return {b,units:s.units||0,bua:s.bua_min?[s.bua_min,s.bua_max,'CRM']:devBua.length?[Math.min(...devBua),Math.max(...devBua),'Emaar plan']:null,
+      plot:s.plot_min?[s.plot_min,s.plot_max,'CRM']:devPlot.length?[Math.min(...devPlot),Math.max(...devPlot),'Emaar plan']:null,
+      launch,m,trend:s.trend_pct,growth:m&&launch?pct(m.avg,launch.v):null};
+  });
+}
+
+// One row per bedroom × layout: researched layouts merged with CRM-tagged units and their sales.
+function layoutRows(c){
+  const st=c.stats||{},rows=new Map();
+  (c.layouts||[]).forEach(l=>{if(!l.name)return;rows.set(`${l.bedrooms}|${l.name.toLowerCase()}`,{b:String(l.bedrooms),name:l.name,dev:l});});
+  (st.layouts||[]).forEach(l=>{const k=`${l.bedrooms}|${String(l.layout).toLowerCase()}`;rows.set(k,{...(rows.get(k)||{b:String(l.bedrooms),name:l.layout}),crm:l});});
+  return [...rows.values()].sort((x,y)=>Number(x.b)-Number(y.b)||byName(x.name,y.name));
+}
+
+async function open(id,fresh){
   activeId=id;renderList();
   history.replaceState(null,'','#'+id);
   const d=$('detail');
-  if(!cache[id]){d.innerHTML='<div style="padding:28px;display:grid;gap:12px"><div class="skeleton" style="width:40%;height:28px"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>';
+  if(!cache[id]||fresh){if(!cache[id])d.innerHTML='<div style="padding:28px;display:grid;gap:12px"><div class="skeleton" style="width:40%;height:28px"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>';
     try{cache[id]=(await api('getCluster',{id})).cluster;}catch(e){d.innerHTML=`<div class="err">${esc(e.message)}</div>`;return;}}
-  const c=cache[id],mix=c.unit_mix||[];
-  const beds=mix.map(m=>m.bedrooms).filter(Boolean);
-  const fact=(label,val)=>`<div class="fact"><span>${label}</span>${val?`<b>${val}</b>`:'<b class="na">Not published</b>'}</div>`;
-  const anyPlot=mix.find(m=>m.plot_min_sqft||m.dld_plot_min_sqft);
+  render(cache[id]);
+}
+
+function render(c){
+  const d=$('detail'),st=c.stats||{},lay=c.layouts||[],beds=bedroomRows(c),lrows=layoutRows(c);
+  const layoutNames=[...new Set(lay.map(l=>l.name).filter(Boolean))];
+  const fact=(label,val,sub)=>`<div class="fact"><span>${label}</span>${val?`<b>${val}</b>`:'<b class="na">Not published</b>'}${sub?`<small>${sub}</small>`:''}</div>`;
+  const tot=beds.reduce((a,r)=>a+r.units,0);
+  const lowCover=c.total_units&&st.units_total&&st.units_total<c.total_units*0.8;
   d.innerHTML=`<div class="hero"><div class="eyebrow">${esc(c.community)}${c.developer?` · ${esc(c.developer)}`:''}</div><h1>${esc(c.name)}</h1>
-      <div class="chips">${c.development_type?`<span class="chip">${esc(c.development_type)}</span>`:''}${beds.length?`<span class="chip">${esc(beds.join(', '))} bedrooms</span>`:''}${c.usp?`<span class="chip">${esc(c.usp)}</span>`:''}</div>
-      ${canEdit?`<div style="margin-top:14px;display:flex;gap:8px"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`:''}</div>
-    <div class="facts">${fact('Handover',esc(c.handover_date))}${fact('Total units',c.total_units?fmt(c.total_units):'')}${fact('Bedroom types',beds.length?esc(beds.join(', ')):'')}<div class="fact"><span>Owner records in your CRM</span><b id="crmCount">…</b></div></div>
-    ${c.original_price_note?`<div class="section"><h2>Price</h2><div class="note">${esc(c.original_price_note)}</div></div>`:''}
-    <div class="section"><h2>Property configurations</h2>${mix.length?`<div class="configs">${mix.map(m=>`<article class="config"><h3>${esc(m.bedrooms)} Bedrooms</h3><div class="type">${esc(m.unit_type||'')}</div><dl>
-        ${m.bua_min_sqft||m.bua_max_sqft?`<dt>BUA (developer)</dt><dd>${range(m.bua_min_sqft,m.bua_max_sqft)} sq ft</dd>`:''}
-        ${m.plot_min_sqft||m.plot_max_sqft?`<dt>Plot (developer)</dt><dd>${range(m.plot_min_sqft,m.plot_max_sqft)} sq ft</dd>`:''}
-        ${m.dld_area_min_sqft?`<dt>Area recorded by DLD</dt><dd>${range(m.dld_area_min_sqft,m.dld_area_max_sqft)} sq ft</dd><dt>DLD sales seen</dt><dd>${fmt(m.dld_sales)}</dd>`:''}
-        ${m.dld_plot_min_sqft?`<dt>Plot recorded by DLD</dt><dd>${range(m.dld_plot_min_sqft,m.dld_plot_max_sqft)} sq ft</dd><dt>DLD plot sales</dt><dd>${fmt(m.dld_plot_sales)}</dd>`:''}
-        ${m.units?`<dt>Units</dt><dd>${fmt(m.units)}</dd>`:''}
-        ${(m.layouts||[]).length?`<dt>Layouts</dt><dd>${esc(m.layouts.join(', '))}</dd>`:''}
-        ${m.op_min_aed?`<dt>Original price</dt><dd>AED ${range(m.op_min_aed,m.op_max_aed)}</dd>`:''}
-      </dl></article>`).join('')}</div>`:'<div class="note">No configurations recorded yet.</div>'}</div>
-    ${c.payment_plan?`<div class="section"><h2>Payment plan</h2><div class="note">${esc(c.payment_plan)}</div></div>`:''}
+      <div class="chips">${c.development_type?`<span class="chip">${esc(c.development_type)}</span>`:''}${beds.length?`<span class="chip">${esc(beds.map(r=>r.b).join(', '))} bedrooms</span>`:''}${c.usp?`<span class="chip">${esc(c.usp)}</span>`:''}</div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm primary" id="refresh">↻ Update info</button>${canEdit?`<button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button>`:''}</div>
+      <div class="meta" id="meta">${st.computed_at?`Figures worked out ${when(st.computed_at)}`:''}${st.dld_last_fetch?` · DLD sales fetched ${when(st.dld_last_fetch)}`:''}${c.research_checked_on?` · Launch facts checked ${day(c.research_checked_on)}`:''}</div></div>
+    <div class="facts six">
+      ${fact('Launched',esc(c.launch_date))}
+      ${fact('Handover',esc(c.handover_date))}
+      ${fact('Units in your CRM',st.units_total?fmt(st.units_total):'',c.total_units?`Emaar total: ${fmt(c.total_units)}`:'')}
+      ${fact('Layout types',layoutNames.length?`${layoutNames.length}`:'',layoutNames.length?esc(layoutNames.join(', ')):'')}
+      ${fact('Bedroom types',beds.length?esc(beds.map(r=>r.b).join(', ')):'')}
+      <div class="fact"><span>Owner records in your CRM</span><b id="crmCount">…</b></div>
+    </div>
+    ${lowCover?`<div class="section" style="padding-top:0"><div class="flag">Your CRM has ${fmt(st.units_total)} of ${fmt(c.total_units)} units here, so unit counts below may be low.</div></div>`:''}
+    <div class="section"><h2>By bedroom type</h2>${beds.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Type</th><th>Units</th><th>BUA</th><th>Plot</th><th>Launch price</th><th>Current avg price</th><th>Since launch</th><th>Last 6 months</th></tr></thead><tbody>
+      ${beds.map(r=>`<tr><td><b>${esc(r.b)} BR</b></td><td>${r.units?fmt(r.units):na}</td>
+        <td>${r.bua?`${sq(r.bua[0],r.bua[1])}<span class="sub">${r.bua[2]}</span>`:na}</td>
+        <td>${r.plot?`${sq(r.plot[0],r.plot[1])}<span class="sub">${r.plot[2]}</span>`:na}</td>
+        <td>${r.launch?`<b>${aed(r.launch.v)}</b><span class="sub">${esc(r.launch.src)}</span>`:na}</td>
+        <td>${r.m?`<b>${aed(r.m.avg)}</b><span class="sub">${short(r.m.min)} – ${short(r.m.max)}${r.m.psf?` · AED ${fmt(r.m.psf)}/sq ft`:''}</span><span class="sub">${r.m.sales} sale${r.m.sales>1?'s':''}, last ${r.m.months} months · latest ${day(r.m.last_date)}</span>`:'<span class="dim">No sales in 12 months</span>'}</td>
+        <td>${signed(r.growth)}</td><td>${signed(r.trend)}</td></tr>`).join('')}
+      <tr class="tot"><td>Total</td><td>${fmt(tot)}${st.units_without_bedrooms?`<span class="sub">+${fmt(st.units_without_bedrooms)} without bedrooms</span>`:''}</td><td colspan="6"></td></tr>
+      </tbody></table></div>`:'<div class="note">No bedroom data yet.</div>'}</div>
+    <div class="section"><h2>By layout${layoutNames.length?` · ${layoutNames.length} layout type${layoutNames.length>1?'s':''}`:''}</h2>${lrows.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Type</th><th>Layout</th><th>Units</th><th>BUA</th><th>Plot</th><th>Launch price</th><th>Current avg price</th></tr></thead><tbody>
+      ${lrows.map(r=>{const dv=r.dev||{},cr=r.crm||{};const devBua=dv.bua_sqft||dv.bua_min_sqft?sq(dv.bua_min_sqft||dv.bua_sqft,dv.bua_max_sqft||dv.bua_sqft):'';
+        const launch=dv.launch_price_aed||cr.first_min;
+        return `<tr><td><b>${esc(r.b)} BR</b></td><td>${esc(r.name)}${dv.note?`<span class="sub">${esc(dv.note)}</span>`:''}</td>
+        <td>${cr.units?`${fmt(cr.units)}<span class="tag">estimated</span>`:dv.units?`${fmt(dv.units)}<span class="sub">Emaar</span>`:na}</td>
+        <td>${cr.bua_min?`${sq(cr.bua_min,cr.bua_max)}<span class="sub">CRM${devBua?` · Emaar plan ${devBua}`:''}</span>`:devBua?`${devBua}<span class="sub">Emaar plan</span>`:na}</td>
+        <td>${cr.plot_min?`${sq(cr.plot_min,cr.plot_max)}<span class="sub">CRM</span>`:dv.plot_min_sqft?`${sq(dv.plot_min_sqft,dv.plot_max_sqft)}<span class="sub">Emaar plan</span>`:na}</td>
+        <td>${launch?`<b>${aed(launch)}</b><span class="sub">${dv.launch_price_aed?'Published':'First recorded sales'}</span>`:na}</td>
+        <td>${cr.market_avg?`<b>${aed(cr.market_avg)}</b><span class="sub">${cr.market_sales} sale${cr.market_sales>1?'s':''}, last 12 months</span>`:na}</td></tr>`;}).join('')}
+      </tbody></table></div>${st.units_without_layout?`<div class="meta">${fmt(st.units_without_layout)} unit${st.units_without_layout>1?'s':''} not matched to a layout yet (no BUA in your CRM, or layouts share the same size).</div>`:''}`:'<div class="note">No layouts recorded yet.</div>'}</div>
+    ${c.payment_plan?`<div class="section"><h2>Payment plan</h2><div class="note" style="white-space:pre-line">${esc(c.payment_plan)}</div></div>`:''}
+    ${c.original_price_note?`<div class="section"><h2>Price note</h2><div class="note">${esc(c.original_price_note)}</div></div>`:''}
     <div class="section"><h2>Sources</h2>${(c.sources||[]).length?`<ul class="src">${c.sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a><small>${esc((s.fields||[]).join(', '))}${s.checked?` · checked ${esc(s.checked)}`:''}</small></li>`).join('')}</ul>`:'<div class="note">No sources recorded.</div>'}
       ${c.open_questions?`<div class="note" style="margin-top:10px">${esc(c.open_questions)}</div>`:''}</div>`;
+  $('refresh').onclick=()=>refresh(c);
   if(canEdit){$('edit').onclick=()=>editor(c);$('del').onclick=()=>remove(c);}
   db.from('owners').select('id',{count:'exact',head:true}).eq('community',c.community).eq('cluster',c.name).then(({count})=>{const el=$('crmCount');if(el)el.textContent=count==null?'—':fmt(count);});
+}
+
+async function refresh(c){
+  const b=$('refresh');b.disabled=true;b.textContent='Updating… (up to a minute)';
+  try{
+    const r=await api('refreshCluster',{id:c.id});cache[c.id]=r.cluster;
+    if(activeId===c.id){render(r.cluster);
+      const note=r.dld?.skipped?'DLD was already fetched in the last hour':r.dld?.error?'DLD fetch failed: '+r.dld.error:r.dld?.mapped!=null?`${fmt(r.dld.mapped)} new DLD sales checked`:'';
+      if(note)$('meta').textContent+=' · '+note;}
+  }catch(e){b.disabled=false;b.textContent='↻ Update info';alert(e.message);}
 }
 
 async function remove(c){
@@ -170,33 +255,41 @@ async function remove(c){
 }
 
 function editor(c={}){
-  const mix=(c.unit_mix&&c.unit_mix.length?c.unit_mix:[{bedrooms:'',unit_type:''}]).map(m=>({...m}));
+  // Layouts: one row per bedroom × layout (researched); launch prices: one row per bedroom type (published only).
+  const lay=(c.layouts&&c.layouts.length?c.layouts:[{bedrooms:'',name:''}]).map(m=>({...m}));
+  const lp=(c.launch_prices||[]).map(m=>({...m}));
   const w=document.createElement('div');w.className='scrim';
-  const row=(m,i)=>`<tr data-i="${i}"><td><input data-k="bedrooms" value="${esc(m.bedrooms||'')}" placeholder="4"></td><td><input data-k="unit_type" value="${esc(m.unit_type||'')}" placeholder="Villa"></td>
-    <td><input data-k="bua_min_sqft" type="number" value="${m.bua_min_sqft||''}"></td><td><input data-k="bua_max_sqft" type="number" value="${m.bua_max_sqft||''}"></td>
-    <td><input data-k="plot_min_sqft" type="number" value="${m.plot_min_sqft||''}"></td><td><input data-k="plot_max_sqft" type="number" value="${m.plot_max_sqft||''}"></td>
-    <td><input data-k="units" type="number" value="${m.units||''}"></td><td><input data-k="layouts" value="${esc((m.layouts||[]).join(', '))}"></td><td><button class="btn sm" data-rm>×</button></td></tr>`;
+  const num=(m,k)=>`<td><input data-k="${k}" type="number" value="${m[k]||''}"></td>`;
+  const lrow=(m,i)=>`<tr data-i="${i}"><td><input data-k="bedrooms" value="${esc(m.bedrooms||'')}" placeholder="4"></td><td><input data-k="name" value="${esc(m.name||'')}" placeholder="Earth"></td>
+    ${num(m,'bua_sqft')}${num(m,'plot_min_sqft')}${num(m,'plot_max_sqft')}${num(m,'units')}${num(m,'launch_price_aed')}<td><input data-k="note" value="${esc(m.note||'')}"></td><td><button type="button" class="btn sm" data-rm>×</button></td></tr>`;
+  const prow=(m,i)=>`<tr data-i="${i}"><td><input data-k="bedrooms" value="${esc(m.bedrooms||'')}" placeholder="4"></td>${num(m,'aed')}<td><input data-k="source" value="${esc(m.source||'')}" placeholder="Emaar launch, Jan 2025"></td><td><input data-k="url" value="${esc(m.url||'')}" placeholder="https://"></td><td><button type="button" class="btn sm" data-rm>×</button></td></tr>`;
   w.innerHTML=`<form class="modal"><header><h2>${c.id?'Edit '+esc(c.name):'Add cluster'}</h2><button type="button" class="btn sm" data-close>Close</button></header><div class="body">
     <div class="grid2"><label>Cluster<input name="name" value="${esc(c.name||'')}" required></label><label>Community<input name="community" value="${esc(c.community||'')}"></label>
     <label>Developer<input name="developer" value="${esc(c.developer||'')}"></label><label>Property type<input name="development_type" value="${esc(c.development_type||'')}"></label>
-    <label>Launch<input name="launch_date" value="${esc(c.launch_date||'')}"></label><label>Handover<input name="handover_date" value="${esc(c.handover_date||'')}"></label>
-    <label>Total units<input name="total_units" type="number" value="${c.total_units||''}"></label><label>Design styles<input name="usp" value="${esc(c.usp||'')}"></label></div>
+    <label>Launched (shown)<input name="launch_date" value="${esc(c.launch_date||'')}" placeholder="Jan 2025"></label><label>Launch date (for first-sales price)<input name="launch_on" type="date" value="${esc(c.launch_on||'')}"></label>
+    <label>Handover<input name="handover_date" value="${esc(c.handover_date||'')}"></label><label>Total units (Emaar)<input name="total_units" type="number" value="${c.total_units||''}"></label>
+    <label>Design styles<input name="usp" value="${esc(c.usp||'')}"></label></div>
     <label>Price note<input name="original_price_note" value="${esc(c.original_price_note||'')}"></label>
     <label>Payment plan<textarea name="payment_plan">${esc(c.payment_plan||'')}</textarea></label>
-    <div><label style="margin-bottom:6px">Configurations (developer figures)</label><table class="mix"><thead><tr><th>Beds</th><th>Type</th><th>BUA min</th><th>BUA max</th><th>Plot min</th><th>Plot max</th><th>Units</th><th>Layouts</th><th></th></tr></thead><tbody>${mix.map(row).join('')}</tbody></table>
-    <button type="button" class="btn sm" data-addrow style="margin-top:8px">+ Add configuration</button></div>
+    <div><label style="margin-bottom:6px">Layouts (one row per bedroom type and layout)</label><table class="mix" data-t="lay"><thead><tr><th>Beds</th><th>Layout</th><th>BUA</th><th>Plot min</th><th>Plot max</th><th>Units</th><th>Launch AED</th><th>Note</th><th></th></tr></thead><tbody></tbody></table>
+    <button type="button" class="btn sm" data-add="lay" style="margin-top:8px">+ Add layout</button></div>
+    <div><label style="margin-bottom:6px">Published launch prices (leave empty to use first recorded sales)</label><table class="mix" data-t="lp"><thead><tr><th>Beds</th><th>From AED</th><th>Source</th><th>Link</th><th></th></tr></thead><tbody></tbody></table>
+    <button type="button" class="btn sm" data-add="lp" style="margin-top:8px">+ Add launch price</button></div>
     <label>Open questions / unverified<textarea name="open_questions">${esc(c.open_questions||'')}</textarea></label></div>
     <footer><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save</button></footer></form>`;
   document.body.append(w);
-  const f=w.querySelector('form'),tb=w.querySelector('tbody');
-  const sync=()=>tb.querySelectorAll('tr').forEach(tr=>{const m=mix[tr.dataset.i];tr.querySelectorAll('[data-k]').forEach(inp=>{const k=inp.dataset.k;m[k]=k==='layouts'?inp.value.split(',').map(s=>s.trim()).filter(Boolean):inp.type==='number'?Number(inp.value||0):inp.value;});});
-  const redraw=()=>{tb.innerHTML=mix.map(row).join('');tb.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{sync();mix.splice(b.closest('tr').dataset.i,1);redraw();});};
-  redraw();
-  w.querySelector('[data-addrow]').onclick=()=>{sync();mix.push({bedrooms:'',unit_type:''});redraw();};
+  const f=w.querySelector('form');
+  const tables={lay:{rows:lay,row:lrow,blank:{bedrooms:'',name:''}},lp:{rows:lp,row:prow,blank:{bedrooms:'',aed:0}}};
+  const sync=t=>w.querySelectorAll(`[data-t="${t}"] tbody tr`).forEach(tr=>{const m=tables[t].rows[tr.dataset.i];tr.querySelectorAll('[data-k]').forEach(inp=>{m[inp.dataset.k]=inp.type==='number'?Number(inp.value||0):inp.value.trim();});});
+  const redraw=t=>{const tb=w.querySelector(`[data-t="${t}"] tbody`);tb.innerHTML=tables[t].rows.map(tables[t].row).join('');
+    tb.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{sync(t);tables[t].rows.splice(b.closest('tr').dataset.i,1);redraw(t);});};
+  redraw('lay');redraw('lp');
+  w.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const t=b.dataset.add;sync(t);tables[t].rows.push({...tables[t].blank});redraw(t);});
   w.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>w.remove());
-  f.onsubmit=async e=>{e.preventDefault();sync();
+  f.onsubmit=async e=>{e.preventDefault();sync('lay');sync('lp');
     const fd=Object.fromEntries(new FormData(f));
-    try{const {cluster}=await api('saveCluster',{cluster:{...c,...fd,total_units:Number(fd.total_units||0),unit_mix:mix.filter(m=>m.bedrooms||m.unit_type)}});w.remove();cache[cluster.id]=cluster;await load();open(cluster.id);}
+    try{const {cluster}=await api('saveCluster',{cluster:{...c,...fd,total_units:Number(fd.total_units||0),layouts:lay.filter(m=>m.bedrooms||m.name),launch_prices:lp.filter(m=>m.bedrooms&&m.aed)}});
+      w.remove();delete cache[cluster.id];await load();open(cluster.id);}
     catch(err){alert(err.message);}};
 }
 
