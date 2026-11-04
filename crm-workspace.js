@@ -64,9 +64,23 @@
   }
   const broadcastIcon=$('v7NavBroadcast')?.querySelector('svg');
   if(broadcastIcon){broadcastIcon.outerHTML=WA_ICON;const svg=$('v7NavBroadcast').querySelector('svg');svg.style.stroke='none';}
+  // Other owner records of the same unit (co-owners, older lists, the developer), one click away.
+  function showCoOwners(btn,list){
+    document.querySelector('.crmCoPop')?.remove();
+    const pop=document.createElement('div');pop.className='crmCoPop';
+    const phone=o=>{const p=String(o.phone1||o.phone2||'').trim();return p?esc(p):'<em>No phone</em>';};
+    pop.innerHTML=`<header><strong>Other records for this unit</strong><button type="button" aria-label="Close">×</button></header>
+      <ul>${list.map(o=>`<li><div><strong>${esc(o.owner||'—')}</strong><span>${phone(o)} · ${esc(o.status||'New')}</span></div><button type="button" class="crmBtn crmBtnSm" data-open="${esc(o.id)}">Profile</button></li>`).join('')}</ul>`;
+    document.body.append(pop);
+    const r=btn.getBoundingClientRect();pop.style.top=`${Math.min(innerHeight-pop.offsetHeight-12,r.bottom+6)+scrollY}px`;pop.style.left=`${Math.min(innerWidth-pop.offsetWidth-12,r.left)+scrollX}px`;
+    pop.querySelector('header button').onclick=()=>pop.remove();
+    pop.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{pop.remove();window.crmOpenOwnerRecord(b.dataset.open);});
+    setTimeout(()=>document.addEventListener('click',function off(e){if(!pop.contains(e.target)){pop.remove();document.removeEventListener('click',off);}}),0);
+  }
+
   // Bedrooms and sizes per unit (public.unit_details; RLS limits it to locations the user can see).
   const udKey=r=>[r.community,r.cluster,r.unit].map(v=>String(v??'')).join('|');
-  const udCache=new Map();
+  const udCache=new Map(),coCache=new Map();
   const sq=v=>v?Math.round(v).toLocaleString('en-US'):'';
   const price=v=>v>=1e6?(Math.round(v/1e4)/100).toString()+'M':v>=1e3?Math.round(v/1e3)+'K':String(v||'');
   async function fillUnitDetails(){
@@ -86,8 +100,17 @@
         if(!cur||t.transaction_date>cur.transaction_date||(t.transaction_date===cur.transaction_date&&dxb&&!cur.dxb))last.set(k,{...t,dxb});});
       want.forEach(k=>udCache.set(k,null));
       (data||[]).forEach(d=>udCache.set(udKey(d),d));
+      const {data:co}=await db.from('owners').select('id,community,cluster,unit,owner,phone1,phone2,status')
+        .eq('is_primary',false).in('cluster',[...new Set(parts.map(p=>p[1]))]).in('unit',[...new Set(parts.map(p=>p[2]))]);
+      (co||[]).forEach(o=>{const k=udKey(o);if(!want.includes(k))return;const cur=coCache.get(k)||[];cur.push(o);coCache.set(k,cur);});
+      want.forEach(k=>{if(!coCache.has(k))coCache.set(k,[]);});
       last.forEach((t,k)=>udCache.set(k,{...(udCache.get(k)||{}),last:t}));
     }
+    document.querySelectorAll('.crmCoOwners[hidden]').forEach(b=>{
+      const list=(coCache.get(b.dataset.co)||[]).filter(o=>String(o.id)!==b.dataset.self);if(!list.length)return;
+      b.hidden=false;b.textContent=`+${list.length} co-owner${list.length>1?'s':''}`;
+      b.onclick=e=>{e.stopPropagation();showCoOwners(b,list);};
+    });
     document.querySelectorAll('.crmUD:not([data-done])').forEach(el=>{
       if(!udCache.has(el.dataset.ud))return;
       const d=udCache.get(el.dataset.ud),beds=(String(d?.bedrooms||'').match(/\d+/)||[''])[0],f=el.dataset.f;
@@ -109,7 +132,7 @@
   const baseOwnerCell=window.ownerCell;
   window.ownerCell=function(row,col){
     if(col.key==='cluster')return `${esc(row.cluster||'—')}${row.community&&!ownerColumns.find(c=>c.key==='community')?.visible?`<small class="crmSubLoc">${esc(row.community)}</small>`:''}`;
-    if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>`;
+    if(col.key==='owner')return `<span class="ownerIdentityName" title="${esc(row.owner)}">${esc(row.owner||'—')}</span>${row.is_primary!==false?`<button type="button" class="crmCoOwners" data-co="${esc(udKey(row))}" data-self="${esc(row.id)}" hidden></button>`:''}`;
     if(col.key==='whatsapp')return ownerContact(row);
     if(col.key==='beds'||col.key==='size'||col.key==='lastprice')return `<span class="crmUD" data-ud="${esc(udKey(row))}" data-f="${col.key}">…</span>`;
     if(col.key==='actions')return `<div class="crmOwnerActions"><button type="button" class="profileBtn" onclick="crmOpenOwnerRecord('${esc(row.id)}')">Profile</button><span data-related-units>${moreUnitButton(row)}</span>${callButton(row)||'<span class="crmNoPhone">No phone number</span>'}${ownerCopy(row)}</div>`;
@@ -157,7 +180,7 @@
     const adv=document.createElement('div');adv.className='crmAdvFilters';adv.hidden=true;
     fields.filter(Boolean).forEach(f=>{const l=document.createElement('label');l.className='crmAdvField';l.innerHTML=`<span>${esc(f.dataset.label||f.getAttribute('placeholder')||'')}</span>`;l.append(f);adv.append(l);});
     const btn=document.createElement('button');btn.type='button';btn.className='crmBtn crmFilterToggle';
-    const count=()=>fields.filter(f=>f&&f.value&&!/^(unit|asc|lead_receive_date|desc)$/.test(f.value)).length;
+    const count=()=>fields.filter(f=>f&&(f.type==='checkbox'?f.checked:f.value&&!/^(unit|asc|lead_receive_date|desc)$/.test(f.value))).length;
     const paint=()=>{const n=count();btn.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>${label}${n?` <b>${n}</b>`:''}`;};
     btn.onclick=()=>{adv.hidden=!adv.hidden;btn.classList.toggle('active',!adv.hidden);};
     fields.forEach(f=>f&&f.addEventListener('change',paint));paint();
@@ -185,7 +208,10 @@
     const unit=$('unitFilter'),source=$('sourceFilter'),sortF=$('ownerSortField'),sortD=$('ownerSortDirection'),status=$('statusFilter');
     if(status)status.dataset.label='Status';
     if(unit)unit.dataset.label='Unit number';if(source)source.dataset.label='Source';if(sortF)sortF.dataset.label='Sort by';if(sortD)sortD.dataset.label='Order';
-    const {adv,btn}=advancedToggle(card,[status,unit,source,sortF,sortD],'Filters');
+    // Every owner record (co-owners, older lists) instead of one row per unit.
+    const allRec=document.createElement('input');allRec.type='checkbox';allRec.id='allOwnerRecords';allRec.dataset.label='Show every owner record';
+    allRec.addEventListener('change',()=>{currentPage=0;loadData();});
+    const {adv,btn}=advancedToggle(card,[status,unit,source,sortF,sortD,allRec],'Filters');
     const reset=card.querySelector('.reset');
     if(reset){reset.className='crmLinkBtn';reset.textContent='Reset';}
     filters.append(btn);if(reset)filters.append(reset);if(ownerMore)filters.append(ownerMore);

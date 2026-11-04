@@ -2369,7 +2369,7 @@ input,select,textarea{background:var(--c-surface-2);color:var(--c-text);border-c
 <link rel="stylesheet" href="crm-leads-fit.css?v=5">
 <link rel="stylesheet" href="crm-workspace-refinement.css?v=5">
 <link rel="stylesheet" href="crm-breakdown.css?v=4">
-<link rel="stylesheet" href="crm-hawaii.css?v=8">
+<link rel="stylesheet" href="crm-hawaii.css?v=9">
 </head>
 
 <body>
@@ -3564,6 +3564,9 @@ ${agentName}`;
       if (unit) query = query.eq("unit", unit);
       if (source) query = query.eq("data_source", source);
       if (status) query = query.eq("status", status);
+      // One row per unit (owners.is_primary); co-owners show as "+N co-owners" on that row.
+      // Searching a name/phone, filtering one unit, or "Show every owner record" lists them all.
+      if (!search && !unit && !el("allOwnerRecords")?.checked) query = query.eq("is_primary", true);
 
       return query;
     }
@@ -6477,6 +6480,6 @@ body.ownerColumnResizing *{
 @media(max-width:640px){.u12PropertyIntro{align-items:flex-start;flex-direction:column}.u12OwnerTabs{overflow-x:auto}.u12OwnerTab{white-space:nowrap}}
 </style>
 
-<script src="crm-enhancements.js?v=26"></script>
+<script src="crm-enhancements.js?v=27"></script>
 </body>
 </html>
