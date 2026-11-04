@@ -183,9 +183,12 @@ function layoutRows(c){
   return [...rows.values()].sort((x,y)=>Number(x.b)-Number(y.b)||byName(x.name,y.name));
 }
 
+const slugify=t=>String(t||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+/* readable address: #<community>-<cluster>, e.g. #the-valley-eden (old #<uuid> links still open) */
+function slugOf(id){const c=clusters.find(x=>x.id===id);if(!c)return id;const n=slugify(c.name),m=slugify(c.community);return !m||n.startsWith(m)?n:m+'-'+n;}
 async function open(id,fresh){
   activeId=id;renderList();
-  history.replaceState(null,'','#'+id);
+  history.replaceState(null,'',location.pathname.replace(/\.html$/,'')+'#'+slugOf(id));
   const d=$('detail');
   if(!cache[id]||fresh){if(!cache[id])d.innerHTML='<div style="padding:28px;display:grid;gap:12px"><div class="skeleton" style="width:40%;height:28px"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>';
     try{cache[id]=(await api('getCluster',{id})).cluster;}catch(e){d.innerHTML=`<div class="err">${esc(e.message)}</div>`;return;}}
@@ -303,7 +306,7 @@ async function load(){
 }
 $('q').oninput=renderList;$('community').onchange=renderList;$('add').onclick=()=>editor({});
 $('theme').onclick=()=>{const light=document.documentElement.dataset.theme!=='light';if(light)document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;try{localStorage.setItem('crm_theme',light?'light':'dark')}catch(e){}};
-load().then(()=>{const id=location.hash.slice(1);if(id&&clusters.some(c=>c.id===id))open(id);else if(clusters[0])open([...clusters].sort((a,b)=>byName(a.community,b.community)||byName(a.name,b.name))[0].id);});
+load().then(()=>{const h=decodeURIComponent(location.hash.slice(1));const hit=clusters.find(c=>c.id===h||slugOf(c.id)===h);if(hit)open(hit.id);else if(clusters[0])open([...clusters].sort((a,b)=>byName(a.community,b.community)||byName(a.name,b.name))[0].id);});
 </script>
 </body>
 </html>

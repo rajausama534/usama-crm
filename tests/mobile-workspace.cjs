@@ -240,7 +240,7 @@ async function checkLeads(page,width){
   await nav(page,'#v7NavUsers');await page.waitForSelector('#usersView:not(.hidden)');
   if(width===390){
    if(await page.locator('.crmMenuToggle').isVisible())await page.locator('.crmMenuToggle').click();
-   await Promise.all([page.waitForURL('**/cluster-guide.html'),page.locator('[data-cluster-guide-entry="nav"]').click()]);
+   await Promise.all([page.waitForURL('**/cluster-guide'),page.locator('[data-cluster-guide-entry="nav"]').click()]);
    await page.waitForSelector('#theme');await page.locator('#theme').click();assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
    await page.goBack();await page.waitForFunction(()=>window.CRMStatus);
   }
