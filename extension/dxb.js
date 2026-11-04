@@ -182,23 +182,35 @@
     progress(job, `Searching "${job.project}"…`);
     const input = await waitFor(() => document.querySelector('#SearchInput'));
     if (!input) throw new Error('DXB Interact search box not found. Are you logged in?');
-    for (let i = 0; i < 6; i++) {
-      const x = document.querySelector('#LocationsStack a.button svg');
-      if (!x) break;
-      fire(x, ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click']);
-      await sleep(400);
-    }
-    input.focus();
-    input.value = job.project;
-    input.dispatchEvent(new InputEvent('input', { bubbles: true }));
-    input.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: job.project.slice(-1) }));
-    const pick = await waitFor(() => {
+    // The page wires up its search box a little after it appears: wait, then try a few times.
+    await waitFor(() => document.querySelector('.AreasList article'), 15000);
+    await sleep(2500);
+    const findPick = () => {
       const list = [...document.querySelectorAll('.AreasList article')].map(a => ({ a, parts: clean(a.innerText).split(',').map(s => s.trim()) }))
         .filter(x => norm(x.parts[0]) === norm(job.project));
       if (!list.length) return null;
       const exact = list.filter(x => x.parts.slice(1).some(p => norm(p) === norm(job.community)));
       return (exact.length ? exact : list).length === 1 ? (exact.length ? exact : list)[0] : (exact[0] || null);
-    }, 12000);
+    };
+    let pick = null;
+    for (let attempt = 0; attempt < 5 && !pick; attempt++) {
+      for (let i = 0; i < 6; i++) {
+        const x = document.querySelector('#LocationsStack a.button svg');
+        if (!x) break;
+        fire(x, ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click']);
+        await sleep(500);
+      }
+      input.focus();
+      input.value = '';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+      await sleep(200);
+      input.value = job.project;
+      input.dispatchEvent(new InputEvent('input', { bubbles: true, data: job.project, inputType: 'insertText' }));
+      input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: job.project.slice(-1) }));
+      input.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: job.project.slice(-1) }));
+      pick = await waitFor(findPick, 5000);
+      if (!pick) { progress(job, `Searching "${job.project}"… (try ${attempt + 2})`); await sleep(1500); }
+    }
     if (!pick) throw new Error(`"${job.project}" was not found on DXB Interact.`);
     fire(pick.a, ['mousedown', 'mouseup', 'click']);
     await sleep(800);
