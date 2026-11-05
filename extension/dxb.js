@@ -9,7 +9,10 @@
   if (window.__usamaDxb) return;
   window.__usamaDxb = true;
 
-  const CRM = 'https://usama-crm.vercel.app';
+  // The CRM runs on its own domain; the old Vercel address still works too.
+  const CRM_ORIGINS = ['https://www.usamabinnusrat.com', 'https://usamabinnusrat.com', 'https://usama-crm.vercel.app'];
+  let CRM = CRM_ORIGINS[0];
+  try { const saved = sessionStorage.getItem('usama_crm_origin'); if (CRM_ORIGINS.includes(saved)) CRM = saved; } catch (_) {}
   const JOB_KEY = 'usamaCrmFetchJob';
   const clean = v => String(v ?? '').replace(/\s+/g, ' ').trim();
   const num = v => { const n = Number(String(v ?? '').replace(/[^\d.]/g, '')); return Number.isFinite(n) && n > 0 ? n : null; };
@@ -123,7 +126,8 @@
     while (Date.now() < end) { try { const v = fn(); if (v) return v; } catch (_) {} await sleep(step); }
     return null;
   }
-  const toCrm = msg => { try { if (window.opener) { window.opener.postMessage(msg, CRM); return true; } } catch (_) {} return false; };
+  // Only the CRM origin that opened this tab receives the message; the others are dropped by the browser.
+  const toCrm = msg => { try { if (window.opener) { CRM_ORIGINS.forEach(o => window.opener.postMessage(msg, o)); return true; } } catch (_) {} return false; };
 
   let box;
   function status(text, done) {
@@ -157,6 +161,7 @@
       try { req = JSON.parse(decodeURIComponent(m[1])); } catch (_) { return; }
       history.replaceState(null, '', location.pathname + location.search);
       if (!req?.project) return;
+      if (CRM_ORIGINS.includes(req.crm)) { CRM = req.crm; try { sessionStorage.setItem('usama_crm_origin', CRM); } catch (_) {} }
       const today = ymd(new Date());
       job = { id: String(req.id || Date.now()), project: String(req.project), community: String(req.community || ''),
               stage: 'search', ranges: [['2012-01-01', today]], ri: 0, split: false, totals: [], rows: {}, started: Date.now(), tries: 0 };

@@ -170,7 +170,7 @@
     let heard=false,finished=false;
     const done=()=>{finished=true;window.removeEventListener('message',onMsg);clearTimeout(timer);};
     w.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{done();w.remove();});
-    const job=encodeURIComponent(JSON.stringify({id,project:cluster,community}));
+    const job=encodeURIComponent(JSON.stringify({id,project:cluster,community,crm:location.origin}));
     const tab=window.open(`${DXB_ORIGIN}/dubai-house-prices#usama-fetch=${job}`,'_blank');
     if(!tab){msg.textContent='Your browser blocked the new tab. Allow pop-ups for this site and press the button again.';sub.textContent='';return;}
     const timer=setTimeout(()=>{if(heard||finished)return;done();

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Usama CRM Helper",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Read Bayut, Dubizzle and Property Finder listings for the Usama CRM Unit Finder, and send DXBinteract sales to the CRM.",
   "permissions": [
     "activeTab",

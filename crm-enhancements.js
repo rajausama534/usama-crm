@@ -22,7 +22,7 @@
     'lead-contacted-hotfix.js?v=2',
     'crm-breakdown-doc.js?v=2',
     'crm-breakdown.js?v=3',
-    'crm-cluster-data.js?v=2'
+    'crm-cluster-data.js?v=3'
   ];
   const load=src=>new Promise(resolve=>{
     const s=document.createElement('script');
