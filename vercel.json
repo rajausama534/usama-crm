@@ -2,9 +2,9 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "usama-crm.vercel.app" }],
-      "destination": "https://www.usamabinnusrat.com/:path*",
+      "destination": "https://www.usamabinnusrat.com/$1",
       "permanent": true
     }
   ]
