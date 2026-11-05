@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Usama CRM Helper",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Read Bayut, Dubizzle and Property Finder listings for the Usama CRM Unit Finder, and send DXBinteract sales to the CRM.",
   "permissions": [
     "activeTab",
@@ -12,9 +12,9 @@
     "https://www.bayut.com/*",
     "https://dubai.dubizzle.com/*",
     "https://www.propertyfinder.ae/*",
-    "https://usama-crm.vercel.app/*",
     "https://www.usamabinnusrat.com/*",
-    "https://dxbinteract.com/*"
+    "https://dxbinteract.com/*",
+    "https://usamabinnusrat.com/*"
   ],
   "action": {
     "default_title": "Usama CRM Unit Finder",
@@ -44,7 +44,7 @@
     {
       "matches": [
         "https://www.usamabinnusrat.com/unit-finder*",
-        "https://usama-crm.vercel.app/unit-finder*"
+        "https://usamabinnusrat.com/unit-finder*"
       ],
       "js": [
         "bridge.js"

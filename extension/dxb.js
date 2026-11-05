@@ -9,8 +9,7 @@
   if (window.__usamaDxb) return;
   window.__usamaDxb = true;
 
-  // The CRM runs on its own domain; the old Vercel address still works too.
-  const CRM_ORIGINS = ['https://www.usamabinnusrat.com', 'https://usamabinnusrat.com', 'https://usama-crm.vercel.app'];
+  const CRM_ORIGINS = ['https://www.usamabinnusrat.com', 'https://usamabinnusrat.com'];
   let CRM = CRM_ORIGINS[0];
   try { const saved = sessionStorage.getItem('usama_crm_origin'); if (CRM_ORIGINS.includes(saved)) CRM = saved; } catch (_) {}
   const JOB_KEY = 'usamaCrmFetchJob';
