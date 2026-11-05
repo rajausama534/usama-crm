@@ -1,0 +1,422 @@
+{
+  "_about": "Facts read from Emaar's agent packs (factsheets + floor-plan books) on 5 Nov 2026. Sheet: Emaar AGENTS_PACK_LINKS.xlsx. BUA = Emaar 'total area' on the floor plan (suite + garage + balcony/terrace). Locked or missing packs: Alana, Rivana, Avena, Avena 2, Farm Gardens 2 (link needs a Dropbox sign-in), June (no plans). Their guides keep their earlier data.",
+  "clusters": [
+    {
+      "community": "The Valley", "name": "Elora",
+      "launch_on": "2023-01-01", "launch_date": "Jan 2023", "handover_date": "Sep 2026 (planned)",
+      "total_units": 430, "usp": "Two styles: Moon and Mysk. 284 × 3 BR, 146 × 4 BR townhouses",
+      "payment_plan": "80/20: 10% down payment (Jan 2023), 7 instalments of 10% during construction, 20% on completion (Sep 2026)",
+      "launch_prices": [{"bedrooms": "3", "aed": 1600000}, {"bedrooms": "4", "aed": 2100000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Moon", "bua_sqft": 2180, "note": "Larger 3 BR plan (2,180 sq ft), maid's room. ~70–85 sq ft more than Mysk"},
+        {"bedrooms": "3", "name": "Mysk", "bua_min_sqft": 2095, "bua_max_sqft": 2112, "note": "Compact 3 BR plan, 2,095–2,112 sq ft (end units are the larger ones)"},
+        {"bedrooms": "4", "name": "Moon", "bua_sqft": 2608, "note": "4 BR with guest bedroom, dressing room and maid's room; ~20 sq ft more than Mysk"},
+        {"bedrooms": "4", "name": "Mysk", "bua_sqft": 2586, "note": "Same rooms as Moon 4 BR (guest bedroom, dressing, maid's); different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Orania",
+      "launch_on": "2022-06-10", "launch_date": "Jun 2022", "handover_date": "Dec 2025 (planned)",
+      "total_units": 308, "usp": "Two styles: Bold and Sleek. 236 × 3 BR, 72 × 4 BR townhouses",
+      "payment_plan": "75/25: 10% down payment (10 Jun 2022), 6 instalments during construction (10%, 10%, 10%, 10%, 10%, 15%), 25% on completion (31 Dec 2025)",
+      "launch_prices": [{"bedrooms": "3", "aed": 1528888}, {"bedrooms": "4", "aed": 1944888}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Bold", "bua_min_sqft": 1896, "bua_max_sqft": 2044, "note": "Two 3 BR plans: middle units ~1,896–1,929 sq ft, end/corner units ~1,959–2,044 sq ft. Maid's room"},
+        {"bedrooms": "3", "name": "Sleek", "bua_min_sqft": 1903, "bua_max_sqft": 2044, "note": "Same plans as Bold (1,903–2,044 sq ft); the difference is the façade"},
+        {"bedrooms": "4", "name": "Bold", "bua_min_sqft": 2284, "bua_max_sqft": 2346, "note": "Guest bedroom + maid's room. End units ~2,346 sq ft, others ~2,284"},
+        {"bedrooms": "4", "name": "Sleek", "bua_min_sqft": 2265, "bua_max_sqft": 2346, "note": "Guest bedroom + maid's room. ~20 sq ft smaller than Bold in middle units (2,265 vs 2,284)"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Talia",
+      "usp": "Three designs: Cyrus, Elio and Pharo (3 & 4 BR townhouses)",
+      "payment_plan": "60/40: 60% during construction, 40% on completion (launch offer)",
+      "layouts": [
+        {"bedrooms": "3", "name": "Cyrus", "bua_min_sqft": 2097, "bua_max_sqft": 2100, "note": "Biggest 3 BR (~2,100 sq ft), maid's room"},
+        {"bedrooms": "3", "name": "Elio", "bua_min_sqft": 1862, "bua_max_sqft": 1921, "note": "Smallest 3 BR (~1,865–1,920 sq ft), maid's room; ~200 sq ft less than Cyrus"},
+        {"bedrooms": "3", "name": "Pharo", "bua_min_sqft": 2035, "bua_max_sqft": 2090, "note": "Mid-size 3 BR (2,035–2,090 sq ft), some plans with balcony + storage"},
+        {"bedrooms": "4", "name": "Cyrus", "bua_min_sqft": 2217, "bua_max_sqft": 2248, "note": "Biggest 4 BR; 2,248 sq ft plan adds a guest bedroom"},
+        {"bedrooms": "4", "name": "Elio", "bua_sqft": 2210, "note": "4 BR with guest bedroom + maid's room, 2,210 sq ft"},
+        {"bedrooms": "4", "name": "Pharo", "bua_min_sqft": 2187, "bua_max_sqft": 2189, "note": "Smallest 4 BR (~2,188 sq ft), guest bedroom + maid's room"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Nara",
+      "handover_date": "Dec 2024 (planned)",
+      "usp": "Single-row townhouses in three designs: Aston, Charm and Palma",
+      "layouts": [
+        {"bedrooms": "3", "name": "Charm", "bua_min_sqft": 2098, "bua_max_sqft": 2100, "note": "Biggest 3 BR (~2,100 sq ft), 4-plex units, maid's room"},
+        {"bedrooms": "3", "name": "Aston", "bua_min_sqft": 2023, "bua_max_sqft": 2089, "note": "Mid-size 3 BR (2,023–2,089 sq ft) in 5, 6 and 10-plex rows; maid's room"},
+        {"bedrooms": "3", "name": "Palma", "bua_min_sqft": 1865, "bua_max_sqft": 1891, "note": "Smallest 3 BR (~1,865–1,890 sq ft) in 5, 8 and 10-plex rows; ~210 sq ft less than Charm"},
+        {"bedrooms": "4", "name": "Charm", "bua_min_sqft": 2218, "bua_max_sqft": 2250, "note": "Biggest 4 BR (up to 2,250 sq ft), guest bedroom + maid's room"},
+        {"bedrooms": "4", "name": "Aston", "bua_min_sqft": 2140, "bua_max_sqft": 2188, "note": "End units; 5 plan variants 2,140–2,188 sq ft, guest bedroom + maid's room"},
+        {"bedrooms": "4", "name": "Palma", "bua_min_sqft": 2212, "bua_max_sqft": 2213, "note": "End units of 8-plex rows, 2,212 sq ft, guest bedroom + maid's room"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Eden",
+      "usp": "Three styles: Spruce, Iris and May Bell. 4 BR are end units",
+      "layouts": [
+        {"bedrooms": "3", "name": "Spruce", "bua_min_sqft": 1930, "bua_max_sqft": 1997, "note": "Smallest 3 BR (1,930–1,997 sq ft); maid's room, laundry, store"},
+        {"bedrooms": "3", "name": "Iris", "bua_min_sqft": 2050, "bua_max_sqft": 2087, "note": "Biggest 3 BR (2,050–2,087 sq ft), ~100 sq ft more than Spruce"},
+        {"bedrooms": "3", "name": "May Bell", "bua_min_sqft": 2028, "bua_max_sqft": 2066, "note": "Mid-size 3 BR (2,028–2,066 sq ft)"},
+        {"bedrooms": "4", "name": "Spruce", "bua_min_sqft": 2323, "bua_max_sqft": 2325, "note": "End unit, guest bedroom + maid's room, 2,323 sq ft"},
+        {"bedrooms": "4", "name": "Iris", "bua_min_sqft": 2335, "bua_max_sqft": 2337, "note": "Biggest 4 BR end unit, 2,335 sq ft"},
+        {"bedrooms": "4", "name": "May Bell", "bua_sqft": 2311, "note": "Smallest 4 BR end unit, 2,311 sq ft"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Nima",
+      "launch_on": "2023-09-01", "launch_date": "Sep 2023", "handover_date": "Jul 2027 (planned)",
+      "total_units": 520, "usp": "Two styles: Canna and Cedar. 362 × 3 BR, 158 × 4 BR townhouses by the waterway",
+      "payment_plan": "90/10: 10% down payment (Sep 2023), 7 instalments during construction (10%, 10%, 10%, 10%, 10%, 15%, 15%), 10% on completion (Jul 2027)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2100000}, {"bedrooms": "4", "aed": 2510000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Canna", "bua_min_sqft": 2233, "bua_max_sqft": 2442, "note": "Two 3 BR plans: standard ~2,233–2,244 sq ft and a large 2,442 sq ft version. Maid's room, walk-in"},
+        {"bedrooms": "3", "name": "Cedar", "bua_min_sqft": 2346, "bua_max_sqft": 2421, "note": "3 BR 2,346–2,421 sq ft, ~110 sq ft more than standard Canna; maid's room, walk-in"},
+        {"bedrooms": "4", "name": "Canna", "bua_min_sqft": 2547, "bua_max_sqft": 2683, "note": "Two 4 BR plans: 2,547 and 2,683 sq ft (end). Guest bedroom + maid's room"},
+        {"bedrooms": "4", "name": "Cedar", "bua_min_sqft": 2599, "bua_max_sqft": 2636, "note": "4 BR 2,599–2,636 sq ft, guest bedroom + maid's room"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Lillia",
+      "launch_on": "2024-03-01", "launch_date": "Mar 2024", "handover_date": "Jan 2027 (planned)",
+      "total_units": 406, "usp": "Two styles: Jade and Pearl. 278 × 3 BR, 128 × 4 BR townhouses",
+      "payment_plan": "90/10: 10% down payment (Mar 2024), 7 instalments during construction (10%, 10%, 10%, 10%, 10%, 15%, 15%), 10% on completion (Jan 2027)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2000000}, {"bedrooms": "4", "aed": 2700000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Jade", "bua_min_sqft": 2132, "bua_max_sqft": 2158, "note": "3 BR 2,132–2,158 sq ft, maid's room (normal and mirrored plan)"},
+        {"bedrooms": "3", "name": "Pearl", "bua_min_sqft": 2182, "bua_max_sqft": 2190, "note": "3 BR ~40 sq ft bigger than Jade (2,182–2,190 sq ft), maid's room"},
+        {"bedrooms": "4", "name": "Jade", "bua_min_sqft": 2973, "bua_max_sqft": 2988, "note": "Biggest 4 BR (2,973–2,988 sq ft), ~200 sq ft more than Pearl"},
+        {"bedrooms": "4", "name": "Pearl", "bua_min_sqft": 2777, "bua_max_sqft": 2792, "note": "4 BR 2,777–2,792 sq ft, maid's room"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Farm Gardens",
+      "launch_on": "2022-12-01", "launch_date": "Dec 2022", "handover_date": "Aug 2026 (planned)",
+      "total_units": 146, "usp": "Two styles: Horizon and Earth. 79 × 4 BR, 67 × 5 BR villas on 8,000–10,000 sq ft plots",
+      "payment_plan": "80/20: 10% down payment (Dec 2022), 7 instalments of 10% during construction, 20% on completion (Aug 2026)",
+      "launch_prices": [{"bedrooms": "4", "aed": 5100000}, {"bedrooms": "5", "aed": 6100000}],
+      "layouts": [
+        {"bedrooms": "4", "name": "Horizon", "bua_sqft": 4950, "note": "Average BUA 4,950 sq ft, average plot 8,914 sq ft (factsheet). Horizon and Earth share sizes; they differ in façade"},
+        {"bedrooms": "4", "name": "Earth", "bua_sqft": 4950, "note": "Same size as Horizon; different (earth-tone) façade"},
+        {"bedrooms": "5", "name": "Horizon", "bua_sqft": 5657, "note": "Average BUA 5,657 sq ft, average plot 10,004 sq ft"},
+        {"bedrooms": "5", "name": "Earth", "bua_sqft": 5657, "note": "Same size as Horizon; different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Farm Gardens 2",
+      "launch_on": "2024-03-04", "launch_date": "Mar 2024",
+      "usp": "4 & 5 BR villas. Two plan sizes per bedroom type (Type A/B and Type C/D)",
+      "launch_prices": [
+        {"bedrooms": "4", "aed": 7611077, "source": "Average Emaar sale, Mar 2024 (first month, DLD via DXB Interact; lowest 7,112,730)"},
+        {"bedrooms": "5", "aed": 9953590, "source": "Average Emaar sale, Mar 2024 (first month, DLD via DXB Interact; lowest 9,221,888)"}
+      ],
+      "open_questions": "Emaar's Farm Gardens 2 pack link needs a Dropbox sign-in, so style names are not confirmed. Sizes are the BUAs recorded on DLD for each unit (two sizes per bedroom type).",
+      "layouts": [
+        {"bedrooms": "4", "name": "Type A / B", "bua_sqft": 6396, "note": "Smaller 4 BR plan, 6,396 sq ft (≈45% of the 4 BR units)"},
+        {"bedrooms": "4", "name": "Type C / D", "bua_sqft": 6642, "note": "Larger 4 BR plan, 6,642 sq ft (+246 sq ft)"},
+        {"bedrooms": "5", "name": "Type A / B", "bua_sqft": 7966, "note": "Smaller 5 BR plan, 7,966 sq ft"},
+        {"bedrooms": "5", "name": "Type C / D", "bua_sqft": 8074, "note": "Larger 5 BR plan, 8,074 sq ft (+108 sq ft)"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Farm Grove",
+      "launch_on": "2024-12-01", "launch_date": "Dec 2024", "handover_date": "Dec 2028 (planned)",
+      "total_units": 482, "usp": "482 villas: 91 × 4 BR standalone, 48 × 5 BR standalone, 68 × 4 BR semi-detached, 275 × 4 BR detached",
+      "payment_plan": "80/20: 10% down payment (Dec 2024), 7 instalments of 10% during construction, 20% on completion (Dec 2028)",
+      "launch_prices": [{"bedrooms": "4", "aed": 4440000, "source": "Emaar factsheet: from AED 4.44M (semi-detached); detached from 4.62M, standalone from 6.68M"}, {"bedrooms": "5", "aed": 7830000}],
+      "layouts": [
+        {"bedrooms": "4", "name": "Willow", "bua_sqft": 5581, "note": "4 BR STANDALONE (type V4): 3 floors with lift, family room, roof terrace, 1,275 sq ft of terraces; min plot 8,736 sq ft; from AED 6.68M. Pool not included"},
+        {"bedrooms": "4", "name": "Lavender", "bua_sqft": 5581, "note": "4 BR STANDALONE, same plan as Willow, different façade"},
+        {"bedrooms": "5", "name": "Ivy", "bua_sqft": 6078, "note": "5 BR STANDALONE (type V5): 3 floors with lift, family room; min plot 11,291 sq ft; from AED 7.83M"},
+        {"bedrooms": "5", "name": "Orchid", "bua_sqft": 6078, "note": "5 BR STANDALONE, same plan as Ivy, different façade"},
+        {"bedrooms": "4", "name": "Gardenia", "bua_sqft": 3755, "note": "4 BR DETACHED villa: 3 floors with lounge + roof terrace; min plot 6,075 sq ft; from AED 4.62M"},
+        {"bedrooms": "4", "name": "Lotus", "bua_sqft": 3741, "note": "4 BR DETACHED villa, same layout as Gardenia (14 sq ft smaller), different façade"},
+        {"bedrooms": "4", "name": "Marigold", "bua_sqft": 3765, "note": "4 BR SEMI-DETACHED (type SD1): 3 floors, lounge + roof terrace; min plot 6,604 sq ft; from AED 4.44M"},
+        {"bedrooms": "4", "name": "Lily", "bua_sqft": 3750, "note": "4 BR SEMI-DETACHED (type SD2), same layout as Marigold, different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Farm Grove 2",
+      "launch_on": "2024-12-01", "launch_date": "Dec 2024", "handover_date": "Oct 2028 (planned)",
+      "total_units": 290, "usp": "290 villas: 70 × 4 BR standalone, 33 × 5 BR standalone, 48 × 4 BR semi-detached, 139 × 4 BR detached",
+      "payment_plan": "80/20: 10% down payment (Dec 2024), 7 instalments of 10% during construction, 20% on completion (Oct 2028)",
+      "launch_prices": [{"bedrooms": "4", "aed": 4440000, "source": "Emaar factsheet: from AED 4.44M (semi-detached); detached from 4.63M, standalone from 6.77M"}, {"bedrooms": "5", "aed": 7780000}],
+      "layouts": [
+        {"bedrooms": "4", "name": "Willow", "bua_sqft": 5581, "note": "4 BR STANDALONE (V4): 3 floors with lift, family room, roof terrace; min plot 9,602 sq ft; from AED 6.77M"},
+        {"bedrooms": "4", "name": "Lavender", "bua_sqft": 5581, "note": "4 BR STANDALONE, same plan as Willow, different façade"},
+        {"bedrooms": "5", "name": "Ivy", "bua_sqft": 6078, "note": "5 BR STANDALONE (V5): 3 floors with lift; min plot 11,660 sq ft; from AED 7.78M"},
+        {"bedrooms": "5", "name": "Orchid", "bua_sqft": 6078, "note": "5 BR STANDALONE, same plan as Ivy, different façade"},
+        {"bedrooms": "4", "name": "Gardenia", "bua_sqft": 3755, "note": "4 BR DETACHED: 3 floors, lounge + roof terrace; min plot 5,487 sq ft; from AED 4.63M"},
+        {"bedrooms": "4", "name": "Lotus", "bua_sqft": 3741, "note": "4 BR DETACHED, same layout as Gardenia, different façade"},
+        {"bedrooms": "4", "name": "Marigold", "bua_sqft": 3765, "note": "4 BR SEMI-DETACHED (SD1); min plot 5,796 sq ft; from AED 4.44M"},
+        {"bedrooms": "4", "name": "Lily", "bua_sqft": 3750, "note": "4 BR SEMI-DETACHED (SD2), same layout as Marigold, different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Kaia",
+      "launch_on": "2025-01-01", "launch_date": "Jan 2025", "handover_date": "Jul 2028 (planned)",
+      "total_units": 156, "usp": "Three designs: Ava and Vina (6-plex), Luna (8-plex). 112 × 3 BR, 44 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Jan 2025), 7 instalments of 10% during construction, 20% on completion (Jul 2028)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2720000}, {"bedrooms": "4", "aed": 3290000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Ava", "bua_sqft": 2375, "note": "6-plex, 3 BR: suite 1,775 + garage 317 + big terraces 284 sq ft"},
+        {"bedrooms": "3", "name": "Vina", "bua_sqft": 2495, "note": "6-plex, 3 BR: biggest suite (1,827 sq ft) + garage 381 + terraces 287; ~120 sq ft more than Ava"},
+        {"bedrooms": "3", "name": "Luna", "bua_sqft": 2261, "note": "8-plex, 3 BR: suite 1,755 + garage 343 + terraces 162; the smallest 3 BR"},
+        {"bedrooms": "4", "name": "Ava", "bua_min_sqft": 2625, "bua_max_sqft": 2675, "note": "6-plex end unit, 4 BR: suite 2,076 + garage 311 + terraces 238–289"},
+        {"bedrooms": "4", "name": "Vina", "bua_sqft": 2611, "note": "6-plex end unit, 4 BR: suite 2,073 + garage 322 + terraces 216"},
+        {"bedrooms": "4", "name": "Luna", "bua_sqft": 2868, "note": "8-plex end unit, biggest 4 BR: largest suite (2,185 sq ft) and largest garage (510 sq ft)"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Elea",
+      "launch_on": "2025-01-01", "launch_date": "Jan 2025", "handover_date": "Jun 2028 (planned)",
+      "total_units": 128, "usp": "Two styles: Slate and Oakley (4-plex). 64 × 3 BR, 64 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Jan 2025), 7 instalments of 10% during construction, 20% on completion (Jun 2028)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2990000}, {"bedrooms": "4", "aed": 3450000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Slate", "bua_sqft": 2452, "note": "4-plex middle unit, 3 BR: suite 1,982 sq ft; ~8 sq ft more than Oakley"},
+        {"bedrooms": "3", "name": "Oakley", "bua_sqft": 2444, "note": "4-plex middle unit, 3 BR: same suite size as Slate, different façade"},
+        {"bedrooms": "4", "name": "Slate", "bua_min_sqft": 2834, "bua_max_sqft": 2838, "note": "4-plex end unit, 4 BR: bigger suite (2,256–2,317) and larger garage (444–510 sq ft); ~155 sq ft more than Oakley"},
+        {"bedrooms": "4", "name": "Oakley", "bua_sqft": 2681, "note": "4-plex end unit, 4 BR: suite 2,251 sq ft, garage 367"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Elva",
+      "launch_on": "2025-02-01", "launch_date": "Feb 2025", "handover_date": "Oct 2028 (planned)",
+      "total_units": 244, "usp": "Two façades: Ravine and Nash (4-plex). 122 × 3 BR, 122 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Feb 2025), 7 instalments of 10% during construction, 20% on completion (Oct 2028)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2890000}, {"bedrooms": "4", "aed": 3390000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Ravine", "bua_sqft": 2418, "note": "4-plex middle unit, suite 1,984 sq ft. Same plan as Nash, different façade"},
+        {"bedrooms": "3", "name": "Nash", "bua_sqft": 2416, "note": "4-plex middle unit, suite 1,983 sq ft"},
+        {"bedrooms": "4", "name": "Ravine", "bua_min_sqft": 2705, "bua_max_sqft": 2710, "note": "4-plex end unit, suite 2,280 sq ft, garage 363"},
+        {"bedrooms": "4", "name": "Nash", "bua_min_sqft": 2706, "bua_max_sqft": 2711, "note": "4-plex end unit, suite 2,279 sq ft, garage 360"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Velora",
+      "usp": "4-plex townhouses in six façades: Oakley, Ravine, Serene, Nash, Vale, Dale",
+      "layouts": [
+        {"bedrooms": "3", "name": "Oakley", "bua_min_sqft": 2478, "bua_max_sqft": 2479, "note": "Middle unit: suite 1,982 + garage 393 + terrace 103 sq ft"},
+        {"bedrooms": "3", "name": "Ravine", "bua_sqft": 2514, "note": "Middle unit: suite 1,982 + garage 395 + biggest terrace 137 sq ft"},
+        {"bedrooms": "3", "name": "Serene", "bua_sqft": 2514, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "3", "name": "Nash", "bua_min_sqft": 2457, "bua_max_sqft": 2460, "note": "Smallest 3 BR: smaller garage (362 sq ft)"},
+        {"bedrooms": "3", "name": "Vale", "bua_sqft": 2492, "note": "Middle unit: suite 1,983 + garage 395 + terrace 114"},
+        {"bedrooms": "3", "name": "Dale", "bua_sqft": 2492, "note": "Same plan as Vale, different façade"},
+        {"bedrooms": "4", "name": "Oakley", "bua_sqft": 2689, "note": "End unit: suite 2,218 + garage 361 + terrace 111"},
+        {"bedrooms": "4", "name": "Ravine", "bua_sqft": 2732, "note": "End unit: suite 2,219 + garage 396 + terrace 117 (largest 4 BR)"},
+        {"bedrooms": "4", "name": "Serene", "bua_sqft": 2732, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "4", "name": "Nash", "bua_min_sqft": 2695, "bua_max_sqft": 2698, "note": "End unit: smaller garage (362 sq ft)"},
+        {"bedrooms": "4", "name": "Vale", "bua_sqft": 2729, "note": "End unit: suite 2,219 + garage 396 + terrace 115"},
+        {"bedrooms": "4", "name": "Dale", "bua_sqft": 2729, "note": "Same plan as Vale, different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Venera",
+      "usp": "4-plex townhouses in seven façades: Slate, Oakley, Ravine, Serene, Nash, Vale, Dale",
+      "layouts": [
+        {"bedrooms": "3", "name": "Slate", "bua_min_sqft": 2437, "bua_max_sqft": 2452, "note": "Middle unit: suite 1,983 + garage 347–353 + terrace 108–116"},
+        {"bedrooms": "3", "name": "Oakley", "bua_min_sqft": 2478, "bua_max_sqft": 2479, "note": "Middle unit: suite 1,982 + garage 393 + terrace 103"},
+        {"bedrooms": "3", "name": "Ravine", "bua_sqft": 2514, "note": "Largest 3 BR: garage 395 + biggest terrace 137"},
+        {"bedrooms": "3", "name": "Serene", "bua_sqft": 2514, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "3", "name": "Nash", "bua_min_sqft": 2457, "bua_max_sqft": 2460, "note": "Smaller garage (362 sq ft)"},
+        {"bedrooms": "3", "name": "Vale", "bua_sqft": 2492, "note": "Suite 1,983 + garage 395 + terrace 114"},
+        {"bedrooms": "3", "name": "Dale", "bua_sqft": 2492, "note": "Same plan as Vale, different façade"},
+        {"bedrooms": "4", "name": "Slate", "bua_min_sqft": 2660, "bua_max_sqft": 2719, "note": "End unit: biggest suite (2,221–2,284 sq ft), smaller garage (330)"},
+        {"bedrooms": "4", "name": "Oakley", "bua_sqft": 2689, "note": "End unit: suite 2,218 + garage 361 + terrace 111"},
+        {"bedrooms": "4", "name": "Ravine", "bua_sqft": 2732, "note": "End unit: suite 2,219 + garage 396 + terrace 117 (largest 4 BR)"},
+        {"bedrooms": "4", "name": "Serene", "bua_sqft": 2732, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "4", "name": "Nash", "bua_min_sqft": 2695, "bua_max_sqft": 2698, "note": "End unit: smaller garage (362 sq ft)"},
+        {"bedrooms": "4", "name": "Vale", "bua_sqft": 2729, "note": "End unit: suite 2,219 + garage 396 + terrace 115"},
+        {"bedrooms": "4", "name": "Dale", "bua_sqft": 2729, "note": "Same plan as Vale, different façade"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Velora 2",
+      "launch_on": "2024-10-01", "launch_date": "Oct 2024", "handover_date": "Jul 2028 (planned)",
+      "total_units": 312, "usp": "Three façades: Ravine, Serene and Nash. 156 × 3 BR, 156 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Oct 2024), 7 instalments of 10% during construction, 20% on completion (Jul 2028)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2930000}, {"bedrooms": "4", "aed": 3370000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Ravine", "bua_sqft": 2514, "note": "Middle unit: suite 1,982 + garage 395 + biggest terrace 137 sq ft"},
+        {"bedrooms": "3", "name": "Serene", "bua_sqft": 2514, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "3", "name": "Nash", "bua_min_sqft": 2457, "bua_max_sqft": 2460, "note": "~55 sq ft smaller: smaller garage (362) and terrace (113–116)"},
+        {"bedrooms": "4", "name": "Ravine", "bua_sqft": 2732, "note": "End unit: suite 2,219 + garage 396 + terrace 117"},
+        {"bedrooms": "4", "name": "Serene", "bua_sqft": 2732, "note": "Same plan as Ravine, different façade"},
+        {"bedrooms": "4", "name": "Nash", "bua_min_sqft": 2695, "bua_max_sqft": 2698, "note": "~35 sq ft smaller: garage 362"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Rivera",
+      "launch_on": "2025-04-01", "launch_date": "Apr 2025", "handover_date": "Jun 2029 (planned)",
+      "total_units": 378, "usp": "378 × 4 BR semi-detached villas, three façade options",
+      "payment_plan": "80/20: 10% down payment (Apr 2025), 7 instalments of 10% during construction, 20% on completion (Jun 2029)",
+      "launch_prices": [{"bedrooms": "4", "aed": 4780000}],
+      "layouts": [
+        {"bedrooms": "4", "name": "Semi-detached", "bua_sqft": 3714, "note": "One 4 BR plan over 3 floors (second-floor lounge + terrace), maid's room, guest bedroom; three façades. Min plot 3,688 sq ft"}
+      ]
+    },
+    {
+      "community": "The Valley", "name": "Vindera",
+      "launch_on": "2025-09-01", "launch_date": "Sep 2025", "handover_date": "Dec 2029 (planned)",
+      "total_units": 578, "usp": "578 townhouses with park views: 352 × 3 BR, 226 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Sep 2025), 7 instalments of 10% during construction, 20% on completion (Dec 2029)",
+      "launch_prices": [{"bedrooms": "3", "aed": 3070000}, {"bedrooms": "4", "aed": 4140000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Middle unit", "bua_min_sqft": 2396, "bua_max_sqft": 2406, "note": "Suite 1,809 + large garage 484–486 + terrace 102–109 sq ft; maid's room, walk-in. Min plot 1,617"},
+        {"bedrooms": "4", "name": "End unit", "bua_min_sqft": 2907, "bua_max_sqft": 2923, "note": "Suite 2,410 + garage 377 + terrace 120–136; guest bedroom, maid's room, storage. Min plot 2,588"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Anya",
+      "launch_on": "2023-01-01", "launch_date": "Jan 2023", "handover_date": "Oct 2026 (planned)",
+      "total_units": 492, "usp": "Three styles: Modern, Classic, Contemporary. 338 × 3 BR, 154 × 4 BR",
+      "payment_plan": "80/20: 10% down payment (Jan 2023), 7 instalments of 10% during construction, 20% on completion (Oct 2026)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2010000}, {"bedrooms": "4", "aed": 2580000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Modern", "bua_sqft": 1908, "note": "Average 3 BR BUA 1,908 sq ft; carport, den, maid's room. The three styles share one plan per bedroom type"},
+        {"bedrooms": "3", "name": "Classic", "bua_sqft": 1908, "note": "Same plan as Modern, classic façade"},
+        {"bedrooms": "3", "name": "Contemporary", "bua_sqft": 1908, "note": "Same plan as Modern, contemporary façade"},
+        {"bedrooms": "4", "name": "Modern", "bua_sqft": 2341, "note": "Average 4 BR BUA 2,341 sq ft; guest bedroom, den, maid's room"},
+        {"bedrooms": "4", "name": "Classic", "bua_sqft": 2341, "note": "Same plan as Modern, classic façade"},
+        {"bedrooms": "4", "name": "Contemporary", "bua_sqft": 2341, "note": "Same plan as Modern, contemporary façade"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Anya 2",
+      "launch_on": "2023-03-01", "launch_date": "Mar 2023", "handover_date": "Dec 2026 (planned)",
+      "total_units": 362, "usp": "234 × 3 BR, 128 × 4 BR townhouses, covered parking",
+      "payment_plan": "90/10: 10% down payment (Mar 2023), 7 instalments during construction (10%, 10%, 10%, 15%, 15%, 10%, 10%), 10% on completion (Dec 2026)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2260000}, {"bedrooms": "4", "aed": 2930000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Townhouse", "bua_sqft": 1979, "note": "Average 3 BR BUA 1,979 sq ft, average plot 1,600 (factsheet)"},
+        {"bedrooms": "4", "name": "Townhouse", "bua_sqft": 2429, "note": "Average 4 BR BUA 2,429 sq ft, average plot 3,075"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "May",
+      "launch_on": "2023-05-01", "launch_date": "May 2023", "handover_date": "Sep 2027 (planned)",
+      "total_units": 298, "usp": "Two styles: Aria and Iris. 206 × 3 BR, 92 × 4 BR",
+      "payment_plan": "90/10: 10% down payment (May 2023), 7 instalments during construction (10%, 10%, 10%, 15%, 15%, 10%, 10%), 10% on completion (Sep 2027)",
+      "launch_prices": [{"bedrooms": "3", "aed": 2400000}, {"bedrooms": "4", "aed": 3100000}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Aria", "bua_sqft": 2010, "note": "Average 3 BR BUA 2,010 sq ft; carport, den, maid's room, walk-in"},
+        {"bedrooms": "3", "name": "Iris", "bua_sqft": 2010, "note": "Same size as Aria; different façade"},
+        {"bedrooms": "4", "name": "Aria", "bua_sqft": 2457, "note": "Average 4 BR BUA 2,457 sq ft"},
+        {"bedrooms": "4", "name": "Iris", "bua_sqft": 2457, "note": "Same size as Aria; different façade"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Raya",
+      "launch_on": "2022-10-01", "launch_date": "Oct 2022", "handover_date": "Jul 2026 (planned)",
+      "usp": "Two styles: Modern and Classic. 3 & 4 BR townhouses, covered parking",
+      "payment_plan": "80/20: 8 instalments of 10% (Oct 2022 – Nov 2025), 20% on completion (Jul 2026)",
+      "launch_prices": [{"bedrooms": "3", "aed": 1950888}, {"bedrooms": "4", "aed": 2539888}],
+      "layouts": [
+        {"bedrooms": "3", "name": "Modern", "bua_min_sqft": 1877, "bua_max_sqft": 1994, "note": "3 BR 1,877–1,994 sq ft (end units larger). Modern and Classic share sizes"},
+        {"bedrooms": "3", "name": "Classic", "bua_min_sqft": 1877, "bua_max_sqft": 1994, "note": "Same plans as Modern, classic façade"},
+        {"bedrooms": "4", "name": "Modern", "bua_min_sqft": 2347, "bua_max_sqft": 2354, "note": "4 BR 2,347–2,354 sq ft"},
+        {"bedrooms": "4", "name": "Classic", "bua_min_sqft": 2347, "bua_max_sqft": 2354, "note": "Same plans as Modern, classic façade"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Ruba",
+      "usp": "Three collections: Siraj, Atheer and Manar (3 & 4 BR townhouses)",
+      "layouts": [
+        {"bedrooms": "3", "name": "Siraj", "bua_min_sqft": 2039, "bua_max_sqft": 2088, "note": "3 BR 2,039–2,088 sq ft; larger version in 5/6/8-plex rows"},
+        {"bedrooms": "3", "name": "Atheer", "bua_min_sqft": 2023, "bua_max_sqft": 2086, "note": "Smallest 3 BR from 2,023 sq ft"},
+        {"bedrooms": "3", "name": "Manar", "bua_min_sqft": 2038, "bua_max_sqft": 2086, "note": "3 BR 2,038–2,086 sq ft"},
+        {"bedrooms": "4", "name": "Siraj", "bua_sqft": 2508, "note": "Biggest 4 BR end unit, 2,508 sq ft (+104 vs Atheer)"},
+        {"bedrooms": "4", "name": "Atheer", "bua_sqft": 2404, "note": "Smallest 4 BR end unit, 2,404 sq ft"},
+        {"bedrooms": "4", "name": "Manar", "bua_sqft": 2483, "note": "4 BR end unit, 2,483 sq ft"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Bliss",
+      "usp": "Two styles: Amber and Ivory. 3 BR duplex, 4 BR duplex and 4 BR triplex",
+      "payment_plan": "70/30, 30% over 2 years after completion (launch offer)",
+      "layouts": [
+        {"bedrooms": "3", "name": "Amber", "bua_min_sqft": 2172, "bua_max_sqft": 2243, "note": "3 BR duplex, carport, maid's room; some units with roof"},
+        {"bedrooms": "3", "name": "Ivory", "bua_min_sqft": 2179, "bua_max_sqft": 2281, "note": "3 BR duplex, ~40 sq ft bigger than Amber in the larger units"},
+        {"bedrooms": "4", "name": "Amber Duplex", "bua_min_sqft": 2880, "bua_max_sqft": 3243, "note": "4 BR on 2 floors, courtyard; end unit (3,243 sq ft) adds walk-in"},
+        {"bedrooms": "4", "name": "Amber Triplex", "bua_min_sqft": 2933, "bua_max_sqft": 2979, "note": "4 BR on 3 floors (Type A) with courtyard, guest bedroom and roof terrace"},
+        {"bedrooms": "4", "name": "Ivory Duplex", "bua_min_sqft": 2861, "bua_max_sqft": 3193, "note": "4 BR on 2 floors, courtyard; end unit 3,193 sq ft"},
+        {"bedrooms": "4", "name": "Ivory Triplex", "bua_min_sqft": 3071, "bua_max_sqft": 3099, "note": "4 BR on 3 floors (Type B), biggest triplex (+130 sq ft vs Amber)"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Bliss 2",
+      "usp": "Two styles: Modern and Classic. 3 BR duplex, 4 BR duplex and 4 BR triplex",
+      "payment_plan": "75/25: 25% on completion (launch offer)",
+      "layouts": [
+        {"bedrooms": "3", "name": "Modern Duplex", "bua_min_sqft": 2201, "bua_max_sqft": 2356, "note": "3 BR on 2 floors, carport, maid's room; end units up to 2,356 sq ft"},
+        {"bedrooms": "3", "name": "Classic Duplex", "bua_min_sqft": 2175, "bua_max_sqft": 2293, "note": "3 BR on 2 floors, slightly smaller than Modern"},
+        {"bedrooms": "4", "name": "Modern Duplex", "bua_min_sqft": 2882, "bua_max_sqft": 3420, "note": "4 BR on 2 floors with courtyard; end unit 3,420 sq ft adds guest bedroom and walk-in"},
+        {"bedrooms": "4", "name": "Classic Duplex", "bua_min_sqft": 2959, "bua_max_sqft": 3250, "note": "4 BR on 2 floors with courtyard; end unit 3,250 sq ft"},
+        {"bedrooms": "4", "name": "Modern Triplex", "bua_min_sqft": 3003, "bua_max_sqft": 3059, "note": "4 BR on 3 floors with courtyard, guest bedroom and roof terrace"},
+        {"bedrooms": "4", "name": "Classic Triplex", "bua_min_sqft": 2907, "bua_max_sqft": 2961, "note": "4 BR on 3 floors, ~100 sq ft smaller than Modern triplex"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Caya",
+      "usp": "Standalone 3, 4 & 5 BR villas with roof access, near Central Park",
+      "payment_plan": "70/30, 30% over 2 years after handover (launch offer)",
+      "layouts": [
+        {"bedrooms": "3", "name": "Type E1M", "bua_sqft": 3534, "note": "3 BR standalone on 3 floors with roof terrace, maid's room"},
+        {"bedrooms": "4", "name": "Type E3M", "bua_min_sqft": 4097, "bua_max_sqft": 4440, "note": "4 BR standalone, 2 versions (4,097 and 4,440 sq ft); family room, roof terrace"},
+        {"bedrooms": "5", "name": "Type E5M", "bua_sqft": 5484, "note": "5 BR standalone, family room + lounge, roof terrace"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Caya II",
+      "usp": "Standalone 3, 4 & 5 BR villas with rooftop and garden terraces",
+      "payment_plan": "70/30, 30% over 2 years after completion (launch offer)",
+      "layouts": [
+        {"bedrooms": "4", "name": "Type E3M", "bua_min_sqft": 4097, "bua_max_sqft": 4440, "note": "4 BR standalone, 2 versions (4,097 and 4,440 sq ft); family room, roof terrace"},
+        {"bedrooms": "5", "name": "Type E5M", "bua_sqft": 5484, "note": "5 BR standalone, family room + lounge, roof terrace"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Elie Saab",
+      "usp": "4 & 5 BR standalone villas, interiors by Elie Saab, covered roof lounge",
+      "payment_plan": "70/30: 70% during construction, 30% on handover",
+      "layouts": [
+        {"bedrooms": "4", "name": "Type A", "bua_sqft": 4128, "note": "4 BR on 3 floors, family room, roof lounge"},
+        {"bedrooms": "4", "name": "Type B", "bua_sqft": 4143, "note": "Biggest 4 BR, 4,143 sq ft"},
+        {"bedrooms": "4", "name": "Type C", "bua_sqft": 4133, "note": "4 BR, 4,133 sq ft"},
+        {"bedrooms": "5", "name": "Type A", "bua_sqft": 4987, "note": "5 BR on 3 floors, 4,987 sq ft"},
+        {"bedrooms": "5", "name": "Type B", "bua_sqft": 5066, "note": "Bigger 5 BR, +79 sq ft"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Spring",
+      "usp": "3 & 4 BR townhouses (Type 6) in 4, 5, 6 and 8-plex rows",
+      "layouts": [
+        {"bedrooms": "3", "name": "Type 6", "bua_min_sqft": 1941, "bua_max_sqft": 1943, "note": "Middle units, ~1,942 sq ft, maid's room"},
+        {"bedrooms": "4", "name": "Type 6", "bua_sqft": 2584, "note": "End units, 2,584 sq ft, guest bedroom + maid's room"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Sun",
+      "usp": "3 BR middle townhouses; 4 BR end units in two types",
+      "layouts": [
+        {"bedrooms": "3", "name": "Middle unit", "note": "3 BR townhouse (middle of row)"},
+        {"bedrooms": "4", "name": "Type 1 (end)", "note": "4 BR end unit, plan type 1"},
+        {"bedrooms": "4", "name": "Type 2 (end)", "note": "4 BR end unit, plan type 2"}
+      ]
+    },
+    {
+      "community": "Arabian Ranches 3", "name": "Joy",
+      "usp": "3 BR middle townhouses in two types; 4 BR in three types",
+      "layouts": [
+        {"bedrooms": "3", "name": "Type 1 (middle)", "note": "3 BR middle unit, plan type 1"},
+        {"bedrooms": "3", "name": "Type 2 (middle)", "note": "3 BR middle unit, plan type 2"},
+        {"bedrooms": "4", "name": "Type 1", "note": "4 BR plan type 1"},
+        {"bedrooms": "4", "name": "Type 3", "note": "4 BR plan type 3"},
+        {"bedrooms": "4", "name": "Type 5", "note": "4 BR plan type 5"}
+      ]
+    }
+  ]
+}
