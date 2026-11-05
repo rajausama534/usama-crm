@@ -45,6 +45,11 @@
     /Reference\s*(?:No\.?|Number)?\s*[:#]?\s*([A-Z0-9_-]{3,})/i,
     /Property\s*Reference\s*[:#]?\s*([A-Z0-9_-]{3,})/i
   ]);
+  const breadcrumbs = () => {
+    const nodes = document.querySelectorAll('[aria-label*="breadcrumb" i] a, [aria-label*="breadcrumb" i] span, [class*="breadcrumb" i] a, [data-testid*="breadcrumb" i] a');
+    const names = [...nodes].map(n => clean(n.textContent)).filter(n => n && n.length < 60 && !/^(home|dubai|uae|properties|for sale|for rent)$/i.test(n));
+    return [...new Set(names)].slice(0, 8);
+  };
   const extract = () => {
     const ld = findJsonLd();
     const body = text();
@@ -82,7 +87,8 @@
       price: number(priceText),
       agency,
       broker,
-      pageTextSample: body.slice(0, 5000)
+      locationNames: breadcrumbs(),
+      pageText: body.slice(0, 20000)
     };
   };
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

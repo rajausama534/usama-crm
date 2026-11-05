@@ -38,5 +38,5 @@ document.getElementById('extract').addEventListener('click', async () => {
 openBtn.addEventListener('click', async () => {
   if (!extracted) return;
   const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(extracted)))));
-  await chrome.tabs.create({ url: `https://usama-crm.vercel.app/unit-finder.html#extension=${encoded}` });
+  await chrome.tabs.create({ url: `https://www.usamabinnusrat.com/unit-finder#extension=${encoded}` });
 });

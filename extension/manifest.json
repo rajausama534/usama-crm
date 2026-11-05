@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Usama CRM Helper",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Send listing details (Bayut, Dubizzle, Property Finder) and DXBinteract sales to Usama CRM.",
   "permissions": [
     "activeTab",
@@ -13,6 +13,7 @@
     "https://dubai.dubizzle.com/*",
     "https://www.propertyfinder.ae/*",
     "https://usama-crm.vercel.app/*",
+    "https://www.usamabinnusrat.com/*",
     "https://dxbinteract.com/*"
   ],
   "action": {
