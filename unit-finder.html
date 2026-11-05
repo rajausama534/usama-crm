@@ -229,8 +229,10 @@ function scoreUnits(d,units,primaryCluster){
   for(const r of res){
    let best=null;
    for(const x of r.u.sizes){const diff=Math.abs(Math.round(x.v)-s.sqft);if(diff===0){best={kind:'exact',x};break}if(!best&&diff<=Math.max(3,s.sqft*0.004))best={kind:'close',x}}
+   if(best&&(r.used||(r.used=new Set())).has(best.x))best=null; // one unit size counts once
    if(best?.kind==='exact')exact.push([r,best.x]);else if(best)close.push([r,best.x]);
   }
+  for(const [r,x] of [...exact,...close])r.used.add(x);
   for(const [r,x] of exact){const k=exact.length;r.score+=w*(30+40/k);r.evidence=true;if(k<=3)r.strong=true;
    r.reasons.push(`${x.label} ${fmt(Math.round(x.v))} sqft matches the listing's ${fmt(s.sqft)} sqft exactly${k===1?' (no other unit has this size)':` (${k} units share this size)`}`)}
   for(const [r,x] of close){const k=close.length;r.score+=w*(8+20/k);r.evidence=true;
