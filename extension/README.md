@@ -20,6 +20,14 @@
 
 The extension reads the listing page already open in your browser, which avoids normal server-side CORS and anti-bot blocks. It does not bypass portal login controls and only reads content available in the currently opened page.
 
+## Paste a Bayut / Dubizzle link in the Unit Finder (v1.4)
+
+Bayut and Dubizzle don't let the CRM server read listings. With this extension installed (and reloaded after
+updating), pasting such a link in the Unit Finder and pressing **Analyse Listing** makes the extension open the
+listing in a background tab of your own Chrome, read it like a normal visit, close the tab and hand the details to
+the page, which then matches the unit. If a portal shows a "security check", open the listing once yourself, then
+try again.
+
 ## DXBinteract sales → CRM
 
 1. Reload the extension in `chrome://extensions` after updating (click the circular arrow on its card).

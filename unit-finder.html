@@ -66,7 +66,7 @@ html body .error{color:#ef4444!important}
 <main class="wrap">
 <section class="hero"><h1>Find the unit behind a listing</h1><p>Paste a Bayut, Dubizzle or Property Finder link. The CRM reads the listing and matches it against its own unit sizes, sales and owners. Confirm the unit once and it is remembered.</p></section>
 <section class="search"><input id="url" placeholder="Bayut, Dubizzle or Property Finder listing link" autocomplete="off"><button id="analyse" class="primary">Analyse Listing</button></section>
-<div id="status" class="status">Property Finder links are read directly. Bayut and Dubizzle block automatic reading, so for those use the Chrome extension or <button class="linkBtn" type="button" onclick="showPaste()">paste the listing page text</button>.</div>
+<div id="status" class="status">Paste any Bayut, Dubizzle or Property Finder link. Bayut and Dubizzle links are opened through the Usama CRM Helper Chrome extension (v1.4). Without it, <button class="linkBtn" type="button" onclick="showPaste()">paste the listing page text</button>.</div>
 <section id="paste" class="paste">
  <p>Open the listing in your browser, press <b>Cmd+A</b> then <b>Cmd+C</b>, and paste everything here. Keep the link above filled in if you have it.</p>
  <textarea id="pasteText" placeholder="Paste the listing page text here"></textarea>
@@ -270,7 +270,7 @@ async function runMatch(d){
  try{
   if(!(d.sizes||[]).length&&!(d.unitHints||[]).length){
    $('cands').innerHTML='';
-   note.textContent=d.blocked?'The listing details are needed to match a unit. Use the Chrome extension on the listing page, or paste the page text above.':'The listing shows no size and no unit number, so it can\'t be matched to a unit.';
+   note.textContent=d.blocked?(d.note||'The listing details are needed to match a unit. Paste the listing page text above.'):'The listing shows no size and no unit number, so it can\'t be matched to a unit.';
    note.style.display='block';$('matchBadge').textContent='NOT ENOUGH DATA';if(d.blocked)showPaste();return}
   const cat=await loadCatalog();
   const where=resolveClusters(d,cat);
@@ -296,6 +296,24 @@ async function runMatch(d){
 }
 $('cands').addEventListener('click',e=>{const b=e.target.closest('.useBtn');if(!b)return;const r=lastCands[+b.dataset.i];if(!r)return;$('mapUnit').value=r.u.unit;$('mapCluster').value=r.u.cluster;saveMapping(r.u.community)});
 
+/* ---------- Chrome extension (reads Bayut / Dubizzle links in your own browser) ---------- */
+const extVersion=()=>document.documentElement.dataset.usamaExt||null;
+const extCanRead=()=>{const v=extVersion();if(!v)return false;const [a,b]=v.split('.').map(Number);return a>1||(a===1&&b>=4)};
+function readViaExtension(url){
+ return new Promise((resolve,reject)=>{
+  const id=Math.random().toString(36).slice(2);
+  const timer=setTimeout(()=>{window.removeEventListener('message',on);reject(new Error('The extension took too long to read the listing.'))},60000);
+  function on(e){const m=e.data;if(e.source!==window||!m||m.source!=='usama-ext'||m.type!=='READ_RESULT'||m.id!==id)return;
+   clearTimeout(timer);window.removeEventListener('message',on);m.ok?resolve(m.data):reject(new Error(m.error||'The extension could not read the listing.'))}
+  window.addEventListener('message',on);
+  window.postMessage({source:'usama-crm',type:'READ_LINK',url,id},location.origin);
+ });
+}
+function extensionPayloadToForm(data){
+ $('pasteText').value=data.pageText||data.pageTextSample||'';
+ return {platform:data.platform,listingId:data.listingId,permitNumber:data.permitNumber,referenceNumber:data.referenceNumber,title:data.title,bedrooms:data.bedrooms,bathrooms:data.bathrooms,price:data.price,agency:data.agency,broker:data.broker,locationNames:data.locationNames||[],locationText:data.locationText||data.area||null};
+}
+
 /* ---------- flow ---------- */
 async function readListing(url,text){
  const r=await fetch('/api/unit-finder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,text})});
@@ -308,6 +326,17 @@ async function analyse(){
  btn.disabled=true;btn.textContent='Reading…';setStatus('Reading the listing…');$('result').classList.remove('show');$('matchBox').classList.remove('show');
  try{
   const d=await readListing(url);
+  if(d.blocked&&!d.removed&&extCanRead()){
+   setStatus(`${esc(d.platform)} doesn't let the CRM server read listings, so your Chrome extension is opening it in a background tab…`);
+   btn.textContent='Opening listing…';
+   try{
+    const data=await readViaExtension(url);
+    await analysePasted(extensionPayloadToForm(data),'Listing read by your Chrome extension');
+    return;
+   }catch(e){d.note=`The extension couldn't read it: ${e.message} Open the listing once in Chrome, then try again, or paste the page text below.`}
+  }else if(d.blocked&&!d.removed){
+   d.note=`${d.platform} doesn't let the CRM server read listings. ${extVersion()?'Reload the Usama CRM Helper extension (needs version 1.4) in chrome://extensions':'Install the Usama CRM Helper extension (version 1.4)'} and links will be read automatically. For now, copy the listing page (Cmd+A, Cmd+C) and paste it below.`;
+  }
   renderListing(d);
   if(d.blocked){setStatus((savedFor(d)?'Saved unit mapping loaded. ':'')+esc(d.note||'The portal blocked automatic reading.'));showPaste()}
   else{setStatus(d.removed?esc(d.note):'Listing read. Matching against CRM units…');$('paste').classList.remove('show')}
@@ -316,7 +345,7 @@ async function analyse(){
  }catch(e){setStatus(esc(e.message),true)}
  finally{btn.disabled=false;btn.textContent='Analyse Listing'}
 }
-async function analysePasted(extra){
+async function analysePasted(extra,doneLabel){
  const text=$('pasteText').value.trim();const url=$('url').value.trim();
  if(text.length<40){setStatus('Paste the listing page text first.',true);showPaste();return}
  const btn=$('pasteGo');btn.disabled=true;btn.textContent='Reading…';
@@ -324,8 +353,8 @@ async function analysePasted(extra){
   const d=await readListing(url,text);
   if(!d.listingId&&url)d.listingId=idFromUrl(url);
   if(extra)for(const k of Object.keys(extra))if(extra[k]!=null&&(d[k]==null||d[k]===''||(Array.isArray(d[k])&&!d[k].length)))d[k]=extra[k];
-  renderListing(d);setStatus('Listing text read. Matching against CRM units…');
-  await runMatch(d);setStatus('Listing text read and matched against CRM units.');
+  renderListing(d);setStatus((doneLabel||'Listing text read')+'. Matching against CRM units…');
+  await runMatch(d);setStatus((doneLabel||'Listing text read')+' and matched against CRM units.');$('paste').classList.remove('show');
  }catch(e){setStatus(esc(e.message),true)}
  finally{btn.disabled=false;btn.textContent='Read pasted listing'}
 }
@@ -350,10 +379,8 @@ function loadExtensionPayload(){
   const data=JSON.parse(decodeURIComponent(escape(atob(raw))));
   history.replaceState(null,'',location.pathname);
   $('url').value=data.url||'';
-  $('pasteText').value=data.pageText||data.pageTextSample||'';
-  const extra={platform:data.platform,listingId:data.listingId,permitNumber:data.permitNumber,referenceNumber:data.referenceNumber,title:data.title,bedrooms:data.bedrooms,bathrooms:data.bathrooms,price:data.price,agency:data.agency,broker:data.broker,locationNames:data.locationNames||[],locationText:data.locationText||data.area||null};
   setStatus('Listing imported from the Chrome extension.');
-  analysePasted(extra);
+  analysePasted(extensionPayloadToForm(data),'Listing imported from the Chrome extension');
  }catch(error){setStatus('Could not read extension data: '+esc(error.message),true)}
 }
 loadExtensionPayload();
