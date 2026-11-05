@@ -12,9 +12,9 @@
     // existing Alana sale notes and attached one wrong sale to every Alana villa.
     // rivana-transactions.js is retired: sale notes now use one format (20261024100000_sale_note_format.sql).
     'owner-related-rows.js?v=20261020-ui1',
-    'crm-upgrade.js?v=20261102',
+    'crm-upgrade.js?v=20261105',
     'crm-calendar.js?v=20261028',
-    'crm-workspace.js?v=20261104b',
+    'crm-workspace.js?v=20261105',
     'crm-dxb.js?v=20261020b',
     'crm-broadcast.js?v=20261020',
     'crm-status-system.js?v=2',
@@ -22,7 +22,7 @@
     'lead-contacted-hotfix.js?v=2',
     'crm-breakdown-doc.js?v=2',
     'crm-breakdown.js?v=3',
-    'crm-cluster-data.js?v=3'
+    'crm-cluster-data.js?v=4'
   ];
   const load=src=>new Promise(resolve=>{
     const s=document.createElement('script');

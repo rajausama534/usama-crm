@@ -82,7 +82,7 @@
   const udKey=r=>[r.community,r.cluster,r.unit].map(v=>String(v??'')).join('|');
   const udCache=new Map(),coCache=new Map();
   const sq=v=>v?Math.round(v).toLocaleString('en-US'):'';
-  const price=v=>v>=1e6?(Math.round(v/1e4)/100).toString()+'M':v>=1e3?Math.round(v/1e3)+'K':String(v||'');
+  const price=v=>v>=1e6?(Math.floor(v/1e3)/1e3).toString()+'M':v>=1e3?Math.floor(v/1e3)+'K':String(v||''); // cut, not rounded: 5,097,888 -> 5.097M
   async function fillUnitDetails(){
     const spans=[...document.querySelectorAll('.crmUD:not([data-done])')];if(!spans.length)return;
     const want=[...new Set(spans.map(s=>s.dataset.ud))].filter(k=>!udCache.has(k));

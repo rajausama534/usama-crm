@@ -10,7 +10,7 @@
   const toast=(m,err)=>{const t=document.createElement('div');t.className='crmToast'+(err?' crmToastError':'');t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),4200);};
   const LAST_KEY='crm_cluster_data_last';
   const num=v=>v?Math.round(v).toLocaleString('en-US'):'';
-  const price=v=>!v?'':v>=1e6?(Math.round(v/1e4)/100)+'M':Math.round(v/1e3)+'K';
+  const price=v=>!v?'':v>=1e6?(Math.floor(v/1e3)/1e3)+'M':Math.floor(v/1e3)+'K'; // cut, not rounded: 5,097,888 -> 5.097M
   const day=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
   const natural=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:'base'});
   const fetchAll=async build=>{const out=[];for(let f=0;;f+=1000){const {data,error}=await build().range(f,f+999);if(error)throw error;out.push(...data);if(data.length<1000)break;}return out;};

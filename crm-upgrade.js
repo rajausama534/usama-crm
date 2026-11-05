@@ -414,7 +414,7 @@
   }
 
   // ------------------------------------------------------------------ owner profile: transactions + ownership history
-  const money=n=>{const v=Number(n);return v>=1e6?`AED ${String(Number((v/1e6).toFixed(2)))}M`:`AED ${fmt(v)}`;};
+  const money=n=>{const v=Number(n);return v>=1e6?`AED ${Math.floor(v/1e3)/1e3}M`:`AED ${fmt(v)}`;};
   const longDate=d=>new Date(d+(String(d).length===10?'T00:00:00':'')).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   async function enrichProfile(row){
     const left=document.querySelector('#profileContent .u6DetailLeft');
