@@ -35,9 +35,9 @@ export default function LoginPage() {
     <main className="min-h-dvh grid place-items-center px-4 py-10">
       <div className="w-full max-w-sm animate-in">
         <div className="flex items-center gap-2.5 mb-8">
-          <div className="size-9 rounded-xl bg-accent text-white grid place-items-center shadow-card"><Building2 size={18} /></div>
+          <div className="size-10 rounded-xl bg-sidebar text-gold grid place-items-center shadow-card"><Building2 size={19} /></div>
           <div>
-            <div className="font-semibold text-ink leading-tight">Usama Real Estate</div>
+            <div className="font-display text-lg font-medium text-ink leading-tight">Usama Real Estate</div>
             <div className="text-xs text-ink-3">Company system</div>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function LoginPage() {
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
-            <h1 className="text-xl font-semibold tracking-tight text-ink">Sign in</h1>
+            <h1 className="font-display text-[28px] font-medium tracking-tight text-ink">Welcome back</h1>
             <Field label="Email">
               <Input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
             </Field>

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Building2, Search, Moon, Sun, LogOut, Menu, LayoutDashboard, Users2, Home, CalendarDays, Monitor } from "lucide-react";
 import { useAuth, useTheme } from "@/components/Providers";
-import { Avatar, cx } from "@/components/ui";
+import { cx } from "@/components/ui";
 import { ROLE_LABEL } from "@/lib/access";
 import { visibleNav } from "./nav";
 import { CommandPalette } from "./CommandPalette";
@@ -29,38 +29,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!ready || !me) {
-    return <div className="min-h-dvh grid place-items-center"><div className="size-8 rounded-xl bg-accent/80 animate-pulse" /></div>;
+    return <div className="min-h-dvh grid place-items-center"><div className="size-8 rounded-xl bg-gold/70 animate-pulse" /></div>;
   }
 
   const sidebar = (
     <nav className="flex h-full flex-col">
-      <div className="flex items-center gap-2.5 px-4 h-14 shrink-0">
-        <div className="size-7 rounded-lg bg-accent text-white grid place-items-center"><Building2 size={15} /></div>
-        <div className="font-semibold text-[15px] text-ink tracking-tight">Usama Real Estate</div>
+      <div className="flex items-center gap-2.5 px-5 h-16 shrink-0">
+        <div className="size-8 rounded-lg bg-sidebar-2 text-gold grid place-items-center ring-1 ring-gold/30"><Building2 size={16} /></div>
+        <div className="leading-tight">
+          <div className="font-display text-[17px] font-medium text-sidebar-active tracking-tight">Usama Real Estate</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-gold/80">Company system</div>
+        </div>
       </div>
       <div className="px-3 pb-2">
         <button onClick={() => setPaletteOpen(true)}
-          className="flex w-full items-center gap-2 h-8 px-2.5 rounded-lg border border-line bg-surface text-sm text-ink-3 hover:border-line-strong transition-colors">
+          className="flex w-full items-center gap-2 h-9 px-3 rounded-lg bg-white/[0.06] text-sm text-sidebar-muted hover:bg-white/10 transition-colors">
           <Search size={14} /> <span className="flex-1 text-left">Search</span>
-          <kbd className="text-[11px] font-medium text-ink-3">⌘K</kbd>
+          <kbd className="text-[11px] font-medium text-sidebar-muted">⌘K</kbd>
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-1 space-y-5">
         {visibleNav(me).map((section, i) => (
           <div key={i}>
-            {section.title && <div className="px-2.5 mb-1 text-[11px] font-semibold uppercase tracking-wider text-ink-3">{section.title}</div>}
+            {section.title && <div className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-muted">{section.title}</div>}
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                 return (
                   <Link key={item.href} href={item.href} prefetch
                     className={cx(
-                      "flex items-center gap-2.5 h-8 px-2.5 rounded-lg text-sm transition-colors",
-                      active ? "bg-surface text-ink font-medium shadow-card border border-line" : "text-ink-2 hover:text-ink hover:bg-surface-2 border border-transparent",
+                      "relative flex items-center gap-2.5 h-9 px-3 rounded-lg text-sm transition-colors",
+                      active ? "bg-sidebar-2 text-sidebar-active font-medium" : "text-sidebar-text hover:text-sidebar-active hover:bg-white/[0.05]",
                     )}>
-                    <item.icon size={16} className={active ? "text-accent" : "text-ink-3"} />
+                    {active && <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-gold" />}
+                    <item.icon size={16} className={active ? "text-gold" : "text-sidebar-muted"} />
                     <span className="flex-1">{item.label}</span>
-                    {item.soon && <span className="text-[10px] font-medium text-ink-3">Soon</span>}
+                    {item.soon && <span className="text-[10px] font-medium text-sidebar-muted">Soon</span>}
                   </Link>
                 );
               })}
@@ -75,17 +79,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block fixed inset-y-0 left-0 w-60 border-r border-line bg-bg">{sidebar}</aside>
+      <aside className="hidden lg:block fixed inset-y-0 left-0 w-64 bg-sidebar">{sidebar}</aside>
 
       {/* Phone/tablet drawer */}
       {drawer && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/30" onClick={() => setDrawer(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 bg-bg border-r border-line animate-in">{sidebar}</aside>
+          <aside className="absolute inset-y-0 left-0 w-72 bg-sidebar animate-in">{sidebar}</aside>
         </div>
       )}
 
-      <div className="lg:pl-60">
+      <div className="lg:pl-64">
         <header className="sticky top-0 z-30 h-14 flex items-center gap-2 px-4 sm:px-6 border-b border-line bg-bg/85 backdrop-blur-md">
           <button className="lg:hidden p-1.5 -ml-1.5 rounded-md text-ink-2 hover:bg-surface-2" onClick={() => setDrawer(true)} aria-label="Menu"><Menu size={20} /></button>
           <button onClick={() => setPaletteOpen(true)} className="lg:hidden p-1.5 rounded-md text-ink-2 hover:bg-surface-2" aria-label="Search"><Search size={18} /></button>
@@ -127,14 +131,14 @@ function UserMenu({ name, role, onSignOut }: { name: string; role: string; onSig
   const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
   const ThemeIcon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
   return (
-    <div className="border-t border-line p-3 flex items-center gap-2.5">
-      <Avatar name={name} size={30} />
+    <div className="border-t border-white/10 p-3 flex items-center gap-2.5">
+      <span className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold text-xs font-semibold ring-1 ring-gold/40">{name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()}</span>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-ink truncate">{name}</div>
-        <div className="text-xs text-ink-3 truncate">{role}</div>
+        <div className="text-sm font-medium text-sidebar-active truncate">{name}</div>
+        <div className="text-xs text-gold/80 truncate">{role}</div>
       </div>
-      <button onClick={() => setTheme(next)} title={`Theme: ${theme}`} className="p-1.5 rounded-md text-ink-3 hover:text-ink hover:bg-surface-2"><ThemeIcon size={16} /></button>
-      <button onClick={onSignOut} title="Sign out" className="p-1.5 rounded-md text-ink-3 hover:text-ink hover:bg-surface-2"><LogOut size={16} /></button>
+      <button onClick={() => setTheme(next)} title={`Theme: ${theme}`} className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-white/10"><ThemeIcon size={16} /></button>
+      <button onClick={onSignOut} title="Sign out" className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-white/10"><LogOut size={16} /></button>
     </div>
   );
 }

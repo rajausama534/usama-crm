@@ -91,7 +91,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
       <div className="min-w-0">
-        <h1 className="text-[22px] font-semibold tracking-tight text-ink">{title}</h1>
+        <h1 className="font-display text-[28px] font-medium tracking-tight text-ink leading-tight">{title}</h1>
         {subtitle && <div className="mt-1 text-sm text-ink-2">{subtitle}</div>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -112,12 +112,12 @@ export function Avatar({ name, size = 28 }: { name?: string | null; size?: numbe
 
 export function Stat({ label, value, hint, tone }: { label: string; value: React.ReactNode; hint?: React.ReactNode; tone?: Tone }) {
   return (
-    <Card className="p-4">
-      <div className="text-xs font-medium text-ink-3">{label}</div>
-      <div className={cx("mt-1.5 text-2xl font-semibold num", tone === "bad" ? "text-bad" : tone === "good" ? "text-good" : tone === "warn" ? "text-warn" : "text-ink")}>
+    <Card className="p-5">
+      <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-ink-3">{label}</div>
+      <div className={cx("mt-2 font-display text-[32px] leading-none font-medium num", tone === "bad" ? "text-bad" : tone === "good" ? "text-good" : tone === "warn" ? "text-warn" : "text-ink")}>
         {value}
       </div>
-      {hint && <div className="mt-1 text-xs text-ink-3">{hint}</div>}
+      {hint && <div className="mt-2 text-xs text-ink-3">{hint}</div>}
     </Card>
   );
 }

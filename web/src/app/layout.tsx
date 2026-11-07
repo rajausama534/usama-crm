@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
+const serif = Fraunces({ variable: "--font-serif", subsets: ["latin"], display: "swap", weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
   title: "Usama Real Estate",
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0e11" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f4ed" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1613" },
   ],
 };
 
@@ -29,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       {/* Browser extensions (e.g. Grammarly) add attributes to <body> before React loads. */}
-      <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${serif.variable} font-sans antialiased`} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
