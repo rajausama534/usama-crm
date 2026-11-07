@@ -23,6 +23,15 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, secretKey, {
 const clean = (v: unknown) => String(v ?? "").trim();
 const list = (v: unknown) => (Array.isArray(v) ? [...new Set(v.map(clean).filter(Boolean))] : []);
 const BAN_FOREVER = "876000h";
+const ROLES = ["admin", "agent", "team_leader", "accounts", "hr"];
+const PERMS = ["compliance", "approve_deals", "approve_expenses", "approve_leave", "approve_listings", "view_finance", "manage_users", "export"];
+const role = (v: unknown) => (ROLES.includes(clean(v)) ? clean(v) : "agent");
+const perms = (v: unknown) => list(v).filter((p) => PERMS.includes(p));
+// Columns added by migration 20261108100000; sent only when the caller provides them.
+const extra = (body: Record<string, unknown>) => ({
+  ...(Array.isArray(body.permissions) ? { permissions: perms(body.permissions) } : {}),
+  ...("team_leader" in body ? { team_leader: clean(body.team_leader).toLowerCase() || null } : {}),
+});
 
 async function callerIsAdmin(req: Request) {
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
@@ -82,7 +91,7 @@ Deno.serve(async (req) => {
       });
       if (error) throw error;
       const { error: accessError } = await admin.from("user_access").upsert({
-        email, name: clean(body.name) || null, role: body.role === "admin" ? "admin" : "agent",
+        email, name: clean(body.name) || null, role: role(body.role), ...extra(body),
         assigned_communities: list(body.assigned_communities), assigned_clusters: list(body.assigned_clusters),
         can_export: !!body.can_export, active: true, user_id: created.user.id, updated_at: new Date().toISOString(),
       }, { onConflict: "email" });
@@ -93,7 +102,7 @@ Deno.serve(async (req) => {
     if (action === "save") {
       if (email === OWNER_EMAIL) return json({ error: "The owner account always has full access." }, 400);
       const { error } = await admin.from("user_access").update({
-        name: clean(body.name) || null, role: body.role === "admin" ? "admin" : "agent",
+        name: clean(body.name) || null, role: role(body.role), ...extra(body),
         assigned_communities: list(body.assigned_communities), assigned_clusters: list(body.assigned_clusters),
         can_export: !!body.can_export, updated_at: new Date().toISOString(),
       }).ilike("email", email);
