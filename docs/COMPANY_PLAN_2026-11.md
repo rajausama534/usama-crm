@@ -1,6 +1,6 @@
 # Usama Real Estate — company system design (November 2026)
 
-Status: **design for Usama's approval. Nothing is built.** Agreed in discussion on 7 Nov 2026.
+Status: **APPROVED by Usama on 7 Nov 2026 — start build step 1.** Agreed in discussion on 7 Nov 2026.
 Company name for now: **Usama Real Estate** (changeable in Settings). VAT registered, returns every 3 months.
 
 Request (7 Nov 2026): run the entire company in the system — sales, accounts, HR, VAT, everything; record
