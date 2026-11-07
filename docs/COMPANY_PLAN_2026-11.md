@@ -148,6 +148,11 @@ system can do, for whoever is asking.
   WhatsApp buttons (Confirm / Cancel). Reports can be sent back as PDF or Excel files.
 - **Who uses Bunty:** **only Usama for now** (agreed 7 Nov 2026), in the app and from Usama's own WhatsApp
   number. Staff access can be switched on later per person, using the rule below.
+- **Morning summary on WhatsApp, every day** (agreed 7 Nov 2026; time to be agreed). Short message with:
+  yesterday's deals closed and value, money received and paid out, bank balance as per the books, commission
+  coming in the next 60 days, today's viewings and follow-ups, approvals waiting, invoices overdue, bills due
+  this week, documents and Trakheesi permits expiring within 30 days, VAT due date when close. Ask Bunty for
+  more detail on any line.
 - **Same rules as people (when staff are added later):** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
