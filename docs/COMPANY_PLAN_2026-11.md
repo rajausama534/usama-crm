@@ -156,6 +156,20 @@ system can do, for whoever is asking.
   coming in the next 60 days, today's viewings and follow-ups, approvals waiting, invoices overdue, bills due
   this week, documents and Trakheesi permits expiring within 30 days, VAT due date when close. Ask Bunty for
   more detail on any line.
+- **More abilities (agreed 7 Nov 2026):**
+  - **Reminders during the day:** follow-ups, viewings and payments due, sent at the right time, not only in
+    the morning summary.
+  - **Instant alerts** when something big happens: deal approved, money received, large expense (amount to be
+    agreed), and similar events.
+  - **Reads photos and files** sent to him (receipt, Emirates ID, passport, Form A, bank statement, invoice,
+    contract), pulls out the details and files them in the right place after Usama confirms.
+  - **Voice notes on WhatsApp:** turned into text by a speech-to-text service, then handled like a typed message.
+  - **Messages owners and leads for Usama:** Bunty drafts, Usama confirms each message before it goes. First
+    messages to people who haven't written in the last 24 hours must use Meta-approved WhatsApp templates
+    (WhatsApp Business rules); every message is saved in that owner's/lead's history.
+  - **Urdu and English:** answers in the language Usama writes in.
+  - Note: WhatsApp only lets Bunty start a conversation outside the 24-hour window with approved templates, so
+    reminders and alerts use short pre-approved templates.
 - **Same rules as people (when staff are added later):** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
