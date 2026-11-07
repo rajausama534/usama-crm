@@ -148,7 +148,10 @@ system can do, for whoever is asking.
   WhatsApp buttons (Confirm / Cancel). Reports can be sent back as PDF or Excel files.
 - **Who uses Bunty:** **only Usama for now** (agreed 7 Nov 2026), in the app and from Usama's own WhatsApp
   number. Staff access can be switched on later per person, using the rule below.
-- **Morning summary on WhatsApp, every day** (agreed 7 Nov 2026; time to be agreed). Short message with:
+- **Morning summary, once a day** (agreed 7 Nov 2026): shown the **first time Usama opens Bunty after
+  10:00 AM Dubai time** — in the app, or his first WhatsApp message to Bunty after 10:00 AM (WhatsApp can't
+  tell when a chat is opened, so the first message counts). Opening Bunty before 10:00 AM shows no summary;
+  no summary is pushed if he doesn't open Bunty that day. Short message with:
   yesterday's deals closed and value, money received and paid out, bank balance as per the books, commission
   coming in the next 60 days, today's viewings and follow-ups, approvals waiting, invoices overdue, bills due
   this week, documents and Trakheesi permits expiring within 30 days, VAT due date when close. Ask Bunty for
