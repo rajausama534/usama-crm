@@ -170,6 +170,24 @@ system can do, for whoever is asking.
   - **Urdu and English:** answers in the language Usama writes in.
   - Note: WhatsApp only lets Bunty start a conversation outside the 24-hour window with approved templates, so
     reminders and alerts use short pre-approved templates.
+- **Even more abilities (agreed 7 Nov 2026):**
+  - **Automatic weekly and monthly reports** on WhatsApp: profit, deals, money in/out, agent rankings.
+  - **Compare periods** on request: this month vs last month, this year vs last year, any two dates.
+  - **Warns when something looks wrong:** a lead with no follow-up for 7 days, a deal stuck waiting for payment,
+    spending higher than usual, and similar.
+  - **Usama's personal to-do list and calendar,** with reminders for his own tasks.
+  - **Finds owners** in the database ("who owns villas in Alana with 4 bedrooms?").
+  - **Drafts emails, offers and listing descriptions** for Usama to approve before anything is sent or published.
+- **Bunty's screen (agreed 7 Nov 2026):**
+  - **Every department on Bunty's screen** as its own tab/tile: Sales, Commission, Accounts, VAT & tax, HR,
+    Documents, Compliance, Listings, Approvals, My tasks, Company overview.
+  - **Pending count on each department** (a badge with the number of things waiting). Tap a department and
+    Bunty says what is pending there, or ask "what's pending in HR?".
+  - **Voice controls like a call screen:** mic button to talk to Bunty, mute (Bunty listens but stays silent),
+    hush (pause reminders and alerts for a while).
+  - **Look and feel:** ultra-futuristic, "2090 invention" — a glowing animated Bunty core that reacts when he
+    listens, thinks and speaks; glass panels; smooth motion; dark by default; still fast and simple to use.
+    A design mock-up is shown to Usama for approval before it is built.
 - **Same rules as people (when staff are added later):** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
