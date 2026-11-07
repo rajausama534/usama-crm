@@ -159,8 +159,8 @@ system can do, for whoever is asking.
 - **More abilities (agreed 7 Nov 2026):**
   - **Reminders during the day:** follow-ups, viewings and payments due, sent at the right time, not only in
     the morning summary.
-  - **Instant alerts** when something big happens: deal approved, money received, large expense (amount to be
-    agreed), and similar events.
+  - **Instant alerts** when something big happens: deal approved, money received, **every expense, any amount**
+    (agreed 7 Nov 2026), and similar events.
   - **Reads photos and files** sent to him (receipt, Emirates ID, passport, Form A, bank statement, invoice,
     contract), pulls out the details and files them in the right place after Usama confirms.
   - **Voice notes on WhatsApp:** turned into text by a speech-to-text service, then handled like a typed message.
