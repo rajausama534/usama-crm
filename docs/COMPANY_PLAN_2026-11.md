@@ -141,6 +141,11 @@ system can do, for whoever is asking.
   "What does Ali get from the Alana deal?", "Whose visa expires this month?", "How much VAT do we owe this
   quarter?", "What was our profit last month?", "How many leave days does Sara have?"
 - **Explains how to do anything** in the system, step by step, for any staff member.
+- **Where:** in the app (chat panel on every page, phone and desktop) **and on WhatsApp** (agreed 7 Nov 2026).
+  WhatsApp runs on the official WhatsApp Business Cloud API (Meta) with its own company number for Bunty; a
+  number already used in the normal WhatsApp app can't be used unless it is moved over. Bunty knows who is
+  writing from their phone number on their staff record; unknown numbers get nothing. Confirm cards come as
+  WhatsApp buttons (Confirm / Cancel). Reports can be sent back as PDF or Excel files.
 - **Same rules as people:** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
