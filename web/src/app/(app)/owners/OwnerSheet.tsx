@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Phone, MessageCircle, Mail, Loader2, BedDouble, Ruler, Users } from "lucide-react";
+import { Mail, Loader2, BedDouble, Ruler, Users } from "lucide-react";
+import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
+import { markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { OWNER_STATUSES, OWNER_STATUS_TONE, type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
 import { useStaff, staffName } from "@/lib/hooks";
 import { Badge, Button, Field, Input, Sheet, Skeleton, Textarea, cx } from "@/components/ui";
-import { count, fmtDate, fmtDateTime, todayDubai, waNumber } from "@/lib/format";
+import { count, fmtDate, fmtDateTime, todayDubai } from "@/lib/format";
 
 type UnitDetails = { property_type: string | null; bedrooms: string | null; bua_sqft: number | null; plot_sqft: number | null; layout: string | null };
 
@@ -47,7 +49,9 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
   useEffect(() => { if (q.data?.owner) setDraft(q.data.owner); }, [q.data]);
 
   const o = q.data?.owner;
+  const template = useWaTemplate();
   const refresh = () => { qc.invalidateQueries({ queryKey: ["owner", id] }); qc.invalidateQueries({ queryKey: ["owners"] }); };
+  async function contact(type: "WhatsApp" | "Call") { if (o && me) { await markOwnerContacted(o.id, type, me.email); refresh(); } }
 
   async function setStatus(s: string) {
     if (!o || !me || s === o.status) return;
@@ -108,9 +112,11 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
 
           <div className="flex flex-wrap gap-2">
             {[o.phone1, o.phone2].filter(Boolean).map((p) => (
-              <div key={p} className="flex gap-1">
-                <a href={`tel:${p}`}><Button size="sm"><Phone size={14} /> <span className="num">{p}</span></Button></a>
-                <a href={`https://wa.me/${waNumber(p)}`} target="_blank" rel="noreferrer"><Button size="sm" aria-label="WhatsApp"><MessageCircle size={14} /></Button></a>
+              <div key={p} className="flex items-center gap-1.5 rounded-xl border border-line pl-3 pr-1 py-1">
+                <span className="text-sm text-ink num mr-1">{p}</span>
+                <WaButton phone={p} text={ownerMessage(template, o)} onContact={() => contact("WhatsApp")} compact />
+                <CallButton phone={p} onContact={() => contact("Call")} compact />
+                <CopyButton value={p} compact />
               </div>
             ))}
             {o.email && <a href={`mailto:${o.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}

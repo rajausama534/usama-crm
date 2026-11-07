@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Phone, MessageCircle, Mail, CalendarPlus, Trophy, Loader2 } from "lucide-react";
+import { Mail, CalendarPlus, Trophy, Loader2 } from "lucide-react";
+import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
+import { leadMessage, markLeadContacted } from "@/lib/contact";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { LEAD_STAGES, STAGE_TONE, type Lead, type Activity, type CrmEvent, logLeadActivity } from "@/lib/crm";
+import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, STAGE_TONE, type Lead, type Activity, type CrmEvent, logLeadActivity } from "@/lib/crm";
 import { useStaff, staffName, useProjects } from "@/lib/hooks";
 import { Badge, Button, Field, Input, Select, Sheet, Skeleton, Textarea, cx } from "@/components/ui";
-import { fmtDateTime, todayDubai, waNumber } from "@/lib/format";
+import { fmtDateTime, todayDubai } from "@/lib/format";
 import { EventForm } from "../calendar/EventForm";
 
-const SOURCES = ["Bayut", "Property Finder", "Dubizzle", "Meta Ads", "WhatsApp", "Referral", "Walk-in", "Listings", "Website", "Other"];
+const SOURCES = LEAD_SOURCES;
 const EDITABLE = ["name", "phone", "email", "project_inquired", "budget", "property_type", "bedroom", "source", "status", "lead_receive_date", "notes", "assigned_to"] as const;
 type Draft = Partial<Record<(typeof EDITABLE)[number], string | null>>;
 
@@ -76,6 +78,8 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
   }
 
   const l = lead.data?.lead;
+  const template = useWaTemplate();
+  async function contacted() { if (l && me) { await markLeadContacted(l.id, me.email); qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["leads"] }); } }
   const title = isNew ? "New lead" : l ? (l.name || "Unnamed lead") : "Lead";
   const dirty = !isNew && l && EDITABLE.some((k) => ((l[k] as string | null) ?? "") !== (draft[k] ?? ""));
 
@@ -92,8 +96,9 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
           {l && (
             <>
               <div className="flex flex-wrap gap-2">
-                {l.phone && <a href={`tel:${l.phone}`}><Button size="sm"><Phone size={14} /> Call</Button></a>}
-                {l.phone && <a href={`https://wa.me/${waNumber(l.phone)}`} target="_blank" rel="noreferrer"><Button size="sm"><MessageCircle size={14} /> WhatsApp</Button></a>}
+                <WaButton phone={l.phone} text={leadMessage(template, l)} onContact={contacted} />
+                <CallButton phone={l.phone} onContact={contacted} />
+                <CopyButton value={l.phone} />
                 {l.email && <a href={`mailto:${l.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
                 <Button size="sm" onClick={() => setScheduling(true)}><CalendarPlus size={14} /> Schedule</Button>
               </div>
@@ -147,7 +152,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
           {(isNew || tab === "details") && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Name"><Input value={draft.name ?? ""} onChange={set("name")} autoFocus={isNew} /></Field>
-              <Field label="Phone"><Input value={draft.phone ?? ""} onChange={set("phone")} inputMode="tel" /></Field>
+              <Field label="Phone"><Input value={draft.phone ?? ""} onChange={set("phone")} inputMode="tel" placeholder="9715xxxxxxx" /></Field>
               <Field label="Email"><Input value={draft.email ?? ""} onChange={set("email")} type="email" /></Field>
               <Field label="Project">
                 <Select value={draft.project_inquired ?? ""} onChange={set("project_inquired")}>
@@ -157,8 +162,20 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                 </Select>
               </Field>
               <Field label="Budget"><Input value={draft.budget ?? ""} onChange={set("budget")} placeholder="e.g. 4M" /></Field>
-              <Field label="Property type"><Input value={draft.property_type ?? ""} onChange={set("property_type")} placeholder="Villa, Townhouse…" /></Field>
-              <Field label="Bedrooms"><Input value={draft.bedroom ?? ""} onChange={set("bedroom")} /></Field>
+              <Field label="Property type">
+                <Select value={draft.property_type ?? ""} onChange={set("property_type")}>
+                  <option value="">—</option>
+                  {draft.property_type && !PROPERTY_TYPES.includes(draft.property_type) && <option>{draft.property_type}</option>}
+                  {PROPERTY_TYPES.map((s) => <option key={s}>{s}</option>)}
+                </Select>
+              </Field>
+              <Field label="Bedrooms">
+                <Select value={draft.bedroom ?? ""} onChange={set("bedroom")}>
+                  <option value="">—</option>
+                  {draft.bedroom && !BEDROOMS.includes(draft.bedroom) && <option>{draft.bedroom}</option>}
+                  {BEDROOMS.map((s) => <option key={s}>{s}</option>)}
+                </Select>
+              </Field>
               <Field label="Source">
                 <Select value={draft.source ?? ""} onChange={set("source")}>
                   <option value="">—</option>

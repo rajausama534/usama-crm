@@ -53,3 +53,8 @@ export function readLocation(): Promise<{ status: string; lat?: number; lng?: nu
     );
   });
 }
+
+// Lead dropdown values (same lists as the old CRM).
+export const LEAD_SOURCES = ["Bayut", "Property Finder", "Dubizzle", "Meta Ads", "Instagram", "TikTok", "WhatsApp", "Referral", "Agent", "Broker", "Walk-in", "Website", "Listings", "Other"];
+export const PROPERTY_TYPES = ["Apartment", "Villa", "Townhouse", "Penthouse", "Plot", "Commercial"];
+export const BEDROOMS = ["Studio", "1BR", "2BR", "3BR", "4BR", "5BR", "6BR", "7BR+"];
