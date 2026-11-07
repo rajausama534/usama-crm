@@ -120,11 +120,33 @@ when money arrives later.
 - Tasks between staff.
 - Alerts in the app (bell) and by email: approvals, follow-ups, document expiries, bills due, Trakheesi expiry.
 
+## 9. Bunty — the company assistant (requested 7 Nov 2026, draft)
+Bunty is an AI assistant built into the system. He knows everything the system holds and can do every task the
+system can do, for whoever is asking.
+
+- **Knows everything:** deals closed (by day/month/agent/team), money in and out, bank balance as per the books,
+  commission per agent (earned, received, paid, still owed), advances, VAT due, cash forecast, pipeline, leads,
+  owners, listings, staff, leave, expiring documents, approvals waiting.
+  Examples: "How many deals did we close in October?", "How much money is coming in the next 60 days?",
+  "What does Ali get from the Alana deal?", "What did we spend on visas this year?"
+- **Does every task:** add a lead or note, book a viewing, record a deal, draft an invoice, log an expense,
+  apply for leave, remind someone, run any report, explain how to do anything in the system.
+- **Same rules as people:** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
+  everything; an agent asking Bunty sees only their own leads, deals and commission.
+- **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
+  email/message or deletes shows a confirm card first ("Record deal AED 2.1M, Ali 50% — Confirm?").
+- **Every action logged** in the change history as "Bunty, for <person>".
+- **Stays up to date by design:** every new feature we build ships with Bunty's ability to read it and do it.
+  A step is not finished until Bunty can answer questions about it and perform its tasks.
+- Powered by Claude (Anthropic API) reading the same Supabase database through approved actions only — never
+  raw database access.
+
 ---
 
 ## Build order (each step tested on a preview and live only with your OK)
 1. **Foundation:** new app shell and design, roles + extra ticks, approvals inbox, your company dashboard,
-   today's Leads / Owners / Calendar moved into the new app.
+   today's Leads / Owners / Calendar moved into the new app,
+   **Bunty** with Leads / Owners / Calendar (then each later step adds its own Bunty abilities).
 2. **Deals + commission + KYC.**
 3. **Accounts:** invoices, bank statement upload, expenses, recurring bills, VAT, cash forecast, P&L, tax estimate.
 4. **HR:** staff, payroll / WPS, leave, documents, gratuity, recruitment.
