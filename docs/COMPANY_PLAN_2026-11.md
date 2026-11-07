@@ -124,13 +124,23 @@ when money arrives later.
 Bunty is an AI assistant built into the system. He knows everything the system holds and can do every task the
 system can do, for whoever is asking.
 
-- **Knows everything:** deals closed (by day/month/agent/team), money in and out, bank balance as per the books,
-  commission per agent (earned, received, paid, still owed), advances, VAT due, cash forecast, pipeline, leads,
-  owners, listings, staff, leave, expiring documents, approvals waiting.
+- **Knows every department, not only deals.** Whatever is in the system, Bunty knows it and can act on it:
+  | Department | Bunty knows | Bunty can do |
+  |---|---|---|
+  | **Sales** | leads, owners, viewings, pipeline, deals closed (by day/month/agent/team), listings | add/update leads and owners, add notes, book viewings, record a deal, follow-up reminders |
+  | **Commission** | each agent's commission earned, received, paid, still owed; TL overrides; company share; advances | work out splits, show what anyone gets from any deal, prepare agent payouts |
+  | **Accounts** | money in and out, bank balance as per the books, invoices paid/unpaid, expenses, recurring bills, P&L, cash forecast | draft invoices, log expenses, match bank lines, run any report, Excel export |
+  | **VAT & tax** | VAT due this quarter (box by box), corporate tax estimate | prepare the VAT figures for the accountant |
+  | **HR** | staff, salaries, payroll, leave balances, gratuity, recruitment pipeline | prepare payroll / WPS file, leave requests, add candidates, onboarding checklist |
+  | **Documents** | every visa, Emirates ID, passport, RERA card (BRN), contract, insurance and its expiry | list what is expiring, remind people |
+  | **Compliance / AML** | KYC status per deal, cash deals needing goAML | chase missing KYC, flag deals |
+  | **Listings & marketing** | live listings, Trakheesi permits, Form A, portal status | create listings, warn before permits expire |
+  | **Approvals & tasks** | everything waiting for approval, tasks between staff | show the inbox, approve on your confirm, assign tasks |
+  | **Company overview** | whole-company dashboard: revenue, company share, pipeline, cash, VAT due, team performance | daily/weekly summary of the whole company |
   Examples: "How many deals did we close in October?", "How much money is coming in the next 60 days?",
-  "What does Ali get from the Alana deal?", "What did we spend on visas this year?"
-- **Does every task:** add a lead or note, book a viewing, record a deal, draft an invoice, log an expense,
-  apply for leave, remind someone, run any report, explain how to do anything in the system.
+  "What does Ali get from the Alana deal?", "Whose visa expires this month?", "How much VAT do we owe this
+  quarter?", "What was our profit last month?", "How many leave days does Sara have?"
+- **Explains how to do anything** in the system, step by step, for any staff member.
 - **Same rules as people:** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
