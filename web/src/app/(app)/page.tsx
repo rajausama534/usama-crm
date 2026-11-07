@@ -65,7 +65,7 @@ export default function Dashboard() {
   return (
     <div className="animate-in space-y-6">
       <div>
-        <h1 className="font-display text-[30px] font-medium tracking-tight text-ink leading-tight">{greeting()}, {me?.name?.split(" ")[0]}</h1>
+        <h1 className="text-[24px] font-normal tracking-tight text-ink-2 leading-tight">{greeting()}, {me?.name?.split(" ")[0]}</h1>
         <p className="text-sm text-ink-2 mt-1">{me?.isSuperAdmin ? "Here’s the whole company today." : "Here’s your day."}</p>
       </div>
 
@@ -197,7 +197,7 @@ function WeeklyLeads({ data }: { data: { week: string; n: number }[] }) {
       <div className="relative h-36 flex items-end gap-[2px] border-b border-line" onMouseLeave={() => setHover(null)}>
         {weeks.map((w, i) => (
           <div key={w.week} className="flex-1 h-full flex items-end cursor-default" onMouseEnter={() => setHover(i)}>
-            <div className={cx("w-full rounded-t-[4px] transition-colors", hover === i ? "bg-gold" : "bg-accent")}
+            <div className={cx("w-full rounded-t-[4px] transition-colors", hover === i ? "bg-accent-hover" : "bg-accent")}
               style={{ height: `${(w.n / max) * 100}%`, minHeight: w.n ? 2 : 0 }} />
           </div>
         ))}

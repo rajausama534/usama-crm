@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Building2, Search, Moon, Sun, LogOut, Menu, LayoutDashboard, Users2, Home, CalendarDays, Monitor } from "lucide-react";
+import { Search, Moon, Sun, LogOut, Menu, LayoutDashboard, Users2, Home, CalendarDays } from "lucide-react";
 import { useAuth, useTheme } from "@/components/Providers";
 import { cx } from "@/components/ui";
 import { ROLE_LABEL } from "@/lib/access";
@@ -35,15 +35,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sidebar = (
     <nav className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 h-16 shrink-0">
-        <div className="size-8 rounded-lg bg-sidebar-2 text-gold grid place-items-center ring-1 ring-gold/30"><Building2 size={16} /></div>
-        <div className="leading-tight">
-          <div className="font-display text-[17px] font-medium text-sidebar-active tracking-tight">Usama Real Estate</div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-gold/80">Company system</div>
-        </div>
+        <div className="text-[20px] font-bold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
       </div>
       <div className="px-3 pb-2">
         <button onClick={() => setPaletteOpen(true)}
-          className="flex w-full items-center gap-2 h-9 px-3 rounded-lg bg-white/[0.06] text-sm text-sidebar-muted hover:bg-white/10 transition-colors">
+          className="flex w-full items-center gap-2 h-9 px-3 rounded-lg bg-surface-2 border border-line text-sm text-ink-3 hover:border-line-strong transition-colors">
           <Search size={14} /> <span className="flex-1 text-left">Search</span>
           <kbd className="text-[11px] font-medium text-sidebar-muted">⌘K</kbd>
         </button>
@@ -58,11 +54,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 return (
                   <Link key={item.href} href={item.href} prefetch
                     className={cx(
-                      "relative flex items-center gap-2.5 h-9 px-3 rounded-lg text-sm transition-colors",
-                      active ? "bg-sidebar-2 text-sidebar-active font-medium" : "text-sidebar-text hover:text-sidebar-active hover:bg-white/[0.05]",
+                      "relative flex items-center gap-3 h-10 px-3 rounded-lg text-sm font-medium transition-colors",
+                      active ? "bg-sidebar-2 text-sidebar-active font-medium" : "text-sidebar-text hover:text-sidebar-active hover:bg-sidebar-hover",
                     )}>
-                    {active && <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-gold" />}
-                    <item.icon size={16} className={active ? "text-gold" : "text-sidebar-muted"} />
+                    {active && <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg bg-accent" />}
+                    <item.icon size={18} className={active ? "text-accent" : "text-sidebar-muted"} />
                     <span className="flex-1">{item.label}</span>
                     {item.soon && <span className="text-[10px] font-medium text-sidebar-muted">Soon</span>}
                   </Link>
@@ -79,13 +75,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block fixed inset-y-0 left-0 w-64 bg-sidebar">{sidebar}</aside>
+      <aside className="hidden lg:block fixed inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-line">{sidebar}</aside>
 
       {/* Phone/tablet drawer */}
       {drawer && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/30" onClick={() => setDrawer(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 bg-sidebar animate-in">{sidebar}</aside>
+          <aside className="absolute inset-y-0 left-0 w-72 bg-sidebar border-r border-sidebar-line animate-in">{sidebar}</aside>
         </div>
       )}
 
@@ -128,17 +124,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function UserMenu({ name, role, onSignOut }: { name: string; role: string; onSignOut: () => void }) {
   const { theme, setTheme } = useTheme();
-  const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
-  const ThemeIcon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
+  const next = theme === "light" ? "dark" : "light";
+  const ThemeIcon = theme === "dark" ? Sun : Moon;
   return (
-    <div className="border-t border-white/10 p-3 flex items-center gap-2.5">
-      <span className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold text-xs font-semibold ring-1 ring-gold/40">{name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()}</span>
+    <div className="border-t border-sidebar-line p-3 flex items-center gap-2.5">
+      <span className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-text text-xs font-semibold">{name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()}</span>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-sidebar-active truncate">{name}</div>
-        <div className="text-xs text-gold/80 truncate">{role}</div>
+        <div className="text-xs text-ink-3 truncate">{role}</div>
       </div>
-      <button onClick={() => setTheme(next)} title={`Theme: ${theme}`} className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-white/10"><ThemeIcon size={16} /></button>
-      <button onClick={onSignOut} title="Sign out" className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-white/10"><LogOut size={16} /></button>
+      <button onClick={() => setTheme(next)} title={theme === "dark" ? "Light mode" : "Dark mode"} className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-sidebar-hover"><ThemeIcon size={16} /></button>
+      <button onClick={onSignOut} title="Sign out" className="p-1.5 rounded-md text-sidebar-muted hover:text-sidebar-active hover:bg-sidebar-hover"><LogOut size={16} /></button>
     </div>
   );
 }

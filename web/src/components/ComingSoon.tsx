@@ -3,7 +3,7 @@ import { Card } from "@/components/ui";
 export function ComingSoon({ title, step, points }: { title: string; step: string; points: string[] }) {
   return (
     <div className="animate-in">
-      <h1 className="font-display text-[28px] font-medium tracking-tight text-ink mb-6">{title}</h1>
+      <h1 className="text-[24px] font-bold tracking-tight text-ink mb-6">{title}</h1>
       <Card className="p-6 max-w-2xl">
         <div className="text-xs font-semibold uppercase tracking-wider text-gold">{step}</div>
         <div className="mt-1 text-ink font-medium">Being built next, as agreed in the company plan.</div>

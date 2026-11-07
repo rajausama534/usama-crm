@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
-const serif = Fraunces({ variable: "--font-serif", subsets: ["latin"], display: "swap", weight: ["400", "500", "600"] });
+const poppins = Poppins({ variable: "--font-poppins", subsets: ["latin"], display: "swap", weight: ["400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
-  title: "Usama Real Estate",
+  title: "Usama CRM",
   description: "Company system: sales, deals, accounts, HR",
 };
 
@@ -15,13 +14,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f4ed" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a1613" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f6fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f17" },
   ],
 };
 
-// Applies the saved theme before first paint so there is no flash.
-const themeScript = `try{var t=localStorage.getItem('ure-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}`;
+// Same key as the old CRM ("crm_theme"): light unless dark was chosen.
+const themeScript = `try{document.documentElement.dataset.theme=localStorage.getItem('crm_theme')==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -30,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       {/* Browser extensions (e.g. Grammarly) add attributes to <body> before React loads. */}
-      <body className={`${inter.variable} ${serif.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body className={`${poppins.variable} font-sans antialiased`} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

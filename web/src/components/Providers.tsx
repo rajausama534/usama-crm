@@ -18,8 +18,8 @@ type AuthState = {
 const AuthCtx = createContext<AuthState>({ ready: false, session: null, me: null, blocked: false, signOut: async () => {} });
 export const useAuth = () => useContext(AuthCtx);
 
-type Theme = "system" | "light" | "dark";
-const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({ theme: "system", setTheme: () => {} });
+type Theme = "light" | "dark";
+const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({ theme: "light", setTheme: () => {} });
 export const useTheme = () => useContext(ThemeCtx);
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -57,15 +57,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => { await db.auth.signOut(); client.clear(); }, [client]);
   const auth = useMemo(() => ({ ready, session, me, blocked, signOut }), [ready, session, me, blocked, signOut]);
 
-  const [theme, setThemeState] = useState<Theme>("system");
-  useEffect(() => {
-    try { const t = localStorage.getItem("ure-theme"); if (t === "light" || t === "dark") setThemeState(t); } catch {}
-  }, []);
+  const [theme, setThemeState] = useState<Theme>("light");
+  useEffect(() => { setThemeState(document.documentElement.dataset.theme === "dark" ? "dark" : "light"); }, []);
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
-    try { if (t === "system") localStorage.removeItem("ure-theme"); else localStorage.setItem("ure-theme", t); } catch {}
-    if (t === "system") delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = t;
+    try { localStorage.setItem("crm_theme", t); } catch {}
+    document.documentElement.dataset.theme = t;
   }, []);
   const themeValue = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
 
