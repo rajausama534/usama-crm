@@ -190,6 +190,7 @@ system can do, for whoever is asking.
     Mock-up: docs/mockups/bunty.html. v1 orb rejected; v2 cleaner with easy-to-read text (bigger, high
     contrast, no grid/stars/heavy glow). **Bunty core chosen: particle sphere** (3D ball of glowing dots that
     rotates, ripples when listening, spins faster when thinking) — 7 Nov 2026.
+    **Bunty screen look APPROVED by Usama, 7 Nov 2026.**
 - **Same rules as people (when staff are added later):** Bunty works with the permissions of the person asking. Usama (Super Admin) gets
   everything; an agent asking Bunty sees only their own leads, deals and commission.
 - **Safe actions:** reading and reports happen at once. Anything that changes money, approves, sends an
