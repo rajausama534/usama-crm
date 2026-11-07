@@ -1,99 +1,136 @@
-# Running the whole company in the CRM — plan (November 2026)
+# Usama Real Estate — company system design (November 2026)
 
-Status: **draft, waiting for Usama's approval.** Nothing is built yet. Branch `deals-commission`.
+Status: **design for Usama's approval. Nothing is built.** Agreed in discussion on 7 Nov 2026.
+Company name for now: **Usama Real Estate** (changeable in Settings). VAT registered, returns every 3 months.
 
-Request (7 Nov 2026): "make it run an entire company including the accounts department, HR, VAT, everything …
-If someone closes a deal, record how much commission that agent will get; if there are multiple agents,
-multiple splits, then company share, then VAT, everything."
-
-## Phase order (agreed 7 Nov 2026)
-1. **Deals + Commission** (this phase, detailed below)
-2. **Accounts** — invoices, income, expenses, VAT return summary every 3 months
-3. **HR** — staff files, salaries, leave, visa / Emirates ID / RERA card expiry reminders
-
-Each phase gets its own plan, approval, branch and preview test before going live.
+Request (7 Nov 2026): run the entire company in the system — sales, accounts, HR, VAT, everything; record
+each deal's commission with multiple agents, splits, company share and VAT. It must be a proper company system,
+super fast, with a high-end, simple, pleasing design.
 
 ---
 
-## Phase 1 — Deals + Commission
+## 1. The new app
+- **New app, same data.** A new modern app (React / Next.js on Vercel) on the existing Supabase database.
+  Owners, leads, notes, calendar and all history stay exactly as they are. The old CRM keeps working until the
+  new one is approved, then usamabinnusrat.com switches over.
+- **Layout:** left sidebar by department — Sales (Leads, Owners, Listings, Deals), Accounts, HR, Compliance,
+  Approvals. Each person sees only the departments they have access to. Cmd+K search finds anything (owner,
+  lead, deal, invoice, staff). Bottom tabs on phone.
+- **Look:** clean premium, light and dark mode, calm and spacious, one accent colour, sharp numbers; smooth
+  animations, not complicated.
+- **Speed targets** (measured on the preview before go-live): any page usable in under 1 second, search results
+  under 0.3 seconds, no full-page reloads.
+- **Super Admin (Usama):** whole-company dashboard — revenue, company share, pipeline, cash forecast, VAT due,
+  agent/team performance, approvals waiting, expiring documents.
 
-### What you agreed
-| Question | Answer |
+## 2. People and access
+- Roles: **Super Admin**, **Agent**, **Team Leader**, **Accounts**, **Admin / HR / Operations**.
+- A role sets the usual access; extra ticks per person (e.g. *Compliance officer*, *Approve expenses*).
+  Compliance is you for now, can be given to an accountant/admin later.
+- Enforced by the database (Row Level Security), not only the screen.
+- Agents: own leads, owners in their areas, own deals and **only their own commission**.
+  Team Leaders: their team's leads, deals and performance. Accounts and Super Admin: everything financial.
+
+## 3. Deals and commission
+**Deal types:** secondary sale, off-plan sale, rental, holiday-home management, other income
+(mortgage referrals, referral fees from agencies).
+
+**Starting a deal:** moving a lead to **Won** opens "Record deal" pre-filled (client, unit, owner); deals can
+also be added from the Deals page. The **agent submits; you or Accounts approve.** Only approved deals count.
+A deal can't be approved until KYC is complete (section 6).
+
+**Default commission (editable on every deal):**
+| Type | Default |
 |---|---|
-| Deal types | Secondary sale (resale), off-plan sale, rental, holiday home / management, plus "other company income" |
-| Commission amount | CRM fills a default rate per deal type; you can change it on any deal |
-| Several agents | Enter % per agent on each deal (must total 100%), plus an option for a deal shared with another agency |
-| Agent vs company | Each agent has their own rate on their profile; can be changed on a single deal |
-| VAT | 5% added on top of the commission; splits are worked out on the amount before VAT |
-| Who sees what | An agent sees the deals they are on and only their own commission. You and a new **Accounts** role see everything |
-| Money tracking | Invoiced → received from client (part payments allowed) → agent paid |
-| Starting a deal | Moving a lead to **Won** opens "Record deal", pre-filled; a deal can also be added from a new **Deals** page |
+| Secondary sale | 2% from buyer. Seller fee optional (sometimes paid) |
+| Off-plan | From the developer's slab (below) |
+| Rental | 5% of yearly rent, paid by tenant |
+| Holiday home | % of the unit's rental income (company income only, no agent share) |
+| Mortgage / agency referral | Amount typed; agent gets their normal rate |
 
-### What a deal records
-- Type, date closed, status (Closed → Invoiced → Part received → Fully received → Agents paid; or Cancelled)
-- Property: community, cluster, unit (linked to the owner record when there is one), property type, beds
-- Price: sale price, or yearly rent for rentals
-- Sides: buyer / tenant (linked to the lead), seller / landlord (linked to the owner), developer for off-plan
-- Commission lines: who pays (buyer, seller, developer, tenant, landlord, other), % or fixed AED → amount
-- Other agency (optional): agency name, RERA/ORN number, their share as % or fixed AED
-- Our agents: each agent's % of the deal and their own rate (copied from their profile, editable here)
-- Notes and attachments (Form F / tenancy contract / booking form) — attachments can come later if you prefer
+**Off-plan developers:** a Developers list with each developer's slabs — by AED sold or by units sold, over a
+period you set. The system suggests the % for each deal. When a higher slab is reached it applies to **all
+units in that period (backdated)**; the system shows the top-up to claim. **Slab top-ups are company income
+only.** Developers usually release commission after the buyer pays 20%, then pay in 45–60 days — the deal shows
+"expected on" for the cash forecast.
 
-### Proposed default rates (change them before I build, or later on a Settings screen)
-| Deal type | Default commission |
-|---|---|
-| Secondary sale | 2% from buyer + 2% from seller |
-| Off-plan | Developer pays; % typed per project (no fixed default) |
-| Rental | 5% of yearly rent from tenant |
-| Holiday home / management | Management fee % typed per property |
-| Other company income | Amount typed |
+**Other agencies (co-broking):** the buyer's agency always collects from the buyer.
+- We are the buyer's agency → we collect and pay the listing agency their agreed share.
+- We hold the property, another agency brings the buyer → we invoice them for our agreed share.
 
-### How the money is worked out (example)
-Villa resale, AED 3,000,000. 2% buyer + 2% seller. Another agency brought the buyer and gets AED 30,000.
-Agent A (rate 50%) did 60% of the work, Agent B (rate 70%) did 40%.
+**Splits — order of calculation:**
+1. Commission before VAT (VAT 5% added on top, kept separate for the FTA, never split)
+2. Minus the other agency's share (if any) → **office commission**
+3. Each of our agents gets their % of the deal (must total 100%) × their own rate (set on their profile,
+   editable per deal)
+4. What's left is the **company share**
+5. Team Leader override = their % (usually 5–10%, set per TL, editable per deal) **of the company share**
 
-| | AED |
-|---|---|
-| Commission before VAT (4% of 3,000,000) | 120,000 |
-| VAT 5% on top (owed to the FTA, not shared) | 6,000 |
-| Invoiced to clients | 126,000 |
-| Other agency's share | − 30,000 |
-| **Left for our office** | **90,000** |
-| Agent A: 60% of 90,000 = 54,000 × 50% | 27,000 |
-| Agent B: 40% of 90,000 = 36,000 × 70% | 25,200 |
-| **Company share** (54,000 − 27,000) + (36,000 − 25,200) | **37,800** |
+Example: office commission AED 100,000, one agent at 50% → agent 50,000, company 50,000;
+TL override 10% → TL 5,000, company keeps 45,000.
 
-Check: 30,000 + 27,000 + 25,200 + 37,800 = 120,000.
+**Paying agents:** agents are paid only after the client/developer money arrives, in proportion to what has been
+received. Advances/loans to an agent are recovered from their next commission. Agents who leave are still paid
+when money arrives later.
 
-Agents become payable as the client's money comes in: if half the commission has been received, half of each
-agent's commission shows as "due now". Off-plan stage payments work the same way.
+**Deal statuses:** Pending approval → Approved → Invoiced → Part received → Fully received → Agents paid
+(or Cancelled; never deleted). Every change kept in history.
 
-### Screens
-- **Deals page** (new menu item): list with filters (type, status, agent, month), totals at the top
-  (commission this month / year, company share, VAT collected, owed by clients, owed to agents).
-- **Record / edit deal** form with the live calculation above, shown as you type.
-- **Deal page**: the breakdown, payments received, agent payouts, history of changes.
-- **Leads**: choosing **Won** asks "Record the deal now?" and opens the form pre-filled.
-- **Users page**: new "Commission rate %" for each agent, and a new **Accounts** role.
-- **Agent's view**: "My deals" with only their own commission: earned, received, paid, still owed.
+## 4. Accounts — the company's books live in the system
+- **One business bank account** (more can be added). Bank statement upload (CSV/Excel) from any bank: the first
+  upload from a bank you show which columns are date / description / amount, it remembers the layout. Each line
+  is matched to deals, invoices and expenses; unknown lines are asked about.
+- **Tax invoices:** numbered, with TRN, logo and bank details; PDF download and sent by email; payment status.
+- **Expenses:** staff submit with a receipt photo; you/Accounts approve; approved ones go into the books and VAT.
+- **Recurring bills:** visa renewals, office tenancy, utilities and other bills with due dates and reminders.
+- **Reports:** profit & loss by month/quarter/year; VAT return figures per quarter (box by box for the FTA);
+  corporate tax estimate (9% on yearly profit above AED 375,000); agent and team performance;
+  **cash forecast** — commission coming in (incl. developers' 45–60 days) and bills going out.
+- Nothing financial is deleted (FTA requires 5 years of records). Excel export for your accountant/auditor,
+  who still reviews and files.
 
-### Safety
-- Database permissions (Row Level Security) enforce who sees what, not just the screen.
-- Every change to a deal, payment or payout is kept in the change history (`crm_change_log`), like owners and leads.
-- Deals are cancelled, never deleted, so the history stays.
-- Nothing existing (owners, leads, notes) is changed. Leads only gain a link to their deal.
-- I test on the Vercel preview first; database changes on the live project and going live need your OK each time.
+## 5. HR
+- **Staff records** with salary type per person: commission only, basic + commission, or mixed.
+- **Payroll** per person: WPS (the system produces the salary file, SIF), bank transfer, or cash
+  (for people not yet on the company visa) with a signed receipt. Commission and advance recoveries shown.
+- **Leave:** request in the system → manager/HR approves; balances by UAE labour law.
+- **Documents with expiry reminders:** visa, work permit/labour card, Emirates ID, passport, RERA broker card
+  (BRN), employment contract, health insurance.
+- **End of service:** running gratuity per person (UAE law) and final settlement (unpaid salary, leave balance,
+  commission still due).
+- No attendance tracking.
+- **Recruitment:** candidates (CV, source, applied → interview → offer → joined) and an onboarding checklist
+  (visa, Emirates ID, RERA course/BRN, system login, portal accounts) that creates the staff record.
 
-### Not in Phase 1 (comes in Accounts)
-Printed tax invoices with invoice numbers, expenses, bank accounts, the quarterly VAT return, the other agency's
-VAT on their invoice to us.
+## 6. Compliance / AML
+- KYC before deal approval: buyer and seller ID copies, nationality, source of funds, sanctions check note.
+- Cash deals of AED 55,000 or more are flagged for a goAML report.
+- Handled by whoever has the *Compliance officer* tick (you for now).
+
+## 7. Listings and marketing
+- Listings created from an existing owner's unit; the owner's history shows "listed with us" then
+  "sold/rented by us".
+- Before going live: valid Trakheesi permit (auto-unpublished when it expires), signed Form A uploaded, manager
+  approval, agent's BRN in date.
+- Published through feeds to Property Finder, Bayut/Dubizzle and **your own website**. Needs feed access from
+  each portal for your account.
+
+## 8. Approvals and alerts
+- **Approvals inbox:** deals and commission splits, expenses and advances, leave requests, listings going live.
+- Tasks between staff.
+- Alerts in the app (bell) and by email: approvals, follow-ups, document expiries, bills due, Trakheesi expiry.
 
 ---
 
-## Phase 2 — Accounts (outline, to be agreed later)
-Tax invoices (numbered, with TRN) created from deals, other income, expenses with receipts, money owed to/from
-the company, VAT return summary per quarter (output VAT from deals, input VAT from expenses), profit per month.
+## Build order (each step tested on a preview and live only with your OK)
+1. **Foundation:** new app shell and design, roles + extra ticks, approvals inbox, your company dashboard,
+   today's Leads / Owners / Calendar moved into the new app.
+2. **Deals + commission + KYC.**
+3. **Accounts:** invoices, bank statement upload, expenses, recurring bills, VAT, cash forecast, P&L, tax estimate.
+4. **HR:** staff, payroll / WPS, leave, documents, gratuity, recruitment.
+5. **Listings:** listings, permits, portal and website feeds.
 
-## Phase 3 — HR (outline, to be agreed later)
-Staff records, salaries and commission statements, leave requests and balances, document storage, expiry
-reminders for visa, Emirates ID, passport and RERA broker card.
+## Safety rules (unchanged)
+- No owner records deleted or merged, no owner history lost, without your OK.
+- Database changes on the live project, merging and going live need your OK each time.
+- Every change to deals, money and staff records is kept in the change history.
