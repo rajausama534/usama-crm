@@ -121,7 +121,6 @@ canvas#core{width:100%;height:100%;display:block}
   <nav class="depts card" id="depts"><div class="title">Departments</div></nav>
 
   <main class="center">
-    <div class="styles" id="styles"></div>
     <div class="coreBox"><canvas id="core"></canvas></div>
     <div class="state" id="state">Ready</div>
     <div class="hello">Good morning, Usama<span>23 things need you today</span></div>
@@ -203,9 +202,6 @@ document.getElementById('ask').onkeydown=e=>{if(e.key==='Enter'&&e.target.value.
 /* ---------- Bunty core: 4 styles to choose from ---------- */
 const STY=[['sphere','1 · Particle sphere'],['waves','2 · Voice waves'],['rings','3 · Halo rings'],['mono','4 · Hologram B']];
 let style=new URLSearchParams(location.search).get('core')||'sphere';
-const sb=document.getElementById('styles');
-STY.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.className=k===style?'on':'';
- b.onclick=()=>{style=k;sb.querySelectorAll('button').forEach(x=>x.className='');b.className='on'};sb.appendChild(b)});
 const cv=document.getElementById('core'),g=cv.getContext('2d');let W,H;
 function size(){const r=cv.getBoundingClientRect(),p=devicePixelRatio||1;cv.width=r.width*p;cv.height=r.height*p;W=cv.width;H=cv.height}
 size();addEventListener('resize',size);
