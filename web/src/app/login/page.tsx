@@ -32,20 +32,20 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-dvh grid place-items-center px-4 py-10">
-      <div className="w-full max-w-sm animate-in">
-        <div className="flex items-center gap-2.5 mb-8">
-          <div className="text-[26px] font-bold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
+    <main className="login-frame min-h-dvh grid place-items-center px-4 py-10">
+      <div className="w-full max-w-[400px] animate-in bg-surface border border-line rounded-[26px] shadow-pop p-7 sm:p-8">
+        <div className="flex items-center gap-2.5 mb-7">
+          <div className="text-[22px] font-semibold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
         </div>
 
         {blocked ? (
-          <div className="rounded-xl border border-line bg-surface p-5 text-sm text-ink-2">
+          <div className="rounded-2xl border border-line bg-surface p-5 text-sm text-ink-2">
             This account has no active access. Ask the admin to add or re-activate you.
             <Button className="mt-4 w-full" onClick={signOut}>Sign out</Button>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
-            <h1 className="text-[24px] font-bold tracking-tight text-ink">Sign in</h1>
+            <h1 className="text-[26px] font-light tracking-tight text-ink">Sign in</h1>
             <Field label="Email">
               <Input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
             </Field>

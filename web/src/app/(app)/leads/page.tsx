@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Users2, ChevronLeft, ChevronRight, RotateCcw, Columns3, FolderKanban, MessageSquareText, Trash2, X } from "lucide-react";
+import { Plus, Search, Users2, ChevronLeft, ChevronRight, RotateCcw, Columns3, FolderKanban, MessageSquareText, Trash2, X, Download, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, STAGE_TONE, type Lead, logLeadActivity } from "@/lib/crm";
@@ -11,7 +11,7 @@ import { useDebounced, useStaff, staffName, useProjects } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
 import { Badge, Button, Card, Empty, Input, ListSkeleton, PageHeader, Segmented, Select, Sheet, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
-import { leadMessage, markLeadContacted } from "@/lib/contact";
+import { downloadCSV, leadMessage, markLeadContacted } from "@/lib/contact";
 import { fmtDate, relative, todayDubai } from "@/lib/format";
 import { LeadSheet } from "./LeadSheet";
 
@@ -58,6 +58,20 @@ function Leads() {
   const [colsOpen, setColsOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  async function exportCsv() {
+    setExporting(true);
+    const cols = ["lead_receive_date", "name", "phone", "email", "project_inquired", "budget", "property_type", "bedroom", "source", "status", "follow_up_date", "notes", "last_contacted"];
+    const all: Record<string, unknown>[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await db.from("leads").select(cols.join(",")).range(from, from + 999);
+      if (error) { toast("Export failed"); setExporting(false); return; }
+      all.push(...((data || []) as unknown as Record<string, unknown>[]));
+      if (!data || data.length < 1000) break;
+    }
+    downloadCSV("leads_export", cols, all);
+    setExporting(false);
+  }
   const [cols, setCols] = useState<Set<ColKey>>(() => new Set(COLUMNS.filter((c) => c.on).map((c) => c.key)));
   useEffect(() => { try { const s = JSON.parse(localStorage.getItem(COLS_KEY) || "null"); if (Array.isArray(s)) setCols(new Set(s)); } catch {} }, []);
   const saveCols = (n: Set<ColKey>) => { setCols(n); try { localStorage.setItem(COLS_KEY, JSON.stringify([...n])); } catch {} };
@@ -155,6 +169,7 @@ function Leads() {
           <Segmented value={view} onChange={(v) => { setView(v); setPicked(new Set()); }} options={[{ value: "list", label: "Table" }, { value: "board", label: "Kanban" }]} />
           <Button onClick={() => setTemplateOpen(true)} title="WhatsApp message"><MessageSquareText size={16} /> WhatsApp message</Button>
           {me?.isAdmin && <Button onClick={() => setProjectsOpen(true)}><FolderKanban size={16} /> Projects</Button>}
+          {me?.isAdmin && <Button onClick={exportCsv} disabled={exporting}>{exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Export leads</Button>}
           <Button variant="primary" onClick={() => setCreating(true)}><Plus size={16} /> Add lead</Button>
         </>}
       />
@@ -374,7 +389,7 @@ function StageChip({ label, n, active, onClick }: { label: string; n?: number; a
   return (
     <button onClick={onClick} className={cx(
       "shrink-0 h-8 px-3 rounded-full border text-[13px] font-medium transition-colors inline-flex items-center gap-1.5",
-      active ? "bg-accent text-white border-accent" : "bg-surface border-line text-ink-2 hover:border-line-strong",
+      active ? "bg-accent text-on-accent border-accent" : "bg-surface border-line text-ink-2 hover:border-line-strong",
     )}>
       {label}{n != null && <span className={cx("num text-xs", active ? "opacity-80" : "text-ink-3")}>{n}</span>}
     </button>

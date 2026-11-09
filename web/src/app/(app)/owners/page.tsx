@@ -3,7 +3,7 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, Home, ChevronLeft, ChevronRight, Download, MessageSquareText, RotateCcw, UserRound, Loader2 } from "lucide-react";
+import { Search, Home, ChevronLeft, ChevronRight, Download, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { OWNER_STATUSES, type Owner } from "@/lib/crm";
@@ -11,9 +11,10 @@ import { useDebounced } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
 import { Badge, Button, Card, Empty, Input, ListSkeleton, PageHeader, Select, Sheet, Textarea, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
-import { downloadCSV, isSystemActivity, markOwnerContacted, ownerMessage } from "@/lib/contact";
+import { BROADCAST_IDS_KEY, downloadCSV, isSystemActivity, markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { count, fmtDate, todayDubai } from "@/lib/format";
 import { OwnerSheet } from "./OwnerSheet";
+import { AddOwnerSheet } from "./AddOwnerSheet";
 
 const PAGE = 50;
 type Opt = { community: string | null; cluster: string | null; data_source: string | null; records: number };
@@ -55,6 +56,8 @@ function Owners() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [remarkFor, setRemarkFor] = useState<Row | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [picked, setPicked] = useState<Set<number>>(new Set());
   const term = orSafe(useDebounced(q, 300));
   const unit = useDebounced(unitNo.trim(), 300);
 
@@ -153,6 +156,22 @@ function Owners() {
     setExporting(false);
   }
 
+  // Tick contacts here, or filter the list, then WhatsApp Broadcast picks them up.
+  function broadcast() {
+    if (picked.size) {
+      try { sessionStorage.setItem(BROADCAST_IDS_KEY, JSON.stringify([...picked])); } catch {}
+      router.push("/broadcast");
+      return;
+    }
+    const sp = new URLSearchParams();
+    if (community) sp.set("community", community);
+    if (cluster) sp.set("cluster", cluster);
+    if (status) sp.set("status", status);
+    if (source) sp.set("source", source);
+    router.push(`/broadcast${sp.size ? `?${sp}` : ""}`);
+  }
+  const toggle = (id: number) => setPicked((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const allOnPage = rows.length > 0 && rows.every((r) => picked.has(r.id));
   const canExport = me?.isAdmin || me?.permissions.has("export");
   const anyFilter = q || unitNo || community || cluster || source || status || allRecords;
 
@@ -161,6 +180,8 @@ function Owners() {
       <PageHeader title="Owner database" subtitle={list.data ? `${count(total)} ${allRecords || term || unit ? "records" : "units"}${cluster || community ? ` in ${cluster || community}` : ""}` : " "}
         actions={<>
           <Button onClick={() => setTemplateOpen(true)}><MessageSquareText size={16} /> WhatsApp message</Button>
+          {me?.isAdmin && <Button onClick={broadcast}><MessageCircle size={16} /> WhatsApp Broadcast{picked.size ? ` (${picked.size})` : ""}</Button>}
+          {me?.isAdmin && <Button variant="primary" onClick={() => setAdding(true)}><Plus size={16} /> Add owner</Button>}
           {canExport && <Button onClick={exportCsv} disabled={exporting}>{exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Export CSV</Button>}
         </>} />
 
@@ -209,7 +230,7 @@ function Owners() {
         <div className="flex flex-wrap items-center gap-2 mt-3">
           {QUICK.map((s) => (
             <button key={s} onClick={() => reset(() => setStatus(status === s ? "" : s))}
-              className={cx("h-8 px-3 rounded-full border text-[13px] font-medium transition-colors", status === s ? "bg-accent text-white border-accent" : "bg-surface border-line text-ink-2 hover:border-line-strong")}>
+              className={cx("h-8 px-3 rounded-full border text-[13px] font-medium transition-colors", status === s ? "bg-accent text-on-accent border-accent" : "bg-surface border-line text-ink-2 hover:border-line-strong")}>
               {s === "Invalid Number" ? "Invalid" : s}
             </button>
           ))}
@@ -236,6 +257,7 @@ function Owners() {
               <table className="w-full text-sm">
                 <thead className="bg-surface-2">
                   <tr className="text-left text-xs text-ink-2 border-b border-line">
+                    {me?.isAdmin && <th className="pl-4 py-2.5 w-8"><input type="checkbox" aria-label="Tick all on this page" className="accent-[var(--accent)]" checked={allOnPage} onChange={() => setPicked((s) => { const n = new Set(s); rows.forEach((r) => { if (allOnPage) n.delete(r.id); else n.add(r.id); }); return n; })} /></th>}
                     {["Community", "Cluster", "Unit", "Owner name", "WhatsApp", "Status", "Latest remark", "Last contacted", "Actions"].map((h) => (
                       <th key={h} className="font-semibold px-3 py-2.5 whitespace-nowrap first:pl-4">{h}</th>
                     ))}
@@ -244,6 +266,7 @@ function Owners() {
                 <tbody className={cx(list.isPlaceholderData && "opacity-60")}>
                   {rows.map((o) => (
                     <tr key={o.id} className="border-b border-line last:border-0 hover:bg-surface-2/60 align-top">
+                      {me?.isAdmin && <td className="pl-4 py-3 w-8"><input type="checkbox" aria-label={`Tick ${o.owner || "owner"}`} className="accent-[var(--accent)]" checked={picked.has(o.id)} onChange={() => toggle(o.id)} /></td>}
                       <td className="pl-4 pr-3 py-3 text-ink-2 max-w-40">{o.community}</td>
                       <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>
                       <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>
@@ -276,7 +299,8 @@ function Owners() {
               {rows.map((o) => (
                 <div key={o.id} className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <button onClick={() => openOwner(o.id)} className="text-left min-w-0">
+                    {me?.isAdmin && <input type="checkbox" aria-label={`Tick ${o.owner || "owner"}`} className="accent-[var(--accent)] mt-1 shrink-0" checked={picked.has(o.id)} onChange={() => toggle(o.id)} />}
+                    <button onClick={() => openOwner(o.id)} className="text-left min-w-0 flex-1">
                       <div className="font-semibold text-ink leading-snug">{o.owner || "—"}</div>
                       <div className="text-xs text-ink-3 mt-0.5">{o.community} · {o.cluster}</div>
                     </button>
@@ -315,6 +339,7 @@ function Owners() {
         </>
       )}
 
+      <AddOwnerSheet open={adding} onClose={() => setAdding(false)} onSaved={(id) => { setAdding(false); refresh(); qc.invalidateQueries({ queryKey: ["owner-options"] }); openOwner(id); }} />
       <TemplateSheet open={templateOpen} onClose={() => setTemplateOpen(false)} />
       <RemarkSheet row={remarkFor} onClose={() => setRemarkFor(null)} onSaved={refresh} />
       <OwnerSheet id={openId ? Number(openId) : null} onClose={() => openOwner(null)} onOpen={openOwner} />

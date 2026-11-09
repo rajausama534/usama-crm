@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Loader2, BedDouble, Ruler, Users } from "lucide-react";
+import { Mail, Loader2, BedDouble, Ruler, Users, FileText } from "lucide-react";
 import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
 import { markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { db } from "@/lib/supabase";
@@ -10,12 +11,16 @@ import { useAuth } from "@/components/Providers";
 import { OWNER_STATUSES, OWNER_STATUS_TONE, type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
 import { useStaff, staffName } from "@/lib/hooks";
 import { Badge, Button, Field, Input, Sheet, Skeleton, Textarea, cx } from "@/components/ui";
-import { count, fmtDate, fmtDateTime, todayDubai } from "@/lib/format";
+import { count, fmtDate, fmtDateTime, shortAED, todayDubai } from "@/lib/format";
 
+type Tx = { id: number; kind: string | null; amount: number | null; transaction_date: string; area_sqft: number | null; area_type: string | null; dld_transaction_number: string | null };
+type Change = { changed_at: string; changed_by: string | null; old_row: Partial<Owner> | null; new_row: Partial<Owner> | null };
+type SameUnit = { id: number; owner: string | null; status: string | null; data_source: string | null };
 type UnitDetails = { property_type: string | null; bedrooms: string | null; bua_sqft: number | null; plot_sqft: number | null; layout: string | null };
 
 export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose: () => void; onOpen: (id: number) => void }) {
   const { me } = useAuth();
+  const router = useRouter();
   const qc = useQueryClient();
   const staff = useStaff();
   const [editing, setEditing] = useState(false);
@@ -31,16 +36,22 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
     queryFn: async () => {
       const { data: o } = await db.from("owners").select("*").eq("id", id!).maybeSingle();
       if (!o) return null;
-      const [related, acts, details] = await Promise.all([
+      const [related, acts, details, tx, same, changes] = await Promise.all([
         db.rpc("crm_related_rows", { owner_ids: [id] }),
         db.from("owner_activities").select("id,activity_type,details,created_by,created_at").eq("owner_id", String(id)).order("created_at", { ascending: false }).limit(100),
         db.from("unit_details").select("property_type,bedrooms,bua_sqft,plot_sqft,layout").eq("community", o.community).eq("cluster", o.cluster).eq("unit", o.unit).maybeSingle(),
+        db.from("property_transactions").select("*").eq("community", o.community).eq("cluster", o.cluster).eq("unit", o.unit).order("transaction_date", { ascending: false }),
+        db.from("owners").select("id,owner,phone1,status,data_source").eq("community", o.community).eq("cluster", o.cluster).eq("unit", o.unit).neq("id", id!),
+        db.from("crm_change_log").select("changed_at,changed_by,old_row,new_row,action").eq("table_name", "owners").eq("row_id", String(id)).order("changed_at", { ascending: false }).limit(20),
       ]);
       return {
         owner: o as Owner,
         related: ((related.data || []) as Owner[]).filter((r) => r.id !== id),
         activities: (acts.data || []) as Activity[],
         details: details.data as UnitDetails | null,
+        transactions: tx.error ? null : ((tx.data || []) as Tx[]),
+        sameUnit: (same.data || []) as SameUnit[],
+        changes: (changes.data || []) as Change[],
       };
     },
   });
@@ -121,6 +132,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
             ))}
             {o.email && <a href={`mailto:${o.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
             {!editing && <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>Edit details</Button>}
+            <Button size="sm" variant="ghost" onClick={() => router.push(`/breakdown?owner=${o.id}`)}><FileText size={14} /> Breakdown</Button>
           </div>
 
           {editing ? (
@@ -173,6 +185,25 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
             </div>
           )}
 
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <div className="text-xs font-medium text-ink-3 mb-2">Transaction history</div>
+              {q.data!.transactions === null ? <div className="text-sm text-ink-3">Transaction history is not available yet.</div>
+               : q.data!.transactions.length === 0 ? <div className="text-sm text-ink-3">No verified transactions for this unit.</div>
+               : <ul className="space-y-2.5">{q.data!.transactions.map((t) => (
+                  <li key={t.id} className="text-sm">
+                    <div className="text-xs text-ink-3 num">{fmtDate(t.transaction_date)}</div>
+                    <div className="font-medium text-ink num">{t.kind || "Sold"} AED {shortAED(t.amount)}</div>
+                    <div className="text-xs text-ink-2 num">{[t.area_sqft ? `${count(t.area_sqft)} sq ft${t.area_type === "plot" ? " plot" : ""}` : "", t.dld_transaction_number ? `DLD ${t.dld_transaction_number}` : ""].filter(Boolean).join(" · ")}</div>
+                  </li>
+                ))}</ul>}
+            </div>
+            <div>
+              <div className="text-xs font-medium text-ink-3 mb-2">Ownership history</div>
+              <OwnershipHistory changes={q.data!.changes} same={q.data!.sameUnit} />
+            </div>
+          </div>
+
           <div>
             <div className="text-xs font-medium text-ink-3 mb-2">History</div>
             <div className="rounded-xl border border-line p-3 space-y-2 mb-4">
@@ -204,4 +235,17 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
       )}
     </Sheet>
   );
+}
+
+function OwnershipHistory({ changes, same }: { changes: Change[]; same: SameUnit[] }) {
+  const items: { when: string; title: string; sub: string }[] = [];
+  for (const c of changes) {
+    const o = c.old_row || {}, n = c.new_row || {};
+    if (n.owner !== undefined && o.owner !== n.owner) items.push({ when: fmtDate(c.changed_at), title: "Owner changed", sub: `${o.owner || "-"} → ${n.owner || "-"}` });
+    else if (o.phone1 !== n.phone1 || o.phone2 !== n.phone2) items.push({ when: fmtDate(c.changed_at), title: "Contact updated", sub: `Previous: ${[o.phone1, o.phone2].filter(Boolean).join(", ") || "-"}` });
+    else if (o.status !== n.status) items.push({ when: fmtDate(c.changed_at), title: `Status ${o.status || "-"} → ${n.status || "-"}`, sub: c.changed_by || "" });
+  }
+  for (const r of same) items.push({ when: "Same unit", title: r.owner || "-", sub: [r.status, r.data_source].filter(Boolean).join(" · ") });
+  if (!items.length) return <div className="text-sm text-ink-3">No other owners or earlier changes recorded for this unit.</div>;
+  return <ul className="space-y-2.5">{items.map((x, i) => <li key={i} className="text-sm"><div className="text-xs text-ink-3 num">{x.when}</div><div className="font-medium text-ink">{x.title}</div>{x.sub && <div className="text-xs text-ink-2">{x.sub}</div>}</li>)}</ul>;
 }

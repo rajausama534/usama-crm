@@ -76,3 +76,8 @@ export function resolveMe(email: string, row: AccessRow | null): Me {
 export function can(me: Me | null, p: Permission): boolean {
   return !!me && (me.isAdmin || me.permissions.has(p));
 }
+
+/** Sales department: the CRM, calendar and market data. Accounts and HR staff do not see it. */
+export function canUseSales(me: Me) {
+  return me.isAdmin || me.role === "team_leader" || me.role === "agent";
+}

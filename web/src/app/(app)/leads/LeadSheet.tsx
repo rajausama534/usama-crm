@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, CalendarPlus, Trophy, Loader2 } from "lucide-react";
+import { Mail, CalendarPlus, Trophy, Loader2, FileText } from "lucide-react";
 import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
 import { leadMessage, markLeadContacted } from "@/lib/contact";
 import { db } from "@/lib/supabase";
@@ -20,6 +21,7 @@ type Draft = Partial<Record<(typeof EDITABLE)[number], string | null>>;
 export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClose: () => void; onCreated: (id: string) => void }) {
   const isNew = id === "new";
   const { me } = useAuth();
+  const router = useRouter();
   const qc = useQueryClient();
   const staff = useStaff();
   const projects = useProjects();
@@ -36,7 +38,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
       const [l, acts, evs] = await Promise.all([
         db.from("leads").select("*").eq("id", id!).maybeSingle(),
         db.from("lead_activities").select("id,activity_type,details,created_by,created_at").eq("lead_id", id!).order("created_at", { ascending: false }).limit(100),
-        db.from("crm_events").select("*").eq("lead_id", id!).eq("status", "Scheduled").order("starts_at"),
+        db.from("crm_events").select("*").eq("lead_id", id!).order("starts_at"),
       ]);
       return { lead: l.data as Lead | null, activities: (acts.data || []) as Activity[], events: (evs.data || []) as CrmEvent[] };
     },
@@ -78,6 +80,8 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
   }
 
   const l = lead.data?.lead;
+  const upcoming = (lead.data?.events || []).filter((e) => e.status === "Scheduled");
+  const past = (lead.data?.events || []).filter((e) => e.status !== "Scheduled").reverse();
   const template = useWaTemplate();
   async function contacted() { if (l && me) { await markLeadContacted(l.id, me.email); qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["leads"] }); } }
   const title = isNew ? "New lead" : l ? (l.name || "Unnamed lead") : "Lead";
@@ -101,6 +105,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                 <CopyButton value={l.phone} />
                 {l.email && <a href={`mailto:${l.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
                 <Button size="sm" onClick={() => setScheduling(true)}><CalendarPlus size={14} /> Schedule</Button>
+                <Button size="sm" onClick={() => router.push(`/breakdown?lead=${l.id}`)}><FileText size={14} /> Breakdown</Button>
               </div>
               <div>
                 <div className="text-xs font-medium text-ink-3 mb-1.5">Stage</div>
@@ -129,14 +134,29 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                   <EventForm leadId={l.id} leadName={l.name} onDone={() => { setScheduling(false); qc.invalidateQueries({ queryKey: ["lead", id] }); }} onCancel={() => setScheduling(false)} />
                 </div>
               )}
-              {lead.data!.events.length > 0 && (
+              {upcoming.length > 0 && (
                 <div className="space-y-1.5">
                   <div className="text-xs font-medium text-ink-3">Coming up</div>
-                  {lead.data!.events.map((e) => (
+                  {upcoming.map((e) => (
                     <div key={e.id} className="flex items-center gap-3 text-sm rounded-lg border border-line px-3 py-2">
                       <Badge tone={new Date(e.starts_at) < new Date() ? "bad" : "accent"}>{e.event_type}</Badge>
                       <span className="flex-1 truncate text-ink">{e.title}</span>
                       <span className="text-xs text-ink-3 num">{fmtDateTime(e.starts_at)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {past.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="text-xs font-medium text-ink-3">Past follow-ups</div>
+                  {past.map((e) => (
+                    <div key={e.id} className="text-sm rounded-lg border border-line px-3 py-2">
+                      <div className="flex items-center gap-3">
+                        <Badge tone={e.status === "Completed" ? "good" : "neutral"}>{e.status}</Badge>
+                        <span className="flex-1 truncate text-ink">{e.title}</span>
+                        <span className="text-xs text-ink-3 num">{fmtDateTime(e.starts_at)}</span>
+                      </div>
+                      {e.outcome && <div className="mt-1 text-[13px] text-ink-2 whitespace-pre-wrap">{e.outcome}</div>}
                     </div>
                   ))}
                 </div>

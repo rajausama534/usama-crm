@@ -4,6 +4,8 @@ import { db } from "@/lib/supabase";
 import { todayDubai } from "@/lib/format";
 
 export const WHATSAPP_TEMPLATE_KEY = "usama_whatsapp_template_v1";
+/** Owner ids ticked on the Owners page, picked up by WhatsApp Broadcast. */
+export const BROADCAST_IDS_KEY = "crm_broadcast_ids";
 export type WaTemplate = { greeting: string; agentName: string; title: string; company: string; message: string };
 
 export const DEFAULT_TEMPLATE: WaTemplate = {

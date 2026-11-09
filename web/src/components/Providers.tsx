@@ -62,7 +62,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     try { localStorage.setItem("crm_theme", t); } catch {}
-    document.documentElement.dataset.theme = t;
+    const apply = () => { document.documentElement.dataset.theme = t; };
+    // Cross-fade between themes where the browser supports it.
+    if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(apply);
+    else apply();
   }, []);
   const themeValue = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
 

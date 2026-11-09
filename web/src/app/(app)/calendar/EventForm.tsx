@@ -21,13 +21,13 @@ export function dubaiParts(iso: string) {
   return { date, time };
 }
 
-export function EventForm({ leadId, leadName, event, defaultDate, onDone, onCancel }: {
-  leadId?: string | null; leadName?: string | null; event?: CrmEvent; defaultDate?: string; onDone: () => void; onCancel: () => void;
+export function EventForm({ leadId, leadName, event, defaultDate, defaultTime, onDone, onCancel }: {
+  leadId?: string | null; leadName?: string | null; event?: CrmEvent; defaultDate?: string; defaultTime?: string; onDone: () => void; onCancel: () => void;
 }) {
   const { me } = useAuth();
   const qc = useQueryClient();
   const staff = useStaff();
-  const start = event ? dubaiParts(event.starts_at) : { date: defaultDate || todayDubai(), time: "10:00" };
+  const start = event ? dubaiParts(event.starts_at) : { date: defaultDate || todayDubai(), time: defaultTime || "10:00" };
   const [type, setType] = useState(event?.event_type || "Follow-Up");
   const [title, setTitle] = useState(event?.title || "");
   const [date, setDate] = useState(start.date);
