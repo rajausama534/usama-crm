@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Loader2, BedDouble, Ruler, Users, FileText } from "lucide-react";
+import { Mail, Loader2, Pencil, FileText } from "lucide-react";
 import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
 import { markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { OWNER_STATUSES, OWNER_STATUS_TONE, type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
+import { OWNER_STATUSES, type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
 import { useStaff, staffName } from "@/lib/hooks";
-import { Badge, Button, Field, Input, Sheet, Skeleton, Textarea, cx } from "@/components/ui";
+import { Avatar, Button, Field, Info, Input, Sheet, Skeleton, StatusBadge, StatusChip, Tabs, Textarea, cx } from "@/components/ui";
 import { count, fmtDate, fmtDateTime, shortAED, todayDubai } from "@/lib/format";
 
 type Tx = { id: number; kind: string | null; amount: number | null; transaction_date: string; area_sqft: number | null; area_type: string | null; dld_transaction_number: string | null };
@@ -29,6 +29,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
   const [err, setErr] = useState("");
   const [noteType, setNoteType] = useState("Call");
   const [note, setNote] = useState("");
+  const [tab, setTab] = useState<"overview" | "history" | "property" | "records">("overview");
 
   const q = useQuery({
     queryKey: ["owner", id],
@@ -56,7 +57,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
     },
   });
 
-  useEffect(() => { setEditing(false); setErr(""); setNote(""); }, [id]);
+  useEffect(() => { setEditing(false); setErr(""); setNote(""); setTab("overview"); }, [id]);
   useEffect(() => { if (q.data?.owner) setDraft(q.data.owner); }, [q.data]);
 
   const o = q.data?.owner;
@@ -100,42 +101,48 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
 
   const set = (k: keyof Owner) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft((d) => ({ ...d, [k]: e.target.value }));
 
+  const d = q.data;
+  const subheader = o && d && (
+    <div className="px-5 pt-4 border-b border-line">
+      <div className="flex items-start gap-3">
+        <Avatar name={o.owner} size={44} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold text-ink leading-snug break-words">{o.owner || "Unknown owner"}</h2>
+            <StatusBadge status={o.status} />
+          </div>
+          <div className="text-sm text-ink-3">{o.community}</div>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 mt-3">
+        {[o.phone1, o.phone2].filter(Boolean).map((p) => (
+          <div key={p} className="flex items-center gap-1.5 rounded-full border border-line pl-3 pr-1 py-1">
+            <span className="text-sm text-ink num mr-1 whitespace-nowrap">{p}</span>
+            <WaButton phone={p} text={ownerMessage(template, o)} onContact={() => contact("WhatsApp")} />
+            <CallButton phone={p} onContact={() => contact("Call")} />
+            <CopyButton value={p} />
+          </div>
+        ))}
+        {o.email && <a href={`mailto:${o.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
+        {!editing && <Button size="sm" onClick={() => { setTab("overview"); setEditing(true); }}><Pencil size={14} /> Edit</Button>}
+        <Button size="sm" onClick={() => router.push(`/breakdown?owner=${o.id}`)}><FileText size={14} /> Breakdown</Button>
+      </div>
+      <Tabs className="mt-4 !border-b-0" value={tab} onChange={setTab} options={[
+        { value: "overview", label: "Overview" },
+        { value: "history", label: "History", n: d.activities.length },
+        { value: "property", label: "Property history", n: (d.transactions?.length || 0) },
+        { value: "records", label: "Other records", n: d.related.length },
+      ]} />
+    </div>
+  );
+
   return (
-    <Sheet open={!!id} onClose={onClose} wide title={o ? <span className="num">{o.cluster} · {o.unit}</span> : "Owner"}
+    <Sheet open={!!id} onClose={onClose} large title={o ? <span className="num">{o.cluster} · {o.unit}</span> : "Owner"} subheader={subheader}
       footer={editing && <><Button variant="ghost" onClick={() => { setEditing(false); setDraft(o || {}); }}>Cancel</Button><Button variant="primary" onClick={saveDetails} disabled={busy}>{busy && <Loader2 size={15} className="animate-spin" />}Save</Button></>}>
       {q.isLoading ? <div className="space-y-3"><Skeleton className="w-1/2" /><Skeleton /><Skeleton className="w-2/3" /></div> :
-       !o ? <div className="text-sm text-ink-3">This owner was not found, or you don’t have access to it.</div> : (
+       !o || !d ? <div className="text-sm text-ink-3">This owner was not found, or you don’t have access to it.</div> : (
         <div className="space-y-6">
-          <div>
-            <div className="text-lg font-semibold text-ink">{o.owner || "Unknown owner"}</div>
-            <div className="text-sm text-ink-3">{o.community}{o.data_source ? ` · source: ${o.data_source}` : ""}</div>
-          </div>
-
-          {q.data!.details && (
-            <div className="flex flex-wrap gap-2 text-xs">
-              {q.data!.details.property_type && <Badge>{q.data!.details.property_type}</Badge>}
-              {q.data!.details.bedrooms && <Badge><BedDouble size={12} /> {q.data!.details.bedrooms} bed</Badge>}
-              {q.data!.details.layout && <Badge>{q.data!.details.layout}</Badge>}
-              {q.data!.details.bua_sqft && <Badge><Ruler size={12} /> BUA {count(q.data!.details.bua_sqft)} sq ft</Badge>}
-              {q.data!.details.plot_sqft && <Badge>Plot {count(q.data!.details.plot_sqft)} sq ft</Badge>}
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-2">
-            {[o.phone1, o.phone2].filter(Boolean).map((p) => (
-              <div key={p} className="flex items-center gap-1.5 rounded-xl border border-line pl-3 pr-1 py-1">
-                <span className="text-sm text-ink num mr-1">{p}</span>
-                <WaButton phone={p} text={ownerMessage(template, o)} onContact={() => contact("WhatsApp")} compact />
-                <CallButton phone={p} onContact={() => contact("Call")} compact />
-                <CopyButton value={p} compact />
-              </div>
-            ))}
-            {o.email && <a href={`mailto:${o.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
-            {!editing && <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>Edit details</Button>}
-            <Button size="sm" variant="ghost" onClick={() => router.push(`/breakdown?owner=${o.id}`)}><FileText size={14} /> Breakdown</Button>
-          </div>
-
-          {editing ? (
+          {tab === "overview" && (editing ? (
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Owner name" className="sm:col-span-2"><Input value={draft.owner ?? ""} onChange={set("owner")} /></Field>
               <Field label="Phone 1"><Input value={draft.phone1 ?? ""} onChange={set("phone1")} /></Field>
@@ -147,89 +154,95 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
           ) : (
             <>
               <div>
-                <div className="text-xs font-medium text-ink-3 mb-1.5">Status</div>
+                <div className="text-xs font-medium text-ink-3 mb-2">Status</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {OWNER_STATUSES.map((s) => (
-                    <button key={s} onClick={() => setStatus(s)} className={cx("h-7 px-2.5 rounded-md text-xs font-medium border transition-colors",
-                      s === o.status ? "bg-ink text-bg border-ink" : "border-line text-ink-2 hover:border-line-strong bg-surface")}>{s}</button>
-                  ))}
+                  {OWNER_STATUSES.map((s) => <StatusChip key={s} status={s} active={s === o.status} onClick={() => setStatus(s)} />)}
                 </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Info label="Last contacted"><span className="num">{fmtDate(o.last_contacted)}</span></Info>
+                <Info label="Follow-up"><span className="num">{fmtDate(o.follow_up_date)}</span></Info>
+                <Info label="Source">{o.data_source}</Info>
+                {d.details?.property_type && <Info label="Property type">{d.details.property_type}</Info>}
+                {d.details?.bedrooms && <Info label="Bedrooms">{d.details.bedrooms}</Info>}
+                {d.details?.layout && <Info label="Layout">{d.details.layout}</Info>}
+                {d.details?.bua_sqft && <Info label="BUA"><span className="num">{count(d.details.bua_sqft)} sq ft</span></Info>}
+                {d.details?.plot_sqft && <Info label="Plot"><span className="num">{count(d.details.plot_sqft)} sq ft</span></Info>}
               </div>
               {(o.remarks || o.admin_remarks || o.agent_remarks || o.manager_remarks) && (
-                <div className="rounded-xl bg-surface-2 p-3.5 text-sm text-ink space-y-1.5 whitespace-pre-wrap">
-                  {o.remarks && <div>{o.remarks}</div>}
-                  {o.admin_remarks && <div><span className="text-ink-3">Admin: </span>{o.admin_remarks}</div>}
-                  {o.manager_remarks && <div><span className="text-ink-3">Manager: </span>{o.manager_remarks}</div>}
-                  {o.agent_remarks && <div><span className="text-ink-3">Agent: </span>{o.agent_remarks}</div>}
+                <div>
+                  <div className="text-xs font-medium text-ink-3 mb-2">Remarks</div>
+                  <div className="rounded-xl bg-surface-2 p-3.5 text-sm text-ink space-y-1.5 whitespace-pre-wrap">
+                    {o.remarks && <div>{o.remarks}</div>}
+                    {o.admin_remarks && <div><span className="text-ink-3">Admin: </span>{o.admin_remarks}</div>}
+                    {o.manager_remarks && <div><span className="text-ink-3">Manager: </span>{o.manager_remarks}</div>}
+                    {o.agent_remarks && <div><span className="text-ink-3">Agent: </span>{o.agent_remarks}</div>}
+                  </div>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><div className="text-xs text-ink-3">Last contacted</div><div className="text-ink num">{fmtDate(o.last_contacted)}</div></div>
-                <div><div className="text-xs text-ink-3">Follow-up</div><div className="text-ink num">{fmtDate(o.follow_up_date)}</div></div>
-              </div>
             </>
-          )}
+          ))}
 
-          {q.data!.related.length > 0 && (
+          {tab === "history" && (
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-medium text-ink-3 mb-1.5"><Users size={13} /> Other records for this unit / phone ({q.data!.related.length})</div>
-              <div className="rounded-xl border border-line divide-y divide-line">
-                {q.data!.related.slice(0, 12).map((r) => (
-                  <button key={r.id} onClick={() => onOpen(r.id)} className="w-full text-left px-3 py-2 flex items-center gap-3 hover:bg-surface-2 text-sm">
-                    <span className="flex-1 truncate text-ink">{r.owner || "—"}</span>
-                    <span className="text-xs text-ink-3 num truncate">{r.cluster} {r.unit}</span>
-                    {r.status && <Badge tone={OWNER_STATUS_TONE[r.status] || "neutral"}>{r.status}</Badge>}
-                  </button>
-                ))}
+              <div className="rounded-xl border border-line p-3 space-y-2 mb-5">
+                <div className="flex gap-1.5">
+                  {["Call", "WhatsApp", "Note"].map((t) => (
+                    <button key={t} onClick={() => setNoteType(t)} className={cx("h-7 px-2.5 rounded-md text-xs font-medium", noteType === t ? "bg-accent-soft text-accent-text" : "text-ink-3 hover:text-ink")}>{t}</button>
+                  ))}
+                </div>
+                <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="What was discussed?" rows={2} className="min-h-14" />
+                <div className="flex justify-end"><Button size="sm" variant="primary" onClick={addNote} disabled={busy || !note.trim()}>Add to history</Button></div>
               </div>
-            </div>
-          )}
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <div className="text-xs font-medium text-ink-3 mb-2">Transaction history</div>
-              {q.data!.transactions === null ? <div className="text-sm text-ink-3">Transaction history is not available yet.</div>
-               : q.data!.transactions.length === 0 ? <div className="text-sm text-ink-3">No verified transactions for this unit.</div>
-               : <ul className="space-y-2.5">{q.data!.transactions.map((t) => (
-                  <li key={t.id} className="text-sm">
-                    <div className="text-xs text-ink-3 num">{fmtDate(t.transaction_date)}</div>
-                    <div className="font-medium text-ink num">{t.kind || "Sold"} AED {shortAED(t.amount)}</div>
-                    <div className="text-xs text-ink-2 num">{[t.area_sqft ? `${count(t.area_sqft)} sq ft${t.area_type === "plot" ? " plot" : ""}` : "", t.dld_transaction_number ? `DLD ${t.dld_transaction_number}` : ""].filter(Boolean).join(" · ")}</div>
+              <ol className="relative border-l border-line ml-1.5 space-y-4">
+                {d.activities.map((a) => (
+                  <li key={a.id} className="pl-4 relative">
+                    <span className="absolute -left-[5px] top-1.5 size-2.5 rounded-full bg-surface border-2 border-accent" />
+                    <div className="flex items-baseline gap-2 text-xs text-ink-3 flex-wrap">
+                      <span className="font-medium text-ink-2">{a.activity_type}</span>
+                      <span>{fmtDateTime(a.created_at)}</span>
+                      {a.created_by && <span>· {staffName(staff.data, a.created_by)}</span>}
+                    </div>
+                    {a.details && <div className="text-sm text-ink mt-0.5 whitespace-pre-wrap">{a.details}</div>}
                   </li>
-                ))}</ul>}
-            </div>
-            <div>
-              <div className="text-xs font-medium text-ink-3 mb-2">Ownership history</div>
-              <OwnershipHistory changes={q.data!.changes} same={q.data!.sameUnit} />
-            </div>
-          </div>
-
-          <div>
-            <div className="text-xs font-medium text-ink-3 mb-2">History</div>
-            <div className="rounded-xl border border-line p-3 space-y-2 mb-4">
-              <div className="flex gap-1.5">
-                {["Call", "WhatsApp", "Note"].map((t) => (
-                  <button key={t} onClick={() => setNoteType(t)} className={cx("h-7 px-2.5 rounded-md text-xs font-medium", noteType === t ? "bg-accent-soft text-accent-text" : "text-ink-3 hover:text-ink")}>{t}</button>
                 ))}
-              </div>
-              <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="What was discussed?" rows={2} className="min-h-14" />
-              <div className="flex justify-end"><Button size="sm" variant="primary" onClick={addNote} disabled={busy || !note.trim()}>Add to history</Button></div>
+                {d.activities.length === 0 && <li className="pl-4 text-sm text-ink-3">No history yet.</li>}
+              </ol>
             </div>
-            <ol className="relative border-l border-line ml-1.5 space-y-4">
-              {q.data!.activities.map((a) => (
-                <li key={a.id} className="pl-4 relative">
-                  <span className="absolute -left-[5px] top-1.5 size-2.5 rounded-full bg-surface border-2 border-accent" />
-                  <div className="flex items-baseline gap-2 text-xs text-ink-3 flex-wrap">
-                    <span className="font-medium text-ink-2">{a.activity_type}</span>
-                    <span>{fmtDateTime(a.created_at)}</span>
-                    {a.created_by && <span>· {staffName(staff.data, a.created_by)}</span>}
-                  </div>
-                  {a.details && <div className="text-sm text-ink mt-0.5 whitespace-pre-wrap">{a.details}</div>}
-                </li>
+          )}
+
+          {tab === "property" && (
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <div className="text-xs font-medium text-ink-3 mb-2">Transaction history</div>
+                {d.transactions === null ? <div className="text-sm text-ink-3">Transaction history is not available yet.</div>
+                 : d.transactions.length === 0 ? <div className="text-sm text-ink-3">No verified transactions for this unit.</div>
+                 : <ul className="space-y-2.5">{d.transactions.map((t) => (
+                    <li key={t.id} className="text-sm">
+                      <div className="text-xs text-ink-3 num">{fmtDate(t.transaction_date)}</div>
+                      <div className="font-medium text-ink num">{t.kind || "Sold"} AED {shortAED(t.amount)}</div>
+                      <div className="text-xs text-ink-2 num">{[t.area_sqft ? `${count(t.area_sqft)} sq ft${t.area_type === "plot" ? " plot" : ""}` : "", t.dld_transaction_number ? `DLD ${t.dld_transaction_number}` : ""].filter(Boolean).join(" · ")}</div>
+                    </li>
+                  ))}</ul>}
+              </div>
+              <div>
+                <div className="text-xs font-medium text-ink-3 mb-2">Ownership history</div>
+                <OwnershipHistory changes={d.changes} same={d.sameUnit} />
+              </div>
+            </div>
+          )}
+
+          {tab === "records" && (d.related.length === 0 ? <div className="text-sm text-ink-3">No other records for this unit or phone.</div> : (
+            <div className="rounded-xl border border-line divide-y divide-line">
+              {d.related.map((r) => (
+                <button key={r.id} onClick={() => onOpen(r.id)} className="w-full text-left px-3 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 hover:bg-surface-2 text-sm">
+                  <span className="flex-1 min-w-48 text-ink break-words">{r.owner || "—"}</span>
+                  <span className="text-xs text-ink-3 num">{r.cluster} {r.unit}</span>
+                  {r.status && <StatusBadge status={r.status} />}
+                </button>
               ))}
-              {q.data!.activities.length === 0 && <li className="pl-4 text-sm text-ink-3">No history yet.</li>}
-            </ol>
-          </div>
+            </div>
+          ))}
           {err && <div className="text-sm text-bad">{err}</div>}
         </div>
       )}

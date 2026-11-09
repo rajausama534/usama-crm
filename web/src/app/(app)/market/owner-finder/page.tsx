@@ -235,7 +235,7 @@ export default function OwnerFinderPage() {
           <div className="mt-4 space-y-2">
             {(stats?.fileRows || []).map((f) => (
               <div key={f.id} className="flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-2.5">
-                <div className="min-w-0"><div className="text-[13px] font-medium text-ink truncate">{f.file_name}</div><div className="text-xs text-ink-3 num">{Number(f.rows_count).toLocaleString()} rows</div></div>
+                <div className="min-w-0"><div className="text-[13px] font-medium text-ink break-words">{f.file_name}</div><div className="text-xs text-ink-3 num">{Number(f.rows_count).toLocaleString()} rows</div></div>
                 <Button size="sm" variant="ghost" onClick={() => removeFile(f.id, f.file_name)}><Trash2 size={14} /> Delete</Button>
               </div>
             ))}

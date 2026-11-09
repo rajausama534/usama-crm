@@ -3,13 +3,13 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, Home, ChevronLeft, ChevronRight, Download, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Home, ChevronLeft, ChevronRight, Download, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { OWNER_STATUSES, type Owner } from "@/lib/crm";
 import { useDebounced } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
-import { Badge, Button, Card, Empty, Input, ListSkeleton, PageHeader, Select, Sheet, Textarea, cx } from "@/components/ui";
+import { Badge, Button, Card, Empty, FilterSelect, ListSkeleton, PageHeader, SearchBox, Sheet, StatusChip, StatusSelect, Textarea, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
 import { BROADCAST_IDS_KEY, downloadCSV, isSystemActivity, markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { count, fmtDate, todayDubai } from "@/lib/format";
@@ -23,12 +23,6 @@ const SORTS = [
   { v: "unit", l: "Sort: Unit number" }, { v: "owner", l: "Sort: Owner name" }, { v: "community", l: "Sort: Community" },
   { v: "cluster", l: "Sort: Cluster" }, { v: "id", l: "Sort: Old / new" },
 ];
-const QUICK = ["New", "Contacted", "For Sale", "For Rent", "Sold", "Call Back", "No Response", "Invalid Number"];
-const STATUS_STYLE: Record<string, string> = {
-  New: "text-accent-text bg-accent-soft", Contacted: "text-ink-2 bg-surface-2", "For Sale": "text-good bg-good-soft", "For Rent": "text-good bg-good-soft",
-  Sold: "text-ink-2 bg-surface-2", Rented: "text-ink-2 bg-surface-2", "Call Back": "text-warn bg-warn-soft", "No Response": "text-ink-3 bg-surface-2",
-  "Not Interested": "text-bad bg-bad-soft", "Invalid Number": "text-bad bg-bad-soft", Agent: "text-ink-2 bg-surface-2",
-};
 
 export default function OwnersPage() {
   return <Suspense><Owners /></Suspense>;
@@ -203,48 +197,34 @@ function Owners() {
         ))}
       </div>
 
-      <Card className="p-4 mb-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1.3fr_1.3fr_0.8fr_1fr_1fr] gap-2">
-          <div className="relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
-            <Input value={q} onChange={(e) => reset(() => setQ(e.target.value))} placeholder="Search owner, phone or unit…" className="pl-9" />
-          </div>
-          <Select value={community} onChange={(e) => reset(() => { setCommunity(e.target.value); setCluster(""); })}>
-            <option value="">All communities</option>
-            {communities.map(([c, n]) => <option key={c} value={c}>{c} ({count(n)})</option>)}
-          </Select>
-          <Select value={cluster} onChange={(e) => reset(() => setCluster(e.target.value))}>
-            <option value="">All clusters</option>
-            {clusters.map(([c, n]) => <option key={c} value={c}>{c} ({count(n)})</option>)}
-          </Select>
-          <Input value={unitNo} onChange={(e) => reset(() => setUnitNo(e.target.value))} placeholder="Unit No." inputMode="text" />
-          <Select value={source} onChange={(e) => reset(() => setSource(e.target.value))}>
-            <option value="">All sources</option>
-            {sources.map((s) => <option key={s}>{s}</option>)}
-          </Select>
-          <Select value={status} onChange={(e) => reset(() => setStatus(e.target.value))}>
-            <option value="">All statuses</option>
-            {OWNER_STATUSES.map((s) => <option key={s}>{s}</option>)}
-          </Select>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 mt-3">
-          {QUICK.map((s) => (
-            <button key={s} onClick={() => reset(() => setStatus(status === s ? "" : s))}
-              className={cx("h-8 px-3 rounded-full border text-[13px] font-medium transition-colors", status === s ? "bg-accent text-on-accent border-accent" : "bg-surface border-line text-ink-2 hover:border-line-strong")}>
-              {s === "Invalid Number" ? "Invalid" : s}
-            </button>
-          ))}
-          <div className="flex-1" />
-          <label className="inline-flex items-center gap-2 text-[13px] text-ink-2 cursor-pointer">
-            <input type="checkbox" className="accent-[var(--accent)]" checked={allRecords} onChange={(e) => reset(() => setAllRecords(e.target.checked))} /> Show every owner record
-          </label>
-          <Select value={sort} onChange={(e) => reset(() => setSort(e.target.value))} className="w-auto">{SORTS.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}</Select>
-          <Select value={dir} onChange={(e) => reset(() => setDir(e.target.value as "asc" | "desc"))} className="w-auto">
-            <option value="asc">Ascending / oldest</option><option value="desc">Descending / newest</option>
-          </Select>
-          {anyFilter && <Button variant="ghost" onClick={() => reset(() => { setQ(""); setUnitNo(""); setCommunity(""); setCluster(""); setSource(""); setStatus(""); setAllRecords(false); })}><RotateCcw size={14} /> Reset filters</Button>}
-        </div>
-      </Card>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <SearchBox value={q} onChange={(v) => reset(() => setQ(v))} placeholder="Search owners…" />
+        <FilterSelect aria-label="Community" value={community} onChange={(e) => reset(() => { setCommunity(e.target.value); setCluster(""); })}>
+          <option value="">All communities</option>
+          {communities.map(([c, n]) => <option key={c} value={c}>{c} ({count(n)})</option>)}
+        </FilterSelect>
+        <FilterSelect aria-label="Cluster" value={cluster} onChange={(e) => reset(() => setCluster(e.target.value))}>
+          <option value="">All clusters</option>
+          {clusters.map(([c, n]) => <option key={c} value={c}>{c} ({count(n)})</option>)}
+        </FilterSelect>
+        <input value={unitNo} onChange={(e) => reset(() => setUnitNo(e.target.value))} placeholder="Unit No." aria-label="Unit number"
+          className={cx("field-sizing-content min-w-20 h-9 rounded-full border px-3.5 text-[13px] font-medium placeholder:text-ink-2 outline-none transition-colors focus:border-accent", unitNo ? "border-accent bg-accent-soft text-accent-text" : "border-line bg-surface text-ink-2 hover:border-line-strong")} />
+        <FilterSelect aria-label="Source" value={source} onChange={(e) => reset(() => setSource(e.target.value))}>
+          <option value="">All sources</option>
+          {sources.map((s) => <option key={s}>{s}</option>)}
+        </FilterSelect>
+        <FilterSelect aria-label="Sort by" active={false} value={sort} onChange={(e) => reset(() => setSort(e.target.value))}>{SORTS.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}</FilterSelect>
+        <Button className="w-9 !px-0" title={dir === "asc" ? "Ascending / oldest first" : "Descending / newest first"} aria-label="Change sort direction" onClick={() => reset(() => setDir(dir === "asc" ? "desc" : "asc"))}>
+          {dir === "asc" ? <ArrowUpNarrowWide size={15} /> : <ArrowDownWideNarrow size={15} />}
+        </Button>
+        {anyFilter && <Button variant="ghost" onClick={() => reset(() => { setQ(""); setUnitNo(""); setCommunity(""); setCluster(""); setSource(""); setStatus(""); setAllRecords(false); })}><RotateCcw size={14} /> Reset</Button>}
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+        {OWNER_STATUSES.map((s) => <StatusChip key={s} status={s} label={s === "Invalid Number" ? "Invalid" : s} active={status === s} onClick={() => reset(() => setStatus(status === s ? "" : s))} />)}
+        <label className="ml-auto inline-flex items-center gap-2 text-[13px] text-ink-2 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" className="accent-[var(--accent)]" checked={allRecords} onChange={(e) => reset(() => setAllRecords(e.target.checked))} /> Show every owner record
+        </label>
+      </div>
 
       {list.isLoading ? <ListSkeleton /> : list.error ? (
         <Card><Empty title="Couldn’t load owners" hint={(list.error as Error).message} /></Card>
@@ -270,7 +250,7 @@ function Owners() {
                       <td className="pl-4 pr-3 py-3 text-ink-2 max-w-40">{o.community}</td>
                       <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>
                       <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>
-                      <td className="px-3 py-3 min-w-56 max-w-72">
+                      <td className="px-3 py-3 min-w-44 max-w-72">
                         <div className="text-ink font-medium leading-snug">{o.owner || "—"}</div>
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                           <button onClick={() => openOwner(o.id)} className="inline-flex items-center gap-1 h-6 px-2 rounded-md bg-accent-soft text-accent-text text-xs font-medium hover:opacity-80"><UserRound size={12} /> Profile</button>
@@ -279,10 +259,10 @@ function Owners() {
                         </div>
                       </td>
                       <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>
-                      <td className="px-3 py-3"><StatusSelect value={o.status} onChange={(s) => changeStatus(o, s)} /></td>
-                      <td className="px-3 py-3 min-w-64 max-w-[420px]">
+                      <td className="px-3 py-3"><StatusSelect value={o.status} options={OWNER_STATUSES} onChange={(s) => changeStatus(o, s)} /></td>
+                      <td className="px-3 py-3 min-w-48 max-w-[420px]">
                         <button onClick={() => setRemarkFor(o)} title="Read or add a remark"
-                          className="w-full text-left text-[13px] leading-snug text-ink-2 hover:text-ink line-clamp-3 whitespace-pre-line rounded-md hover:bg-surface-2 -m-1 p-1">
+                          className="w-full text-left text-[13px] leading-snug text-ink-2 hover:text-ink whitespace-pre-line rounded-md hover:bg-surface-2 -m-1 p-1">
                           {o.__remark || <span className="text-ink-3">No remark yet</span>}
                         </button>
                       </td>
@@ -307,16 +287,16 @@ function Owners() {
                     <span className="shrink-0 rounded-lg bg-accent-soft text-accent-text text-sm font-bold px-2.5 py-1 num">Unit {o.unit}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <StatusSelect value={o.status} onChange={(s) => changeStatus(o, s)} />
+                    <StatusSelect value={o.status} options={OWNER_STATUSES} onChange={(s) => changeStatus(o, s)} />
                     <span className="text-xs text-ink-3 ml-auto">Last contact {fmtDate(o.last_contacted)}</span>
                   </div>
-                  <button onClick={() => setRemarkFor(o)} className="w-full text-left text-[13px] text-ink-2 rounded-lg bg-surface-2 px-3 py-2 line-clamp-3 whitespace-pre-line">
+                  <button onClick={() => setRemarkFor(o)} className="w-full text-left text-[13px] text-ink-2 rounded-lg bg-surface-2 px-3 py-2 whitespace-pre-line">
                     {o.__remark || <span className="text-ink-3">No remark yet — tap to add</span>}
                   </button>
-                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                  <div className="flex items-center gap-2">
                     <WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} />
                     <CallButton phone={o.phone1 || o.phone2} onContact={() => contact(o, "Call")} />
-                    <CopyButton value={o.phone1 || o.phone2} compact />
+                    <CopyButton value={o.phone1 || o.phone2} />
                   </div>
                   {(!!o.__coOwners || (o.__units || 0) > 1) && (
                     <div className="flex gap-1.5 text-xs">
@@ -374,18 +354,6 @@ function Owners() {
       if (r.is_primary !== false) r.__coOwners = (co.data || []).filter((x) => x.unit === r.unit && x.cluster === r.cluster && x.community === r.community && x.id !== r.id).length;
     }
   }
-}
-
-function StatusSelect({ value, onChange }: { value: string | null; onChange: (v: string) => void }) {
-  const current = value && value !== "-" ? value : "New";
-  const opts = OWNER_STATUSES.includes(current as (typeof OWNER_STATUSES)[number]) ? OWNER_STATUSES : [current, ...OWNER_STATUSES];
-  return (
-    <select value={current} onChange={(e) => onChange(e.target.value)} onClick={(e) => e.stopPropagation()}
-      className={cx("h-8 rounded-lg border-0 px-2.5 pr-7 text-[13px] font-semibold cursor-pointer outline-none appearance-none bg-no-repeat bg-[length:14px] bg-[right_6px_center]", STATUS_STYLE[current] || "bg-surface-2 text-ink-2")}
-      style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a4' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")" }}>
-      {opts.map((s) => <option key={s}>{s}</option>)}
-    </select>
-  );
 }
 
 function RemarkSheet({ row, onClose, onSaved }: { row: Row | null; onClose: () => void; onSaved: () => void }) {

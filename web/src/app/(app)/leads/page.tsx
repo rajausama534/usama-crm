@@ -3,13 +3,13 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Users2, ChevronLeft, ChevronRight, RotateCcw, Columns3, FolderKanban, MessageSquareText, Trash2, X, Download, Loader2 } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Plus, UserRound, Users2, ChevronLeft, ChevronRight, RotateCcw, Columns3, FolderKanban, MessageSquareText, Trash2, X, Download, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, STAGE_TONE, type Lead, logLeadActivity } from "@/lib/crm";
+import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, type Lead, logLeadActivity } from "@/lib/crm";
 import { useDebounced, useStaff, staffName, useProjects } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
-import { Badge, Button, Card, Empty, Input, ListSkeleton, PageHeader, Segmented, Select, Sheet, cx } from "@/components/ui";
+import { Badge, Button, Card, Empty, FilterSelect, Input, ListSkeleton, PageHeader, SearchBox, Segmented, Select, Sheet, StatusBadge, StatusChip, StatusSelect, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
 import { downloadCSV, leadMessage, markLeadContacted } from "@/lib/contact";
 import { fmtDate, relative, todayDubai } from "@/lib/format";
@@ -18,11 +18,11 @@ import { LeadSheet } from "./LeadSheet";
 const PAGE = 50;
 type ColKey = "name" | "phone" | "project_inquired" | "budget" | "status" | "notes" | "whatsapp" | "lead_receive_date" | "email" | "property_type" | "bedroom" | "source" | "follow_up_date" | "last_contacted" | "assigned_to";
 const COLUMNS: { key: ColKey; label: string; on: boolean }[] = [
-  { key: "name", label: "Name", on: true }, { key: "phone", label: "Phone", on: true }, { key: "project_inquired", label: "Project inquired", on: true },
+  { key: "name", label: "Name", on: true }, { key: "phone", label: "Phone", on: true }, { key: "project_inquired", label: "Project", on: true },
   { key: "budget", label: "Budget", on: true }, { key: "status", label: "Status", on: true }, { key: "notes", label: "Notes", on: true },
   { key: "whatsapp", label: "Contact", on: true }, { key: "lead_receive_date", label: "Received", on: false }, { key: "email", label: "Email", on: false },
   { key: "property_type", label: "Property type", on: false }, { key: "bedroom", label: "Bedroom", on: false }, { key: "source", label: "Source", on: false },
-  { key: "follow_up_date", label: "Follow-up date", on: true }, { key: "last_contacted", label: "Last contacted", on: false }, { key: "assigned_to", label: "Agent", on: false },
+  { key: "follow_up_date", label: "Follow-up", on: true }, { key: "last_contacted", label: "Last contacted", on: false }, { key: "assigned_to", label: "Agent", on: false },
 ];
 const COLS_KEY = "crm_new_lead_columns_v1";
 const SORTS = [{ v: "lead_receive_date", l: "Sort: Received date" }, { v: "name", l: "Sort: Name" }, { v: "follow_up_date", l: "Sort: Follow-up" }, { v: "created_at", l: "Sort: Created" }];
@@ -174,45 +174,36 @@ function Leads() {
         </>}
       />
 
-      <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1">
-        <StageChip label="All" n={stats.data?.leads.total} active={!stage} onClick={() => setFilter(() => setStage(""))} />
-        {LEAD_STAGES.map((s) => <StageChip key={s} label={s} n={counts[s] || 0} active={stage === s} onClick={() => setFilter(() => setStage(stage === s ? "" : s))} />)}
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <SearchBox value={q} onChange={(v) => setFilter(() => setQ(v))} placeholder="Search leads…" />
+        <FilterSelect aria-label="Source" value={source} onChange={(e) => setFilter(() => setSource(e.target.value))}>
+          <option value="">All sources</option>{LEAD_SOURCES.map((s) => <option key={s}>{s}</option>)}
+        </FilterSelect>
+        <FilterSelect aria-label="Project" value={project} onChange={(e) => setFilter(() => setProject(e.target.value))}>
+          <option value="">All projects</option>{projects.data?.map((p) => <option key={p}>{p}</option>)}
+        </FilterSelect>
+        {me?.isAdmin && (
+          <FilterSelect aria-label="Agent" value={agent} onChange={(e) => setFilter(() => setAgent(e.target.value))}>
+            <option value="">All agents</option><option value="-">Not assigned</option>
+            {staff.data?.map((s) => <option key={s.email} value={s.email}>{s.name || s.email}</option>)}
+          </FilterSelect>
+        )}
+        <label className={cx("inline-flex items-center gap-2 h-9 rounded-full border pl-3.5 pr-2.5 text-[13px] font-medium transition-colors focus-within:border-accent", followUp ? "border-accent bg-accent-soft text-accent-text" : "border-line bg-surface text-ink-2 hover:border-line-strong")}>
+          <span className="whitespace-nowrap">Follow-up</span>
+          <input type="date" value={followUp} onChange={(e) => setFilter(() => setFollowUp(e.target.value))} className="bg-transparent outline-none num" />
+        </label>
+        <FilterSelect aria-label="Sort by" active={false} value={sort} onChange={(e) => setFilter(() => setSort(e.target.value))}>{SORTS.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}</FilterSelect>
+        <Button className="w-9 !px-0" title={dir === "desc" ? "Newest / Z → A" : "Oldest / A → Z"} aria-label="Change sort direction" onClick={() => setFilter(() => setDir(dir === "desc" ? "asc" : "desc"))}>
+          {dir === "asc" ? <ArrowUpNarrowWide size={15} /> : <ArrowDownWideNarrow size={15} />}
+        </Button>
+        {view === "list" && <Button className="w-9 !px-0" title="Columns" aria-label="Columns" onClick={() => setColsOpen(true)}><Columns3 size={15} /></Button>}
+        {due && <Badge tone={due === "overdue" ? "bad" : "warn"}>{due === "today" ? "Follow-ups today" : "Overdue"} <button onClick={() => setFilter(() => setDue(""))} aria-label="Clear"><X size={12} /></button></Badge>}
+        {anyFilter && <Button variant="ghost" onClick={() => setFilter(() => { setQ(""); setStage(""); setSource(""); setProject(""); setFollowUp(""); setAgent(""); setDue(""); })}><RotateCcw size={14} /> Reset</Button>}
       </div>
-
-      <Card className="p-4 mb-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2">
-          <div className="relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
-            <Input value={q} onChange={(e) => setFilter(() => setQ(e.target.value))} placeholder="Search name, phone, email or project…" className="pl-9" />
-          </div>
-          <Select value={source} onChange={(e) => setFilter(() => setSource(e.target.value))}>
-            <option value="">All sources</option>{LEAD_SOURCES.map((s) => <option key={s}>{s}</option>)}
-          </Select>
-          <Select value={project} onChange={(e) => setFilter(() => setProject(e.target.value))}>
-            <option value="">All projects</option>{projects.data?.map((p) => <option key={p}>{p}</option>)}
-          </Select>
-          <label className="flex items-center gap-2 h-9 rounded-lg border border-line bg-surface px-3 text-sm text-ink-3 hover:border-line-strong focus-within:border-accent">
-            <span className="whitespace-nowrap">Follow-up</span>
-            <input type="date" value={followUp} onChange={(e) => setFilter(() => setFollowUp(e.target.value))} className="flex-1 min-w-0 bg-transparent text-ink outline-none num" />
-          </label>
-          {me?.isAdmin ? (
-            <Select value={agent} onChange={(e) => setFilter(() => setAgent(e.target.value))}>
-              <option value="">All agents</option><option value="-">Not assigned</option>
-              {staff.data?.map((s) => <option key={s.email} value={s.email}>{s.name || s.email}</option>)}
-            </Select>
-          ) : <div />}
-        </div>
-        <div className="flex flex-wrap items-center gap-2 mt-3">
-          {due && <Badge tone={due === "overdue" ? "bad" : "warn"}>{due === "today" ? "Follow-ups today" : "Overdue"} <button onClick={() => setFilter(() => setDue(""))} aria-label="Clear"><X size={12} /></button></Badge>}
-          <div className="flex-1" />
-          <Select value={sort} onChange={(e) => setFilter(() => setSort(e.target.value))} className="w-auto">{SORTS.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}</Select>
-          <Select value={dir} onChange={(e) => setFilter(() => setDir(e.target.value as "asc" | "desc"))} className="w-auto">
-            <option value="desc">Newest / Z → A</option><option value="asc">Oldest / A → Z</option>
-          </Select>
-          {view === "list" && <Button onClick={() => setColsOpen(true)}><Columns3 size={15} /> Columns</Button>}
-          {anyFilter && <Button variant="ghost" onClick={() => setFilter(() => { setQ(""); setStage(""); setSource(""); setProject(""); setFollowUp(""); setAgent(""); setDue(""); })}><RotateCcw size={14} /> Reset filters</Button>}
-        </div>
-      </Card>
+      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+        <StageChip label="All" n={stats.data?.leads.total} active={!stage} onClick={() => setFilter(() => setStage(""))} />
+        {LEAD_STAGES.map((s) => <StatusChip key={s} status={s} n={counts[s] || 0} active={stage === s} onClick={() => setFilter(() => setStage(stage === s ? "" : s))} />)}
+      </div>
 
       {picked.size > 0 && (
         <div className="sticky top-16 z-20 mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-accent bg-surface p-2.5 shadow-pop animate-in">
@@ -239,16 +230,16 @@ function Leads() {
                 <thead className="bg-surface-2">
                   <tr className="text-left text-xs text-ink-2 border-b border-line">
                     <th className="w-10 pl-4"><input type="checkbox" className="accent-[var(--accent)]" checked={allPicked} onChange={(e) => setPicked(e.target.checked ? new Set(rows.map((r) => r.id)) : new Set())} aria-label="Select all" /></th>
-                    {visible.map((c) => <th key={c.key} className="font-semibold px-2 py-2.5 whitespace-nowrap">{c.label}</th>)}
-                    <th className="w-16" />
+                    {visible.map((c) => <th key={c.key} className="font-semibold px-3 py-2.5 whitespace-nowrap">{c.label}</th>)}
+                    <th className="w-11" />
                   </tr>
                 </thead>
                 <tbody className={cx(list.isPlaceholderData && "opacity-60")}>
                   {rows.map((l) => (
                     <tr key={l.id} className={cx("border-b border-line last:border-0 align-top", picked.has(l.id) ? "bg-accent-soft" : "hover:bg-surface-2/60")}>
                       <td className="pl-4 pt-3.5"><input type="checkbox" className="accent-[var(--accent)]" checked={picked.has(l.id)} onChange={(e) => toggle(l.id, e.target.checked)} aria-label="Select lead" /></td>
-                      {visible.map((c) => <td key={c.key} className="px-2 py-2">{cell(l, c.key)}</td>)}
-                      <td className="pr-3 py-2"><Button size="sm" onClick={() => openLead(l.id)}>View</Button></td>
+                      {visible.map((c) => <td key={c.key} className="px-1 py-2">{cell(l, c.key)}</td>)}
+                      <td className="pr-3 py-2"><Button size="sm" className="w-8 !px-0" title="Open profile" aria-label="Open profile" onClick={() => openLead(l.id)}><UserRound size={14} /></Button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -263,14 +254,14 @@ function Leads() {
                       <div className="font-semibold text-ink">{l.name || "Unnamed"}</div>
                       <div className="text-xs text-ink-3 mt-0.5">{[l.project_inquired, l.budget, l.source].filter(Boolean).join(" · ") || l.phone}</div>
                     </button>
-                    <Badge tone={STAGE_TONE[l.status || ""] || "neutral"}>{l.status || "New"}</Badge>
+                    <StatusBadge status={l.status} />
                   </div>
-                  {l.notes && <div className="text-[13px] text-ink-2 rounded-lg bg-surface-2 px-3 py-2 line-clamp-3">{l.notes}</div>}
+                  {l.notes && <div className="text-[13px] text-ink-2 rounded-lg bg-surface-2 px-3 py-2 whitespace-pre-line">{l.notes}</div>}
                   {l.follow_up_date && <div className={cx("text-xs", l.follow_up_date < todayDubai() ? "text-bad" : "text-ink-3")}>Follow-up {relative(l.follow_up_date)}</div>}
-                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                  <div className="flex items-center gap-2">
                     <WaButton phone={l.phone} text={leadMessage(template, l)} onContact={() => contact(l)} />
                     <CallButton phone={l.phone} onContact={() => contact(l)} />
-                    <CopyButton value={l.phone} compact />
+                    <CopyButton value={l.phone} />
                   </div>
                 </div>
               ))}
@@ -310,26 +301,20 @@ function Leads() {
   function cell(l: Lead, k: ColKey) {
     switch (k) {
       case "name": case "phone": case "budget": case "email":
-        return <EditCell value={l[k]} onSave={(v) => saveField(l, k, v)} className={cx(k === "name" && "font-medium min-w-36", k === "phone" && "num min-w-32", k === "budget" && "w-24", k === "email" && "min-w-44")} />;
+        return <EditCell value={l[k]} onSave={(v) => saveField(l, k, v)} className={cx(k === "name" && "font-medium min-w-24", k === "phone" && "num", k === "budget" && "min-w-14 whitespace-nowrap", k === "email" && "min-w-44")} />;
       case "project_inquired": return <EditSelect value={l.project_inquired} options={projects.data || []} onSave={(v) => saveField(l, k, v)} />;
       case "property_type": return <EditSelect value={l[k]} options={PROPERTY_TYPES} onSave={(v) => saveField(l, k, v)} />;
       case "bedroom": return <EditSelect value={l[k]} options={BEDROOMS} onSave={(v) => saveField(l, k, v)} />;
       case "source": return <EditSelect value={l[k]} options={LEAD_SOURCES} onSave={(v) => saveField(l, k, v)} />;
-      case "status":
-        return (
-          <select value={l.status || "New"} onChange={(e) => saveField(l, "status", e.target.value)}
-            className="h-8 rounded-lg border border-line bg-surface px-2 text-[13px] font-semibold text-ink outline-none focus:border-accent">
-            {[...new Set([l.status || "New", ...LEAD_STAGES])].map((s) => <option key={s}>{s}</option>)}
-          </select>
-        );
-      case "notes": return <EditCell value={l.notes} onSave={(v) => saveField(l, "notes", v)} multiline className="min-w-56" />;
+      case "status": return <StatusSelect value={l.status} options={LEAD_STAGES} onChange={(v) => saveField(l, "status", v)} />;
+      case "notes": return <EditCell value={l.notes} onSave={(v) => saveField(l, "notes", v)} multiline className="min-w-40" />;
       case "lead_receive_date": case "follow_up_date":
         return <input type="date" defaultValue={l[k] || ""} key={l[k] || ""} onBlur={(e) => saveField(l, k, e.target.value)}
           className={cx("h-8 rounded-lg border border-transparent hover:border-line bg-transparent px-2 text-[13px] num outline-none focus:border-accent", k === "follow_up_date" && l.follow_up_date && l.follow_up_date < todayDubai() && !["Won", "Lost"].includes(l.status || "") ? "text-bad" : "text-ink-2")} />;
       case "last_contacted": return <span className="text-ink-2 num leading-8 whitespace-nowrap">{fmtDate(l.last_contacted)}</span>;
       case "assigned_to": return <span className="text-ink-2 leading-8 whitespace-nowrap">{staffName(staff.data, l.assigned_to)}</span>;
       case "whatsapp":
-        return <div className="flex gap-1.5"><WaButton phone={l.phone} text={leadMessage(template, l)} onContact={() => contact(l)} compact /><CallButton phone={l.phone} onContact={() => contact(l)} compact /><CopyButton value={l.phone} compact /></div>;
+        return <div className="flex gap-1.5"><WaButton phone={l.phone} text={leadMessage(template, l)} onContact={() => contact(l)} /><CallButton phone={l.phone} onContact={() => contact(l)} /><CopyButton value={l.phone} /></div>;
     }
   }
 }
@@ -338,14 +323,14 @@ function Leads() {
 function EditCell({ value, onSave, multiline, className }: { value: string | null; onSave: (v: string) => void; multiline?: boolean; className?: string }) {
   const [v, setV] = useState(value ?? "");
   useEffect(() => setV(value ?? ""), [value]);
-  const base = "w-full rounded-lg border border-transparent hover:border-line bg-transparent px-2 text-[13px] text-ink outline-none focus:border-accent focus:bg-surface transition-colors";
-  if (multiline) return <textarea value={v} rows={2} onChange={(e) => setV(e.target.value)} onBlur={() => onSave(v)} onKeyDown={(e) => { if (e.key === "Escape") { setV(value ?? ""); (e.target as HTMLElement).blur(); } }} className={cx(base, "py-1.5 resize-y leading-snug min-h-8", className)} placeholder="Add notes" />;
-  return <input value={v} onChange={(e) => setV(e.target.value)} onBlur={() => onSave(v)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLElement).blur(); if (e.key === "Escape") { setV(value ?? ""); (e.target as HTMLElement).blur(); } }} className={cx(base, "h-8", className)} />;
+  const base = "rounded-lg border border-transparent hover:border-line bg-transparent px-2 text-[13px] text-ink outline-none focus:border-accent focus:bg-surface transition-colors";
+  if (multiline) return <textarea value={v} rows={2} onChange={(e) => setV(e.target.value)} onBlur={() => onSave(v)} onKeyDown={(e) => { if (e.key === "Escape") { setV(value ?? ""); (e.target as HTMLElement).blur(); } }} className={cx(base, "field-sizing-content w-full py-1.5 resize-none leading-snug min-h-8", className)} placeholder="Add notes" />;
+  return <input value={v} onChange={(e) => setV(e.target.value)} onBlur={() => onSave(v)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLElement).blur(); if (e.key === "Escape") { setV(value ?? ""); (e.target as HTMLElement).blur(); } }} className={cx(base, "field-sizing-content w-auto min-w-14 h-8", className)} />;
 }
 function EditSelect({ value, options, onSave }: { value: string | null; options: string[]; onSave: (v: string) => void }) {
   return (
     <select value={value || ""} onChange={(e) => onSave(e.target.value)}
-      className="h-8 max-w-48 rounded-lg border border-transparent hover:border-line bg-transparent px-2 text-[13px] text-ink-2 outline-none focus:border-accent">
+      className="field-sizing-content h-8 rounded-lg border border-transparent hover:border-line bg-transparent px-2 text-[13px] text-ink-2 outline-none focus:border-accent">
       <option value="">—</option>
       {value && !options.includes(value) && <option>{value}</option>}
       {options.map((o) => <option key={o}>{o}</option>)}
@@ -413,15 +398,15 @@ function Board({ rows, onOpen, onMove }: { rows: Lead[]; onOpen: (id: string) =>
           onDrop={(e) => { e.preventDefault(); setOver(null); const l = rows.find((r) => r.id === e.dataTransfer.getData("text/plain")); if (l) onMove(l, s); }}
           className={cx("w-72 shrink-0 rounded-xl bg-surface-2 border p-2 snap-start transition-colors", over === s ? "border-accent" : "border-line")}>
           <div className="flex items-center justify-between px-1.5 py-1 mb-1">
-            <span className="text-[13px] font-semibold text-ink">{s}</span>
+            <StatusBadge status={s} />
             <span className="text-xs text-ink-3 num">{byStage[s]?.length || 0}</span>
           </div>
           <div className="space-y-1.5 max-h-[70vh] overflow-y-auto">
             {byStage[s]?.map((l) => (
               <div key={l.id} draggable onDragStart={(e) => e.dataTransfer.setData("text/plain", l.id)} onClick={() => onOpen(l.id)}
                 className="rounded-lg bg-surface border border-line p-2.5 cursor-pointer hover:border-line-strong shadow-card">
-                <div className="text-sm font-medium text-ink truncate">{l.name || "Unnamed"}</div>
-                <div className="text-xs text-ink-3 truncate mt-0.5">{[l.project_inquired, l.budget].filter(Boolean).join(" · ") || l.phone}</div>
+                <div className="text-sm font-medium text-ink break-words">{l.name || "Unnamed"}</div>
+                <div className="text-xs text-ink-3 break-words mt-0.5">{[l.project_inquired, l.budget].filter(Boolean).join(" · ") || l.phone}</div>
                 {l.follow_up_date && <div className={cx("text-xs mt-1.5", l.follow_up_date < todayDubai() ? "text-bad" : "text-ink-3")}>Follow-up {relative(l.follow_up_date)}</div>}
               </div>
             ))}

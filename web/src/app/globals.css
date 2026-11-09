@@ -308,3 +308,34 @@ body { -webkit-font-smoothing: antialiased; font-size: 14px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* Status colours, one palette for Owners and Leads (same as the old CRM). */
+[data-tone="blue"] { --st-fg: #214d91; --st-bg: #eaf1fc; --st-border: #bfd1ec; }
+[data-tone="lime"] { --st-fg: #365d25; --st-bg: #edf6e7; --st-border: #c6dbb9; }
+[data-tone="green"] { --st-fg: #1c6241; --st-bg: #e8f5ed; --st-border: #b8dcc8; }
+[data-tone="indigo"] { --st-fg: #46469b; --st-bg: #efeffb; --st-border: #cfcfee; }
+[data-tone="gold"] { --st-fg: #73550f; --st-bg: #faf3df; --st-border: #e7d7a8; }
+[data-tone="purple"] { --st-fg: #69418a; --st-bg: #f4edf9; --st-border: #dbc9e9; }
+[data-tone="slate"] { --st-fg: #445367; --st-bg: #edf1f5; --st-border: #ccd5df; }
+[data-tone="red"] { --st-fg: #943845; --st-bg: #fbecef; --st-border: #eac6cd; }
+[data-tone="grey"] { --st-fg: #50545e; --st-bg: #eff0f2; --st-border: #d1d3d9; }
+[data-tone="orange"] { --st-fg: #874b1c; --st-bg: #fbf0e6; --st-border: #e9ceb7; }
+[data-tone="teal"] { --st-fg: #1d6561; --st-bg: #e6f4f2; --st-border: #b9dcd7; }
+[data-tone="emerald"] { --st-fg: #0e6448; --st-bg: #e4f5ed; --st-border: #addbc6; }
+[data-tone="cyan"] { --st-fg: #235e70; --st-bg: #e9f4f8; --st-border: #c0dce5; }
+:root[data-theme="dark"] [data-tone="blue"] { --st-fg: #b5d0ff; --st-bg: #162a46; --st-border: #36577d; }
+:root[data-theme="dark"] [data-tone="lime"] { --st-fg: #c4e9ac; --st-bg: #243724; --st-border: #45643c; }
+:root[data-theme="dark"] [data-tone="green"] { --st-fg: #9fdfbb; --st-bg: #15372b; --st-border: #32644b; }
+:root[data-theme="dark"] [data-tone="indigo"] { --st-fg: #c5c5ff; --st-bg: #292940; --st-border: #555580; }
+:root[data-theme="dark"] [data-tone="gold"] { --st-fg: #ecd48f; --st-bg: #39301b; --st-border: #6d5b2f; }
+:root[data-theme="dark"] [data-tone="purple"] { --st-fg: #d8bdf5; --st-bg: #30223e; --st-border: #64477c; }
+:root[data-theme="dark"] [data-tone="slate"] { --st-fg: #c0cbd9; --st-bg: #252f3c; --st-border: #4c5a6c; }
+:root[data-theme="dark"] [data-tone="red"] { --st-fg: #f3b5bd; --st-bg: #3c242c; --st-border: #79424d; }
+:root[data-theme="dark"] [data-tone="grey"] { --st-fg: #c6c9d0; --st-bg: #2e3037; --st-border: #5b5e68; }
+:root[data-theme="dark"] [data-tone="orange"] { --st-fg: #f0c19b; --st-bg: #392b20; --st-border: #76583b; }
+:root[data-theme="dark"] [data-tone="teal"] { --st-fg: #9cddd8; --st-bg: #153634; --st-border: #346865; }
+:root[data-theme="dark"] [data-tone="emerald"] { --st-fg: #94e4c5; --st-bg: #12382d; --st-border: #2d7056; }
+:root[data-theme="dark"] [data-tone="cyan"] { --st-fg: #a7dce9; --st-bg: #1b333c; --st-border: #3b626f; }
+.status-tone { background-color: var(--st-bg); color: var(--st-fg); border: 1px solid var(--st-border); }
+.status-tone.is-active { box-shadow: 0 0 0 1.5px var(--st-fg); }
+.status-tone option { color: var(--text); background: var(--surface); }

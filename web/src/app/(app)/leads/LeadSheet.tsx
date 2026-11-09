@@ -8,10 +8,10 @@ import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/Co
 import { leadMessage, markLeadContacted } from "@/lib/contact";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, STAGE_TONE, type Lead, type Activity, type CrmEvent, logLeadActivity } from "@/lib/crm";
+import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, type Lead, type Activity, type CrmEvent, logLeadActivity } from "@/lib/crm";
 import { useStaff, staffName, useProjects } from "@/lib/hooks";
-import { Badge, Button, Field, Input, Select, Sheet, Skeleton, Textarea, cx } from "@/components/ui";
-import { fmtDateTime, todayDubai } from "@/lib/format";
+import { Avatar, Badge, Button, Field, Info, Input, Select, Sheet, Skeleton, StatusBadge, StatusChip, Tabs, Textarea, cx } from "@/components/ui";
+import { fmtDate, fmtDateTime, todayDubai } from "@/lib/format";
 import { EventForm } from "../calendar/EventForm";
 
 const SOURCES = LEAD_SOURCES;
@@ -28,7 +28,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
   const [draft, setDraft] = useState<Draft>({});
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
-  const [tab, setTab] = useState<"details" | "activity">("activity");
+  const [tab, setTab] = useState<"overview" | "history" | "followups" | "details">("overview");
   const [scheduling, setScheduling] = useState(false);
 
   const lead = useQuery({
@@ -50,7 +50,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
     else if (lead.data?.lead) { const l = lead.data.lead; setDraft(Object.fromEntries(EDITABLE.map((k) => [k, (l[k] as string | null) ?? ""]))); }
   }, [isNew, id, lead.data, me]);
 
-  useEffect(() => { if (!isNew) setTab("activity"); }, [id, isNew]);
+  useEffect(() => { if (!isNew) setTab("overview"); }, [id, isNew]);
 
   const set = (k: keyof Draft) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setDraft((d) => ({ ...d, [k]: e.target.value }));
 
@@ -76,7 +76,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
     if (error) { setErr(error.message); return; }
     if (old && old.status !== payload.status) await logLeadActivity(id!, "Status Change", `Status changed from ${old.status || "-"} to ${payload.status || "-"}.`, me.email);
     qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-    setTab("activity");
+    setTab("overview");
   }
 
   const l = lead.data?.lead;
@@ -84,42 +84,65 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
   const past = (lead.data?.events || []).filter((e) => e.status !== "Scheduled").reverse();
   const template = useWaTemplate();
   async function contacted() { if (l && me) { await markLeadContacted(l.id, me.email); qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["leads"] }); } }
-  const title = isNew ? "New lead" : l ? (l.name || "Unnamed lead") : "Lead";
   const dirty = !isNew && l && EDITABLE.some((k) => ((l[k] as string | null) ?? "") !== (draft[k] ?? ""));
 
+  async function setStage(s: string) {
+    if (!l || !me || s === l.status) return;
+    const { error } = await db.from("leads").update({ status: s, last_contacted: todayDubai() }).eq("id", l.id);
+    if (error) { setErr(error.message); return; }
+    await logLeadActivity(l.id, "Status Change", `Status changed from ${l.status || "-"} to ${s}.`, me.email);
+    qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+  }
+
+  const subheader = l && (
+    <div className="px-5 pt-4 border-b border-line">
+      <div className="flex items-start gap-3">
+        <Avatar name={l.name} size={44} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold text-ink leading-snug break-words">{l.name || "Unnamed lead"}</h2>
+            <StatusBadge status={l.status} />
+          </div>
+          <div className="text-sm text-ink-3">{[l.project_inquired, l.budget].filter(Boolean).join(" · ") || "No project yet"}</div>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 mt-3">
+        {l.phone && (
+          <div className="flex items-center gap-1.5 rounded-full border border-line pl-3 pr-1 py-1">
+            <span className="text-sm text-ink num mr-1 whitespace-nowrap">{l.phone}</span>
+            <WaButton phone={l.phone} text={leadMessage(template, l)} onContact={contacted} />
+            <CallButton phone={l.phone} onContact={contacted} />
+            <CopyButton value={l.phone} />
+          </div>
+        )}
+        {l.email && <a href={`mailto:${l.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
+        <Button size="sm" onClick={() => { setTab("followups"); setScheduling(true); }}><CalendarPlus size={14} /> Schedule</Button>
+        <Button size="sm" onClick={() => router.push(`/breakdown?lead=${l.id}`)}><FileText size={14} /> Breakdown</Button>
+      </div>
+      <Tabs className="mt-4 !border-b-0" value={tab} onChange={setTab} options={[
+        { value: "overview", label: "Overview" },
+        { value: "history", label: "History", n: lead.data!.activities.length },
+        { value: "followups", label: "Follow-ups", n: lead.data!.events.length },
+        { value: "details", label: "Edit details" },
+      ]} />
+    </div>
+  );
+
   return (
-    <Sheet open={!!id} onClose={onClose} wide title={
-      <span className="flex items-center gap-2">{title}{l?.status && <Badge tone={STAGE_TONE[l.status] || "neutral"}>{l.status}</Badge>}</span>
-    } footer={(isNew || tab === "details") && <>
-      <Button variant="ghost" onClick={isNew ? onClose : () => setTab("activity")}>Cancel</Button>
+    <Sheet open={!!id} onClose={onClose} large title={isNew ? "New lead" : "Lead profile"} subheader={subheader}
+      footer={(isNew || tab === "details") && <>
+      <Button variant="ghost" onClick={isNew ? onClose : () => setTab("overview")}>Cancel</Button>
       <Button variant="primary" onClick={save} disabled={saving || (!isNew && !dirty)}>{saving && <Loader2 size={15} className="animate-spin" />}{isNew ? "Add lead" : "Save changes"}</Button>
     </>}>
       {!isNew && lead.isLoading ? <div className="space-y-3"><Skeleton className="w-1/2" /><Skeleton /><Skeleton className="w-2/3" /></div> :
        !isNew && !l ? <div className="text-sm text-ink-3">This lead was not found, or you don’t have access to it.</div> : (
-        <div className="space-y-5">
-          {l && (
+        <div className="space-y-6">
+          {l && tab === "overview" && (
             <>
-              <div className="flex flex-wrap gap-2">
-                <WaButton phone={l.phone} text={leadMessage(template, l)} onContact={contacted} />
-                <CallButton phone={l.phone} onContact={contacted} />
-                <CopyButton value={l.phone} />
-                {l.email && <a href={`mailto:${l.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
-                <Button size="sm" onClick={() => setScheduling(true)}><CalendarPlus size={14} /> Schedule</Button>
-                <Button size="sm" onClick={() => router.push(`/breakdown?lead=${l.id}`)}><FileText size={14} /> Breakdown</Button>
-              </div>
               <div>
-                <div className="text-xs font-medium text-ink-3 mb-1.5">Stage</div>
+                <div className="text-xs font-medium text-ink-3 mb-2">Stage</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {LEAD_STAGES.map((s) => (
-                    <button key={s} onClick={async () => {
-                      if (!me || s === l.status) return;
-                      const { error } = await db.from("leads").update({ status: s, last_contacted: todayDubai() }).eq("id", l.id);
-                      if (error) { setErr(error.message); return; }
-                      await logLeadActivity(l.id, "Status Change", `Status changed from ${l.status || "-"} to ${s}.`, me.email);
-                      qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-                    }} className={cx("h-7 px-2.5 rounded-md text-xs font-medium border transition-colors",
-                      s === l.status ? "bg-ink text-bg border-ink" : "border-line text-ink-2 hover:border-line-strong bg-surface")}>{s}</button>
-                  ))}
+                  {LEAD_STAGES.map((s) => <StatusChip key={s} status={s} active={s === l.status} onClick={() => setStage(s)} />)}
                 </div>
               </div>
               {l.status === "Won" && (
@@ -128,6 +151,28 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                   <div><div className="font-medium text-ink">Deal won</div><div className="text-ink-2">Recording the deal and its commission arrives in Step 2 (Deals).</div></div>
                 </div>
               )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Info label="Project">{l.project_inquired}</Info>
+                <Info label="Budget"><span className="num">{l.budget}</span></Info>
+                <Info label="Property type">{l.property_type}</Info>
+                <Info label="Bedrooms">{l.bedroom}</Info>
+                <Info label="Source">{l.source}</Info>
+                <Info label="Received"><span className="num">{fmtDate(l.lead_receive_date)}</span></Info>
+                <Info label="Follow-up"><span className="num">{fmtDate(l.follow_up_date)}</span></Info>
+                <Info label="Last contacted"><span className="num">{fmtDate(l.last_contacted)}</span></Info>
+                {me?.isAdmin && <Info label="Agent">{l.assigned_to ? staffName(staff.data, l.assigned_to) : "Unassigned"}</Info>}
+              </div>
+              {l.notes && (
+                <div>
+                  <div className="text-xs font-medium text-ink-3 mb-2">Notes</div>
+                  <div className="rounded-xl bg-surface-2 p-3.5 text-sm text-ink whitespace-pre-wrap">{l.notes}</div>
+                </div>
+              )}
+            </>
+          )}
+
+          {l && tab === "followups" && (
+            <>
               {scheduling && me && (
                 <div className="rounded-xl border border-line p-4 bg-surface-2/50">
                   <div className="text-sm font-medium text-ink mb-3">Schedule for {l.name || "this lead"}</div>
@@ -138,9 +183,9 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                 <div className="space-y-1.5">
                   <div className="text-xs font-medium text-ink-3">Coming up</div>
                   {upcoming.map((e) => (
-                    <div key={e.id} className="flex items-center gap-3 text-sm rounded-lg border border-line px-3 py-2">
+                    <div key={e.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm rounded-lg border border-line px-3 py-2">
                       <Badge tone={new Date(e.starts_at) < new Date() ? "bad" : "accent"}>{e.event_type}</Badge>
-                      <span className="flex-1 truncate text-ink">{e.title}</span>
+                      <span className="flex-1 min-w-40 text-ink break-words">{e.title}</span>
                       <span className="text-xs text-ink-3 num">{fmtDateTime(e.starts_at)}</span>
                     </div>
                   ))}
@@ -151,9 +196,9 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                   <div className="text-xs font-medium text-ink-3">Past follow-ups</div>
                   {past.map((e) => (
                     <div key={e.id} className="text-sm rounded-lg border border-line px-3 py-2">
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <Badge tone={e.status === "Completed" ? "good" : "neutral"}>{e.status}</Badge>
-                        <span className="flex-1 truncate text-ink">{e.title}</span>
+                        <span className="flex-1 min-w-40 text-ink break-words">{e.title}</span>
                         <span className="text-xs text-ink-3 num">{fmtDateTime(e.starts_at)}</span>
                       </div>
                       {e.outcome && <div className="mt-1 text-[13px] text-ink-2 whitespace-pre-wrap">{e.outcome}</div>}
@@ -161,11 +206,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
                   ))}
                 </div>
               )}
-              <div className="flex gap-4 border-b border-line text-sm">
-                {(["activity", "details"] as const).map((t) => (
-                  <button key={t} onClick={() => setTab(t)} className={cx("pb-2 -mb-px border-b-2 capitalize", tab === t ? "border-accent text-ink font-medium" : "border-transparent text-ink-3 hover:text-ink")}>{t}</button>
-                ))}
-              </div>
+              {!scheduling && upcoming.length + past.length === 0 && <div className="text-sm text-ink-3">No follow-ups yet. Use Schedule to add one.</div>}
             </>
           )}
 
@@ -217,7 +258,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
             </div>
           )}
 
-          {!isNew && tab === "activity" && l && <ActivityLog leadId={l.id} items={lead.data!.activities} staff={staff.data} />}
+          {!isNew && tab === "history" && l && <ActivityLog leadId={l.id} items={lead.data!.activities} staff={staff.data} />}
           {err && <div className="text-sm text-bad">{err}</div>}
         </div>
       )}

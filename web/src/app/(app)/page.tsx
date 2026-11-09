@@ -132,7 +132,7 @@ function SalesDashboard() {
           <div className="space-y-2">
             {pipeline.map((p, i) => (
               <Link key={p.stage} href="/leads" className="group grid grid-cols-[112px_1fr_36px] items-center gap-3 text-[13px]">
-                <span className="text-ink-2 truncate group-hover:text-ink transition-colors">{p.stage}</span>
+                <span className="text-ink-2 break-words group-hover:text-ink transition-colors">{p.stage}</span>
                 <span className="h-4 rounded-full bg-surface-2 overflow-hidden">
                   <span className={cx("grow-x block h-full rounded-full", p.stage === "Won" ? "bg-good" : p.stage === "Lost" ? "bg-ink-3/50" : "bg-accent")}
                     style={{ width: `${(p.n / maxStage) * 100}%`, minWidth: p.n ? 6 : 0, ["--i" as string]: i }} title={`${p.stage}: ${p.n}`} />
@@ -153,8 +153,8 @@ function SalesDashboard() {
                 <Link key={e.id} href={e.lead_id ? `/leads?open=${e.lead_id}` : "/calendar"} className="flex items-center gap-3 rounded-xl px-2 py-2 -mx-2 hover:bg-surface-2 transition-colors">
                   <Avatar name={e.leads?.name || e.title} size={32} />
                   <span className="flex-1 min-w-0">
-                    <span className="block text-[13px] font-medium text-ink truncate">{e.leads?.name || e.title}</span>
-                    <span className="block text-xs text-ink-3 truncate">{e.event_type}{me?.isAdmin ? ` · ${staffName(staff.data, e.assigned_to)}` : ""}</span>
+                    <span className="block text-[13px] font-medium text-ink break-words">{e.leads?.name || e.title}</span>
+                    <span className="block text-xs text-ink-3 break-words">{e.event_type}{me?.isAdmin ? ` · ${staffName(staff.data, e.assigned_to)}` : ""}</span>
                   </span>
                   <span className="text-xs num text-ink-2">{fmtTime(e.starts_at)}</span>
                 </Link>
@@ -178,7 +178,7 @@ function SalesDashboard() {
                   const name = staffName(staff.data, email || null);
                   return (
                     <tr key={email} className="border-t border-line">
-                      <td className="py-2"><span className="flex items-center gap-2.5 text-ink"><Avatar name={name} size={26} /> <span className="truncate">{name}</span></span></td>
+                      <td className="py-2"><span className="flex items-center gap-2.5 text-ink"><Avatar name={name} size={26} /> <span className="break-words">{name}</span></span></td>
                       <td className="py-2 text-right num text-ink">{v.active}</td>
                       <td className="py-2 text-right num">{v.won ? <Badge tone="good">{v.won}</Badge> : <span className="text-ink-3">0</span>}</td>
                       <td className="py-2 text-right num text-ink-3">{v.lost}</td>
@@ -421,7 +421,7 @@ function LeadSources({ data }: { data: Record<string, number> }) {
             {rows.map(([name, n], i) => (
               <div key={name} className="flex items-center gap-2 text-[13px]">
                 <span className="size-2 rounded-full shrink-0" style={{ background: colors[i] }} />
-                <span className="flex-1 text-ink-2 truncate">{name}</span>
+                <span className="flex-1 text-ink-2 break-words">{name}</span>
                 <span className="text-xs text-ink-3 num">{count(n)}</span>
                 <span className="w-9 text-right font-medium text-ink num">{Math.round((n / total) * 100)}%</span>
               </div>

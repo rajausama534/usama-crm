@@ -1,8 +1,9 @@
 "use client";
 
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { initials } from "@/lib/format";
+import { statusTone } from "@/lib/status";
 
 export function cx(...c: (string | false | null | undefined)[]) {
   return c.filter(Boolean).join(" ");
@@ -48,6 +49,70 @@ export function Badge({ tone = "neutral", className, children }: { tone?: Tone; 
       {children}
     </span>
   );
+}
+
+/** Coloured status label. */
+export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
+  const s = status && status !== "-" ? status : "New";
+  return <span data-tone={statusTone(s)} className={cx("status-tone inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap", className)}>{s}</span>;
+}
+/** Coloured status pill you can click: filters and status pickers. */
+export function StatusChip({ status, label, n, active, onClick }: { status: string; label?: string; n?: number; active?: boolean; onClick: () => void }) {
+  return (
+    <button type="button" data-tone={statusTone(status)} aria-pressed={!!active} onClick={onClick}
+      className={cx("status-tone shrink-0 inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-[box-shadow,opacity] hover:opacity-85", active && "is-active")}>
+      {label || status}{n != null && <span className="num opacity-70">{n}</span>}
+    </button>
+  );
+}
+const CHEVRON = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a4' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")";
+/** Status dropdown coloured by its current value; always as wide as its text. */
+export function StatusSelect({ value, options, onChange }: { value: string | null; options: readonly string[]; onChange: (v: string) => void }) {
+  const current = value && value !== "-" ? value : "New";
+  return (
+    <select value={current} data-tone={statusTone(current)} onChange={(e) => onChange(e.target.value)} onClick={(e) => e.stopPropagation()}
+      className="status-tone field-sizing-content h-8 rounded-full pl-3 pr-7 text-xs font-semibold cursor-pointer outline-none appearance-none bg-no-repeat bg-[length:14px] bg-[right_8px_center]"
+      style={{ backgroundImage: CHEVRON }}>
+      {[...new Set([current, ...options])].map((s) => <option key={s}>{s}</option>)}
+    </select>
+  );
+}
+/** Small dropdown for filter bars: as wide as its text, highlighted while a filter is on. */
+export function FilterSelect({ className, active, value, children, ...p }: React.SelectHTMLAttributes<HTMLSelectElement> & { active?: boolean }) {
+  const on = active ?? !!value;
+  return (
+    <select {...p} value={value} style={{ backgroundImage: CHEVRON }}
+      className={cx("field-sizing-content h-9 rounded-full border pl-3.5 pr-8 text-[13px] font-medium cursor-pointer outline-none appearance-none bg-no-repeat bg-[length:14px] bg-[right_10px_center] transition-colors focus:border-accent",
+        on ? "border-accent bg-accent-soft text-accent-text" : "border-line bg-surface text-ink-2 hover:border-line-strong", className)}>
+      {children}
+    </select>
+  );
+}
+export function SearchBox({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-48 sm:max-w-md">
+      <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}
+        className="w-full h-9 rounded-full border border-line bg-surface pl-9 pr-4 text-[13px] text-ink placeholder:text-ink-3 outline-none transition-colors hover:border-line-strong focus:border-accent" />
+    </div>
+  );
+}
+/** Underlined tabs. */
+export function Tabs<T extends string>({ value, options, onChange, className }: { value: T; options: { value: T; label: string; n?: number }[]; onChange: (v: T) => void; className?: string }) {
+  return (
+    <div role="tablist" className={cx("flex gap-5 overflow-x-auto border-b border-line text-sm", className)}>
+      {options.map((o) => (
+        <button key={o.value} type="button" role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)}
+          className={cx("shrink-0 pb-2.5 border-b-2 whitespace-nowrap transition-colors", value === o.value ? "border-accent text-ink font-medium" : "border-transparent text-ink-3 hover:text-ink")}>
+          {o.label}{o.n != null && <span className="ml-1.5 text-xs num text-ink-3">{o.n}</span>}
+        </button>
+      ))}
+    </div>
+  );
+}
+/** Label over a value, for profile summaries. */
+export function Info({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="min-w-0"><div className="text-xs text-ink-3">{label}</div><div className="mt-0.5 text-sm text-ink break-words">{children || "—"}</div></div>;
 }
 
 const field = "w-full h-9 rounded-xl border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-3 outline-none transition-[border-color,box-shadow] duration-200 hover:border-line-strong focus:border-accent focus:ring-3 focus:ring-accent/15";
@@ -148,7 +213,7 @@ export function Stat({ label, value, hint, tone, icon, delta, bar }: {
     <Card className="stat p-5">
       <div className="flex items-center justify-between gap-2">
         <div className="stat-label flex items-center gap-1.5 text-xs font-medium text-ink-2 min-w-0">
-          {icon && <span className="text-ink-3 shrink-0">{icon}</span>}<span className="leading-tight lg:truncate">{label}</span>
+          {icon && <span className="text-ink-3 shrink-0">{icon}</span>}<span className="leading-tight">{label}</span>
         </div>
         {delta}
       </div>
@@ -166,12 +231,16 @@ export function Stat({ label, value, hint, tone, icon, delta, bar }: {
 }
 
 /** Slide-over panel from the right (full screen on phones). Stays on screen briefly while it slides away. */
-export function Sheet({ open, onClose, title, children, footer, wide }: {
+export function Sheet({ open, onClose, title, children, footer, wide, large, subheader }: {
   open: boolean; onClose: () => void; title: React.ReactNode; children: React.ReactNode; footer?: React.ReactNode; wide?: boolean;
+  /** Extra-wide, for full profiles. */
+  large?: boolean;
+  /** Stays in place above the scrolling area (name, actions, tabs). */
+  subheader?: React.ReactNode;
 }) {
   const [mounted, setMounted] = useState(open);
-  const last = useRef({ title, children, footer });
-  if (open) last.current = { title, children, footer };
+  const last = useRef({ title, children, footer, subheader });
+  if (open) last.current = { title, children, footer, subheader };
 
   useEffect(() => {
     if (open) { setMounted(true); return; }
@@ -194,14 +263,15 @@ export function Sheet({ open, onClose, title, children, footer, wide }: {
       <div className={cx(
         "absolute right-0 top-0 h-full w-full bg-surface shadow-pop flex flex-col sm:border-l sm:border-line sm:rounded-l-[26px] overflow-hidden",
         open ? "sheet-in" : "sheet-out",
-        wide ? "sm:max-w-2xl" : "sm:max-w-lg",
+        large ? "sm:max-w-3xl" : wide ? "sm:max-w-2xl" : "sm:max-w-lg",
       )} role="dialog" aria-modal="true">
-        <div className="flex items-center justify-between gap-3 px-5 h-14 border-b border-line shrink-0">
-          <div className="font-semibold text-ink truncate">{c.title}</div>
+        <div className="flex items-center justify-between gap-3 px-5 min-h-14 py-3 border-b border-line shrink-0">
+          <div className="font-semibold text-ink min-w-0 break-words">{c.title}</div>
           <button onClick={onClose} className="p-1.5 -mr-1.5 rounded-full text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors" aria-label="Close">
             <X size={18} />
           </button>
         </div>
+        {c.subheader && <div className="shrink-0">{c.subheader}</div>}
         <div className="flex-1 overflow-y-auto px-5 py-5">{c.children}</div>
         {c.footer && <div className="px-5 py-3 border-t border-line flex justify-end gap-2 shrink-0">{c.footer}</div>}
       </div>

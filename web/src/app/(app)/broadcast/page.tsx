@@ -208,7 +208,7 @@ function Page() {
                     {shown.map((r, i) => (
                       <label key={r.id} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-surface-2">
                         <input type="checkbox" className="accent-[var(--accent)]" checked={picked.has(r.id)} onChange={(e) => setPicked((s) => { const n = new Set(s); if (e.target.checked) n.add(r.id); else n.delete(r.id); return n; })} />
-                        <span className="min-w-0"><span className="text-[13px] font-medium text-ink"><span className="text-ink-3 num">#{start + i + 1}</span> {r.owner || "Owner"}</span><span className="block text-xs text-ink-3 truncate">{r.community} · {r.cluster} · Unit {r.unit}</span></span>
+                        <span className="min-w-0"><span className="text-[13px] font-medium text-ink"><span className="text-ink-3 num">#{start + i + 1}</span> {r.owner || "Owner"}</span><span className="block text-xs text-ink-3 break-words">{r.community} · {r.cluster} · Unit {r.unit}</span></span>
                       </label>
                     ))}
                   </div>
@@ -274,7 +274,7 @@ function Page() {
               <div className="mt-3 max-h-56 overflow-y-auto divide-y divide-line">
                 {queue.map((x, i) => {
                   const [label, tone] = STATE[x.state];
-                  return <div key={x.row.id} className={cx("flex items-center justify-between gap-3 py-1.5 text-[13px]", i === pos && "font-medium")}><span className="truncate text-ink">{x.row.owner || "Owner"} · {x.row.unit}</span><Badge tone={tone}>{label}</Badge></div>;
+                  return <div key={x.row.id} className={cx("flex items-center justify-between gap-3 py-1.5 text-[13px]", i === pos && "font-medium")}><span className="break-words text-ink">{x.row.owner || "Owner"} · {x.row.unit}</span><Badge tone={tone}>{label}</Badge></div>;
                 })}
               </div>
             </Card>
