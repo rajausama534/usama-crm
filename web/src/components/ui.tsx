@@ -162,13 +162,20 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   );
 }
 
-export function Avatar({ name, size = 28 }: { name?: string | null; size?: number }) {
+/** Initials, or the photo at `src` when it loads (falls back to initials if there is none). */
+export function Avatar({ name, size = 28, src }: { name?: string | null; size?: number; src?: string | null }) {
+  const [failed, setFailed] = useState<string | null>(null);
+  const showImg = !!src && failed !== src;
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-text font-semibold"
+      className="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-soft text-accent-text font-semibold"
       style={{ width: size, height: size, fontSize: size * 0.38 }}
     >
       {initials(name)}
+      {showImg && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" className="absolute inset-0 size-full object-cover" onError={() => setFailed(src)} />
+      )}
     </span>
   );
 }

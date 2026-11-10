@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Loader2, Megaphone, Pencil, FileText } from "lucide-react";
+import { Mail, Loader2, Megaphone, Pencil, FileText, Trash2 } from "lucide-react";
+import { useConfirm } from "@/components/Confirm";
 import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
 import { markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { OWNER_STATUSES, type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
-import { useStaff, staffName } from "@/lib/hooks";
+import { type Owner, type Activity, logOwnerActivity } from "@/lib/crm";
+import { useStaff, staffName, useOwnerStatuses } from "@/lib/hooks";
 import { Avatar, Button, Field, Info, Input, Sheet, Skeleton, StatusBadge, StatusChip, Tabs, Textarea, cx } from "@/components/ui";
 import { count, fmtDate, fmtDateTime, shortAED, todayDubai } from "@/lib/format";
 
@@ -20,6 +21,7 @@ type UnitDetails = { property_type: string | null; bedrooms: string | null; bua_
 
 export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose: () => void; onOpen: (id: number) => void }) {
   const { me } = useAuth();
+  const ownerStatuses = useOwnerStatuses();
   const router = useRouter();
   const qc = useQueryClient();
   const staff = useStaff();
@@ -30,6 +32,8 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
   const [noteType, setNoteType] = useState("Call");
   const [note, setNote] = useState("");
   const [tab, setTab] = useState<"overview" | "history" | "property" | "records">("overview");
+  const [editAct, setEditAct] = useState<{ id: Activity["id"]; text: string } | null>(null);
+  const [ask, confirmNode] = useConfirm();
 
   const q = useQuery({
     queryKey: ["owner", id],
@@ -57,7 +61,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
     },
   });
 
-  useEffect(() => { setEditing(false); setErr(""); setNote(""); setTab("overview"); }, [id]);
+  useEffect(() => { setEditing(false); setErr(""); setNote(""); setTab("overview"); setEditAct(null); }, [id]);
   useEffect(() => { if (q.data?.owner) setDraft(q.data.owner); }, [q.data]);
 
   const o = q.data?.owner;
@@ -97,6 +101,24 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
     await logOwnerActivity(o.id, noteType, note.trim(), me.email);
     await db.from("owners").update({ last_contacted: todayDubai() }).eq("id", o.id);
     setBusy(false); setNote(""); refresh();
+  }
+
+  // History entries: only admin may change or remove one (also enforced by the database; every change is kept in crm_change_log).
+  async function saveActivity() {
+    if (!editAct || !me?.isAdmin) return;
+    setBusy(true); setErr("");
+    const { error } = await db.from("owner_activities").update({ details: editAct.text.trim() }).eq("id", editAct.id);
+    setBusy(false);
+    if (error) { setErr(error.message); return; }
+    setEditAct(null); refresh();
+  }
+  async function deleteActivity(a: Activity) {
+    if (!me?.isAdmin) return;
+    const ok = await ask({ title: "Delete this history entry?", hint: "A copy is kept in the change log.", yes: "Delete", danger: true });
+    if (!ok) return;
+    const { error } = await db.from("owner_activities").delete().eq("id", a.id);
+    if (error) { setErr(error.message); return; }
+    refresh();
   }
 
   const set = (k: keyof Owner) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft((d) => ({ ...d, [k]: e.target.value }));
@@ -157,7 +179,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
               <div>
                 <div className="text-xs font-medium text-ink-3 mb-2">Status</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {OWNER_STATUSES.map((s) => <StatusChip key={s} status={s} active={s === o.status} onClick={() => setStatus(s)} />)}
+                  {ownerStatuses.map((s) => <StatusChip key={s} status={s} active={s === o.status} onClick={() => setStatus(s)} />)}
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -203,8 +225,22 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
                       <span className="font-medium text-ink-2">{a.activity_type}</span>
                       <span>{fmtDateTime(a.created_at)}</span>
                       {a.created_by && <span>· {staffName(staff.data, a.created_by)}</span>}
+                      {me?.isAdmin && editAct?.id !== a.id && (
+                        <span className="ml-auto flex gap-0.5">
+                          <button onClick={() => setEditAct({ id: a.id, text: a.details || "" })} className="p-1 rounded-md text-ink-3 hover:text-ink hover:bg-surface-2" aria-label="Edit entry" title="Edit"><Pencil size={13} /></button>
+                          <button onClick={() => deleteActivity(a)} className="p-1 rounded-md text-ink-3 hover:text-bad hover:bg-surface-2" aria-label="Delete entry" title="Delete"><Trash2 size={13} /></button>
+                        </span>
+                      )}
                     </div>
-                    {a.details && <div className="text-sm text-ink mt-0.5 whitespace-pre-wrap">{a.details}</div>}
+                    {editAct?.id === a.id ? (
+                      <div className="mt-1.5 space-y-2">
+                        <Textarea value={editAct.text} onChange={(e) => setEditAct({ ...editAct, text: e.target.value })} rows={3} autoFocus />
+                        <div className="flex justify-end gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => setEditAct(null)}>Cancel</Button>
+                          <Button size="sm" variant="primary" onClick={saveActivity} disabled={busy || !editAct.text.trim()}>Save</Button>
+                        </div>
+                      </div>
+                    ) : a.details && <div className="text-sm text-ink mt-0.5 whitespace-pre-wrap">{a.details}</div>}
                   </li>
                 ))}
                 {d.activities.length === 0 && <li className="pl-4 text-sm text-ink-3">No history yet.</li>}
@@ -247,6 +283,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
           {err && <div className="text-sm text-bad">{err}</div>}
         </div>
       )}
+      {confirmNode}
     </Sheet>
   );
 }

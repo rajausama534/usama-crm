@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Loader2, Plus, X } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
+import { useOwnerStatuses } from "@/lib/hooks";
 import { Button, Field, Input, Segmented, Select, Sheet } from "@/components/ui";
-import { OWNER_STATUSES, logOwnerActivity } from "@/lib/crm";
+import { logOwnerActivity } from "@/lib/crm";
 
 type Prop = { community: string; cluster: string; unit: string; status: string; data_source: string };
 const BLANK = { owner: "", email: "", phone1: "", phone2: "", community: "", cluster: "", unit: "", status: "New", data_source: "" };
@@ -14,6 +15,7 @@ const blankProp = (): Prop => ({ community: "", cluster: "", unit: "", status: "
 /** Admins add an owner, and any more properties under the same owner and contact details. */
 export function AddOwnerSheet({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: (id: number) => void }) {
   const { me } = useAuth();
+  const ownerStatuses = useOwnerStatuses();
   const [tab, setTab] = useState<"details" | "properties">("details");
   const [form, setForm] = useState(BLANK);
   const [props, setProps] = useState<Prop[]>([]);
@@ -58,7 +60,7 @@ export function AddOwnerSheet({ open, onClose, onSaved }: { open: boolean; onClo
           <Field label="Community"><Input value={form.community} onChange={set("community")} /></Field>
           <Field label="Cluster"><Input value={form.cluster} onChange={set("cluster")} /></Field>
           <Field label="Unit"><Input value={form.unit} onChange={set("unit")} /></Field>
-          <Field label="Status"><Select value={form.status} onChange={set("status")}>{OWNER_STATUSES.map((s) => <option key={s}>{s}</option>)}</Select></Field>
+          <Field label="Status"><Select value={form.status} onChange={set("status")}>{ownerStatuses.map((s) => <option key={s}>{s}</option>)}</Select></Field>
           <Field label="Source" className="sm:col-span-2"><Input value={form.data_source} onChange={set("data_source")} /></Field>
         </div>
       ) : (
@@ -69,7 +71,7 @@ export function AddOwnerSheet({ open, onClose, onSaved }: { open: boolean; onClo
               <Field label="Community"><Input value={p.community} onChange={setP(i, "community")} /></Field>
               <Field label="Cluster"><Input value={p.cluster} onChange={setP(i, "cluster")} /></Field>
               <Field label="Unit"><Input value={p.unit} onChange={setP(i, "unit")} /></Field>
-              <Field label="Status"><Select value={p.status} onChange={setP(i, "status")}>{OWNER_STATUSES.map((s) => <option key={s}>{s}</option>)}</Select></Field>
+              <Field label="Status"><Select value={p.status} onChange={setP(i, "status")}>{ownerStatuses.map((s) => <option key={s}>{s}</option>)}</Select></Field>
               <Field label="Source" className="sm:col-span-2"><Input value={p.data_source} onChange={setP(i, "data_source")} /></Field>
               <button aria-label="Remove property" className="absolute top-2 right-2 p-1 rounded-full text-ink-3 hover:text-ink hover:bg-surface-2" onClick={() => setProps((l) => l.filter((_, n) => n !== i))}><X size={15} /></button>
             </div>

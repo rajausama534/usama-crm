@@ -9,11 +9,11 @@ import { ChevronLeft, ChevronRight, Loader2, MessageCircle, Square } from "lucid
 import { db } from "@/lib/supabase";
 import { fetchAll, natural } from "@/lib/tools";
 import { useAuth } from "@/components/Providers";
+import { useOwnerStatuses } from "@/lib/hooks";
 import { useWaTemplate } from "@/components/ContactKit";
 import { Badge, Button, Card, Field, Input, PageHeader, Select, Textarea, Toast, cx, type Tone } from "@/components/ui";
 import { BROADCAST_IDS_KEY, formatPhone, intro, type WaTemplate } from "@/lib/contact";
 import { todayDubai } from "@/lib/format";
-import { OWNER_STATUSES } from "@/lib/crm";
 
 const SELECT = "id,owner,phone1,phone2,unit,cluster,community,status";
 type Row = { id: number; owner: string | null; phone1: string | null; phone2: string | null; unit: string | null; cluster: string | null; community: string | null; status: string | null };
@@ -37,6 +37,7 @@ export default function BroadcastPage() {
 
 function Page() {
   const { me } = useAuth();
+  const ownerStatuses = useOwnerStatuses();
   const params = useSearchParams();
   const template = useWaTemplate();
   const [scope, setScope] = useState<Scope>("inside");
@@ -183,7 +184,7 @@ function Page() {
               <div className="mt-3 grid sm:grid-cols-3 gap-2">
                 <Select value={fCommunity} aria-label="Community" onChange={(e) => { setFCommunity(e.target.value); setFCluster(""); }}><option value="">All communities</option>{communities.map((c) => <option key={c}>{c}</option>)}</Select>
                 <Select value={fCluster} aria-label="Cluster" disabled={!fCommunity} onChange={(e) => setFCluster(e.target.value)}><option value="">All clusters</option>{clustersOf(fCommunity).map((c) => <option key={c}>{c}</option>)}</Select>
-                <Select value={fStatus} aria-label="Status" onChange={(e) => setFStatus(e.target.value)}><option value="">All statuses</option>{OWNER_STATUSES.map((s) => <option key={s}>{s}</option>)}</Select>
+                <Select value={fStatus} aria-label="Status" onChange={(e) => setFStatus(e.target.value)}><option value="">All statuses</option>{ownerStatuses.map((s) => <option key={s}>{s}</option>)}</Select>
               </div>
             )}
             {scope === "inside" && (

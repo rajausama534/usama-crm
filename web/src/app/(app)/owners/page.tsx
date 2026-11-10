@@ -3,11 +3,11 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDownWideNarrow, ArrowUpNarrowWide, Home, ChevronLeft, ChevronRight, Download, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Home, ChevronLeft, ChevronRight, Download, Columns3, Tags, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
-import { OWNER_STATUSES, type Owner } from "@/lib/crm";
-import { useDebounced } from "@/lib/hooks";
+import { type Owner } from "@/lib/crm";
+import { useDebounced, useOwnerStatuses } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
 import { Badge, Button, Card, Empty, FilterSelect, ListSkeleton, PageHeader, SearchBox, Sheet, StatusChip, StatusSelect, Textarea, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
@@ -15,6 +15,7 @@ import { BROADCAST_IDS_KEY, downloadCSV, isSystemActivity, markOwnerContacted, o
 import { count, fmtDate, todayDubai } from "@/lib/format";
 import { OwnerSheet } from "./OwnerSheet";
 import { AddOwnerSheet } from "./AddOwnerSheet";
+import { ColumnsSheet, OWNER_COLUMNS, StatusesSheet, useOwnerColumns } from "./OwnerSettings";
 
 const PAGE = 50;
 type Opt = { community: string | null; cluster: string | null; data_source: string | null; records: number };
@@ -36,6 +37,7 @@ function Owners() {
   const toast = useToast();
   const template = useWaTemplate();
   const openId = params.get("open");
+  const ownerStatuses = useOwnerStatuses();
 
   const [q, setQ] = useState("");
   const [unitNo, setUnitNo] = useState("");
@@ -51,6 +53,10 @@ function Owners() {
   const [remarkFor, setRemarkFor] = useState<Row | null>(null);
   const [exporting, setExporting] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [colsOpen, setColsOpen] = useState(false);
+  const [statusesOpen, setStatusesOpen] = useState(false);
+  const cols = useOwnerColumns();
+  const { show } = cols;
   const [picked, setPicked] = useState<Set<number>>(new Set());
   const term = orSafe(useDebounced(q, 300));
   const unit = useDebounced(unitNo.trim(), 300);
@@ -217,10 +223,12 @@ function Owners() {
         <Button className="w-9 !px-0" title={dir === "asc" ? "Ascending / oldest first" : "Descending / newest first"} aria-label="Change sort direction" onClick={() => reset(() => setDir(dir === "asc" ? "desc" : "asc"))}>
           {dir === "asc" ? <ArrowUpNarrowWide size={15} /> : <ArrowDownWideNarrow size={15} />}
         </Button>
+        <Button onClick={() => setColsOpen(true)} title="Manage columns"><Columns3 size={15} /> Columns</Button>
+        {me?.isAdmin && <Button onClick={() => setStatusesOpen(true)} title="Manage owner statuses"><Tags size={15} /> Statuses</Button>}
         {anyFilter && <Button variant="ghost" onClick={() => reset(() => { setQ(""); setUnitNo(""); setCommunity(""); setCluster(""); setSource(""); setStatus(""); setAllRecords(false); })}><RotateCcw size={14} /> Reset</Button>}
       </div>
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        {OWNER_STATUSES.map((s) => <StatusChip key={s} status={s} label={s === "Invalid Number" ? "Invalid" : s} active={status === s} onClick={() => reset(() => setStatus(status === s ? "" : s))} />)}
+        {ownerStatuses.map((s) => <StatusChip key={s} status={s} label={s === "Invalid Number" ? "Invalid" : s} active={status === s} onClick={() => reset(() => setStatus(status === s ? "" : s))} />)}
         <label className="ml-auto inline-flex items-center gap-2 text-[13px] text-ink-2 cursor-pointer whitespace-nowrap">
           <input type="checkbox" className="accent-[var(--accent)]" checked={allRecords} onChange={(e) => reset(() => setAllRecords(e.target.checked))} /> Show every owner record
         </label>
@@ -238,8 +246,8 @@ function Owners() {
                 <thead className="bg-surface-2">
                   <tr className="text-left text-xs text-ink-2 border-b border-line">
                     {me?.isAdmin && <th className="pl-4 py-2.5 w-8"><input type="checkbox" aria-label="Tick all on this page" className="accent-[var(--accent)]" checked={allOnPage} onChange={() => setPicked((s) => { const n = new Set(s); rows.forEach((r) => { if (allOnPage) n.delete(r.id); else n.add(r.id); }); return n; })} /></th>}
-                    {["Community", "Cluster", "Unit", "Owner name", "WhatsApp", "Status", "Latest remark", "Last contacted", "Actions"].map((h) => (
-                      <th key={h} className="font-semibold px-3 py-2.5 whitespace-nowrap first:pl-4">{h}</th>
+                    {OWNER_COLUMNS.filter((c) => show(c.k)).map((c) => (
+                      <th key={c.k} className="font-semibold px-3 py-2.5 whitespace-nowrap first:pl-4">{c.l}</th>
                     ))}
                   </tr>
                 </thead>
@@ -247,9 +255,9 @@ function Owners() {
                   {rows.map((o) => (
                     <tr key={o.id} className="border-b border-line last:border-0 hover:bg-surface-2/60 align-top">
                       {me?.isAdmin && <td className="pl-4 py-3 w-8"><input type="checkbox" aria-label={`Tick ${o.owner || "owner"}`} className="accent-[var(--accent)]" checked={picked.has(o.id)} onChange={() => toggle(o.id)} /></td>}
-                      <td className="pl-4 pr-3 py-3 text-ink-2 max-w-40">{o.community}</td>
-                      <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>
-                      <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>
+                      {show("community") && <td className="pl-4 pr-3 py-3 text-ink-2 max-w-40">{o.community}</td>}
+                      {show("cluster") && <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>}
+                      {show("unit") && <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>}
                       <td className="px-3 py-3 min-w-44 max-w-72">
                         <div className="text-ink font-medium leading-snug">{o.owner || "—"}</div>
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -258,16 +266,16 @@ function Owners() {
                           {!!o.__coOwners && <span className="h-6 px-2 inline-flex items-center rounded-md bg-surface-2 text-xs text-ink-3">+{o.__coOwners} co-owner{o.__coOwners > 1 ? "s" : ""}</span>}
                         </div>
                       </td>
-                      <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>
-                      <td className="px-3 py-3"><StatusSelect value={o.status} options={OWNER_STATUSES} onChange={(s) => changeStatus(o, s)} /></td>
-                      <td className="px-3 py-3 min-w-48 max-w-[420px]">
+                      {show("whatsapp") && <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>}
+                      {show("status") && <td className="px-3 py-3"><StatusSelect value={o.status} options={ownerStatuses} onChange={(s) => changeStatus(o, s)} /></td>}
+                      {show("remark") && <td className="px-3 py-3 min-w-48 max-w-[420px]">
                         <button onClick={() => setRemarkFor(o)} title="Read or add a remark"
                           className="w-full text-left text-[13px] leading-snug text-ink-2 hover:text-ink whitespace-pre-line rounded-md hover:bg-surface-2 -m-1 p-1">
                           {o.__remark || <span className="text-ink-3">No remark yet</span>}
                         </button>
-                      </td>
-                      <td className="px-3 py-3 text-ink-2 num whitespace-nowrap">{fmtDate(o.last_contacted)}</td>
-                      <td className="px-3 py-3"><div className="flex gap-1.5"><CallButton phone={o.phone1 || o.phone2} onContact={() => contact(o, "Call")} /><CopyButton value={o.phone1 || o.phone2} /></div></td>
+                      </td>}
+                      {show("last") && <td className="px-3 py-3 text-ink-2 num whitespace-nowrap">{fmtDate(o.last_contacted)}</td>}
+                      {show("actions") && <td className="px-3 py-3"><div className="flex gap-1.5"><CallButton phone={o.phone1 || o.phone2} onContact={() => contact(o, "Call")} /><CopyButton value={o.phone1 || o.phone2} /></div></td>}
                     </tr>
                   ))}
                 </tbody>
@@ -287,7 +295,7 @@ function Owners() {
                     <span className="shrink-0 rounded-lg bg-accent-soft text-accent-text text-sm font-bold px-2.5 py-1 num">Unit {o.unit}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <StatusSelect value={o.status} options={OWNER_STATUSES} onChange={(s) => changeStatus(o, s)} />
+                    <StatusSelect value={o.status} options={ownerStatuses} onChange={(s) => changeStatus(o, s)} />
                     <span className="text-xs text-ink-3 ml-auto">Last contact {fmtDate(o.last_contacted)}</span>
                   </div>
                   <button onClick={() => setRemarkFor(o)} className="w-full text-left text-[13px] text-ink-2 rounded-lg bg-surface-2 px-3 py-2 whitespace-pre-line">
@@ -320,6 +328,8 @@ function Owners() {
       )}
 
       <AddOwnerSheet open={adding} onClose={() => setAdding(false)} onSaved={(id) => { setAdding(false); refresh(); qc.invalidateQueries({ queryKey: ["owner-options"] }); openOwner(id); }} />
+      <ColumnsSheet open={colsOpen} onClose={() => setColsOpen(false)} hidden={cols.hidden} save={cols.save} />
+      <StatusesSheet open={statusesOpen} onClose={() => setStatusesOpen(false)} />
       <TemplateSheet open={templateOpen} onClose={() => setTemplateOpen(false)} />
       <RemarkSheet row={remarkFor} onClose={() => setRemarkFor(null)} onSaved={refresh} />
       <OwnerSheet id={openId ? Number(openId) : null} onClose={() => openOwner(null)} onOpen={openOwner} />

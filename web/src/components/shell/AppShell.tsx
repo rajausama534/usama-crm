@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Search, Moon, Sun, LogOut, Menu, LayoutDashboard, Users2, Home, CalendarDays } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Search, Moon, Sun, LogOut, Camera, Loader2, Menu, LayoutDashboard, Users2, Home, CalendarDays } from "lucide-react";
 import { useAuth, useTheme } from "@/components/Providers";
 import { Avatar, cx } from "@/components/ui";
 import { ROLE_LABEL, canUseSales } from "@/lib/access";
+import { useMyAvatar } from "@/lib/avatar";
 import { canOpen, visibleNav } from "./nav";
 import { CommandPalette } from "./CommandPalette";
 import { NotificationBell } from "./NotificationBell";
@@ -18,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const avatar = useMyAvatar();
   const [drawer, setDrawer] = useState(false);
 
   useEffect(() => { if (ready && (!session || blocked)) router.replace("/login"); }, [ready, session, blocked, router]);
@@ -64,7 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         ))}
       </div>
-      <UserMenu name={me.name} role={ROLE_LABEL[me.role]} onSignOut={signOut} />
+      <UserMenu name={me.name} role={ROLE_LABEL[me.role]} onSignOut={signOut} avatar={avatar} />
     </nav>
   );
 
@@ -96,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <TodayChip />
             <ThemeToggle />
             <NotificationBell />
-            <span className="hidden sm:inline-flex ml-1"><Avatar name={me.name} size={32} /></span>
+            <span className="hidden sm:inline-flex ml-1"><Avatar name={me.name} size={32} src={avatar.src} /></span>
           </header>
           <main className="relative px-4 sm:px-6 lg:px-8 pt-3 pb-28 lg:pb-10 max-w-[1440px] mx-auto">{children}</main>
         </div>
@@ -156,17 +158,35 @@ function ThemeToggle() {
   );
 }
 
-function UserMenu({ name, role, onSignOut }: { name: string; role: string; onSignOut: () => void }) {
+function UserMenu({ name, role, onSignOut, avatar }: { name: string; role: string; onSignOut: () => void; avatar: ReturnType<typeof useMyAvatar> }) {
+  const file = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    setBusy(true); setMsg("");
+    try { await avatar.upload(f); } catch (err) { setMsg((err as Error).message); }
+    setBusy(false);
+  }
   return (
     <div className="p-3">
       <div className="flex items-center gap-2.5 rounded-2xl bg-sidebar-2 shadow-nav p-2.5">
-        <Avatar name={name} size={32} />
+        <button onClick={() => file.current?.click()} title="Change profile photo" aria-label="Change profile photo" className="group relative rounded-full">
+          <Avatar name={name} size={32} src={avatar.src} />
+          <span className="absolute inset-0 grid place-items-center rounded-full bg-black/45 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            {busy ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+          </span>
+        </button>
+        <input ref={file} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={pick} />
         <div className="flex-1 min-w-0">
           <div className="text-[13px] font-medium text-sidebar-active truncate">{name}</div>
           <div className="text-[11px] text-ink-3 truncate">{role}</div>
         </div>
         <button onClick={onSignOut} title="Sign out" aria-label="Sign out" className="p-1.5 rounded-full text-sidebar-muted hover:text-sidebar-active hover:bg-sidebar-hover transition-colors"><LogOut size={15} /></button>
       </div>
+      {msg && <div className="mt-2 px-1 text-[11px] text-bad">{msg}</div>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 // Sales: leads and owners. Owner records are never deleted or merged by Bunty, and owner names/phones are not
 // changed here: only status, follow-up date and notes (notes are added, never overwritten).
 
-import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, OWNER_STATUSES, PROPERTY_TYPES } from "@/lib/crm";
+import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, OWNER_STATUSES, PROPERTY_TYPES, loadOwnerStatuses } from "@/lib/crm";
 import { ToolError, type BuntyModule, type BuntyTool, type BuntyCtx } from "../types";
 import { changeLines, cut, must, orSafe } from "../util";
 
@@ -176,7 +176,7 @@ const searchOwners: BuntyTool<{ query?: string; community?: string; cluster?: st
       community: { type: "string", maxLength: 80, description: "e.g. The Valley, Arabian Ranches 3" },
       cluster: { type: "string", maxLength: 80, description: "e.g. Alana, Golf Homes" },
       unit: { type: "string", maxLength: 40 },
-      status: { type: "string", enum: OWNER_STATUSES },
+      status: { type: "string", maxLength: 40, description: "Owner status (standard or the admin's custom ones)" },
       bedrooms: { type: "string", maxLength: 10 },
       follow_up: { type: "string", enum: ["overdue", "today"] },
       limit: { type: "integer", minimum: 1, maximum: 25 },
@@ -247,16 +247,18 @@ const updateOwner: BuntyTool<{ id: number; status?: string; follow_up_date?: str
   description: "Change an owner record's status and/or follow-up date. (Names, phones and remarks are not changed by Bunty; add a note instead.)",
   input_schema: {
     type: "object",
-    properties: { id: { type: "integer" }, status: { type: "string", enum: OWNER_STATUSES }, follow_up_date: { type: "string", format: "date" } },
+    properties: { id: { type: "integer" }, status: { type: "string", maxLength: 40, description: "Owner status (standard or the admin's custom ones)" }, follow_up_date: { type: "string", format: "date" } },
     required: ["id"], additionalProperties: false,
   },
   async preview(ctx, { id, ...patch }) {
+    await checkOwnerStatus(ctx, patch.status);
     const o = await loadOwner(ctx, id);
     const lines = changeLines(o, patch, { status: "Status", follow_up_date: "Follow-up date" });
     return { title: `Update owner ${ownerLabel(o)}`, lines: lines.length ? lines : ["No change"] };
   },
   async run(ctx, { id, ...patch }) {
     if (!Object.keys(patch).length) throw new ToolError("Nothing to change");
+    await checkOwnerStatus(ctx, patch.status);
     const o = await loadOwner(ctx, id);
     const lines = changeLines(o, patch, { status: "Status", follow_up_date: "Follow-up date" });
     must(await ctx.db.from("owners").update(patch).eq("id", id).select("id").single(), "Update owner");
@@ -267,6 +269,12 @@ const updateOwner: BuntyTool<{ id: number; status?: string; follow_up_date?: str
     return { ok: true, changed: lines, link: `/owners?open=${id}` };
   },
 };
+
+async function checkOwnerStatus(ctx: BuntyCtx, status?: string) {
+  if (status == null) return;
+  const all = await loadOwnerStatuses(ctx.db);
+  if (!all.includes(status)) throw new ToolError(`Unknown owner status "${status}". Use one of: ${all.join(", ")}`);
+}
 
 const addOwnerNote: BuntyTool<{ id: number; text: string; type?: string }> = {
   name: "add_owner_note",
@@ -305,7 +313,7 @@ export const sales: BuntyModule = {
   department: "sales",
   tools: [searchLeads, getLead, createLead, updateLead, addLeadNote, searchOwners, getOwner, updateOwner, addOwnerNote, listStaff],
   guide: "Sales covers leads (buyers/tenants asking about property) and owners (the owner database by community → cluster → unit). " +
-    `Lead stages: ${LEAD_STAGES.join(", ")}. Owner statuses: ${OWNER_STATUSES.join(", ")}. Never delete or merge owner records.`,
+    `Lead stages: ${LEAD_STAGES.join(", ")}. Owner statuses: ${OWNER_STATUSES.join(", ")}, plus any custom ones the admin added (an unknown one is refused with the full list). Never delete or merge owner records.`,
   async pending(ctx) {
     const [over, today, ownersToday, noFollow] = await Promise.all([
       ctx.db.from("leads").select("id,name", { count: "exact" }).lt("follow_up_date", ctx.today).not("status", "in", "(Won,Lost)").order("follow_up_date").limit(3),

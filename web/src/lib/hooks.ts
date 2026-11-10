@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
+import { OWNER_STATUSES, loadOwnerStatuses } from "@/lib/crm";
 
 export function useDebounced<T>(v: T, ms = 250) {
   const [d, setD] = useState(v);
@@ -44,4 +45,11 @@ export function useProjects() {
       return (data || []).map((p) => p.name as string);
     },
   });
+}
+
+/** Owner statuses for pickers and filters: the standard list plus the admin's custom ones. */
+export function useOwnerStatuses(): string[] {
+  const { me } = useAuth();
+  const q = useQuery({ queryKey: ["owner-statuses"], enabled: !!me, staleTime: 10 * 60_000, queryFn: () => loadOwnerStatuses() });
+  return q.data || [...OWNER_STATUSES];
 }

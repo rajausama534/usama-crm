@@ -8,6 +8,14 @@ export const STAGE_TONE: Record<string, Tone> = {
 };
 
 export const OWNER_STATUSES = ["New", "Contacted", "Call Back", "No Response", "Not Interested", "For Sale", "For Rent", "Sold", "Rented", "Agent", "Invalid Number"] as const;
+/** Standard statuses plus the admin's own (table crm_owner_statuses, migration 20261110120000). Falls back to the
+ *  standard list if the table isn't there yet. Works with the browser client and Bunty's server client. */
+export async function loadOwnerStatuses(client: { from: typeof db.from } = db): Promise<string[]> {
+  const { data, error } = await client.from("crm_owner_statuses").select("name").order("sort_order").order("name");
+  const extra = error ? [] : (data || []).map((r: { name: string }) => r.name).filter((n: string) => !(OWNER_STATUSES as readonly string[]).includes(n));
+  return [...OWNER_STATUSES, ...extra];
+}
+
 export const OWNER_STATUS_TONE: Record<string, Tone> = {
   New: "accent", Contacted: "neutral", "Call Back": "warn", "No Response": "neutral", "Not Interested": "bad",
   "For Sale": "good", "For Rent": "good", Sold: "neutral", Rented: "neutral", Agent: "neutral", "Invalid Number": "bad",
