@@ -6,6 +6,7 @@ import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-quer
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Plus, UserRound, Users2, ChevronLeft, ChevronRight, RotateCcw, Columns3, FolderKanban, MessageSquareText, Trash2, X, Download, Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
+import { ColumnPickerSheet, useColumnPrefs, type ColumnDef } from "@/components/ColumnPicker";
 import { BEDROOMS, LEAD_SOURCES, LEAD_STAGES, PROPERTY_TYPES, type Lead, logLeadActivity } from "@/lib/crm";
 import { useDebounced, useStaff, staffName, useProjects } from "@/lib/hooks";
 import { orSafe } from "@/components/shell/CommandPalette";
@@ -17,14 +18,15 @@ import { LeadSheet } from "./LeadSheet";
 
 const PAGE = 50;
 type ColKey = "name" | "phone" | "project_inquired" | "budget" | "status" | "notes" | "whatsapp" | "lead_receive_date" | "email" | "property_type" | "bedroom" | "source" | "follow_up_date" | "last_contacted" | "assigned_to";
-const COLUMNS: { key: ColKey; label: string; on: boolean }[] = [
+const COLUMNS: ColumnDef<ColKey>[] = [
   { key: "name", label: "Name", on: true }, { key: "phone", label: "Phone", on: true }, { key: "project_inquired", label: "Project", on: true },
   { key: "budget", label: "Budget", on: true }, { key: "status", label: "Status", on: true }, { key: "notes", label: "Notes", on: true },
   { key: "whatsapp", label: "Contact", on: true }, { key: "lead_receive_date", label: "Received", on: false }, { key: "email", label: "Email", on: false },
   { key: "property_type", label: "Property type", on: false }, { key: "bedroom", label: "Bedroom", on: false }, { key: "source", label: "Source", on: false },
   { key: "follow_up_date", label: "Follow-up", on: true }, { key: "last_contacted", label: "Last contacted", on: false }, { key: "assigned_to", label: "Agent", on: false },
 ];
-const COLS_KEY = "crm_new_lead_columns_v1";
+const COLS_KEY = "crm_new_lead_columns_v2"; // { order, shown }; v1 was a plain list of shown keys
+const COLS_KEY_V1 = "crm_new_lead_columns_v1";
 const SORTS = [{ v: "lead_receive_date", l: "Sort: Received date" }, { v: "name", l: "Sort: Name" }, { v: "follow_up_date", l: "Sort: Follow-up" }, { v: "created_at", l: "Sort: Created" }];
 
 export default function LeadsPage() {
@@ -72,9 +74,7 @@ function Leads() {
     downloadCSV("leads_export", cols, all);
     setExporting(false);
   }
-  const [cols, setCols] = useState<Set<ColKey>>(() => new Set(COLUMNS.filter((c) => c.on).map((c) => c.key)));
-  useEffect(() => { try { const s = JSON.parse(localStorage.getItem(COLS_KEY) || "null"); if (Array.isArray(s)) setCols(new Set(s)); } catch {} }, []);
-  const saveCols = (n: Set<ColKey>) => { setCols(n); try { localStorage.setItem(COLS_KEY, JSON.stringify([...n])); } catch {} };
+  const colPrefs = useColumnPrefs(COLS_KEY, COLUMNS, COLS_KEY_V1);
   const term = orSafe(useDebounced(q, 250));
 
   const stats = useQuery({
@@ -155,7 +155,7 @@ function Leads() {
     setPicked(new Set()); toast("Deleted"); refresh();
   }
 
-  const visible = COLUMNS.filter((c) => cols.has(c.key) && (c.key !== "assigned_to" || me?.isAdmin));
+  const visible = colPrefs.visible.filter((c) => c.key !== "assigned_to" || me?.isAdmin);
   const allPicked = rows.length > 0 && rows.every((r) => picked.has(r.id));
   const anyFilter = q || stage || source || project || followUp || agent || due;
   const toggle = (id: string, on: boolean) => { const n = new Set(picked); if (on) n.add(id); else n.delete(id); setPicked(n); };
@@ -280,18 +280,7 @@ function Leads() {
         <Board rows={rows} onOpen={openLead} onMove={(l, s) => saveField(l, "status", s)} />
       )}
 
-      <Sheet open={colsOpen} onClose={() => setColsOpen(false)} title="Columns" footer={<>
-        <Button variant="ghost" className="mr-auto" onClick={() => saveCols(new Set(COLUMNS.filter((c) => c.on).map((c) => c.key)))}>Reset</Button>
-        <Button variant="primary" onClick={() => setColsOpen(false)}>Done</Button>
-      </>}>
-        <div className="grid grid-cols-2 gap-2">
-          {COLUMNS.filter((c) => c.key !== "assigned_to" || me?.isAdmin).map((c) => (
-            <label key={c.key} className={cx("flex items-center gap-2.5 rounded-lg border px-3 h-10 text-sm cursor-pointer", cols.has(c.key) ? "border-accent bg-accent-soft text-ink" : "border-line text-ink-2")}>
-              <input type="checkbox" className="accent-[var(--accent)]" checked={cols.has(c.key)} onChange={() => { const n = new Set(cols); if (n.has(c.key)) n.delete(c.key); else n.add(c.key); saveCols(n); }} /> {c.label}
-            </label>
-          ))}
-        </div>
-      </Sheet>
+      <ColumnPickerSheet open={colsOpen} onClose={() => setColsOpen(false)} prefs={colPrefs} hide={(k) => k === "assigned_to" && !me?.isAdmin} />
       <ProjectsSheet open={projectsOpen} onClose={() => setProjectsOpen(false)} />
       <TemplateSheet open={templateOpen} onClose={() => setTemplateOpen(false)} />
       <LeadSheet id={creating ? "new" : openId} onClose={() => { setCreating(false); openLead(null); }} onCreated={(id) => { setCreating(false); openLead(id); }} />

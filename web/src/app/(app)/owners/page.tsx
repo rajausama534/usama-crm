@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Fragment, Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Home, ChevronLeft, ChevronRight, Download, Columns3, Tags, MessageSquareText, MessageCircle, Plus, RotateCcw, UserRound, Loader2 } from "lucide-react";
@@ -15,7 +15,8 @@ import { BROADCAST_IDS_KEY, downloadCSV, isSystemActivity, markOwnerContacted, o
 import { count, fmtDate, todayDubai } from "@/lib/format";
 import { OwnerSheet } from "./OwnerSheet";
 import { AddOwnerSheet } from "./AddOwnerSheet";
-import { ColumnsSheet, OWNER_COLUMNS, StatusesSheet, useOwnerColumns } from "./OwnerSettings";
+import { OWNER_COLUMNS, StatusesSheet, type OwnerCol } from "./OwnerSettings";
+import { ColumnPickerSheet, useColumnPrefs } from "@/components/ColumnPicker";
 
 const PAGE = 50;
 type Opt = { community: string | null; cluster: string | null; data_source: string | null; records: number };
@@ -55,8 +56,7 @@ function Owners() {
   const [adding, setAdding] = useState(false);
   const [colsOpen, setColsOpen] = useState(false);
   const [statusesOpen, setStatusesOpen] = useState(false);
-  const cols = useOwnerColumns();
-  const { show } = cols;
+  const colPrefs = useColumnPrefs(`crm_owner_cols_v2:${me?.email || ""}`, OWNER_COLUMNS);
   const [picked, setPicked] = useState<Set<number>>(new Set());
   const term = orSafe(useDebounced(q, 300));
   const unit = useDebounced(unitNo.trim(), 300);
@@ -246,8 +246,8 @@ function Owners() {
                 <thead className="bg-surface-2">
                   <tr className="text-left text-xs text-ink-2 border-b border-line">
                     {me?.isAdmin && <th className="pl-4 py-2.5 w-8"><input type="checkbox" aria-label="Tick all on this page" className="accent-[var(--accent)]" checked={allOnPage} onChange={() => setPicked((s) => { const n = new Set(s); rows.forEach((r) => { if (allOnPage) n.delete(r.id); else n.add(r.id); }); return n; })} /></th>}
-                    {OWNER_COLUMNS.filter((c) => show(c.k)).map((c) => (
-                      <th key={c.k} className="font-semibold px-3 py-2.5 whitespace-nowrap first:pl-4">{c.l}</th>
+                    {colPrefs.visible.map((c) => (
+                      <th key={c.key} className="font-semibold px-3 py-2.5 whitespace-nowrap first:pl-4">{c.label}</th>
                     ))}
                   </tr>
                 </thead>
@@ -255,27 +255,7 @@ function Owners() {
                   {rows.map((o) => (
                     <tr key={o.id} className="border-b border-line last:border-0 hover:bg-surface-2/60 align-top">
                       {me?.isAdmin && <td className="pl-4 py-3 w-8"><input type="checkbox" aria-label={`Tick ${o.owner || "owner"}`} className="accent-[var(--accent)]" checked={picked.has(o.id)} onChange={() => toggle(o.id)} /></td>}
-                      {show("community") && <td className="pl-4 pr-3 py-3 text-ink-2 max-w-40">{o.community}</td>}
-                      {show("cluster") && <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>}
-                      {show("unit") && <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>}
-                      <td className="px-3 py-3 min-w-44 max-w-72">
-                        <div className="text-ink font-medium leading-snug">{o.owner || "—"}</div>
-                        <div className="flex flex-wrap gap-1.5 mt-1.5">
-                          <button onClick={() => openOwner(o.id)} className="inline-flex items-center gap-1 h-6 px-2 rounded-md bg-accent-soft text-accent-text text-xs font-medium hover:opacity-80"><UserRound size={12} /> Profile</button>
-                          {!!o.__units && o.__units > 1 && <button onClick={() => openOwner(o.id)} className="h-6 px-2 rounded-md border border-line text-xs text-ink-2 hover:border-line-strong">{o.__units} units</button>}
-                          {!!o.__coOwners && <span className="h-6 px-2 inline-flex items-center rounded-md bg-surface-2 text-xs text-ink-3">+{o.__coOwners} co-owner{o.__coOwners > 1 ? "s" : ""}</span>}
-                        </div>
-                      </td>
-                      {show("whatsapp") && <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>}
-                      {show("status") && <td className="px-3 py-3"><StatusSelect value={o.status} options={ownerStatuses} onChange={(s) => changeStatus(o, s)} /></td>}
-                      {show("remark") && <td className="px-3 py-3 min-w-48 max-w-[420px]">
-                        <button onClick={() => setRemarkFor(o)} title="Read or add a remark"
-                          className="w-full text-left text-[13px] leading-snug text-ink-2 hover:text-ink whitespace-pre-line rounded-md hover:bg-surface-2 -m-1 p-1">
-                          {o.__remark || <span className="text-ink-3">No remark yet</span>}
-                        </button>
-                      </td>}
-                      {show("last") && <td className="px-3 py-3 text-ink-2 num whitespace-nowrap">{fmtDate(o.last_contacted)}</td>}
-                      {show("actions") && <td className="px-3 py-3"><div className="flex gap-1.5"><CallButton phone={o.phone1 || o.phone2} onContact={() => contact(o, "Call")} /><CopyButton value={o.phone1 || o.phone2} /></div></td>}
+                      {colPrefs.visible.map((c) => <Fragment key={c.key}>{ownerCell(o, c.key)}</Fragment>)}
                     </tr>
                   ))}
                 </tbody>
@@ -328,13 +308,44 @@ function Owners() {
       )}
 
       <AddOwnerSheet open={adding} onClose={() => setAdding(false)} onSaved={(id) => { setAdding(false); refresh(); qc.invalidateQueries({ queryKey: ["owner-options"] }); openOwner(id); }} />
-      <ColumnsSheet open={colsOpen} onClose={() => setColsOpen(false)} hidden={cols.hidden} save={cols.save} />
+      <ColumnPickerSheet open={colsOpen} onClose={() => setColsOpen(false)} prefs={colPrefs} />
       <StatusesSheet open={statusesOpen} onClose={() => setStatusesOpen(false)} />
       <TemplateSheet open={templateOpen} onClose={() => setTemplateOpen(false)} />
       <RemarkSheet row={remarkFor} onClose={() => setRemarkFor(null)} onSaved={refresh} />
       <OwnerSheet id={openId ? Number(openId) : null} onClose={() => openOwner(null)} onOpen={openOwner} />
     </div>
   );
+
+  /** One table cell per column, so the person's column order is used. */
+  function ownerCell(o: Row, k: OwnerCol) {
+    switch (k) {
+      case "community": return <td className="px-3 py-3 text-ink-2 max-w-40 first:pl-4">{o.community}</td>;
+      case "cluster": return <td className="px-3 py-3 text-ink-2 max-w-40">{o.cluster}</td>;
+      case "unit": return <td className="px-3 py-3 font-semibold text-ink num whitespace-nowrap">{o.unit}</td>;
+      case "owner": return (
+        <td className="px-3 py-3 min-w-44 max-w-72">
+          <div className="text-ink font-medium leading-snug">{o.owner || "—"}</div>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            <button onClick={() => openOwner(o.id)} className="inline-flex items-center gap-1 h-6 px-2 rounded-md bg-accent-soft text-accent-text text-xs font-medium hover:opacity-80"><UserRound size={12} /> Profile</button>
+            {!!o.__units && o.__units > 1 && <button onClick={() => openOwner(o.id)} className="h-6 px-2 rounded-md border border-line text-xs text-ink-2 hover:border-line-strong">{o.__units} units</button>}
+            {!!o.__coOwners && <span className="h-6 px-2 inline-flex items-center rounded-md bg-surface-2 text-xs text-ink-3">+{o.__coOwners} co-owner{o.__coOwners > 1 ? "s" : ""}</span>}
+          </div>
+        </td>
+      );
+      case "whatsapp": return <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>;
+      case "status": return <td className="px-3 py-3"><StatusSelect value={o.status} options={ownerStatuses} onChange={(s) => changeStatus(o, s)} /></td>;
+      case "remark": return (
+        <td className="px-3 py-3 min-w-48 max-w-[420px]">
+          <button onClick={() => setRemarkFor(o)} title="Read or add a remark"
+            className="w-full text-left text-[13px] leading-snug text-ink-2 hover:text-ink whitespace-pre-line rounded-md hover:bg-surface-2 -m-1 p-1">
+            {o.__remark || <span className="text-ink-3">No remark yet</span>}
+          </button>
+        </td>
+      );
+      case "last": return <td className="px-3 py-3 text-ink-2 num whitespace-nowrap">{fmtDate(o.last_contacted)}</td>;
+      case "actions": return <td className="px-3 py-3"><div className="flex gap-1.5"><CallButton phone={o.phone1 || o.phone2} onContact={() => contact(o, "Call")} /><CopyButton value={o.phone1 || o.phone2} /></div></td>;
+    }
+  }
 
   /** Latest remark, number of units the same owner holds, and co-owners on the same unit — for the rows on screen. */
   async function enrich(rows: Row[]) {

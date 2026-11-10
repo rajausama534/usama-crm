@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { ColumnDef } from "@/components/ColumnPicker";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Trash2 } from "lucide-react";
 import { db } from "@/lib/supabase";
@@ -10,51 +11,13 @@ import { Button, Input, Sheet, StatusBadge } from "@/components/ui";
 import { useConfirm } from "@/components/Confirm";
 import { useToast } from "@/components/ContactKit";
 
-/** Owners table columns. "owner" is always shown. */
-export const OWNER_COLUMNS = [
-  { k: "community", l: "Community" }, { k: "cluster", l: "Cluster" }, { k: "unit", l: "Unit" },
-  { k: "owner", l: "Owner name", locked: true }, { k: "whatsapp", l: "WhatsApp" }, { k: "status", l: "Status" },
-  { k: "remark", l: "Latest remark" }, { k: "last", l: "Last contacted" }, { k: "actions", l: "Actions" },
-] as const;
-export type OwnerCol = (typeof OWNER_COLUMNS)[number]["k"];
-
-/** Hidden columns, saved per person on this device (as the old CRM did). */
-export function useOwnerColumns() {
-  const { me } = useAuth();
-  const key = `crm_owner_cols_hidden_v1:${me?.email || ""}`;
-  const [hidden, setHidden] = useState<Set<OwnerCol>>(new Set());
-  useEffect(() => {
-    try { setHidden(new Set(JSON.parse(localStorage.getItem(key) || "[]"))); } catch { setHidden(new Set()); }
-  }, [key]);
-  const save = (next: Set<OwnerCol>) => {
-    setHidden(next);
-    try { localStorage.setItem(key, JSON.stringify([...next])); } catch {}
-  };
-  return { show: (k: OwnerCol) => !hidden.has(k), hidden, save };
-}
-
-export function ColumnsSheet({ open, onClose, hidden, save }: { open: boolean; onClose: () => void; hidden: Set<OwnerCol>; save: (s: Set<OwnerCol>) => void }) {
-  const flip = (k: OwnerCol) => { const n = new Set(hidden); if (n.has(k)) n.delete(k); else n.add(k); save(n); };
-  return (
-    <Sheet open={open} onClose={onClose} title="Manage columns" footer={<>
-      <Button variant="ghost" onClick={() => save(new Set())}>Show all</Button>
-      <Button variant="primary" onClick={onClose}>Done</Button>
-    </>}>
-      <div className="text-sm text-ink-2 mb-3">Choose which columns show in the owners table. Saved for you on this device.</div>
-      <ul className="divide-y divide-line rounded-xl border border-line">
-        {OWNER_COLUMNS.map((c) => (
-          <li key={c.k}>
-            <label className="flex items-center gap-3 px-3.5 py-2.5 text-sm text-ink cursor-pointer">
-              <input type="checkbox" className="accent-[var(--accent)]" disabled={"locked" in c && c.locked}
-                checked={!hidden.has(c.k)} onChange={() => flip(c.k)} />
-              {c.l}{"locked" in c && c.locked && <span className="text-xs text-ink-3">(always shown)</span>}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </Sheet>
-  );
-}
+/** Owners table columns (order and on/off are chosen per person in the Columns picker). "owner" is always shown. */
+export type OwnerCol = "community" | "cluster" | "unit" | "owner" | "whatsapp" | "status" | "remark" | "last" | "actions";
+export const OWNER_COLUMNS: ColumnDef<OwnerCol>[] = [
+  { key: "community", label: "Community", on: true }, { key: "cluster", label: "Cluster", on: true }, { key: "unit", label: "Unit", on: true },
+  { key: "owner", label: "Owner name", on: true, locked: true }, { key: "whatsapp", label: "WhatsApp", on: true }, { key: "status", label: "Status", on: true },
+  { key: "remark", label: "Latest remark", on: true }, { key: "last", label: "Last contacted", on: true }, { key: "actions", label: "Actions", on: true },
+];
 
 /** Admin only: add or remove custom owner statuses (shared with everyone). The standard ones can't be removed. */
 export function StatusesSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
