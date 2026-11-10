@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Loader2, Pencil, FileText } from "lucide-react";
+import { Mail, Loader2, Megaphone, Pencil, FileText } from "lucide-react";
 import { CallButton, CopyButton, WaButton, useWaTemplate } from "@/components/ContactKit";
 import { markOwnerContacted, ownerMessage } from "@/lib/contact";
 import { db } from "@/lib/supabase";
@@ -126,6 +126,7 @@ export function OwnerSheet({ id, onClose, onOpen }: { id: number | null; onClose
         {o.email && <a href={`mailto:${o.email}`}><Button size="sm"><Mail size={14} /> Email</Button></a>}
         {!editing && <Button size="sm" onClick={() => { setTab("overview"); setEditing(true); }}><Pencil size={14} /> Edit</Button>}
         <Button size="sm" onClick={() => router.push(`/breakdown?owner=${o.id}`)}><FileText size={14} /> Breakdown</Button>
+        <Button size="sm" onClick={() => router.push(`/listings?new=1&owner=${o.id}`)}><Megaphone size={14} /> Create listing</Button>
       </div>
       <Tabs className="mt-4 !border-b-0" value={tab} onChange={setTab} options={[
         { value: "overview", label: "Overview" },

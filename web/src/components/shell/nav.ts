@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Inbox, CalendarDays, Users2, Home, Megaphone, Handshake,
-  Landmark, BadgeCheck, ShieldCheck, Settings, MessageCircle, FileText, Building2, UserSearch, Map, BarChart3, Sparkles, type LucideIcon,
+  Landmark, BadgeCheck, ShieldCheck, Settings, MessageCircle, FileText, Building2, UserSearch, Map, BarChart3, Sparkles, ClipboardList, type LucideIcon,
 } from "lucide-react";
 import { canUseSales, type Me } from "@/lib/access";
 
@@ -25,6 +25,7 @@ export const NAV: NavSection[] = [
       { href: "/bunty", label: "Bunty", icon: Sparkles, show: (me) => me.isSuperAdmin },
       { href: "/approvals", label: "Approvals", icon: Inbox },
       { href: "/calendar", label: "Calendar", icon: CalendarDays, show: canUseSales },
+      { href: "/my", label: "My requests", icon: ClipboardList },
     ],
   },
   {
@@ -32,8 +33,8 @@ export const NAV: NavSection[] = [
     items: [
       { href: "/leads", label: "Leads", icon: Users2, show: canUseSales },
       { href: "/owners", label: "Owners", icon: Home, show: canUseSales },
-      { href: "/deals", label: "Deals", icon: Handshake, soon: "Step 2", show: canUseSales },
-      { href: "/listings", label: "Listings", icon: Megaphone, soon: "Step 5", show: canUseSales },
+      { href: "/deals", label: "Deals", icon: Handshake, show: canUseSales },
+      { href: "/listings", label: "Listings", icon: Megaphone, show: canUseSales },
       { href: "/broadcast", label: "WhatsApp Broadcast", icon: MessageCircle, show: (me) => me.isAdmin },
       { href: "/breakdown", label: "Breakdown", icon: FileText, show: canUseSales },
     ],
@@ -50,9 +51,9 @@ export const NAV: NavSection[] = [
   {
     title: "Company",
     items: [
-      { href: "/accounts", label: "Accounts", icon: Landmark, soon: "Step 3", show: finance },
-      { href: "/hr", label: "HR", icon: BadgeCheck, soon: "Step 4", show: hr },
-      { href: "/compliance", label: "Compliance", icon: ShieldCheck, soon: "Step 2", show: compliance },
+      { href: "/accounts", label: "Accounts", icon: Landmark, show: finance },
+      { href: "/hr", label: "HR", icon: BadgeCheck, show: hr },
+      { href: "/compliance", label: "Compliance", icon: ShieldCheck, show: compliance },
     ],
   },
   {

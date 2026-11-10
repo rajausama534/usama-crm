@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlarmClock, ArrowRight, ArrowUpRight, BadgeCheck, CalendarClock, Handshake, Inbox, Landmark, PhoneCall, UsersRound, Home } from "lucide-react";
+import { AlarmClock, ArrowRight, ArrowUpRight, CalendarClock, PhoneCall, UsersRound, Home } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { canUseSales } from "@/lib/access";
@@ -12,6 +12,7 @@ import { LEAD_STAGES } from "@/lib/crm";
 import { useStaff, staffName } from "@/lib/hooks";
 import { Avatar, Badge, Card, CountUp, Segmented, Skeleton, Stat, buttonClass, cx } from "@/components/ui";
 import { count, fmtTime } from "@/lib/format";
+import { CompanyCards } from "@/components/company/CompanyCards";
 
 type Stats = {
   owners: { records: number; units: number; contacted_7d: number; contacted_30d: number };
@@ -191,28 +192,7 @@ function SalesDashboard() {
         )}
       </div>
 
-      {me?.isSuperAdmin && (
-        <div>
-          <div className="text-xs font-medium text-ink-3 mb-2">Coming to this dashboard</div>
-          <div className="stagger grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { icon: Inbox, t: "Approvals", d: "Deals, expenses, leave and listings waiting for you", href: "/approvals" },
-              { icon: Handshake, t: "Deals & commission", d: "Revenue, company share, owed to agents — Step 2" },
-              { icon: Landmark, t: "Cash & VAT", d: "Bank, cash forecast, VAT due, profit — Step 3" },
-              { icon: BadgeCheck, t: "Staff", d: "Payroll, leave, expiring documents — Step 4" },
-            ].map((x) => {
-              const body = (
-                <Card className={cx("p-4 h-full", x.href ? "lift hover:border-line-strong" : "border-dashed shadow-none bg-transparent")}>
-                  <x.icon size={18} className="text-ink-3" />
-                  <div className="text-sm font-medium text-ink mt-2">{x.t}</div>
-                  <div className="text-xs text-ink-3 mt-0.5">{x.d}</div>
-                </Card>
-              );
-              return x.href ? <Link key={x.t} href={x.href}>{body}</Link> : <div key={x.t}>{body}</div>;
-            })}
-          </div>
-        </div>
-      )}
+      {me?.isSuperAdmin && <CompanyCards />}
     </div>
   );
 }

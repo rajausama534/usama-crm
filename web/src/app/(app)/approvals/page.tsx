@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox, Check, X, Loader2 } from "lucide-react";
@@ -12,6 +13,9 @@ import { aed, fmtDateTime } from "@/lib/format";
 type Approval = {
   id: string; kind: string; ref_table: string; ref_id: string; title: string; summary: string | null; amount: number | null;
   requested_by: string; requested_at: string; status: string; decided_by: string | null; decided_at: string | null; decision_note: string | null;
+};
+const REF_LINK: Record<string, (id: string) => string> = {
+  crm_deals: (id) => `/deals?open=${id}`, crm_listings: (id) => `/listings?open=${id}`, crm_expenses: () => "/accounts?tab=expenses", crm_leave: () => "/hr?tab=leave",
 };
 const KIND_LABEL: Record<string, string> = { deal: "Deal", expense: "Expense", advance: "Advance", leave: "Leave", listing: "Listing" };
 const STATUS_TONE: Record<string, Tone> = { pending: "warn", approved: "good", rejected: "bad", withdrawn: "neutral" };
@@ -59,7 +63,7 @@ export default function ApprovalsPage() {
         actions={<Segmented value={tab} onChange={setTab} options={[{ value: "pending", label: "Waiting" }, { value: "done", label: "Decided" }, { value: "mine", label: "My requests" }]} />} />
 
       {q.isLoading ? <ListSkeleton rows={4} /> : q.data === null ? (
-        <Card><Empty icon={<Inbox size={28} />} title="Approvals switch on with the step 1 database update" hint="Once it’s applied, deals, expenses, leave and listings that need a decision will collect here." /></Card>
+        <Card><Empty icon={<Inbox size={28} />} title="Approvals switch on with the database update" hint="Once it’s applied, deals, expenses, leave and listings that need a decision will collect here." /></Card>
       ) : !q.data?.length ? (
         <Card><Empty icon={<Inbox size={28} />} title={tab === "pending" ? "Nothing waiting for you" : "Nothing here yet"} hint={tab === "pending" ? "New requests will appear here as soon as they’re submitted." : undefined} /></Card>
       ) : (
@@ -73,6 +77,7 @@ export default function ApprovalsPage() {
                   {a.status !== "pending" && <Badge tone={STATUS_TONE[a.status]}>{a.status}</Badge>}
                 </div>
                 {a.summary && <div className="text-sm text-ink-2 mt-1 whitespace-pre-wrap">{a.summary}</div>}
+                {REF_LINK[a.ref_table] && <Link href={REF_LINK[a.ref_table](a.ref_id)} className="inline-block mt-1 text-[13px] font-medium text-accent-text hover:underline">Open the {KIND_LABEL[a.kind]?.toLowerCase() || "item"}</Link>}
                 <div className="text-xs text-ink-3 mt-1.5">
                   {staffName(staff.data, a.requested_by)} · {fmtDateTime(a.requested_at)}
                   {a.decided_by && ` · ${a.status} by ${staffName(staff.data, a.decided_by)} ${fmtDateTime(a.decided_at)}`}

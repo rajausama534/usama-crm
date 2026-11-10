@@ -148,7 +148,8 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
               {l.status === "Won" && (
                 <div className="flex items-start gap-3 rounded-xl border border-good/30 bg-good-soft p-3.5 text-sm">
                   <Trophy size={18} className="text-good mt-0.5 shrink-0" />
-                  <div><div className="font-medium text-ink">Deal won</div><div className="text-ink-2">Recording the deal and its commission arrives in Step 2 (Deals).</div></div>
+                  <div className="flex-1"><div className="font-medium text-ink">Deal won</div><div className="text-ink-2">Record the deal and its commission. It goes to Usama or Accounts for approval.</div></div>
+                  <Button size="sm" variant="primary" onClick={() => router.push(`/deals?new=1&lead=${l.id}`)}>Record deal</Button>
                 </div>
               )}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

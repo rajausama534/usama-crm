@@ -1,27 +1,29 @@
-// Bunty's departments and abilities. Each later build step adds a module here (deals → "commission"/"compliance",
-// accounts → "accounts"/"vat", HR → "hr"/"documents", listings → "listings") and removes its `soon` tag.
+// Bunty's departments and abilities. Every department of the company plan has a module here; a new feature ships
+// with its own tools in ./tools.
 
 import type { BuntyCtx, BuntyModule, BuntyTool, Department, DepartmentKey, PendingSummary } from "./types";
 import { sales } from "./tools/sales";
 import { calendar } from "./tools/calendar";
 import { approvals } from "./tools/approvals";
 import { overview } from "./tools/overview";
+import { accounts, commission, compliance, documents, hr, listings, vat } from "./tools/company";
 
 export const DEPARTMENTS: Department[] = [
   { key: "overview", name: "Overview" },
   { key: "sales", name: "Sales" },
-  { key: "commission", name: "Commission", soon: "Step 2" },
-  { key: "accounts", name: "Accounts", soon: "Step 3" },
-  { key: "vat", name: "VAT & tax", soon: "Step 3" },
-  { key: "hr", name: "HR", soon: "Step 4" },
-  { key: "documents", name: "Documents", soon: "Step 4" },
-  { key: "compliance", name: "Compliance", soon: "Step 2" },
-  { key: "listings", name: "Listings", soon: "Step 5" },
+  { key: "commission", name: "Commission" },
+  { key: "accounts", name: "Accounts" },
+  { key: "vat", name: "VAT & tax" },
+  { key: "hr", name: "HR" },
+  { key: "documents", name: "Documents" },
+  { key: "compliance", name: "Compliance" },
+  { key: "listings", name: "Listings" },
   { key: "approvals", name: "Approvals" },
   { key: "tasks", name: "My tasks" },
 ];
 
-export const MODULES: BuntyModule[] = [overview, sales, calendar, approvals];
+// New modules go at the end so the tool order (and the prompt cache) stays stable.
+export const MODULES: BuntyModule[] = [overview, sales, calendar, approvals, commission, compliance, accounts, vat, hr, documents, listings];
 
 /** Tools in a fixed order (keeps the prompt cache stable). Later: filter by the person's role/ticks. */
 export function toolsFor(): BuntyTool[] {

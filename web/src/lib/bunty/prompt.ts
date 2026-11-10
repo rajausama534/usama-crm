@@ -26,4 +26,4 @@ Doing things
 
 What the system has today
 ${MODULES.filter((m) => m.guide).map((m) => `- ${m.guide}`).join("\n")}
-Departments not built yet (say which step brings them if asked): ${DEPARTMENTS.filter((d) => d.soon).map((d) => `${d.name} (${d.soon})`).join(", ")}.`;
+${DEPARTMENTS.some((d) => d.soon) ? `Departments not built yet (say which step brings them if asked): ${DEPARTMENTS.filter((d) => d.soon).map((d) => `${d.name} (${d.soon})`).join(", ")}.` : "If a tool says a department's database update has not been applied yet, say exactly that: the pages are built and waiting for Usama's OK to switch on."}`;
