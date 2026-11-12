@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Loader2, ShieldCheck } from "lucide-react";
+import { Check, Loader2, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { Badge, Button, Field, Input, Select, Textarea } from "@/components/ui";
@@ -9,17 +9,56 @@ import { useToast } from "@/components/ContactKit";
 import { FileField, FormError } from "./kit";
 import { isCompliance, uploadDoc, useRefresh } from "@/lib/company/data";
 import { fmtDateTime } from "@/lib/format";
+import { kycMissing } from "@/lib/company/calc";
 
 export type Kyc = {
-  id: string; deal_id: string; party: string; full_name: string | null; nationality: string | null; id_type: string | null; id_number: string | null;
+  id: string; deal_id: string; party: string; party_no?: number; full_name: string | null; nationality: string | null; id_type: string | null; id_number: string | null;
   id_expiry: string | null; id_file: string | null; source_of_funds: string | null; sanctions_checked: boolean; sanctions_note: string | null;
   status: "pending" | "complete"; completed_by: string | null; completed_at: string | null;
 };
 const LABEL: Record<string, string> = { buyer: "Buyer", seller: "Seller", tenant: "Tenant", landlord: "Landlord" };
 export const partyLabel = (p: string) => LABEL[p] || p;
+const noOf = (k: Kyc) => k.party_no ?? 1;
 
-/** One party's KYC. The agent fills it in; only the compliance officer can mark it complete. */
-export function KycForm({ row, dealId, party, canEdit }: { row: Kyc | undefined; dealId: string; party: string; canEdit: boolean }) {
+export { kycMissing };
+
+/** Every KYC of a deal, one form per person, with "Add second buyer" while the deal can still be edited. */
+export function KycParties({ dealId, need, rows, canEdit, open }: { dealId: string; need: string[]; rows: Kyc[]; canEdit: boolean; open: boolean }) {
+  const { me } = useAuth();
+  const toast = useToast();
+  const refresh = useRefresh();
+  const [adding, setAdding] = useState("");
+  const canAdd = open && (canEdit || isCompliance(me));
+  async function add(party: string, no: number) {
+    setAdding(party);
+    const r = await db.from("crm_kyc").insert({ deal_id: dealId, party, party_no: no });
+    setAdding("");
+    if (r.error) toast(r.error.message); else refresh();
+  }
+  if (!need.length) return <div className="text-sm text-ink-3">This type of deal needs no KYC.</div>;
+  return (
+    <>
+      {need.map((p) => {
+        const mine = rows.filter((k) => k.party === p).sort((a, b) => noOf(a) - noOf(b));
+        const next = mine.length ? Math.max(...mine.map(noOf)) + 1 : 2;
+        return (
+          <div key={p} className="space-y-3">
+            {mine.length ? mine.map((k) => <KycForm key={k.id} dealId={dealId} party={p} partyNo={noOf(k)} numbered={mine.length > 1} row={k} canEdit={canEdit} />)
+              : <KycForm dealId={dealId} party={p} partyNo={1} numbered={false} row={undefined} canEdit={canEdit} />}
+            {canAdd && mine.length > 0 && next <= 4 && (
+              <Button size="sm" onClick={() => add(p, next)} disabled={!!adding}>
+                {adding === p ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}Add {next === 2 ? "second" : next === 3 ? "third" : "fourth"} {partyLabel(p).toLowerCase()}
+              </Button>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/** One person's KYC. The agent fills it in; only the compliance officer can mark it complete. */
+export function KycForm({ row, dealId, party, partyNo = 1, numbered = false, canEdit }: { row: Kyc | undefined; dealId: string; party: string; partyNo?: number; numbered?: boolean; canEdit: boolean }) {
   const { me } = useAuth();
   const toast = useToast();
   const refresh = useRefresh();
@@ -50,16 +89,25 @@ export function KycForm({ row, dealId, party, canEdit }: { row: Kyc | undefined;
       ...(officer ? { sanctions_checked: v.sanctions_checked, sanctions_note: v.sanctions_note.trim() || null } : {}),
       status: complete ? "complete" : "pending",
     };
-    const r = row ? await db.from("crm_kyc").update(body).eq("id", row.id) : await db.from("crm_kyc").insert({ ...body, deal_id: dealId, party });
+    const r = row ? await db.from("crm_kyc").update(body).eq("id", row.id) : await db.from("crm_kyc").insert({ ...body, deal_id: dealId, party, party_no: partyNo });
     setBusy(false);
     if (r.error) { setErr(r.error.message); return; }
     toast(complete ? "KYC completed" : "Saved"); refresh();
   }
 
+  async function remove() {
+    if (!row || !window.confirm(`Remove ${partyLabel(party).toLowerCase()} ${partyNo} from this deal's KYC?`)) return;
+    setBusy(true); setErr("");
+    const r = await db.from("crm_kyc").delete().eq("id", row.id);
+    setBusy(false);
+    if (r.error) { setErr(r.error.message); return; }
+    toast("Removed"); refresh();
+  }
+
   return (
     <div className="rounded-2xl border border-line p-4">
       <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="font-medium text-ink">{partyLabel(party)}</div>
+        <div className="font-medium text-ink">{partyLabel(party)}{numbered || partyNo > 1 ? ` ${partyNo}` : ""}</div>
         {done ? <Badge tone="good"><ShieldCheck size={12} /> Complete</Badge> : <Badge tone="warn">KYC pending</Badge>}
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -87,6 +135,7 @@ export function KycForm({ row, dealId, party, canEdit }: { row: Kyc | undefined;
       <FormError>{err}</FormError>
       {editable && (
         <div className="mt-3 flex justify-end gap-2">
+          {row && partyNo > 1 && <Button size="sm" variant="ghost" onClick={remove} disabled={busy}><Trash2 size={14} /> Remove</Button>}
           <Button size="sm" onClick={() => save(false)} disabled={busy}>{busy && <Loader2 size={14} className="animate-spin" />}Save</Button>
           {officer && <Button size="sm" variant="primary" onClick={() => save(true)} disabled={busy}><Check size={14} /> Mark complete</Button>}
         </div>

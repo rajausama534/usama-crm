@@ -11,7 +11,7 @@ import { Badge, Button, Field, Input, Select, Sheet, Tabs, Textarea, buttonClass
 import { useToast } from "@/components/ContactKit";
 import { useConfirm } from "@/components/Confirm";
 import { DEAL_TONE, FormError, Line, Section } from "@/components/company/kit";
-import { KycForm, partyLabel, type Kyc } from "@/components/company/KycForm";
+import { KycParties, kycMissing, partyLabel, type Kyc } from "@/components/company/KycForm";
 import { isCompliance, isFinance, requestApproval, useRefresh, useRows } from "@/lib/company/data";
 import {
   DEAL_STATUS, DEAL_TYPES, GOAML_CASH_LIMIT, addDays, advancesOwed, dealMoney, kycParties, num, payableNow, r2, slabFor, splitDeal,
@@ -249,7 +249,7 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
   const sp = splits.data || [];
   const company = deal ? r2(num(deal.office_commission) - sp.reduce((s, l) => s + num(l.amount), 0)) : 0;
   const kycNeeded = deal ? kycParties(deal.deal_type) : [];
-  const kycOpen = kycNeeded.filter((p) => (kyc.data || []).find((k) => k.party === p)?.status !== "complete");
+  const kycOpen = kycMissing(kycNeeded, kyc.data || []);
   const active = deal && !["pending", "rejected", "cancelled"].includes(deal.status);
 
   const form = (
@@ -456,8 +456,7 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
 
   const kycTab = deal && (
     <div className="space-y-3">
-      {!kycNeeded.length ? <div className="text-sm text-ink-3">This type of deal needs no KYC.</div>
-        : kycNeeded.map((p) => <KycForm key={p} dealId={deal.id} party={p} row={(kyc.data || []).find((k) => k.party === p)} canEdit={mine && ["pending", "rejected"].includes(deal.status)} />)}
+      <KycParties dealId={deal.id} need={kycNeeded} rows={kyc.data || []} canEdit={mine && ["pending", "rejected"].includes(deal.status)} open={["pending", "rejected"].includes(deal.status)} />
     </div>
   );
 

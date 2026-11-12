@@ -108,6 +108,10 @@ export function slabTopUp(dev: Developer, deals: Pick<Deal, "price" | "commissio
 export function kycParties(type: DealType): string[] {
   return type === "secondary" ? ["buyer", "seller"] : type === "offplan" ? ["buyer"] : type === "rental" ? ["tenant", "landlord"] : [];
 }
+/** Parties whose KYC is not done: no row yet, or any of its people (e.g. joint buyers) not complete. Same rule as private.kyc_missing. */
+export function kycMissing(need: string[], rows: { party: string; status: string }[]): string[] {
+  return need.filter((p) => { const mine = rows.filter((k) => k.party === p); return !mine.length || mine.some((k) => k.status !== "complete"); });
+}
 
 /* ------------------------------------------------------------------ dates */
 export const ymd = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;

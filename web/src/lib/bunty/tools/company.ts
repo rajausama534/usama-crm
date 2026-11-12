@@ -6,7 +6,7 @@ import { ToolError, type BuntyCtx, type BuntyModule, type BuntyTool } from "../t
 import { must } from "../util";
 import {
   CANDIDATE_STAGES, COUNTED, DEAL_STATUS, DEAL_TYPES, EXPENSE_CATEGORIES, LISTING_STATUS, addDays, advancesOwed, bankBalance, cashForecast, corporateTax, dealMoney, daysBetween,
-  expiryState, gratuity, kycParties, leaveBalance, monthStart, num, payableNow, periodOf, profitAndLoss, r2, vatReturn,
+  expiryState, gratuity, kycMissing, kycParties, leaveBalance, monthStart, num, payableNow, periodOf, profitAndLoss, r2, vatReturn,
   type BankAccount, type BankLine, type Bill, type Candidate, type CompanySettings, type Deal, type DealType, type Developer, type Expense, type Invoice, type Leave, type Listing,
   type PayrollLine, type PayrollRun, type Split, type Staff, type StaffDoc,
 } from "@/lib/company/calc";
@@ -77,7 +77,7 @@ const getDeal: BuntyTool<{ id: string }> = {
     if (!d) throw new ToolError("Deal not found (or you cannot see it).");
     const [splits, pays, kyc] = await Promise.all([
       rows<Split>(ctx, "crm_deal_splits", (q) => q.eq("deal_id", i.id)), rows<{ kind: string; email: string | null; amount: number; paid_on: string }>(ctx, "crm_deal_payments", (q) => q.eq("deal_id", i.id)),
-      rows<{ party: string; status: string }>(ctx, "crm_kyc", (q) => q.eq("deal_id", i.id)),
+      rows<KycRow>(ctx, "crm_kyc", (q) => q.eq("deal_id", i.id)),
     ]);
     const m = dealMoney(d);
     return {
@@ -85,7 +85,8 @@ const getDeal: BuntyTool<{ id: string }> = {
       money: { commission_before_vat: m.gross, vat: m.vat, due_from_client: m.due, other_agency_share: m.otherAgency, office_commission: m.office, received: d.received, still_to_come: Math.max(0, r2(m.due - num(d.received))) },
       split: splits.map((s) => ({ who: s.email, role: s.kind, share_of_deal_pct: s.share_pct, rate_pct: s.rate_pct, amount: s.amount, paid: s.paid, payable_now: payableNow(d, s) })),
       company_share_if_all_lines_visible: r2(m.office - splits.reduce((s, l) => s + num(l.amount), 0)),
-      payments: pays, kyc_needed: kycParties(d.deal_type), kyc, link: `/deals?open=${d.id}`,
+      payments: pays, kyc_needed: kycParties(d.deal_type), kyc_missing: kycMissing(kycParties(d.deal_type), kyc),
+      kyc: kyc.map((k) => ({ party: k.party, person_no: k.party_no ?? 1, name: k.full_name, status: k.status })), link: `/deals?open=${d.id}`,
     };
   },
 };
@@ -165,11 +166,11 @@ export const commission: BuntyModule = {
 };
 
 /* ------------------------------------------------------------------ compliance */
-type KycRow = { deal_id: string; party: string; status: string };
+type KycRow = { deal_id: string; party: string; party_no?: number; full_name?: string | null; status: string };
 async function kycGaps(ctx: BuntyCtx) {
   const [deals, kyc] = await Promise.all([rows<Deal>(ctx, "crm_deals"), rows<KycRow>(ctx, "crm_kyc")]);
   return {
-    kyc: deals.filter((d) => ["pending", "rejected"].includes(d.status)).map((d) => ({ d, missing: kycParties(d.deal_type).filter((p) => kyc.find((k) => k.deal_id === d.id && k.party === p)?.status !== "complete") })).filter((x) => x.missing.length),
+    kyc: deals.filter((d) => ["pending", "rejected"].includes(d.status)).map((d) => ({ d, missing: kycMissing(kycParties(d.deal_type), kyc.filter((k) => k.deal_id === d.id)) })).filter((x) => x.missing.length),
     goaml: deals.filter((d) => d.goaml_status === "needed" && d.status !== "cancelled"),
   };
 }

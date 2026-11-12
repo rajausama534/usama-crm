@@ -9,7 +9,7 @@ import { useStaff, staffName } from "@/lib/hooks";
 import { Badge, Button, Empty, ListSkeleton, PageHeader, Sheet, Stat, Tabs, buttonClass } from "@/components/ui";
 import { useToast } from "@/components/ContactKit";
 import { DataTable, DEAL_TONE, SetupNeeded } from "@/components/company/kit";
-import { KycForm, partyLabel, type Kyc } from "@/components/company/KycForm";
+import { KycParties, kycMissing, partyLabel, type Kyc } from "@/components/company/KycForm";
 import { isCompliance, useRefresh, useRows } from "@/lib/company/data";
 import { DEAL_STATUS, DEAL_TYPES, kycParties, type Deal } from "@/lib/company/calc";
 import { aed, fmtDate } from "@/lib/format";
@@ -28,7 +28,7 @@ export default function CompliancePage() {
   const rows = useMemo(() => (deals.data || []).filter((d) => d.status !== "cancelled").map((d) => {
     const need = kycParties(d.deal_type);
     const mine = (kyc.data || []).filter((k) => k.deal_id === d.id);
-    const missing = need.filter((p) => mine.find((k) => k.party === p)?.status !== "complete");
+    const missing = kycMissing(need, mine);
     return { ...d, need, missing };
   }), [deals.data, kyc.data]);
   const todo = rows.filter((d) => d.missing.length && ["pending", "rejected"].includes(d.status));
@@ -76,8 +76,8 @@ export default function CompliancePage() {
         {deal && (
           <div className="space-y-3">
             {deal.goaml_status === "needed" && <div className="rounded-xl bg-bad-soft text-bad text-sm p-3">Cash of {aed(deal.cash_amount)}: file a goAML report (DPMSR) with the UAE FIU, then record the reference here.</div>}
-            {!deal.need.length ? <div className="text-sm text-ink-3">This type of deal needs no KYC.</div>
-              : deal.need.map((p) => <KycForm key={p} dealId={deal.id} party={p} row={(kyc.data || []).find((k) => k.deal_id === deal.id && k.party === p)} canEdit={deal.created_by.toLowerCase() === me?.email && ["pending", "rejected"].includes(deal.status)} />)}
+            <KycParties dealId={deal.id} need={deal.need} rows={(kyc.data || []).filter((k) => k.deal_id === deal.id)}
+              canEdit={deal.created_by.toLowerCase() === me?.email && ["pending", "rejected"].includes(deal.status)} open={["pending", "rejected"].includes(deal.status)} />
           </div>
         )}
       </Sheet>
