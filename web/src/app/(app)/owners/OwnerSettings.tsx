@@ -12,10 +12,12 @@ import { useConfirm } from "@/components/Confirm";
 import { useToast } from "@/components/ContactKit";
 
 /** Owners table columns (order and on/off are chosen per person in the Columns picker). "owner" is always shown. */
-export type OwnerCol = "community" | "cluster" | "unit" | "owner" | "whatsapp" | "status" | "remark" | "last" | "actions";
+export type OwnerCol = "community" | "cluster" | "unit" | "owner" | "beds" | "size" | "lastprice" | "whatsapp" | "status" | "remark" | "last" | "actions";
 export const OWNER_COLUMNS: ColumnDef<OwnerCol>[] = [
   { key: "community", label: "Community", on: true }, { key: "cluster", label: "Cluster", on: true }, { key: "unit", label: "Unit", on: true },
-  { key: "owner", label: "Owner name", on: true, locked: true }, { key: "whatsapp", label: "WhatsApp", on: true }, { key: "status", label: "Status", on: true },
+  { key: "owner", label: "Owner name", on: true, locked: true },
+  { key: "beds", label: "BR", on: true }, { key: "size", label: "Size (BUA / plot)", on: true }, { key: "lastprice", label: "Last sale", on: true },
+  { key: "whatsapp", label: "WhatsApp", on: true }, { key: "status", label: "Status", on: true },
   { key: "remark", label: "Latest remark", on: true }, { key: "last", label: "Last contacted", on: true }, { key: "actions", label: "Actions", on: true },
 ];
 

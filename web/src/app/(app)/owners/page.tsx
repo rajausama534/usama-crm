@@ -20,7 +20,15 @@ import { ColumnPickerSheet, useColumnPrefs } from "@/components/ColumnPicker";
 
 const PAGE = 50;
 type Opt = { community: string | null; cluster: string | null; data_source: string | null; records: number };
-type Row = Owner & { __remark?: string; __units?: number; __coOwners?: number };
+type LastSale = { amount: number; transaction_date: string; sold_by: string | null; dxb: boolean };
+type Row = Owner & { __remark?: string; __units?: number; __coOwners?: number;
+  __beds?: string; __bua?: number | null; __plot?: number | null; __last?: LastSale | null; __ud?: boolean };
+const sqft = (v?: number | null) => (v ? Math.round(v).toLocaleString("en-US") : "");
+const short = (v: number) => (v >= 1e6 ? `${Math.round(v / 1e4) / 100}M` : v >= 1e3 ? `${Math.round(v / 1e3)}K` : String(v));
+const monthYear = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+/** "5BR · 8,074 sq ft · plot 9,302 · last AED 10.26M Mar 2024" for the phone cards. */
+const unitLine = (o: Row) => [o.__beds && `${o.__beds}BR`, o.__bua && `${sqft(o.__bua)} sq ft`, o.__plot && `plot ${sqft(o.__plot)}`,
+  o.__last && `last AED ${short(o.__last.amount)} ${monthYear(o.__last.transaction_date)}${o.__last.sold_by ? ` · ${o.__last.sold_by}` : ""}`].filter(Boolean).join(" · ");
 const SORTS = [
   { v: "unit", l: "Sort: Unit number" }, { v: "owner", l: "Sort: Owner name" }, { v: "community", l: "Sort: Community" },
   { v: "cluster", l: "Sort: Cluster" }, { v: "id", l: "Sort: Old / new" },
@@ -271,6 +279,7 @@ function Owners() {
                     <button onClick={() => openOwner(o.id)} className="text-left min-w-0 flex-1">
                       <div className="font-semibold text-ink leading-snug">{o.owner || "—"}</div>
                       <div className="text-xs text-ink-3 mt-0.5">{o.community} · {o.cluster}</div>
+                      {!!unitLine(o) && <div className="text-xs text-ink-2 mt-0.5 num">{unitLine(o)}</div>}
                     </button>
                     <span className="shrink-0 rounded-lg bg-accent-soft text-accent-text text-sm font-bold px-2.5 py-1 num">Unit {o.unit}</span>
                   </div>
@@ -332,6 +341,20 @@ function Owners() {
           </div>
         </td>
       );
+      case "beds": return <td className="px-3 py-3 text-ink num whitespace-nowrap">{o.__ud ? o.__beds || "—" : "…"}</td>;
+      case "size": return (
+        <td className="px-3 py-3 text-ink num whitespace-nowrap" title={[o.__bua && `BUA ${sqft(o.__bua)} sq ft`, o.__plot && `Plot ${sqft(o.__plot)} sq ft`].filter(Boolean).join(" · ")}>
+          {!o.__ud ? "…" : !o.__bua && !o.__plot ? "—" : <>{o.__bua ? sqft(o.__bua) : <span className="text-ink-3 text-xs">Plot </span>}{o.__bua ? (o.__plot ? <div className="text-xs text-ink-3">Plot {sqft(o.__plot)}</div> : null) : sqft(o.__plot)}</>}
+        </td>
+      );
+      case "lastprice": {
+        const t = o.__last;
+        return (
+          <td className="px-3 py-3 text-ink num whitespace-nowrap" title={t ? `AED ${Math.round(t.amount).toLocaleString("en-US")} · ${fmtDate(t.transaction_date)}${t.sold_by ? ` · ${t.sold_by}` : ""}` : ""}>
+            {!o.__ud ? "…" : !t ? "—" : <>{short(t.amount)}<div className="text-xs text-ink-3">{monthYear(t.transaction_date)}{t.sold_by ? ` · ${t.sold_by}` : ""}</div></>}
+          </td>
+        );
+      }
       case "whatsapp": return <td className="px-3 py-3"><WaButton phone={o.phone1 || o.phone2} text={ownerMessage(template, o)} onContact={() => contact(o, "WhatsApp")} /></td>;
       case "status": return <td className="px-3 py-3"><StatusSelect value={o.status} options={ownerStatuses} onChange={(s) => changeStatus(o, s)} /></td>;
       case "remark": return (
@@ -351,11 +374,26 @@ function Owners() {
   async function enrich(rows: Row[]) {
     const ids = rows.map((r) => r.id);
     const units = [...new Set(rows.map((r) => r.unit).filter(Boolean))] as string[];
-    const [acts, related, co] = await Promise.all([
+    const clusters = [...new Set(rows.map((r) => r.cluster).filter(Boolean))] as string[];
+    const [acts, related, co, ud, tx] = await Promise.all([
       db.from("owner_activities").select("owner_id,activity_type,details,created_at").in("owner_id", ids.map(String)).order("created_at", { ascending: false }).limit(1500),
       db.rpc("crm_related_rows", { owner_ids: ids }),
       units.length ? db.from("owners").select("id,community,cluster,unit").in("unit", units).eq("is_primary", false).limit(2000) : Promise.resolve({ data: [] }),
+      // Bedrooms and sizes (unit_details) and the last purchase (property_transactions, kind Sold) — the old CRM's BR / Size / Last Price.
+      units.length ? db.from("unit_details").select("community,cluster,unit,bedrooms,bua_sqft,plot_sqft").in("cluster", clusters).in("unit", units) : Promise.resolve({ data: [] }),
+      units.length ? db.from("property_transactions").select("community,cluster,unit,transaction_date,amount,source,sold_by").eq("kind", "Sold").in("cluster", clusters).in("unit", units).limit(5000) : Promise.resolve({ data: [] }),
     ]);
+    const uk = (x: { community: string | null; cluster: string | null; unit: string | null }) => `${x.community}|${x.cluster}|${x.unit}`;
+    const details = new Map<string, { bedrooms: string | null; bua_sqft: number | null; plot_sqft: number | null }>();
+    for (const d of ud.data || []) details.set(uk(d), d);
+    // Newest sale, DXB Interact records first (an older manual import has dated rows DXB does not show).
+    const last = new Map<string, LastSale>();
+    for (const t of tx.data || []) {
+      if (!t.amount || !t.transaction_date) continue;
+      const k = uk(t), dxb = /^DXB/i.test(t.source || ""), cur = last.get(k);
+      if (!cur || (dxb && !cur.dxb) || (dxb === cur.dxb && t.transaction_date > cur.transaction_date))
+        last.set(k, { amount: Number(t.amount), transaction_date: t.transaction_date, sold_by: t.sold_by, dxb });
+    }
     const byOwner = new Map<string, { activity_type: string; details: string }[]>();
     for (const a of acts.data || []) {
       if (isSystemActivity(a)) continue;
@@ -372,6 +410,9 @@ function Owners() {
       const name = norm(r.owner), phones = [phone(r.phone1), phone(r.phone2)].filter(Boolean);
       const mine = rel.filter((x) => (name && norm(x.owner) === name) || phones.includes(phone(x.phone1)) || phones.includes(phone(x.phone2)));
       r.__units = new Set(mine.map((x) => `${x.community}|${x.cluster}|${x.unit}`)).size;
+      const d = details.get(uk(r));
+      r.__beds = (String(d?.bedrooms || "").match(/\d+/) || [""])[0];
+      r.__bua = d?.bua_sqft ?? null; r.__plot = d?.plot_sqft ?? null; r.__last = last.get(uk(r)) || null; r.__ud = !("error" in ud && ud.error);
       if (r.is_primary !== false) r.__coOwners = (co.data || []).filter((x) => x.unit === r.unit && x.cluster === r.cluster && x.community === r.community && x.id !== r.id).length;
     }
   }

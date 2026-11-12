@@ -26,10 +26,17 @@ export function useColumnPrefs<K extends string>(storageKey: string, all: readon
       }
     } catch { saved = null; }
     if (!saved) { setPrefs(defaults); return; }
-    // Keep saved order, drop unknown keys, add any new columns at the end.
+    // Keep saved order, drop unknown keys.
     const order = (saved.order || defaults.order).filter((k) => valid.has(k));
-    for (const k of defaults.order) if (!order.includes(k)) order.push(k);
     const shown = (saved.shown || defaults.shown).filter((k) => valid.has(k));
+    // A column added after this layout was saved goes next to its default neighbour, shown if it is on by default.
+    if (saved.order) defaults.order.forEach((k, i) => {
+      if (order.includes(k)) return;
+      const prev = defaults.order.slice(0, i).reverse().find((p) => order.includes(p));
+      order.splice(prev ? order.indexOf(prev) + 1 : 0, 0, k);
+      if (all.find((c) => c.key === k)?.on && !shown.includes(k)) shown.push(k);
+    });
+    for (const k of defaults.order) if (!order.includes(k)) order.push(k);
     for (const c of all) if (c.locked && !shown.includes(c.key)) shown.push(c.key);
     setPrefs({ order, shown });
   }, [storageKey, legacyKey, all, defaults]);
