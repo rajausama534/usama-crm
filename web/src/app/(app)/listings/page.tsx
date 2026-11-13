@@ -178,7 +178,7 @@ function Listings() {
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <button onClick={() => setOpen(null)} className="p-2 -ml-2 rounded-full text-ink-2 hover:text-ink hover:bg-surface-2" aria-label="Back to listings"><ArrowLeft size={20} /></button>
           <h1 className="text-[26px] font-normal tracking-tight text-ink leading-tight">{l ? (l.title || l.ref) : "Add a listing"}</h1>
-          {l && <span className="flex items-center gap-2"><span className="num text-sm text-ink-3">{l.ref}</span><Badge tone={SIMPLE_TONE[l.status]}>{LISTING_STATUS[l.status]}</Badge></span>}
+          {l && <span className="flex items-center gap-2">{l.title && <span className="num text-sm text-ink-3">{l.ref}</span>}<Badge tone={SIMPLE_TONE[l.status]}>{LISTING_STATUS[l.status]}</Badge></span>}
         </div>
         <div className="max-w-4xl mx-auto space-y-5">
           {l && blockers && blockers.length > 0 && ["draft", "pending"].includes(l.status) && (
@@ -268,7 +268,7 @@ function Listings() {
 
         <div className="fixed bottom-0 inset-x-0 lg:left-60 z-40 border-t border-line bg-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
           <div className="max-w-4xl mx-auto px-4 py-3 flex flex-wrap items-center justify-end gap-2">
-            {canDelete && <Button variant="ghost" className="mr-auto text-bad" onClick={remove} disabled={busy}><Trash2 size={15} /> Delete listing</Button>}
+            {canDelete && <Button variant="ghost" className="mr-auto !text-bad hover:!bg-bad/10" onClick={remove} disabled={busy}><Trash2 size={15} /> Delete listing</Button>}
             <Button variant="ghost" onClick={() => setOpen(null)}>{l ? "Close" : "Cancel"}</Button>
             {l && l.status === "live" && (mine || approver) && <><Button onClick={() => setStatusTo("unpublished")}>Unpublish</Button><Button onClick={() => setStatusTo(l.purpose === "rent" ? "rented" : "sold")}>{l.purpose === "rent" ? "Rented by us" : "Sold by us"}</Button></>}
             {l && l.status === "unpublished" && (mine || approver) && <Button onClick={() => setStatusTo("draft")}>Back to draft</Button>}
