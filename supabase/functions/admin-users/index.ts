@@ -124,6 +124,36 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === "delete") {
+      // Removes the person completely: their leads and owner records go to `move_to` (or become unassigned),
+      // agents who had them as team leader lose that link, their access row is deleted and their login is
+      // deleted (or banned forever if the login can't be deleted). Their past history notes stay as written.
+      if (email === caller) return json({ error: "You can't delete your own account." }, 400);
+      const moveTo = clean(body.move_to).toLowerCase() || null;
+      if (moveTo) {
+        const { data: target } = await admin.from("user_access").select("active").ilike("email", moveTo).maybeSingle();
+        if (moveTo !== OWNER_EMAIL && !target?.active) return json({ error: "Pick an active person to receive their leads." }, 400);
+        if (moveTo === email) return json({ error: "Pick someone else to receive their leads." }, 400);
+      }
+      const like = email.replace(/[\\%_]/g, "\\$&");
+      for (const table of ["leads", "owners"]) {
+        const { error } = await admin.from(table).update({ assigned_to: moveTo }).ilike("assigned_to", like);
+        if (error) throw error;
+      }
+      await admin.from("user_access").update({ team_leader: null }).ilike("team_leader", like);
+      const { error: rowError } = await admin.from("user_access").delete().ilike("email", like);
+      if (rowError) throw rowError;
+      const u = await findAuthUser(email);
+      if (u) {
+        const { error } = await admin.auth.admin.deleteUser(u.id);
+        if (error) {
+          const { error: banError } = await admin.auth.admin.updateUserById(u.id, { ban_duration: BAN_FOREVER });
+          if (banError) throw banError;
+        }
+      }
+      return json({ ok: true });
+    }
+
     if (action === "set_password") {
       const password = String(body.password ?? "");
       if (password.length < 8) return json({ error: "The new password must be at least 8 characters." }, 400);

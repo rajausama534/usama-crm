@@ -247,6 +247,8 @@ function UserEditor({ user, all, onClose }: { user: UserRow | null; all: UserRow
         </div>
       )}
 
+      {!isNew && !isOwner && <DeleteUser user={user!} staff={all.filter((u) => u.active && u.email !== user!.email)} onDone={onClose} />}
+
       {!isNew && <AssignedData email={user!.email} name={user!.name || user!.email} staff={all.filter((u) => u.active)} />}
 
       {!isOwner && (
@@ -471,6 +473,42 @@ function DatabaseSummary({ user }: { user: UserRow }) {
           </div>
         </div>
       )}
+    </Card>
+  );
+}
+
+/** Delete a person: no more sign-in, no access, and their leads and owners go to someone else. */
+function DeleteUser({ user, staff, onDone }: { user: UserRow; staff: UserRow[]; onDone: () => void }) {
+  const qc = useQueryClient();
+  const [moveTo, setMoveTo] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const name = user.name || user.email;
+  async function del() {
+    const to = staff.find((s) => s.email === moveTo);
+    if (!confirm(`Delete ${name}?\n\nThey can no longer sign in or see anything in the CRM. Their leads and owner records go to ${to ? to.name || to.email : "nobody (unassigned)"}. This can't be undone.`)) return;
+    setBusy(true); setErr("");
+    try {
+      await call("delete", { email: user.email, move_to: moveTo });
+      for (const k of ["admin-users", "staff", "leads", "owners", "lead-counts-by-user"]) qc.invalidateQueries({ queryKey: [k] });
+      onDone();
+    } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
+  }
+  return (
+    <Card className="p-5 mt-4 border-bad/30">
+      <h2 className="text-sm font-semibold text-bad">Delete user</h2>
+      <p className="text-xs text-ink-3 mt-0.5 mb-3">Removes their login and all their access for good. To stop them for a while instead, use Deactivate.</p>
+      <div className="flex flex-wrap items-end gap-2">
+        <Field label="Give their leads and owner records to" className="min-w-64">
+          <Select value={moveTo} onChange={(e) => setMoveTo(e.target.value)}>
+            <option value="">Nobody (unassigned)</option>
+            {staff.map((s) => <option key={s.email} value={s.email}>{s.name || s.email}</option>)}
+          </Select>
+        </Field>
+        <Button onClick={del} disabled={busy} className="!text-bad !border-bad/40">{busy && <Loader2 size={15} className="animate-spin" />}Delete {name}</Button>
+      </div>
+      {err && <div className="text-sm text-bad mt-2">{err}</div>}
     </Card>
   );
 }
