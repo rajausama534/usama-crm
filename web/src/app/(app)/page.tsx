@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+
 import { useQuery } from "@tanstack/react-query";
 import { AlarmClock, ArrowRight, ArrowUpRight, CalendarClock, PhoneCall, UsersRound, Home } from "lucide-react";
 import { db } from "@/lib/supabase";
@@ -10,9 +10,11 @@ import { canUseSales } from "@/lib/access";
 import { visibleNav } from "@/components/shell/nav";
 import { LEAD_STAGES } from "@/lib/crm";
 import { useStaff, staffName } from "@/lib/hooks";
-import { Avatar, Badge, Card, CountUp, Segmented, Skeleton, Stat, buttonClass, cx } from "@/components/ui";
+import { Avatar, Badge, Card, CountUp, Skeleton, Stat, buttonClass, cx } from "@/components/ui";
 import { count, fmtTime } from "@/lib/format";
-import { CompanyCards } from "@/components/company/CompanyCards";
+import { CompanyDashboard } from "@/components/dashboard/CompanyDashboard";
+import { ActivityChart } from "@/components/team/kit";
+import { computeMetrics, usePeople, useTeamData } from "@/lib/team";
 
 type Stats = {
   owners: { records: number; units: number; contacted_7d: number; contacted_30d: number };
@@ -32,6 +34,7 @@ function greeting() {
 export default function Dashboard() {
   const { me } = useAuth();
   if (me && !canUseSales(me)) return <DepartmentHome />;
+  if (me?.isAdmin) return <CompanyDashboard greeting={greeting()} />;
   return <SalesDashboard />;
 }
 
@@ -123,7 +126,7 @@ function SalesDashboard() {
       </div>
 
       <div className="stagger grid lg:grid-cols-[1.55fr_1fr] gap-5">
-        {s ? <WeeklyLeads data={s.leads_by_week} /> : <Card className="p-5 h-72"><Skeleton className="w-40" /></Card>}
+        <MyWeek />
         {s ? <OwnerCoverage contacted={s.owners.contacted_30d} total={s.owners.records} week={s.owners.contacted_7d} /> : <Card className="p-5 h-72"><Skeleton className="w-40" /></Card>}
       </div>
 
@@ -171,7 +174,7 @@ function SalesDashboard() {
         {s && <LeadSources data={s.lead_source} />}
         {team.data && team.data.length > 0 && (
           <Card className="p-5 overflow-x-auto">
-            <CardTitle title="Team" />
+            <CardTitle title="Team" href="/team" link="Team performance" />
             <table className="w-full text-[13px]">
               <thead><tr className="text-xs text-ink-3 text-left"><th className="font-medium pb-2">Agent</th><th className="font-medium pb-2 text-right">Active</th><th className="font-medium pb-2 text-right">Won</th><th className="font-medium pb-2 text-right">Lost</th></tr></thead>
               <tbody>
@@ -192,7 +195,6 @@ function SalesDashboard() {
         )}
       </div>
 
-      {me?.isSuperAdmin && <CompanyCards />}
     </div>
   );
 }
@@ -207,83 +209,19 @@ function CardTitle({ title, badge, href, link }: { title: string; badge?: string
 }
 
 /** Smooth curve through points (Catmull-Rom turned into beziers). */
-function smoothPath(pts: [number, number][]) {
-  if (pts.length < 2) return "";
-  let d = `M${pts[0][0]},${pts[0][1]}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
-    d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
-  }
-  return d;
-}
-
-/** New leads per week: bars, a smooth line over them, and a glass tooltip. */
-function WeeklyLeads({ data }: { data: { week: string; n: number }[] }) {
-  const all = useMemo(() => {
-    // Fill empty weeks so the time axis is continuous.
-    const out: { week: string; n: number }[] = [];
-    const byWeek = new Map(data.map((d) => [d.week, d.n]));
-    const now = new Date();
-    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7)));
-    for (let i = 11; i >= 0; i--) {
-      const d = new Date(monday); d.setUTCDate(monday.getUTCDate() - i * 7);
-      const k = d.toISOString().slice(0, 10);
-      out.push({ week: k, n: byWeek.get(k) || 0 });
-    }
-    return out;
-  }, [data]);
-  const [range, setRange] = useState<"4" | "8" | "12">("12");
-  const weeks = all.slice(-Number(range));
-  const [hover, setHover] = useState<number | null>(null);
-  const max = Math.max(1, ...weeks.map((w) => w.n));
-  const label = (k: string) => new Date(`${k}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-  const total = weeks.reduce((a, w) => a + w.n, 0);
-  const pts = weeks.map((w, i): [number, number] => [((i + 0.5) / weeks.length) * 100, 100 - (w.n / max) * 86 - 6]);
-  const line = smoothPath(pts);
-  const area = `${line} L${pts[pts.length - 1][0]},100 L${pts[0][0]},100 Z`;
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    setHover(Math.min(weeks.length - 1, Math.max(0, Math.floor(((e.clientX - r.left) / r.width) * weeks.length))));
-  };
-
+/** The signed-in person's calls, WhatsApp and updates this week, with a link to their full profile. */
+function MyWeek() {
+  const { me } = useAuth();
+  const people = usePeople();
+  const week = useTeamData("week");
+  const mine = people.data?.find((p) => p.email === me?.email);
+  const m = week.data && me ? computeMetrics(week.data, [me.email]).get(me.email) : null;
+  if (!m || !week.data) return <Card className="p-5 h-72"><Skeleton className="w-40" /></Card>;
   return (
-    <Card className="p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div>
-          <div className="text-sm font-medium text-ink">New leads per week</div>
-          <div className="mt-1 flex items-baseline gap-2"><span className="text-[22px] font-light num text-ink leading-none"><CountUp key={range} value={count(total)} /></span><span className="text-xs text-ink-3">in {range} weeks</span></div>
-        </div>
-        <Segmented value={range} onChange={(v) => { setRange(v); setHover(null); }} options={[{ value: "4", label: "4W" }, { value: "8", label: "8W" }, { value: "12", label: "12W" }]} />
-      </div>
-      <div key={range} className="relative h-44 touch-pan-y" onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
-        <div className="absolute inset-0 flex items-end gap-1.5">
-          {weeks.map((w, i) => (
-            <div key={w.week} className="flex-1 h-full flex items-end">
-              <div className="grow-y w-full rounded-t-lg transition-[background-color] duration-200"
-                style={{ height: `${Math.max(6, (w.n / max) * 92)}%`, background: hover === i ? "var(--chart-bar-on)" : "var(--chart-bar)", ["--i" as string]: i }} />
-            </div>
-          ))}
-        </div>
-        <svg className="wipe absolute inset-0 w-full h-full overflow-visible pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-          <defs>
-            <linearGradient id="wk-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-1)" stopOpacity="0.26" /><stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0" /></linearGradient>
-          </defs>
-          <path d={area} fill="url(#wk-fill)" className="scrim-in" />
-          <path d={line} fill="none" stroke="var(--chart-1)" strokeWidth="2.25" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </svg>
-        {hover != null && (
-          <>
-            <span className="absolute size-2.5 rounded-full border-2 border-surface bg-accent -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ left: `${pts[hover][0]}%`, top: `${pts[hover][1]}%` }} />
-            <div className="chart-tip absolute top-1 -translate-x-1/2 rounded-xl border border-line-strong px-3 py-2 text-xs shadow-pop pointer-events-none whitespace-nowrap"
-              style={{ left: `${Math.min(84, Math.max(16, pts[hover][0]))}%` }}>
-              <div className="text-ink-3">Week of {label(weeks[hover].week)}</div>
-              <div className="mt-0.5 font-medium text-ink num">{weeks[hover].n} new lead{weeks[hover].n === 1 ? "" : "s"}</div>
-            </div>
-          </>
-        )}
-      </div>
-      <div className="flex justify-between text-[11px] text-ink-3 mt-2 num"><span>{label(weeks[0].week)}</span><span>{label(weeks[weeks.length - 1].week)}</span></div>
-    </Card>
+    <div className="space-y-2">
+      <ActivityChart days={week.data.range.days} perDay={m.perDay} title={`My week · ${m.calls} calls · ${m.whatsapp} WhatsApp · ${m.ownersReached} owners`} />
+      {mine && <Link href={`/team/${mine.id || encodeURIComponent(mine.email)}`} className="text-xs text-ink-2 hover:text-ink">My full performance →</Link>}
+    </div>
   );
 }
 
