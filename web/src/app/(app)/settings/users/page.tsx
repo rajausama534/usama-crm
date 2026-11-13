@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import { useDebounced } from "@/lib/hooks";
 import { relative } from "@/lib/format";
 
 type UserRow = {
-  email: string; name: string | null; role: string | null; active: boolean; permissions?: string[] | null; team_leader?: string | null;
+  id?: string; email: string; name: string | null; role: string | null; active: boolean; permissions?: string[] | null; team_leader?: string | null;
   assigned_communities: string[] | null; assigned_clusters: string[] | null; can_export: boolean | null;
   has_login?: boolean; last_sign_in_at?: string | null;
 };
@@ -62,11 +62,19 @@ function Users() {
       return m;
     },
   });
+  // The address bar carries the person's record id, never their email or name.
   const go = (key: string | null) => router.push(key ? `/settings/users?user=${encodeURIComponent(key)}` : "/settings/users", { scroll: true });
+  const keyOf = (u: UserRow) => u.id || u.email;
+  // Old links had the email in them: swap it for the id so the address stays clean.
+  useEffect(() => {
+    if (!openKey?.includes("@")) return;
+    const u = users.data?.find((x) => x.email === openKey.toLowerCase());
+    if (u?.id) router.replace(`/settings/users?user=${u.id}`, { scroll: false });
+  }, [openKey, users.data, router]);
 
   if (!me?.isAdmin) return <Card><Empty icon={<ShieldCheck size={28} />} title="Only admins can manage users" /></Card>;
 
-  const editing = openKey && openKey !== "new" ? users.data?.find((u) => u.email === openKey) : undefined;
+  const editing = openKey && openKey !== "new" ? users.data?.find((u) => keyOf(u) === openKey || u.email === openKey) : undefined;
   if (openKey === "new") return <UserEditor key="new" user={null} all={users.data || []} onClose={() => go(null)} />;
   if (editing) return <UserEditor key={editing.email} user={editing} all={users.data || []} onClose={() => go(null)} />;
 
@@ -83,7 +91,7 @@ function Users() {
       ) : (
         <Card className="divide-y divide-line">
           {rows.map((u) => (
-            <button key={u.email} onClick={() => go(u.email)} className={cx("w-full text-left p-4 flex items-center gap-3 hover:bg-surface-2", !u.active && "opacity-50")}>
+            <button key={u.email} onClick={() => go(keyOf(u))} className={cx("w-full text-left p-4 flex items-center gap-3 hover:bg-surface-2", !u.active && "opacity-50")}>
               <Avatar name={u.name || u.email} size={34} />
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-ink break-words">{u.name || u.email}</div>
