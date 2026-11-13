@@ -48,6 +48,20 @@ function Users() {
     queryFn: async () => ((await call("list")).users || []) as UserRow[],
   });
   const rows = (users.data || []).filter((u) => !q || `${u.name} ${u.email}`.toLowerCase().includes(q.toLowerCase()));
+  const leadCounts = useQuery({
+    queryKey: ["lead-counts-by-user"],
+    enabled: !!me?.isAdmin,
+    queryFn: async () => {
+      const m = new Map<string, number>();
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await db.from("leads").select("assigned_to").not("assigned_to", "is", null).range(from, from + 999);
+        if (error) throw error;
+        for (const r of data || []) { const k = (r.assigned_to as string).toLowerCase(); m.set(k, (m.get(k) || 0) + 1); }
+        if (!data || data.length < 1000) break;
+      }
+      return m;
+    },
+  });
   const go = (key: string | null) => router.push(key ? `/settings/users?user=${encodeURIComponent(key)}` : "/settings/users", { scroll: true });
 
   if (!me?.isAdmin) return <Card><Empty icon={<ShieldCheck size={28} />} title="Only admins can manage users" /></Card>;
@@ -74,6 +88,7 @@ function Users() {
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-ink break-words">{u.name || u.email}</div>
                 <div className="text-xs text-ink-3 break-words">{u.email}{u.last_sign_in_at ? ` · last sign-in ${relative(u.last_sign_in_at)}` : u.has_login === false ? " · no login yet" : ""}</div>
+                <AccessSummary user={u} leads={leadCounts.data?.get(u.email.toLowerCase()) || 0} />
               </div>
               <div className="hidden sm:flex gap-1.5 flex-wrap justify-end">
                 {(u.permissions || []).map((p) => <Badge key={p}>{PERMISSIONS[p as Permission] || p}</Badge>)}
@@ -141,6 +156,8 @@ function UserEditor({ user, all, onClose }: { user: UserRow | null; all: UserRow
       <button onClick={onClose} className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink mb-3"><ArrowLeft size={15} /> Users & access</button>
       <PageHeader title={isNew ? "Add user" : user!.name || user!.email} subtitle={isNew ? "Create a login and choose what this person can see" : user!.email} />
 
+      {!isNew && !isOwner && <DatabaseSummary user={user!} />}
+
       {isOwner ? <Card className="p-5 text-sm text-ink-2">The owner account always has full access and can’t be changed here.</Card> : (
         <div className="grid lg:grid-cols-2 gap-4 items-start">
           <div className="space-y-4">
@@ -190,7 +207,7 @@ function UserEditor({ user, all, onClose }: { user: UserRow | null; all: UserRow
 
           {role !== "admin" ? (
             <Card className="p-5">
-              <h2 className="text-sm font-semibold text-ink">Owner areas this person can see</h2>
+              <h2 className="text-sm font-semibold text-ink">Database assigned (owner areas)</h2>
               <p className="text-xs text-ink-3 mt-0.5 mb-3">{areas.size} selected. Press Save to apply changes.</p>
               {areas.size > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
@@ -328,7 +345,7 @@ function AssignedData({ email, name, staff }: { email: string; name: string; sta
       </div>
       <Tabs className="mb-4" value={tab} onChange={(t) => { setTab(t); setFind(""); }} options={[
         { value: "leads", label: "Leads", n: data.data?.leadCount },
-        { value: "owners", label: "Owner records", n: data.data?.ownerCount },
+        { value: "owners", label: "Single owner records", n: data.data?.ownerCount },
       ]} />
 
       <div className="relative max-w-md mb-2">
@@ -380,6 +397,78 @@ function AssignedData({ email, name, staff }: { email: string; name: string; sta
             </tbody>
           </table>
           {(total || 0) > LIST_LIMIT && <div className="text-xs text-ink-3 mt-2">Showing the first {LIST_LIMIT} of {total}.</div>}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+const areaName = (a: string) => a.replace("::", " · ");
+const userAreas = (u: UserRow) => [...(u.assigned_communities || []), ...(u.assigned_clusters || [])];
+const isAllAccess = (u: UserRow) => u.email === SUPER_ADMIN_EMAIL || u.role === "admin";
+
+/** One line under each person on the users list: which database (areas) and how many leads they have. */
+function AccessSummary({ user, leads }: { user: UserRow; leads: number }) {
+  if (isAllAccess(user)) return <div className="text-xs text-ink-2 mt-1">Database: everything</div>;
+  const areas = userAreas(user);
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-xs">
+      <span className="text-ink-3">Database:</span>
+      {areas.length ? areas.map((a) => <span key={a} className="rounded-full bg-accent-soft text-accent-text px-2 py-0.5 font-medium">{areaName(a)}</span>)
+        : <span className="text-ink-3">none</span>}
+      <span className="text-ink-3">· {leads} lead{leads === 1 ? "" : "s"} assigned</span>
+    </div>
+  );
+}
+
+/** Top of a person's page: exactly what they can see, with counts. */
+function DatabaseSummary({ user }: { user: UserRow }) {
+  const areas = userAreas(user);
+  const counts = useQuery({
+    queryKey: ["database-summary", user.email, areas.join("|")],
+    queryFn: async () => {
+      const mine = user.email.replace(/[\\%_]/g, "\\$&");
+      const per = await Promise.all(areas.map(async (a) => {
+        const [community, cluster] = a.split("::");
+        let q = db.from("owners").select("id", { count: "exact", head: true });
+        q = cluster ? q.eq("community", community).eq("cluster", cluster) : q.eq("community", community);
+        const r = await q;
+        return [a, r.count || 0] as const;
+      }));
+      const [l, o] = await Promise.all([
+        db.from("leads").select("id", { count: "exact", head: true }).ilike("assigned_to", mine),
+        db.from("owners").select("id", { count: "exact", head: true }).ilike("assigned_to", mine),
+      ]);
+      return { per, leads: l.count || 0, ownersSingle: o.count || 0 };
+    },
+  });
+  const name = user.name || user.email;
+  return (
+    <Card className="p-5 mb-4">
+      <h2 className="text-sm font-semibold text-ink mb-3">What {name} can see</h2>
+      {isAllAccess(user) ? <div className="text-sm text-ink-2">Everything (admin).</div> : (
+        <div className="grid sm:grid-cols-3 gap-4 text-sm">
+          <div>
+            <div className="text-xs font-medium text-ink-3 mb-1.5">Database (owner areas)</div>
+            {areas.length ? (
+              <div className="flex flex-wrap gap-1.5">
+                {areas.map((a) => {
+                  const n = counts.data?.per.find(([k]) => k === a)?.[1];
+                  return <span key={a} className="rounded-full bg-accent-soft text-accent-text px-2.5 py-0.5 text-xs font-medium">{areaName(a)}{n !== undefined ? ` · ${n.toLocaleString()} owners` : ""}</span>;
+                })}
+              </div>
+            ) : <div className="text-ink-3">None assigned. Pick areas below and press Save.</div>}
+          </div>
+          <div>
+            <div className="text-xs font-medium text-ink-3 mb-1.5">Leads</div>
+            <div className="text-ink"><span className="num font-semibold">{counts.data?.leads ?? "…"}</span> assigned</div>
+            <div className="text-xs text-ink-3 mt-0.5">{user.role === "team_leader" ? "Also sees their team’s leads." : "Sees only the leads assigned to them."}</div>
+          </div>
+          <div>
+            <div className="text-xs font-medium text-ink-3 mb-1.5">Single owner records</div>
+            <div className="text-ink"><span className="num font-semibold">{counts.data?.ownersSingle ?? "…"}</span> given one by one</div>
+            <div className="text-xs text-ink-3 mt-0.5">Outside their areas. Manage them at the bottom of this page.</div>
+          </div>
         </div>
       )}
     </Card>

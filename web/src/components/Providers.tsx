@@ -40,7 +40,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const { data } = await db.from("user_access").select("*").ilike("email", email).maybeSingle<AccessRow>();
     const resolved = resolveMe(email, data);
     const isBlocked = !resolved.isSuperAdmin && (!data || data.active === false);
-    setMe(isBlocked ? null : resolved);
+    // Keep the same object when nothing changed: Supabase re-sends SIGNED_IN when the tab regains focus, and a new
+    // object here made open forms (new lead, etc.) reset what was being typed.
+    const next = isBlocked ? null : resolved;
+    setMe((prev) => (prev && next && JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
     setBlocked(isBlocked);
     setReady(true);
   }, []);

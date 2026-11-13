@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Mail, CalendarPlus, Trophy, Loader2, FileText } from "lucide-react";
@@ -44,10 +44,20 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
     },
   });
 
+  // Fill the form once per opened lead. It must not refill when the login refreshes or the lead re-fetches,
+  // or whatever was typed is wiped (13 Nov 2026: name and phone vanished while adding a new lead).
+  const filledFor = useRef<string | null>(null);
   useEffect(() => {
-    setErr(""); setScheduling(false);
-    if (isNew) { setDraft({ status: "New", lead_receive_date: todayDubai(), assigned_to: me?.isAdmin ? "" : me?.email || "" }); setTab("details"); }
-    else if (lead.data?.lead) { const l = lead.data.lead; setDraft(Object.fromEntries(EDITABLE.map((k) => [k, (l[k] as string | null) ?? ""]))); }
+    if (!id) { filledFor.current = null; return; }
+    if (filledFor.current === id) return;
+    if (isNew) {
+      if (!me) return;
+      filledFor.current = id; setErr(""); setScheduling(false);
+      setDraft({ status: "New", lead_receive_date: todayDubai(), assigned_to: me.isAdmin ? "" : me.email || "" }); setTab("details");
+    } else if (lead.data?.lead) {
+      filledFor.current = id; setErr(""); setScheduling(false);
+      const l = lead.data.lead; setDraft(Object.fromEntries(EDITABLE.map((k) => [k, (l[k] as string | null) ?? ""])));
+    }
   }, [isNew, id, lead.data, me]);
 
   useEffect(() => { if (!isNew) setTab("overview"); }, [id, isNew]);
@@ -75,6 +85,7 @@ export function LeadSheet({ id, onClose, onCreated }: { id: string | null; onClo
     setSaving(false);
     if (error) { setErr(error.message); return; }
     if (old && old.status !== payload.status) await logLeadActivity(id!, "Status Change", `Status changed from ${old.status || "-"} to ${payload.status || "-"}.`, me.email);
+    filledFor.current = null;
     qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["lead", id] }); qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
     setTab("overview");
   }
