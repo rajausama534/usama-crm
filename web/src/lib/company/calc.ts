@@ -363,11 +363,10 @@ export const LISTING_STATUS: Record<string, string> = { draft: "Draft", pending:
 export const PORTALS: Record<string, string> = { property_finder: "Property Finder", bayut: "Bayut / Dubizzle", website: "Our website" };
 
 /** Same checks as the database (private.listing_blockers), for showing on the form. `brnExpiry` = the agent's RERA card expiry. */
-export function listingBlockers(l: Pick<Listing, "permit_no" | "permit_expiry" | "form_a_path" | "price">, brnExpiry: string | null | undefined, today: string) {
+/** A Trakheesi permit is only issued on a signed Form A, so the permit number covers both. */
+export function listingBlockers(l: Pick<Listing, "permit_no" | "price">, brnExpiry: string | null | undefined, today: string) {
   const out: string[] = [];
   if (!String(l.permit_no || "").trim()) out.push("Trakheesi permit number is missing");
-  if (!l.permit_expiry || l.permit_expiry < today) out.push("Trakheesi permit has expired or has no expiry date");
-  if (!l.form_a_path) out.push("Signed Form A is not uploaded");
   if (!(num(l.price) > 0)) out.push("Price is missing");
   if (!brnExpiry || brnExpiry < today) out.push("The agent has no RERA broker card (BRN) in date on their staff record");
   return out;
