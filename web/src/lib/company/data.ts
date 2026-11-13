@@ -5,7 +5,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { can, type Me } from "@/lib/access";
-import type { CompanySettings } from "./calc";
+import { invoiceFromDeal, type CompanySettings, type Deal, type Developer } from "./calc";
+import { todayDubai } from "@/lib/format";
 
 /** True when the database update for these departments has not been applied yet. */
 export const isMissing = (m?: string | null) => !!m && /relation|does not exist|schema cache|Could not find/i.test(m);
@@ -49,6 +50,22 @@ export async function requestApproval(a: { kind: "deal" | "expense" | "advance" 
   const { error } = await db.from("crm_approvals").insert({ ...a, title: a.title.slice(0, 200), summary: a.summary?.slice(0, 2000) || null, amount: a.amount ?? null });
   if (error && error.code !== "23505") throw new Error(error.message);
 }
+
+/** After a deal is approved, issue its tax invoice once (Accounts only; quietly does nothing for others or if one exists). */
+export async function autoInvoiceDeal(dealId: string): Promise<string | null> {
+  const [d, inv, devs] = await Promise.all([
+    db.from("crm_deals").select("*").eq("id", dealId).maybeSingle(),
+    db.from("crm_invoices").select("id").eq("deal_id", dealId).neq("status", "cancelled").limit(1),
+    db.from("crm_developers").select("id,name"),
+  ]);
+  const deal = d.data as Deal | null;
+  if (!deal || inv.error || (inv.data || []).length || !["approved", "part_received", "received", "agents_paid"].includes(deal.status)) return null;
+  if (!(num0(deal.commission) + num0(deal.seller_fee) > 0)) return null;
+  const today = todayDubai();
+  const r = await db.from("crm_invoices").insert({ ...invoiceFromDeal(deal, (devs.data || []) as Developer[], today), issue_date: today }).select("invoice_no").single();
+  return r.error ? null : r.data.invoice_no;
+}
+const num0 = (n: unknown) => Number(n) || 0;
 
 const BUCKET = "company-docs";
 /** Saves a private file (ID copy, receipt, Form A, staff document). Returns its path. */

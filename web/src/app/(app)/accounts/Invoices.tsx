@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FileText, Loader2, Mail, Plus, Printer, Trash2 } from "lucide-react";
+import { FileText, Loader2, Mail, Plus, Printer, Search, Trash2, X } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { Badge, Button, Empty, Field, Input, Sheet, Textarea, buttonClass } from "@/components/ui";
 import { useToast } from "@/components/ContactKit";
 import { useConfirm } from "@/components/Confirm";
 import { DataTable, FormError, Line, SIMPLE_TONE } from "@/components/company/kit";
 import { useCompany, useRefresh, useRows } from "@/lib/company/data";
-import { addDays, num, r2, type CompanySettings, type Invoice } from "@/lib/company/calc";
+import { COUNTED, DEAL_TYPES, addDays, invoiceFromDeal, num, r2, type CompanySettings, type Deal, type Developer, type Invoice } from "@/lib/company/calc";
 import { aed, fmtDate, todayDubai } from "@/lib/format";
 
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -54,19 +54,36 @@ export function Invoices({ openId }: { openId?: string | null }) {
   const blank = { bill_to: "", bill_to_address: "", bill_to_trn: "", issue_date: todayDubai(), due_date: addDays(todayDubai(), 7), notes: "", vatOn: true };
   const [f, setF] = useState(blank);
   const [lines, setLines] = useState([{ description: "", amount: "" }]);
+  const deals = useRows<Deal>("crm_deals", { order: "deal_date" });
+  const developers = useRows<Developer>("crm_developers", { order: "name", asc: true });
+  const [dealId, setDealId] = useState<string | null>(null);
+  const [pickOpen, setPickOpen] = useState(false);
   const [payAmt, setPayAmt] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => { if (openId) setOpen(openId); }, [openId]);
   const inv = (list.data || []).find((i) => i.id === open);
   const sub = r2(lines.reduce((s, l) => s + num(l.amount), 0));
+  const invoiced = new Set((list.data || []).filter((i) => i.deal_id && i.status !== "cancelled").map((i) => i.deal_id));
+  const devName = (d: Deal) => (developers.data || []).find((x) => x.id === d.developer_id)?.name || "";
+  const term = f.bill_to.trim().toLowerCase();
+  const matches = (deals.data || []).filter((d) => COUNTED.has(d.status)
+    && (!term || `${d.client_name} ${d.other_agency || ""} ${devName(d)} ${d.community || ""} ${d.cluster || ""} ${d.unit || ""} ${d.deal_no}`.toLowerCase().includes(term))).slice(0, 8);
+  const linked = (deals.data || []).find((d) => d.id === dealId);
+  function pickDeal(d: Deal) {
+    const x = invoiceFromDeal(d, developers.data || [], todayDubai());
+    setF((v) => ({ ...v, bill_to: x.bill_to, due_date: x.due_date, vatOn: true }));
+    setLines(x.lines.map((l) => ({ description: l.description, amount: String(l.amount) })));
+    setDealId(d.id); setPickOpen(false); setErr("");
+  }
 
   async function create() {
     if (!f.bill_to.trim()) return setErr("Enter who the invoice is for.");
     const ls = lines.filter((l) => l.description.trim() && num(l.amount) > 0).map((l) => ({ description: l.description.trim(), amount: num(l.amount) }));
     if (!ls.length) return setErr("Add at least one line with a description and an amount.");
     setBusy(true); setErr("");
-    const r = await db.from("crm_invoices").insert({ bill_to: f.bill_to.trim(), bill_to_address: f.bill_to_address.trim() || null, bill_to_trn: f.bill_to_trn.trim() || null, issue_date: f.issue_date,
+    if (dealId && invoiced.has(dealId)) return setErr("This deal already has an invoice. Cancel that one first, or remove the deal link.");
+    const r = await db.from("crm_invoices").insert({ deal_id: dealId, bill_to: f.bill_to.trim(), bill_to_address: f.bill_to_address.trim() || null, bill_to_trn: f.bill_to_trn.trim() || null, issue_date: f.issue_date,
       due_date: f.due_date || null, lines: ls, subtotal: sub, vat: f.vatOn ? r2(sub * 0.05) : 0, notes: f.notes.trim() || null }).select("id,invoice_no").single();
     setBusy(false);
     if (r.error) return setErr(r.error.message);
@@ -88,9 +105,9 @@ export function Invoices({ openId }: { openId?: string | null }) {
 
   return (
     <>
-      <div className="flex justify-end mb-3"><Button variant="primary" onClick={() => { setF(blank); setLines([{ description: "", amount: "" }]); setErr(""); setOpen("new"); }}><Plus size={15} /> New invoice</Button></div>
+      <div className="flex justify-end mb-3"><Button variant="primary" onClick={() => { setF(blank); setLines([{ description: "", amount: "" }]); setDealId(null); setErr(""); setOpen("new"); }}><Plus size={15} /> New invoice</Button></div>
       {!settings.trn && <div className="mb-3 rounded-xl bg-warn-soft text-warn text-sm px-3 py-2">Add the company TRN, address and bank details in Settings so they print on every invoice.</div>}
-      <DataTable rows={list.data || []} onRow={(i) => setOpen(i.id)} empty={<Empty icon={<FileText size={28} />} title="No invoices yet" hint="Create one here, or from an approved deal (Money tab → Create tax invoice)." />} cols={[
+      <DataTable rows={list.data || []} onRow={(i) => setOpen(i.id)} empty={<Empty icon={<FileText size={28} />} title="No invoices yet" hint="Approved deals get their invoice automatically. You can also create one here: search the client under Bill to." />} cols={[
         { h: "Invoice", cell: (i) => <span className="font-medium num">{i.invoice_no}</span> },
         { h: "Date", cell: (i) => <span className="num whitespace-nowrap text-ink-2">{fmtDate(i.issue_date)}</span> },
         { h: "Bill to", cell: (i) => i.bill_to },
@@ -106,7 +123,29 @@ export function Invoices({ openId }: { openId?: string | null }) {
         <Button variant="primary" onClick={create} disabled={busy}>{busy && <Loader2 size={15} className="animate-spin" />}Create invoice</Button>
       </>}>
         <div className="grid sm:grid-cols-2 gap-3">
-          <Field label="Bill to"><Input value={f.bill_to} onChange={(e) => setF({ ...f, bill_to: e.target.value })} /></Field>
+          <Field label="Bill to (search a client or deal)">
+            <div className="relative">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" />
+              <Input className="pl-9" value={f.bill_to} placeholder="Client name, unit or deal number" autoComplete="off"
+                onFocus={() => setPickOpen(true)} onBlur={() => setTimeout(() => setPickOpen(false), 150)}
+                onChange={(e) => { setF({ ...f, bill_to: e.target.value }); setPickOpen(true); }} />
+              {pickOpen && matches.length > 0 && (
+                <div className="absolute z-20 mt-1 w-full max-h-72 overflow-auto rounded-xl border border-line bg-surface shadow-pop">
+                  {matches.map((d) => {
+                    const x = invoiceFromDeal(d, developers.data || []);
+                    return (
+                      <button key={d.id} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => pickDeal(d)}
+                        className="w-full text-left px-3 py-2 hover:bg-surface-2 border-b border-line last:border-0">
+                        <div className="flex items-center justify-between gap-2 text-sm"><span className="font-medium text-ink truncate">{x.bill_to}</span><span className="num text-ink-2 whitespace-nowrap">{aed(r2(x.subtotal * 1.05))}</span></div>
+                        <div className="text-xs text-ink-3 truncate">Deal #{d.deal_no} · {[DEAL_TYPES[d.deal_type]?.label, d.community, d.cluster, d.unit].filter(Boolean).join(" · ")}{invoiced.has(d.id) ? " · already invoiced" : ""}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {linked && <span className="mt-1 flex items-center gap-1 text-xs text-ink-3">Linked to deal #{linked.deal_no}: amounts filled from the deal<button type="button" aria-label="Remove deal link" onClick={() => setDealId(null)} className="hover:text-bad"><X size={13} /></button></span>}
+          </Field>
           <Field label="Their TRN (if registered)"><Input value={f.bill_to_trn} onChange={(e) => setF({ ...f, bill_to_trn: e.target.value })} /></Field>
           <Field label="Address" className="sm:col-span-2"><Textarea rows={2} value={f.bill_to_address} onChange={(e) => setF({ ...f, bill_to_address: e.target.value })} /></Field>
           <Field label="Invoice date"><Input type="date" value={f.issue_date} onChange={(e) => setF({ ...f, issue_date: e.target.value })} /></Field>

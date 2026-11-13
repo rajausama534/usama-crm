@@ -10,7 +10,7 @@ import { Badge, Button, Empty, Field, Input, ListSkeleton, PageHeader, SearchBox
 import { useToast } from "@/components/ContactKit";
 import { DataTable, DEAL_TONE, FormError, SetupNeeded, type Col } from "@/components/company/kit";
 import { isFinance, useRefresh, useRows } from "@/lib/company/data";
-import { COUNTED, DEAL_STATUS, DEAL_TYPES, advancesOwed, dealMoney, monthStart, num, payableNow, r2, slabTopUp, type Deal, type Developer, type Expense, type Split } from "@/lib/company/calc";
+import { COUNTED, DEAL_STATUS, DEAL_TYPES, dealMoney, monthStart, num, r2, slabTopUp, type Deal, type Developer, type Split } from "@/lib/company/calc";
 import { aed, fmtDate, todayDubai } from "@/lib/format";
 import { DealSheet } from "./DealSheet";
 
@@ -26,7 +26,7 @@ function Deals() {
   const finance = isFinance(me);
   const deals = useRows<Deal>("crm_deals", { order: "deal_date" });
   const splits = useRows<Split>("crm_deal_splits");
-  const [tab, setTab] = useState<"deals" | "payouts" | "developers">("deals");
+  const [tab, setTab] = useState<"deals" | "developers">("deals");
   const [status, setStatus] = useState("");
   const [q, setQ] = useState("");
 
@@ -47,10 +47,7 @@ function Deals() {
     const countedIds = new Set(counted.map((d) => d.id));
     return {
       commission: sum(thisMonth, (d) => dealMoney(d).gross), company: sum(thisMonth, company), n: thisMonth.length,
-      toCome: sum(counted, (d) => Math.max(0, dealMoney(d).due - num(d.received))),
-      owed: r2(counted.reduce((s, d) => s + (byDeal.get(d.id) || []).reduce((t, l) => t + num(l.amount) - num(l.paid), 0), 0)),
-      payable: r2(counted.reduce((s, d) => s + (byDeal.get(d.id) || []).reduce((t, l) => t + payableNow(d, l), 0), 0)),
-      pending: rows.filter((d) => d.status === "pending").length,
+      pending: rows.filter((d) => d.status === "pending").length, approved: counted.length,
       myEarned: r2(my.filter((s) => countedIds.has(s.deal_id)).reduce((s, l) => s + num(l.amount), 0)),
       myPaid: r2(my.reduce((s, l) => s + num(l.paid), 0)),
     };
@@ -78,15 +75,15 @@ function Deals() {
 
   return (
     <div className="animate-in">
-      <PageHeader title="Deals" subtitle="Every deal, its commission split and the money received"
+      <PageHeader title="Deals" subtitle="Every deal: property, price, agents and commission. Billing is in Accounts."
         actions={<Button variant="primary" onClick={() => setOpen("new")}><Plus size={16} /> Record deal</Button>} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {finance ? <>
           <Stat label="Commission this month" value={aed(stats.commission)} hint={`${stats.n} deal${stats.n === 1 ? "" : "s"}, before VAT`} />
           <Stat label="Company share this month" value={aed(stats.company)} tone="good" />
-          <Stat label="Still to be received" value={aed(stats.toCome)} hint="Commission + VAT on open deals" />
-          <Stat label="Owed to agents" value={aed(stats.owed)} hint={`${aed(stats.payable)} can be paid now`} tone={stats.payable > 0 ? "warn" : undefined} />
+          <Stat label="Approved deals" value={String(stats.approved)} hint="All time" />
+          <Stat label="Waiting for approval" value={String(stats.pending)} />
         </> : <>
           <Stat label="My commission earned" value={aed(stats.myEarned)} hint="Approved deals" />
           <Stat label="Paid to me" value={aed(stats.myPaid)} tone="good" />
@@ -95,7 +92,7 @@ function Deals() {
         </>}
       </div>
 
-      {finance && <Tabs className="mb-4" value={tab} onChange={setTab} options={[{ value: "deals", label: "Deals", n: rows.length }, { value: "payouts", label: "Agent payouts" }, { value: "developers", label: "Developers" }]} />}
+      {finance && <Tabs className="mb-4" value={tab} onChange={setTab} options={[{ value: "deals", label: "Deals", n: rows.length }, { value: "developers", label: "Developers" }]} />}
 
       {tab === "deals" && <>
         <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -108,43 +105,10 @@ function Deals() {
         <DataTable cols={cols} rows={shown} onRow={(d) => setOpen(d.id)}
           empty={<Empty icon={<Handshake size={28} />} title={rows.length ? "No deals match" : "No deals yet"} hint={rows.length ? undefined : "Record a deal here, or move a lead to Won and press “Record deal”."} />} />
       </>}
-      {tab === "payouts" && finance && <Payouts deals={rows} splits={sp} />}
       {tab === "developers" && finance && <Developers deals={rows} />}
 
       <DealSheet id={open} leadId={params.get("lead")} deals={rows} onClose={() => setOpen(null)} onCreated={(id) => setOpen(id)} />
     </div>
-  );
-}
-
-/** What each person has earned, been paid and can be paid now. */
-function Payouts({ deals, splits }: { deals: Deal[]; splits: Split[] }) {
-  const staff = useStaff();
-  const advances = useRows<Expense>("crm_expenses", { key: ["advances"], filter: (q) => q.eq("kind", "advance").eq("status", "approved") });
-  const rows = useMemo(() => {
-    const byId = new Map(deals.map((d) => [d.id, d]));
-    const m = new Map<string, { id: string; earned: number; paid: number; now: number; deals: number }>();
-    for (const s of splits) {
-      const d = byId.get(s.deal_id);
-      if (!d || !COUNTED.has(d.status)) continue;
-      const k = s.email.toLowerCase(); const cur = m.get(k) || { id: k, earned: 0, paid: 0, now: 0, deals: 0 };
-      cur.earned = r2(cur.earned + num(s.amount)); cur.paid = r2(cur.paid + num(s.paid)); cur.now = r2(cur.now + payableNow(d, s)); cur.deals++;
-      m.set(k, cur);
-    }
-    return [...m.values()].sort((a, b) => b.now - a.now || b.earned - a.earned);
-  }, [deals, splits]);
-  return (
-    <>
-      <DataTable rows={rows} empty={<Empty title="No commission to pay yet" hint="Agents appear here once a deal with their share is approved." />} cols={[
-        { h: "Person", cell: (r) => <span className="font-medium">{staffName(staff.data, r.id)}</span> },
-        { h: "Deals", right: true, cell: (r) => r.deals },
-        { h: "Earned", right: true, cell: (r) => aed(r.earned) },
-        { h: "Paid", right: true, cell: (r) => aed(r.paid) },
-        { h: "Still owed", right: true, cell: (r) => aed(r2(r.earned - r.paid)) },
-        { h: "Can be paid now", right: true, cell: (r) => <span className={r.now > 0 ? "text-warn font-medium" : "text-ink-3"}>{aed(r.now)}</span> },
-        { h: "Advance outstanding", right: true, cell: (r) => { const a = advancesOwed(advances.data || [], r.id); return a > 0 ? <span className="text-bad">{aed(a)}</span> : <span className="text-ink-3">—</span>; } },
-      ]} />
-      <div className="mt-2 text-xs text-ink-3">Agents are paid in proportion to the client&apos;s money received. To pay someone, open the deal and use the Money tab.</div>
-    </>
   );
 }
 

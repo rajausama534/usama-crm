@@ -9,6 +9,7 @@ import { useAuth } from "@/components/Providers";
 import { useStaff, staffName } from "@/lib/hooks";
 import { Badge, Button, Card, Empty, ListSkeleton, PageHeader, Segmented, Textarea, type Tone } from "@/components/ui";
 import { aed, fmtDateTime } from "@/lib/format";
+import { autoInvoiceDeal } from "@/lib/company/data";
 
 type Approval = {
   id: string; kind: string; ref_table: string; ref_id: string; title: string; summary: string | null; amount: number | null;
@@ -53,6 +54,8 @@ export default function ApprovalsPage() {
     const { error } = await db.rpc("crm_decide_approval", { p_id: deciding.a.id, p_approve: deciding.approve, p_note: note || null });
     setBusy(false);
     if (error) { setErr(error.message); return; }
+    // An approved deal gets its tax invoice straight away (Accounts only; does nothing for others).
+    if (deciding.approve && deciding.a.ref_table === "crm_deals") await autoInvoiceDeal(deciding.a.ref_id);
     setDeciding(null); setNote("");
     qc.invalidateQueries({ queryKey: ["approvals"] });
   }

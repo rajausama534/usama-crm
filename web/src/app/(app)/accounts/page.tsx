@@ -13,11 +13,12 @@ import { useCompany, useRefresh, useRows } from "@/lib/company/data";
 import { addDays, bankBalance, cashForecast, daysBetween, num, periodOf, profitAndLoss, r2, vatReturn, type BankAccount, type BankLine, type CompanySettings } from "@/lib/company/calc";
 import { aed, fmtDate, todayDubai } from "@/lib/format";
 import { Invoices } from "./Invoices";
+import { Commissions } from "./Commissions";
 import { Bills } from "./Bills";
 import { Bank } from "./Bank";
 import { Reports, useBooks } from "./Reports";
 
-type Tab = "overview" | "invoices" | "expenses" | "bills" | "bank" | "reports" | "settings";
+type Tab = "overview" | "commissions" | "invoices" | "expenses" | "bills" | "bank" | "reports" | "settings";
 
 export default function AccountsPage() {
   return <Suspense><Accounts /></Suspense>;
@@ -34,12 +35,13 @@ function Accounts() {
   if (b.missing) return <><PageHeader title="Accounts" /><SetupNeeded what="Accounts" /></>;
   return (
     <div className="animate-in">
-      <PageHeader title="Accounts" subtitle="Invoices, expenses, bills, the bank and the reports for your accountant" />
+      <PageHeader title="Accounts" subtitle="Commissions, invoices, expenses, bills, the bank and the reports for your accountant" />
       <Tabs className="mb-5" value={tab} onChange={setTab} options={[
-        { value: "overview", label: "Overview" }, { value: "invoices", label: "Invoices" }, { value: "expenses", label: "Expenses", n: b.expenses.filter((e) => e.status === "pending").length || undefined },
+        { value: "overview", label: "Overview" }, { value: "commissions", label: "Commissions" }, { value: "invoices", label: "Invoices" }, { value: "expenses", label: "Expenses", n: b.expenses.filter((e) => e.status === "pending").length || undefined },
         { value: "bills", label: "Bills" }, { value: "bank", label: "Bank" }, { value: "reports", label: "Reports" }, { value: "settings", label: "Settings" },
       ]} />
       {tab === "overview" && <Overview />}
+      {tab === "commissions" && <Commissions openId={params.get("open")} onOpen={(id) => router.replace(id ? `/accounts?tab=commissions&open=${id}` : "/accounts?tab=commissions", { scroll: false })} />}
       {tab === "invoices" && <Invoices openId={params.get("open")} />}
       {tab === "expenses" && <Expenses />}
       {tab === "bills" && <Bills />}

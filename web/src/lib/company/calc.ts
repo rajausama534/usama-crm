@@ -155,6 +155,17 @@ export type Invoice = {
   issue_date: string; due_date: string | null; lines: { description: string; amount: number }[]; subtotal: number; vat: number; total: number;
   paid: number; status: string; notes: string | null; created_by: string;
 };
+/** Who a deal's tax invoice goes to and its lines: the developer (off-plan), the other agency (when they pay us), else the client. */
+export function invoiceFromDeal(deal: Deal, developers: Pick<Developer, "id" | "name">[] = [], today = new Date().toISOString().slice(0, 10)) {
+  const developer = developers.find((d) => d.id === deal.developer_id);
+  const bill_to = deal.deal_type === "offplan" && developer ? developer.name : deal.other_agency_direction === "they_pay" && deal.other_agency ? deal.other_agency : deal.client_name;
+  const where = [deal.community, deal.cluster, deal.unit].filter(Boolean).join(", ");
+  const lines = [{ description: `${DEAL_TYPES[deal.deal_type].label} commission${where ? ` — ${where}` : ""}`, amount: num(deal.commission) }];
+  if (num(deal.seller_fee)) lines.push({ description: "Seller fee", amount: num(deal.seller_fee) });
+  const subtotal = r2(lines.reduce((s, l) => s + l.amount, 0));
+  const due = deal.expected_on && deal.expected_on > today ? deal.expected_on : addDays(today, 7);
+  return { deal_id: deal.id, bill_to, lines, subtotal, vat: r2(subtotal * 0.05), due_date: due };
+}
 export type Expense = {
   id: string; kind: "expense" | "advance"; expense_date: string; category: string; vendor: string | null; description: string | null;
   amount: number; vat: number; total: number; receipt_path: string | null; staff_email: string | null; recovered: number; bill_id: string | null;

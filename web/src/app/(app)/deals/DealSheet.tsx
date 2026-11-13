@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Check, FileText, Loader2, Plus, Trash2, X } from "lucide-react";
+import { AlertTriangle, Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { can } from "@/lib/access";
@@ -12,10 +12,10 @@ import { useToast } from "@/components/ContactKit";
 import { useConfirm } from "@/components/Confirm";
 import { DEAL_TONE, FormError, Line, Section } from "@/components/company/kit";
 import { KycParties, kycMissing, partyLabel, type Kyc } from "@/components/company/KycForm";
-import { isCompliance, isFinance, requestApproval, useRefresh, useRows } from "@/lib/company/data";
+import { autoInvoiceDeal, isCompliance, isFinance, requestApproval, useRefresh, useRows } from "@/lib/company/data";
 import {
-  DEAL_STATUS, DEAL_TYPES, GOAML_CASH_LIMIT, addDays, advancesOwed, dealMoney, kycParties, num, payableNow, r2, slabFor, splitDeal,
-  type Deal, type DealPayment, type DealType, type Developer, type Expense, type Invoice, type Split, type Staff, type StaffRate,
+  DEAL_STATUS, DEAL_TYPES, GOAML_CASH_LIMIT, addDays, dealMoney, kycParties, num, r2, slabFor, splitDeal,
+  type Deal, type DealType, type Developer, type Split, type Staff, type StaffRate,
 } from "@/lib/company/calc";
 import { aed, fmtDate, todayDubai } from "@/lib/format";
 
@@ -41,23 +41,19 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
   const staffRows = useRows<Staff>("crm_staff", { key: ["all"] });
   const developers = useRows<Developer>("crm_developers", { order: "name", asc: true });
   const splits = useRows<Split>("crm_deal_splits", { key: [id], enabled: !!deal, filter: (q) => q.eq("deal_id", id) });
-  const payments = useRows<DealPayment>("crm_deal_payments", { key: [id], enabled: !!deal, filter: (q) => q.eq("deal_id", id), order: "paid_on" });
   const kyc = useRows<Kyc>("crm_kyc", { key: [id], enabled: !!deal, filter: (q) => q.eq("deal_id", id) });
-  const invoices = useRows<Invoice>("crm_invoices", { key: ["deal", id], enabled: !!deal && finance, filter: (q) => q.eq("deal_id", id) });
-  const advances = useRows<Expense>("crm_expenses", { key: ["advances"], enabled: !!deal && finance, filter: (q) => q.eq("kind", "advance").eq("status", "approved") });
 
-  const [tab, setTab] = useState<"overview" | "money" | "kyc">("overview");
+  const [tab, setTab] = useState<"overview" | "kyc">("overview");
   const [editing, setEditing] = useState(false);
   const [f, setF] = useState<Form>(blankForm(""));
   const [agents, setAgents] = useState<AgentRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [pay, setPay] = useState<null | { kind: "received" | "payout"; email?: string; amount: string; date: string; method: string; note: string; recover: string; max?: number }>(null);
 
   // Start a new deal (optionally from a Won lead), or load the saved one for editing.
   useEffect(() => {
     if (!open) return;
-    setErr(""); setTab("overview"); setPay(null);
+    setErr(""); setTab("overview");
     if (!isNew) { setEditing(false); return; }
     const base = blankForm(me?.email || "");
     setF(base); setEditing(true);
@@ -182,48 +178,8 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
     if (!a.data) { toast("No approval request found. Open Approvals."); return; }
     const r = await db.rpc("crm_decide_approval", { p_id: a.data.id, p_approve: approve, p_note: null });
     if (r.error) { toast(r.error.message); return; }
-    toast(approve ? "Deal approved" : "Deal rejected"); refresh();
-  }
-
-  async function makeInvoice() {
-    if (!deal) return;
-    const developer = (developers.data || []).find((d) => d.id === deal.developer_id);
-    const billTo = deal.deal_type === "offplan" && developer ? developer.name : deal.other_agency_direction === "they_pay" && deal.other_agency ? deal.other_agency : deal.client_name;
-    const where = [deal.community, deal.cluster, deal.unit].filter(Boolean).join(", ");
-    const lines = [{ description: `${DEAL_TYPES[deal.deal_type].label} commission${where ? ` — ${where}` : ""}`, amount: num(deal.commission) }];
-    if (num(deal.seller_fee)) lines.push({ description: "Seller fee", amount: num(deal.seller_fee) });
-    const sub = r2(lines.reduce((s, l) => s + l.amount, 0));
-    const r = await db.from("crm_invoices").insert({ deal_id: deal.id, bill_to: billTo, issue_date: todayDubai(), due_date: deal.expected_on || addDays(todayDubai(), 7), lines, subtotal: sub, vat: r2(sub * 0.05) }).select("invoice_no").single();
-    if (r.error) { toast(r.error.message); return; }
-    toast(`Invoice ${r.data.invoice_no} created`); refresh();
-  }
-
-  async function savePayment() {
-    if (!deal || !pay) return;
-    const amount = num(pay.amount), recover = num(pay.recover);
-    if (!(amount > 0)) return setErr("Enter the amount.");
-    if (recover > amount) return setErr("The advance recovered cannot be more than the commission being paid.");
-    setBusy(true); setErr("");
-    const note = [pay.note.trim(), recover ? `AED ${recover.toLocaleString("en-US")} kept back against advance` : ""].filter(Boolean).join(" · ") || null;
-    const r = await db.from("crm_deal_payments").insert({ deal_id: deal.id, kind: pay.kind, email: pay.kind === "payout" ? pay.email : null, amount, paid_on: pay.date, method: pay.method || null, note });
-    if (r.error) { setBusy(false); return setErr(r.error.message); }
-    if (pay.kind === "received") {
-      // Keep the deal's tax invoice in step with the money received.
-      const inv = (invoices.data || []).find((i) => i.status !== "cancelled");
-      if (inv) { const paid = r2(num(inv.paid) + amount); await db.from("crm_invoices").update({ paid, status: paid >= num(inv.total) ? "paid" : "part_paid" }).eq("id", inv.id); }
-    }
-    if (recover && pay.email) {
-      // Oldest advances first.
-      let left = recover;
-      for (const a of (advances.data || []).filter((x) => (x.staff_email || "").toLowerCase() === pay.email && num(x.amount) > num(x.recovered)).sort((x, y) => x.expense_date.localeCompare(y.expense_date))) {
-        if (left <= 0) break;
-        const take = Math.min(left, num(a.amount) - num(a.recovered));
-        await db.from("crm_expenses").update({ recovered: r2(num(a.recovered) + take) }).eq("id", a.id);
-        left = r2(left - take);
-      }
-    }
-    setBusy(false); setPay(null);
-    toast(pay.kind === "received" ? "Money received recorded" : "Payout recorded"); refresh();
+    const no = approve && finance ? await autoInvoiceDeal(deal.id) : null;
+    toast(approve ? (no ? `Deal approved, invoice ${no} created` : "Deal approved") : "Deal rejected"); refresh();
   }
 
   async function cancelDeal() {
@@ -360,6 +316,9 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
       )}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
         <div><div className="text-xs text-ink-3">Client</div><div className="text-ink">{deal.client_name}</div><div className="text-ink-3 num">{deal.client_phone}</div></div>
+        {(kyc.data || []).filter((k) => k.full_name).map((k) => <div key={k.id}><div className="text-xs text-ink-3">{partyLabel(k.party)}</div><div className="text-ink">{k.full_name}</div></div>)}
+        <div><div className="text-xs text-ink-3">Deal type</div><div className="text-ink">{DEAL_TYPES[deal.deal_type].label}</div></div>
+        <div><div className="text-xs text-ink-3">Agents</div><div className="text-ink">{sp.filter((l) => l.kind === "agent").map((l) => staffName(staff.data, l.email)).join(", ") || "Company"}</div></div>
         <div><div className="text-xs text-ink-3">Property</div><div className="text-ink">{[deal.community, deal.cluster, deal.unit].filter(Boolean).join(" · ") || "—"}</div></div>
         <div><div className="text-xs text-ink-3">{DEAL_TYPES[deal.deal_type].priceLabel}</div><div className="text-ink num">{aed(deal.price)}</div></div>
         <div><div className="text-xs text-ink-3">Deal date</div><div className="text-ink num">{fmtDate(deal.deal_date)}</div></div>
@@ -376,81 +335,11 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
         {dm.otherAgency > 0 && <Line label="Other agency's share" value={`− ${aed(dm.otherAgency)}`} />}
         <Line label="Office commission" value={aed(dm.office)} strong />
         {sp.map((l) => (
-          <Line key={l.id} label={`${staffName(staff.data, l.email)} · ${l.kind === "agent" ? `${num(l.share_pct)}% of deal × ${num(l.rate_pct)}% rate` : `team leader ${num(l.rate_pct)}% of company share`}`}
-            hint={num(l.paid) ? `Paid ${aed(l.paid)}` : undefined} value={aed(l.amount)} />
+          <Line key={l.id} label={`${staffName(staff.data, l.email)} · ${l.kind === "agent" ? `${num(l.share_pct)}% of deal × ${num(l.rate_pct)}% rate` : `team leader ${num(l.rate_pct)}% of company share`}`} value={aed(l.amount)} />
         ))}
         {(finance || approver) && <Line label="Company share" value={aed(company)} strong tone="good" />}
       </div>
-    </div>
-  );
-
-  const moneyTab = deal && (
-    <div className="space-y-5">
-      <div className="rounded-2xl bg-surface-2 p-4">
-        <Line label="Due from the client (commission + VAT)" value={aed(dm.due)} />
-        <Line label="Received so far" value={aed(deal.received)} tone={num(deal.received) >= dm.due ? "good" : undefined} />
-        <Line label="Still to come" value={aed(Math.max(0, r2(dm.due - num(deal.received))))} strong />
-      </div>
-      {finance && active && (
-        <div className="flex flex-wrap gap-2">
-          {!(invoices.data || []).some((i) => i.status !== "cancelled") && <Button onClick={makeInvoice}><FileText size={15} /> Create tax invoice</Button>}
-          <Button variant="primary" onClick={() => { setErr(""); setPay({ kind: "received", amount: String(Math.max(0, r2(dm.due - num(deal.received)))), date: todayDubai(), method: deal.payment_method || "bank", note: "", recover: "" }); }}><Plus size={15} /> Money received</Button>
-        </div>
-      )}
-      {(invoices.data || []).map((i) => (
-        <Link key={i.id} href={`/accounts?tab=invoices&open=${i.id}`} className="flex items-center justify-between gap-3 rounded-xl border border-line px-3 py-2.5 text-sm hover:border-line-strong">
-          <span className="flex items-center gap-2 text-ink"><FileText size={15} className="text-ink-3" /> {i.invoice_no}</span><span className="num text-ink-2">{aed(i.total)} · {i.status.replace("_", " ")}</span>
-        </Link>
-      ))}
-
-      <Section title="Commission to pay">
-        {!sp.length ? <div className="text-sm text-ink-3">No agent share on this deal.</div> : (
-          <div className="rounded-xl border border-line divide-y divide-line">
-            {sp.map((l) => {
-              const now = payableNow(deal, l), owed = advancesOwed(advances.data || [], l.email);
-              return (
-                <div key={l.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
-                  <div className="flex-1 min-w-40"><div className="text-ink">{staffName(staff.data, l.email)}</div>
-                    <div className="text-xs text-ink-3 num">{aed(l.amount)} earned · {aed(l.paid)} paid{owed > 0 && finance ? ` · advance outstanding ${aed(owed)}` : ""}</div></div>
-                  {finance && active && now > 0 ? (
-                    <Button size="sm" variant="primary" onClick={() => { setErr(""); setPay({ kind: "payout", email: l.email, amount: String(now), max: now, date: todayDubai(), method: "bank", note: "", recover: owed > 0 ? String(Math.min(owed, now)) : "" }); }}>Pay {aed(now)}</Button>
-                  ) : <span className="text-xs text-ink-3">{num(l.paid) >= num(l.amount) && num(l.amount) > 0 ? "Paid in full" : "Paid as the client's money arrives"}</span>}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Section>
-
-      {pay && (
-        <div className="rounded-2xl border border-accent/40 p-4">
-          <div className="font-medium text-ink mb-3">{pay.kind === "received" ? "Money received from the client" : `Pay ${staffName(staff.data, pay.email)}`}</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <Field label="Amount AED"><Input inputMode="decimal" value={pay.amount} onChange={(e) => setPay({ ...pay, amount: e.target.value })} /></Field>
-            <Field label="Date"><Input type="date" value={pay.date} onChange={(e) => setPay({ ...pay, date: e.target.value })} /></Field>
-            <Field label="Method"><Select value={pay.method} onChange={(e) => setPay({ ...pay, method: e.target.value })}><option value="bank">Bank transfer</option><option value="cheque">Cheque</option><option value="cash">Cash</option></Select></Field>
-            {pay.kind === "payout" && <Field label="Of which kept against advance"><Input inputMode="decimal" value={pay.recover} onChange={(e) => setPay({ ...pay, recover: e.target.value })} placeholder="0" /></Field>}
-            <Field label="Note" className="col-span-2"><Input value={pay.note} onChange={(e) => setPay({ ...pay, note: e.target.value })} /></Field>
-          </div>
-          {pay.kind === "payout" && num(pay.recover) > 0 && <div className="mt-2 text-xs text-ink-3">Transfer to the agent: {aed(Math.max(0, r2(num(pay.amount) - num(pay.recover))))}</div>}
-          <FormError>{err}</FormError>
-          <div className="mt-3 flex justify-end gap-2"><Button variant="ghost" onClick={() => setPay(null)}>Cancel</Button><Button variant="primary" onClick={savePayment} disabled={busy}>{busy && <Loader2 size={15} className="animate-spin" />}Save</Button></div>
-        </div>
-      )}
-
-      <Section title="History">
-        {!(payments.data || []).length ? <div className="text-sm text-ink-3">No payments recorded yet.</div> : (
-          <div className="rounded-xl border border-line divide-y divide-line">
-            {(payments.data || []).map((p) => (
-              <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-                <div><div className="text-ink">{p.kind === "received" ? "Received from client" : p.kind === "payout" ? `Paid to ${staffName(staff.data, p.email)}` : "Paid to other agency"}</div>
-                  <div className="text-xs text-ink-3">{fmtDate(p.paid_on)}{p.method ? ` · ${p.method}` : ""}{p.note ? ` · ${p.note}` : ""}</div></div>
-                <div className={`num ${p.kind === "received" ? "text-good" : "text-ink"}`}>{p.kind === "received" ? "+" : "−"} {aed(p.amount)}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
+      {finance && active && <Link href={`/accounts?tab=commissions&open=${deal.id}`} className={buttonClass("secondary")}>Invoice, payments and payouts in Accounts</Link>}
     </div>
   );
 
@@ -465,7 +354,7 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
     <>
       <Sheet open={open} onClose={onClose} large
         title={isNew ? "Record a deal" : deal ? <span className="flex items-center gap-2 flex-wrap">Deal #{deal.deal_no} <Badge tone={DEAL_TONE[deal.status]}>{DEAL_STATUS[deal.status]}</Badge></span> : "Deal"}
-        subheader={!showForm && deal ? <div className="px-5 pt-3"><Tabs value={tab} onChange={setTab} options={[{ value: "overview", label: "Overview" }, { value: "money", label: "Money" }, { value: "kyc", label: "KYC", n: kycOpen.length || undefined }]} /></div> : undefined}
+        subheader={!showForm && deal ? <div className="px-5 pt-3"><Tabs value={tab} onChange={setTab} options={[{ value: "overview", label: "Overview" }, { value: "kyc", label: "KYC", n: kycOpen.length || undefined }]} /></div> : undefined}
         footer={showForm ? <>
           <Button variant="ghost" onClick={isNew ? onClose : () => { setEditing(false); setErr(""); }}>Cancel</Button>
           <Button variant="primary" onClick={save} disabled={busy}>{busy && <Loader2 size={15} className="animate-spin" />}{isNew ? "Send for approval" : deal?.status === "rejected" ? "Save and send again" : "Save changes"}</Button>
@@ -478,7 +367,7 @@ export function DealSheet({ id, leadId, deals, onClose, onCreated }: { id: strin
           </>}
           {deal.status === "pending" && !approver && <Link href="/approvals" className={buttonClass("secondary")}>Waiting for approval</Link>}
         </> : undefined}>
-        {showForm ? form : !deal ? <div className="text-sm text-ink-3">This deal was not found, or you don&apos;t have access to it.</div> : tab === "overview" ? overview : tab === "money" ? moneyTab : kycTab}
+        {showForm ? form : !deal ? <div className="text-sm text-ink-3">This deal was not found, or you don&apos;t have access to it.</div> : tab === "overview" ? overview : kycTab}
       </Sheet>
       {confirmNode}
     </>
