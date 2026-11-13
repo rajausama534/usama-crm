@@ -50,7 +50,7 @@ function Leads() {
   const [source, setSource] = useState("");
   const [project, setProject] = useState("");
   const [followUp, setFollowUp] = useState("");
-  const [agent, setAgent] = useState("");
+  const [agent, setAgent] = useState(() => params.get("agent") || "");
   const [due, setDue] = useState<"" | "today" | "overdue">("");
   const [sort, setSort] = useState("lead_receive_date");
   const [dir, setDir] = useState<"asc" | "desc">("desc");

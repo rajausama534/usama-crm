@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Inbox, CalendarDays, Users2, Home, Megaphone, Handshake,
-  Landmark, BadgeCheck, ShieldCheck, Settings, MessageCircle, FileText, Building2, UserSearch, Map, BarChart3, Sparkles, ClipboardList, type LucideIcon,
+  Landmark, BadgeCheck, ShieldCheck, Settings, MessageCircle, FileText, Building2, UserSearch, Map, BarChart3, Sparkles, ClipboardList, Trophy, type LucideIcon,
 } from "lucide-react";
 import { canUseSales, type Me } from "@/lib/access";
 
@@ -31,6 +31,7 @@ export const NAV: NavSection[] = [
   {
     title: "Sales",
     items: [
+      { href: "/team", label: "Team performance", icon: Trophy, show: canUseSales },
       { href: "/leads", label: "Leads", icon: Users2, show: canUseSales },
       { href: "/owners", label: "Owners", icon: Home, show: canUseSales },
       { href: "/deals", label: "Deals", icon: Handshake, show: canUseSales },

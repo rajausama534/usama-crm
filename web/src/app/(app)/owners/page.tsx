@@ -8,6 +8,7 @@ import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { type Owner } from "@/lib/crm";
 import { useDebounced, useOwnerStatuses } from "@/lib/hooks";
+import { usePeople, isSalesPerson, type Person } from "@/lib/team";
 import { orSafe } from "@/components/shell/CommandPalette";
 import { Badge, Button, Card, Empty, FilterSelect, ListSkeleton, PageHeader, SearchBox, Sheet, StatusChip, StatusSelect, Textarea, cx } from "@/components/ui";
 import { CallButton, CopyButton, TemplateSheet, WaButton, useToast, useWaTemplate } from "@/components/ContactKit";
@@ -50,8 +51,12 @@ function Owners() {
 
   const [q, setQ] = useState("");
   const [unitNo, setUnitNo] = useState("");
-  const [community, setCommunity] = useState("");
-  const [cluster, setCluster] = useState("");
+  const [community, setCommunity] = useState(() => params.get("community") || "");
+  const [cluster, setCluster] = useState(() => params.get("cluster") || "");
+  const [agent, setAgent] = useState(() => params.get("agent") || "");
+  const people = usePeople();
+  const agents = (people.data || []).filter((p) => p.active && isSalesPerson(p) && (p.areas.length || p.email === agent));
+  const agentOr = agentFilter(agents.find((p) => p.email === agent));
   const [source, setSource] = useState("");
   const [status, setStatus] = useState("");
   const [sort, setSort] = useState("unit");
@@ -89,7 +94,7 @@ function Owners() {
     return { communities: sorted(cm), clusters: sorted(cl), sources: [...so].sort() };
   }, [options.data, community]);
 
-  const key = ["owners", term, unit, community, cluster, source, status, sort, dir, allRecords, page] as const;
+  const key = ["owners", term, unit, community, cluster, agentOr, source, status, sort, dir, allRecords, page] as const;
   const list = useQuery({
     queryKey: key,
     placeholderData: keepPreviousData,
@@ -104,6 +109,7 @@ function Owners() {
       if (unit) query = query.eq("unit", unit);
       if (community) query = query.eq("community", community);
       if (cluster) query = query.eq("cluster", cluster);
+      if (agentOr) query = query.or(agentOr);
       if (source) query = query.eq("data_source", source);
       if (status) query = query.eq("status", status);
       // One row per unit (owners.is_primary), as the old CRM; searching, a unit number or "every record" lists all.
@@ -153,6 +159,7 @@ function Owners() {
       let qq = db.from("owners").select(cols.join(",")).range(from, from + 999);
       if (community) qq = qq.eq("community", community);
       if (cluster) qq = qq.eq("cluster", cluster);
+      if (agentOr) qq = qq.or(agentOr);
       if (status) qq = qq.eq("status", status);
       if (source) qq = qq.eq("data_source", source);
       const { data, error } = await qq;
@@ -181,7 +188,7 @@ function Owners() {
   const toggle = (id: number) => setPicked((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const allOnPage = rows.length > 0 && rows.every((r) => picked.has(r.id));
   const canExport = me?.isAdmin || me?.permissions.has("export");
-  const anyFilter = q || unitNo || community || cluster || source || status || allRecords;
+  const anyFilter = q || unitNo || community || cluster || agent || source || status || allRecords;
 
   return (
     <div className="animate-in">
@@ -221,6 +228,12 @@ function Owners() {
           <option value="">All clusters</option>
           {clusters.map(([c, n]) => <option key={c} value={c}>{c} ({count(n)})</option>)}
         </FilterSelect>
+        {(me?.isAdmin || me?.role === "team_leader") && agents.length > 0 && (
+          <FilterSelect aria-label="Agent" value={agent} onChange={(e) => reset(() => setAgent(e.target.value))}>
+            <option value="">All agents</option>
+            {agents.map((p) => <option key={p.email} value={p.email}>{`${p.name}’s database`}</option>)}
+          </FilterSelect>
+        )}
         <input value={unitNo} onChange={(e) => reset(() => setUnitNo(e.target.value))} placeholder="Unit No." aria-label="Unit number"
           className={cx("field-sizing-content min-w-20 h-9 rounded-full border px-3.5 text-[13px] font-medium placeholder:text-ink-2 outline-none transition-colors focus:border-accent", unitNo ? "border-accent bg-accent-soft text-accent-text" : "border-line bg-surface text-ink-2 hover:border-line-strong")} />
         <FilterSelect aria-label="Source" value={source} onChange={(e) => reset(() => setSource(e.target.value))}>
@@ -233,7 +246,7 @@ function Owners() {
         </Button>
         <Button onClick={() => setColsOpen(true)} title="Manage columns"><Columns3 size={15} /> Columns</Button>
         {me?.isAdmin && <Button onClick={() => setStatusesOpen(true)} title="Manage owner statuses"><Tags size={15} /> Statuses</Button>}
-        {anyFilter && <Button variant="ghost" onClick={() => reset(() => { setQ(""); setUnitNo(""); setCommunity(""); setCluster(""); setSource(""); setStatus(""); setAllRecords(false); })}><RotateCcw size={14} /> Reset</Button>}
+        {anyFilter && <Button variant="ghost" onClick={() => reset(() => { setQ(""); setUnitNo(""); setCommunity(""); setCluster(""); setAgent(""); setSource(""); setStatus(""); setAllRecords(false); })}><RotateCcw size={14} /> Reset</Button>}
       </div>
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
         {ownerStatuses.map((s) => <StatusChip key={s} status={s} label={s === "Invalid Number" ? "Invalid" : s} active={status === s} onClick={() => reset(() => setStatus(status === s ? "" : s))} />)}
@@ -450,4 +463,13 @@ function RemarkSheet({ row, onClose, onSaved }: { row: Row | null; onClose: () =
       )}
     </Sheet>
   );
+}
+
+/** PostgREST "or" filter for the owners in one agent's database: their communities, clusters, or records given to them directly. */
+function agentFilter(p: Person | undefined): string {
+  if (!p) return "";
+  const q = (v: string) => `"${v.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  const parts = [`assigned_to.ilike.${q(p.email)}`];
+  if (p.areas.length) parts.push(`community.in.(${p.areas.map(q).join(",")})`, `cluster.in.(${p.areas.map(q).join(",")})`);
+  return parts.join(",");
 }
