@@ -13,6 +13,7 @@ import { CommandPalette } from "./CommandPalette";
 import { NotificationBell } from "./NotificationBell";
 import { Reminders } from "./Reminders";
 import { DxbImport } from "./DxbImport";
+import { LogoMark } from "@/components/shell/Logo";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { ready, session, me, blocked, signOut } = useAuth();
@@ -41,7 +42,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sidebar = (
     <nav className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 h-16 shrink-0">
-        <div className="text-[19px] font-semibold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
+        <LogoMark size={28} />
+          <div className="text-[19px] font-semibold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-1 space-y-5">
         {visibleNav(me).map((section, i) => (

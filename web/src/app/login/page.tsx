@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { db } from "@/lib/supabase";
 import { useAuth } from "@/components/Providers";
 import { Button, Field, Input } from "@/components/ui";
+import { LogoMark } from "@/components/shell/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function LoginPage() {
     <main className="login-frame min-h-dvh grid place-items-center px-4 py-10">
       <div className="w-full max-w-[400px] animate-in bg-surface border border-line rounded-[26px] shadow-pop p-7 sm:p-8">
         <div className="flex items-center gap-2.5 mb-7">
+          <LogoMark size={32} />
           <div className="text-[22px] font-semibold tracking-tight"><span className="text-ink">Usama</span> <span className="text-accent">CRM</span></div>
         </div>
 
